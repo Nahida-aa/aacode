@@ -29,11 +29,6 @@ const config = defineConfig({
 			// 	},
 			// },
 			preset: 'vercel',
-			vercel: {
-				functions: {
-					runtime: 'bun1.x',
-				},
-			},
 		}),
 		tailwindcss(),
 		tanstackStart(),
