@@ -1,8 +1,9 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { queryOnce, useLiveInfiniteQuery } from '@tanstack/react-db';
 import { ClientOnly, createFileRoute } from '@tanstack/react-router';
 import type { z } from 'better-auth';
-import { Check, HistoryIcon, PlusIcon, TimerIcon } from 'lucide-react';
-import { useLocalStorage } from 'usehooks-ts';
+import { Check, HistoryIcon, PlusIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useIntersectionObserver } from 'usehooks-ts';
 import { Button } from '#/components/ui/button.tsx';
 import { useAppForm } from '#/components/uix/form/useAppForm.tsx';
 import { Description } from '#/components/uix/label.tsx';
@@ -12,7 +13,13 @@ import { formatToNow } from '#/lib/utils.timeFormat.ts';
 
 export const Route = createFileRoute('/demo/todo')({
 	loader: async () => {
-		await Promise.all([todoCollection.preload()]);
+		await queryOnce((q) =>
+			q
+				.from({ todo: todoCollection })
+				.orderBy(({ todo }) => todo.updated_at, 'desc')
+				.orderBy(({ todo }) => todo.id, 'desc')
+				.limit(10),
+		);
 
 		return null;
 	},
@@ -30,21 +37,46 @@ function RouteComponent() {
 }
 
 function TodoListClient() {
-	const { data: todos } = useLiveQuery((q) =>
-		q
-			.from({ todo: todoCollection })
-			.orderBy(({ todo }) => todo.updated_at, 'desc'),
+	const { ref: sentinelRef, isIntersecting } = useIntersectionObserver({
+		threshold: 0,
+		rootMargin: '300px 0px',
+	});
+	const {
+		data: todos,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage,
+	} = useLiveInfiniteQuery(
+		(q) =>
+			q
+				.from({ todo: todoCollection })
+				.orderBy(({ todo }) => todo.updated_at, 'desc')
+				.orderBy(({ todo }) => todo.id, 'desc'),
+		{ pageSize: 10 },
 	);
 	console.log({
 		isDate: todos?.[0]?.updated_at instanceof Date,
 		length: todos?.length,
 	});
+	useEffect(() => {
+		if (!isIntersecting) return;
+		if (!hasNextPage || isFetchingNextPage) return;
+		void fetchNextPage();
+	}, [fetchNextPage, hasNextPage, isFetchingNextPage, isIntersecting]);
+
 	return (
 		<div className="p-2 flex flex-col gap-2">
 			<AddTodoCard />
 			{todos?.map((todo) => (
 				<TodoCard key={todo.id} todo={todo} />
 			))}
+			<div ref={sentinelRef} className="h-1" />
+			{isFetchingNextPage ? (
+				<div className="text-sm text-muted-foreground">Loading more...</div>
+			) : null}
+			{!hasNextPage ? (
+				<div className="text-sm text-muted-foreground">No more todos</div>
+			) : null}
 		</div>
 	);
 }
@@ -94,23 +126,34 @@ function TodoCard({ todo }: { todo: Todo }) {
 }
 function AddTodoCard() {
 	type FormValues = z.input<typeof addTodoSchema>;
-	const [value, setValue, removeValue] = useLocalStorage(
-		'AddTodoCard',
-		{} as FormValues,
-	);
+	const [formKey, setFormKey] = useState(0);
+	const initialValuesRef = useRef<FormValues | null>(null);
+	if (initialValuesRef.current === null) {
+		try {
+			const raw = window.localStorage.getItem('AddTodoCard');
+			initialValuesRef.current = raw
+				? (JSON.parse(raw) as FormValues)
+				: ({} as FormValues);
+		} catch {
+			initialValuesRef.current = {} as FormValues;
+		}
+	}
 	const form = useAppForm({
 		formId: 'AddTodoCard',
-		defaultValues: value,
+		defaultValues: initialValuesRef.current,
 		validators: {
 			onChange: addTodoSchema,
 		},
 		onSubmit: async ({ value, formApi }) => {
-			const tx = await todoCollection.insert(value);
+			const tx = todoCollection.insert(value);
+			await tx.isPersisted.promise;
 			formApi.reset();
+			window.localStorage.removeItem('AddTodoCard');
+			setFormKey((prev) => prev + 1);
 		},
 	});
 	return (
-		<form.AppForm>
+		<form.AppForm key={formKey}>
 			<form.Form
 				onSubmit={form.handleSubmit}
 				className="flex flex-col gap-3 bg-card rounded-md p-2"

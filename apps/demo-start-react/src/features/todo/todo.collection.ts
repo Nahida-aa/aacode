@@ -1,5 +1,5 @@
 import { electricCollectionOptions } from '@tanstack/electric-db-collection';
-import { createCollection } from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 import { isServer } from '@tanstack/react-query';
 import { createSelectSchema } from 'drizzle-zod';
 import { nanoid } from 'nanoid';
@@ -10,11 +10,12 @@ import { todo } from '#/features/todo/todo.table.ts';
 import { orpc } from '#/orpc._client.ts';
 
 // 在文件顶部定义一个全局队列
-const mutationQueue = Promise.resolve();
+// const mutationQueue = Promise.resolve();
 
 export const todoCollection = createCollection(
 	electricCollectionOptions({
 		id: 'todo',
+		syncMode: 'progressive',
 		schema: selectTodoSchema.extend({
 			id: selectTodoSchema.shape.id.default(nanoid),
 			created_at: selectTodoSchema.shape.created_at.default(() => new Date()),
@@ -82,3 +83,5 @@ export const todoCollection = createCollection(
 		// }
 	}),
 );
+
+todoCollection.createIndex((row) => row.updated_at, { indexType: BasicIndex });
