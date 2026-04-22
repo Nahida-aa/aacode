@@ -61,7 +61,7 @@ const listMessages = (request: Request) => {
 	let cleanup: (() => void) | undefined;
 	// sse 实时聊天原理, 查询 api 订阅数据库变化, 数据库变化时推送消息给客户端
 	const stream = new ReadableStream({
-		start(controller) {
+		async start(controller) {
 			// 辅助函数：安全地入队字节流
 			const push = (data: any) => {
 				const jsonString = JSON.stringify(data) + '\n';
@@ -82,6 +82,7 @@ const listMessages = (request: Request) => {
 					try {
 						for (const change of changes) {
 							if (change.type === 'insert') {
+								console.log('New message:', change.value);
 								push(change.value);
 							}
 						}
@@ -90,13 +91,18 @@ const listMessages = (request: Request) => {
 						isAlive = false;
 					}
 				});
+				// 設置 15 分鐘主動關閉
+				// await new Promise((r) => setTimeout(r, 15 * 60 * 1000));
+				// maxDurationTimeout = setTimeout(() => cleanup?.(), 15 * 60 * 1000);
 				// 3. 定義明確的清理邏輯
 				cleanup = () => {
+					// clearTimeout(maxDurationTimeout);
 					subscribe.unsubscribe();
 					try {
 						controller.close(); // 這裡的 close 是在「出事」或「主動斷開」時才調用
 					} catch (e) {}
 				};
+
 				// 3. ⚠️ 重要：当客户端断开连接时，必须取消订阅
 				request.signal.addEventListener('abort', () => {
 					isAlive = false;
