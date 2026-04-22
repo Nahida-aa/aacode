@@ -64,8 +64,10 @@ export const pgupdated_at = () =>
 
 export const nanoidWithTimestamps = {
 	id: pgNanoid(), // `${nanoid()}`
-	created_at: timestamp('created_at').defaultNow().notNull(),
-	updated_at: timestamp('updated_at')
+	created_at: timestamp('created_at', { withTimezone: true })
+		.defaultNow()
+		.notNull(),
+	updated_at: timestamp('updated_at', { withTimezone: true })
 		.$onUpdate(() => new Date())
 		.notNull(),
 };
