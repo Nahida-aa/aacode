@@ -12,26 +12,29 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoTableRouteImport } from './routes/demo/table'
-import { Route as DemoStoreRouteImport } from './routes/demo/store'
-import { Route as DemoOrpcTodoRouteImport } from './routes/demo/orpc-todo'
+import { Route as IntegrationTanstackQueryRouteImport } from './routes/integration/tanstack-query'
+import { Route as IntegrationTableRouteImport } from './routes/integration/table'
+import { Route as IntegrationStoreRouteImport } from './routes/integration/store'
+import { Route as IntegrationDrizzleRouteImport } from './routes/integration/drizzle'
+import { Route as DemoTodoRouteImport } from './routes/demo/todo'
 import { Route as DemoMcpTodosRouteImport } from './routes/demo/mcp-todos'
-import { Route as DemoI18nRouteImport } from './routes/demo.i18n'
-import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
-import { Route as DemoDbChatApiRouteImport } from './routes/demo/db-chat-api'
-import { Route as DemoDbChatRouteImport } from './routes/demo/db-chat'
-import { Route as DemoBetterAuthRouteImport } from './routes/demo/better-auth'
 import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structured'
 import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
 import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
-import { Route as ApiSplatRouteImport } from './routes/api.$'
+import { Route as ApiTodoRouteImport } from './routes/api/todo'
+import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as IntegrationBetterAuthIndexRouteImport } from './routes/integration/better-auth/index'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
+import { Route as UiActionButtonRouteImport } from './routes/ui/action/button'
+import { Route as IntegrationTanstackDbChatApiRouteImport } from './routes/integration/tanstack-db/chat-api'
+import { Route as IntegrationTanstackDbChatRouteImport } from './routes/integration/tanstack-db/chat'
+import { Route as IntegrationOrpcTodoRouteImport } from './routes/integration/orpc/todo'
+import { Route as IntegrationI18nParaglideRouteImport } from './routes/integration/i18n/paraglide'
+import { Route as IntegrationFormSimpleRouteImport } from './routes/integration/form/simple'
+import { Route as IntegrationFormAddressRouteImport } from './routes/integration/form/address'
 import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
-import { Route as DemoFormSimpleRouteImport } from './routes/demo/form.simple'
-import { Route as DemoFormAddressRouteImport } from './routes/demo/form.address'
 import { Route as DemoApiMcpTodosRouteImport } from './routes/demo/api.mcp-todos'
-import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
+import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
 import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
@@ -54,54 +57,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
+const IntegrationTanstackQueryRoute =
+  IntegrationTanstackQueryRouteImport.update({
+    id: '/integration/tanstack-query',
+    path: '/integration/tanstack-query',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const IntegrationTableRoute = IntegrationTableRouteImport.update({
+  id: '/integration/table',
+  path: '/integration/table',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTableRoute = DemoTableRouteImport.update({
-  id: '/demo/table',
-  path: '/demo/table',
+const IntegrationStoreRoute = IntegrationStoreRouteImport.update({
+  id: '/integration/store',
+  path: '/integration/store',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoStoreRoute = DemoStoreRouteImport.update({
-  id: '/demo/store',
-  path: '/demo/store',
+const IntegrationDrizzleRoute = IntegrationDrizzleRouteImport.update({
+  id: '/integration/drizzle',
+  path: '/integration/drizzle',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoOrpcTodoRoute = DemoOrpcTodoRouteImport.update({
-  id: '/demo/orpc-todo',
-  path: '/demo/orpc-todo',
+const DemoTodoRoute = DemoTodoRouteImport.update({
+  id: '/demo/todo',
+  path: '/demo/todo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoMcpTodosRoute = DemoMcpTodosRouteImport.update({
   id: '/demo/mcp-todos',
   path: '/demo/mcp-todos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoI18nRoute = DemoI18nRouteImport.update({
-  id: '/demo/i18n',
-  path: '/demo/i18n',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
-  id: '/demo/drizzle',
-  path: '/demo/drizzle',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDbChatApiRoute = DemoDbChatApiRouteImport.update({
-  id: '/demo/db-chat-api',
-  path: '/demo/db-chat-api',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDbChatRoute = DemoDbChatRouteImport.update({
-  id: '/demo/db-chat',
-  path: '/demo/db-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoBetterAuthRoute = DemoBetterAuthRouteImport.update({
-  id: '/demo/better-auth',
-  path: '/demo/better-auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
@@ -119,29 +103,68 @@ const DemoAiChatRoute = DemoAiChatRouteImport.update({
   path: '/demo/ai-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTodoRoute = ApiTodoRouteImport.update({
+  id: '/api/todo',
+  path: '/api/todo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationBetterAuthIndexRoute =
+  IntegrationBetterAuthIndexRouteImport.update({
+    id: '/integration/better-auth/',
+    path: '/integration/better-auth/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
   id: '/demo/guitars/',
   path: '/demo/guitars/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UiActionButtonRoute = UiActionButtonRouteImport.update({
+  id: '/ui/action/button',
+  path: '/ui/action/button',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationTanstackDbChatApiRoute =
+  IntegrationTanstackDbChatApiRouteImport.update({
+    id: '/integration/tanstack-db/chat-api',
+    path: '/integration/tanstack-db/chat-api',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const IntegrationTanstackDbChatRoute =
+  IntegrationTanstackDbChatRouteImport.update({
+    id: '/integration/tanstack-db/chat',
+    path: '/integration/tanstack-db/chat',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const IntegrationOrpcTodoRoute = IntegrationOrpcTodoRouteImport.update({
+  id: '/integration/orpc/todo',
+  path: '/integration/orpc/todo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationI18nParaglideRoute =
+  IntegrationI18nParaglideRouteImport.update({
+    id: '/integration/i18n/paraglide',
+    path: '/integration/i18n/paraglide',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const IntegrationFormSimpleRoute = IntegrationFormSimpleRouteImport.update({
+  id: '/integration/form/simple',
+  path: '/integration/form/simple',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationFormAddressRoute = IntegrationFormAddressRouteImport.update({
+  id: '/integration/form/address',
+  path: '/integration/form/address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
   id: '/demo/guitars/$guitarId',
   path: '/demo/guitars/$guitarId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormSimpleRoute = DemoFormSimpleRouteImport.update({
-  id: '/demo/form/simple',
-  path: '/demo/form/simple',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoFormAddressRoute = DemoFormAddressRouteImport.update({
-  id: '/demo/form/address',
-  path: '/demo/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoApiMcpTodosRoute = DemoApiMcpTodosRouteImport.update({
@@ -190,26 +213,29 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/todo': typeof ApiTodoRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
   '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/better-auth': typeof DemoBetterAuthRoute
-  '/demo/db-chat': typeof DemoDbChatRoute
-  '/demo/db-chat-api': typeof DemoDbChatApiRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
-  '/demo/i18n': typeof DemoI18nRoute
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
-  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/demo/todo': typeof DemoTodoRoute
+  '/integration/drizzle': typeof IntegrationDrizzleRoute
+  '/integration/store': typeof IntegrationStoreRoute
+  '/integration/table': typeof IntegrationTableRoute
+  '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/api/mcp-todos': typeof DemoApiMcpTodosRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/integration/form/address': typeof IntegrationFormAddressRoute
+  '/integration/form/simple': typeof IntegrationFormSimpleRoute
+  '/integration/i18n/paraglide': typeof IntegrationI18nParaglideRoute
+  '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
+  '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
+  '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
+  '/ui/action/button': typeof UiActionButtonRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
   '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
@@ -221,26 +247,29 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/todo': typeof ApiTodoRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
   '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/better-auth': typeof DemoBetterAuthRoute
-  '/demo/db-chat': typeof DemoDbChatRoute
-  '/demo/db-chat-api': typeof DemoDbChatApiRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
-  '/demo/i18n': typeof DemoI18nRoute
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
-  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/demo/todo': typeof DemoTodoRoute
+  '/integration/drizzle': typeof IntegrationDrizzleRoute
+  '/integration/store': typeof IntegrationStoreRoute
+  '/integration/table': typeof IntegrationTableRoute
+  '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/api/mcp-todos': typeof DemoApiMcpTodosRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/integration/form/address': typeof IntegrationFormAddressRoute
+  '/integration/form/simple': typeof IntegrationFormSimpleRoute
+  '/integration/i18n/paraglide': typeof IntegrationI18nParaglideRoute
+  '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
+  '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
+  '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
+  '/ui/action/button': typeof UiActionButtonRoute
   '/demo/guitars': typeof DemoGuitarsIndexRoute
+  '/integration/better-auth': typeof IntegrationBetterAuthIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
   '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
@@ -253,26 +282,29 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/todo': typeof ApiTodoRoute
   '/demo/ai-chat': typeof DemoAiChatRoute
   '/demo/ai-image': typeof DemoAiImageRoute
   '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/better-auth': typeof DemoBetterAuthRoute
-  '/demo/db-chat': typeof DemoDbChatRoute
-  '/demo/db-chat-api': typeof DemoDbChatApiRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
-  '/demo/i18n': typeof DemoI18nRoute
   '/demo/mcp-todos': typeof DemoMcpTodosRoute
-  '/demo/orpc-todo': typeof DemoOrpcTodoRoute
-  '/demo/store': typeof DemoStoreRoute
-  '/demo/table': typeof DemoTableRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/demo/todo': typeof DemoTodoRoute
+  '/integration/drizzle': typeof IntegrationDrizzleRoute
+  '/integration/store': typeof IntegrationStoreRoute
+  '/integration/table': typeof IntegrationTableRoute
+  '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/demo/api/mcp-todos': typeof DemoApiMcpTodosRoute
-  '/demo/form/address': typeof DemoFormAddressRoute
-  '/demo/form/simple': typeof DemoFormSimpleRoute
   '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/integration/form/address': typeof IntegrationFormAddressRoute
+  '/integration/form/simple': typeof IntegrationFormSimpleRoute
+  '/integration/i18n/paraglide': typeof IntegrationI18nParaglideRoute
+  '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
+  '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
+  '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
+  '/ui/action/button': typeof UiActionButtonRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/demo/api/ai/chat': typeof DemoApiAiChatRoute
   '/demo/api/ai/image': typeof DemoApiAiImageRoute
   '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
@@ -286,26 +318,29 @@ export interface FileRouteTypes {
     | '/about'
     | '/mcp'
     | '/api/$'
+    | '/api/todo'
     | '/demo/ai-chat'
     | '/demo/ai-image'
     | '/demo/ai-structured'
-    | '/demo/better-auth'
-    | '/demo/db-chat'
-    | '/demo/db-chat-api'
-    | '/demo/drizzle'
-    | '/demo/i18n'
     | '/demo/mcp-todos'
-    | '/demo/orpc-todo'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
+    | '/demo/todo'
+    | '/integration/drizzle'
+    | '/integration/store'
+    | '/integration/table'
+    | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/demo/api/mcp-todos'
-    | '/demo/form/address'
-    | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
+    | '/integration/form/address'
+    | '/integration/form/simple'
+    | '/integration/i18n/paraglide'
+    | '/integration/orpc/todo'
+    | '/integration/tanstack-db/chat'
+    | '/integration/tanstack-db/chat-api'
+    | '/ui/action/button'
     | '/demo/guitars/'
+    | '/integration/better-auth/'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
     | '/demo/api/ai/structured'
@@ -317,26 +352,29 @@ export interface FileRouteTypes {
     | '/about'
     | '/mcp'
     | '/api/$'
+    | '/api/todo'
     | '/demo/ai-chat'
     | '/demo/ai-image'
     | '/demo/ai-structured'
-    | '/demo/better-auth'
-    | '/demo/db-chat'
-    | '/demo/db-chat-api'
-    | '/demo/drizzle'
-    | '/demo/i18n'
     | '/demo/mcp-todos'
-    | '/demo/orpc-todo'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
+    | '/demo/todo'
+    | '/integration/drizzle'
+    | '/integration/store'
+    | '/integration/table'
+    | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/demo/api/mcp-todos'
-    | '/demo/form/address'
-    | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
+    | '/integration/form/address'
+    | '/integration/form/simple'
+    | '/integration/i18n/paraglide'
+    | '/integration/orpc/todo'
+    | '/integration/tanstack-db/chat'
+    | '/integration/tanstack-db/chat-api'
+    | '/ui/action/button'
     | '/demo/guitars'
+    | '/integration/better-auth'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
     | '/demo/api/ai/structured'
@@ -348,26 +386,29 @@ export interface FileRouteTypes {
     | '/about'
     | '/mcp'
     | '/api/$'
+    | '/api/todo'
     | '/demo/ai-chat'
     | '/demo/ai-image'
     | '/demo/ai-structured'
-    | '/demo/better-auth'
-    | '/demo/db-chat'
-    | '/demo/db-chat-api'
-    | '/demo/drizzle'
-    | '/demo/i18n'
     | '/demo/mcp-todos'
-    | '/demo/orpc-todo'
-    | '/demo/store'
-    | '/demo/table'
-    | '/demo/tanstack-query'
+    | '/demo/todo'
+    | '/integration/drizzle'
+    | '/integration/store'
+    | '/integration/table'
+    | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/demo/api/mcp-todos'
-    | '/demo/form/address'
-    | '/demo/form/simple'
     | '/demo/guitars/$guitarId'
+    | '/integration/form/address'
+    | '/integration/form/simple'
+    | '/integration/i18n/paraglide'
+    | '/integration/orpc/todo'
+    | '/integration/tanstack-db/chat'
+    | '/integration/tanstack-db/chat-api'
+    | '/ui/action/button'
     | '/demo/guitars/'
+    | '/integration/better-auth/'
     | '/demo/api/ai/chat'
     | '/demo/api/ai/image'
     | '/demo/api/ai/structured'
@@ -380,26 +421,29 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   McpRoute: typeof McpRoute
   ApiSplatRoute: typeof ApiSplatRoute
+  ApiTodoRoute: typeof ApiTodoRoute
   DemoAiChatRoute: typeof DemoAiChatRoute
   DemoAiImageRoute: typeof DemoAiImageRoute
   DemoAiStructuredRoute: typeof DemoAiStructuredRoute
-  DemoBetterAuthRoute: typeof DemoBetterAuthRoute
-  DemoDbChatRoute: typeof DemoDbChatRoute
-  DemoDbChatApiRoute: typeof DemoDbChatApiRoute
-  DemoDrizzleRoute: typeof DemoDrizzleRoute
-  DemoI18nRoute: typeof DemoI18nRoute
   DemoMcpTodosRoute: typeof DemoMcpTodosRoute
-  DemoOrpcTodoRoute: typeof DemoOrpcTodoRoute
-  DemoStoreRoute: typeof DemoStoreRoute
-  DemoTableRoute: typeof DemoTableRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  DemoTodoRoute: typeof DemoTodoRoute
+  IntegrationDrizzleRoute: typeof IntegrationDrizzleRoute
+  IntegrationStoreRoute: typeof IntegrationStoreRoute
+  IntegrationTableRoute: typeof IntegrationTableRoute
+  IntegrationTanstackQueryRoute: typeof IntegrationTanstackQueryRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
   DemoApiMcpTodosRoute: typeof DemoApiMcpTodosRoute
-  DemoFormAddressRoute: typeof DemoFormAddressRoute
-  DemoFormSimpleRoute: typeof DemoFormSimpleRoute
   DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
+  IntegrationFormAddressRoute: typeof IntegrationFormAddressRoute
+  IntegrationFormSimpleRoute: typeof IntegrationFormSimpleRoute
+  IntegrationI18nParaglideRoute: typeof IntegrationI18nParaglideRoute
+  IntegrationOrpcTodoRoute: typeof IntegrationOrpcTodoRoute
+  IntegrationTanstackDbChatRoute: typeof IntegrationTanstackDbChatRoute
+  IntegrationTanstackDbChatApiRoute: typeof IntegrationTanstackDbChatApiRoute
+  UiActionButtonRoute: typeof UiActionButtonRoute
   DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
+  IntegrationBetterAuthIndexRoute: typeof IntegrationBetterAuthIndexRoute
   DemoApiAiChatRoute: typeof DemoApiAiChatRoute
   DemoApiAiImageRoute: typeof DemoApiAiImageRoute
   DemoApiAiStructuredRoute: typeof DemoApiAiStructuredRoute
@@ -430,32 +474,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
+    '/integration/tanstack-query': {
+      id: '/integration/tanstack-query'
+      path: '/integration/tanstack-query'
+      fullPath: '/integration/tanstack-query'
+      preLoaderRoute: typeof IntegrationTanstackQueryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/table': {
-      id: '/demo/table'
-      path: '/demo/table'
-      fullPath: '/demo/table'
-      preLoaderRoute: typeof DemoTableRouteImport
+    '/integration/table': {
+      id: '/integration/table'
+      path: '/integration/table'
+      fullPath: '/integration/table'
+      preLoaderRoute: typeof IntegrationTableRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/store': {
-      id: '/demo/store'
-      path: '/demo/store'
-      fullPath: '/demo/store'
-      preLoaderRoute: typeof DemoStoreRouteImport
+    '/integration/store': {
+      id: '/integration/store'
+      path: '/integration/store'
+      fullPath: '/integration/store'
+      preLoaderRoute: typeof IntegrationStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/orpc-todo': {
-      id: '/demo/orpc-todo'
-      path: '/demo/orpc-todo'
-      fullPath: '/demo/orpc-todo'
-      preLoaderRoute: typeof DemoOrpcTodoRouteImport
+    '/integration/drizzle': {
+      id: '/integration/drizzle'
+      path: '/integration/drizzle'
+      fullPath: '/integration/drizzle'
+      preLoaderRoute: typeof IntegrationDrizzleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/todo': {
+      id: '/demo/todo'
+      path: '/demo/todo'
+      fullPath: '/demo/todo'
+      preLoaderRoute: typeof DemoTodoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/mcp-todos': {
@@ -463,41 +514,6 @@ declare module '@tanstack/react-router' {
       path: '/demo/mcp-todos'
       fullPath: '/demo/mcp-todos'
       preLoaderRoute: typeof DemoMcpTodosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/i18n': {
-      id: '/demo/i18n'
-      path: '/demo/i18n'
-      fullPath: '/demo/i18n'
-      preLoaderRoute: typeof DemoI18nRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/drizzle': {
-      id: '/demo/drizzle'
-      path: '/demo/drizzle'
-      fullPath: '/demo/drizzle'
-      preLoaderRoute: typeof DemoDrizzleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/db-chat-api': {
-      id: '/demo/db-chat-api'
-      path: '/demo/db-chat-api'
-      fullPath: '/demo/db-chat-api'
-      preLoaderRoute: typeof DemoDbChatApiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/db-chat': {
-      id: '/demo/db-chat'
-      path: '/demo/db-chat'
-      fullPath: '/demo/db-chat'
-      preLoaderRoute: typeof DemoDbChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/better-auth': {
-      id: '/demo/better-auth'
-      path: '/demo/better-auth'
-      fullPath: '/demo/better-auth'
-      preLoaderRoute: typeof DemoBetterAuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/ai-structured': {
@@ -521,11 +537,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoAiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/todo': {
+      id: '/api/todo'
+      path: '/api/todo'
+      fullPath: '/api/todo'
+      preLoaderRoute: typeof ApiTodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$': {
       id: '/api/$'
       path: '/api/$'
       fullPath: '/api/$'
       preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/better-auth/': {
+      id: '/integration/better-auth/'
+      path: '/integration/better-auth'
+      fullPath: '/integration/better-auth/'
+      preLoaderRoute: typeof IntegrationBetterAuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/guitars/': {
@@ -535,25 +565,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoGuitarsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ui/action/button': {
+      id: '/ui/action/button'
+      path: '/ui/action/button'
+      fullPath: '/ui/action/button'
+      preLoaderRoute: typeof UiActionButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/tanstack-db/chat-api': {
+      id: '/integration/tanstack-db/chat-api'
+      path: '/integration/tanstack-db/chat-api'
+      fullPath: '/integration/tanstack-db/chat-api'
+      preLoaderRoute: typeof IntegrationTanstackDbChatApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/tanstack-db/chat': {
+      id: '/integration/tanstack-db/chat'
+      path: '/integration/tanstack-db/chat'
+      fullPath: '/integration/tanstack-db/chat'
+      preLoaderRoute: typeof IntegrationTanstackDbChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/orpc/todo': {
+      id: '/integration/orpc/todo'
+      path: '/integration/orpc/todo'
+      fullPath: '/integration/orpc/todo'
+      preLoaderRoute: typeof IntegrationOrpcTodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/i18n/paraglide': {
+      id: '/integration/i18n/paraglide'
+      path: '/integration/i18n/paraglide'
+      fullPath: '/integration/i18n/paraglide'
+      preLoaderRoute: typeof IntegrationI18nParaglideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/form/simple': {
+      id: '/integration/form/simple'
+      path: '/integration/form/simple'
+      fullPath: '/integration/form/simple'
+      preLoaderRoute: typeof IntegrationFormSimpleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/form/address': {
+      id: '/integration/form/address'
+      path: '/integration/form/address'
+      fullPath: '/integration/form/address'
+      preLoaderRoute: typeof IntegrationFormAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/guitars/$guitarId': {
       id: '/demo/guitars/$guitarId'
       path: '/demo/guitars/$guitarId'
       fullPath: '/demo/guitars/$guitarId'
       preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/simple': {
-      id: '/demo/form/simple'
-      path: '/demo/form/simple'
-      fullPath: '/demo/form/simple'
-      preLoaderRoute: typeof DemoFormSimpleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/form/address': {
-      id: '/demo/form/address'
-      path: '/demo/form/address'
-      fullPath: '/demo/form/address'
-      preLoaderRoute: typeof DemoFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/api/mcp-todos': {
@@ -620,26 +685,29 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   McpRoute: McpRoute,
   ApiSplatRoute: ApiSplatRoute,
+  ApiTodoRoute: ApiTodoRoute,
   DemoAiChatRoute: DemoAiChatRoute,
   DemoAiImageRoute: DemoAiImageRoute,
   DemoAiStructuredRoute: DemoAiStructuredRoute,
-  DemoBetterAuthRoute: DemoBetterAuthRoute,
-  DemoDbChatRoute: DemoDbChatRoute,
-  DemoDbChatApiRoute: DemoDbChatApiRoute,
-  DemoDrizzleRoute: DemoDrizzleRoute,
-  DemoI18nRoute: DemoI18nRoute,
   DemoMcpTodosRoute: DemoMcpTodosRoute,
-  DemoOrpcTodoRoute: DemoOrpcTodoRoute,
-  DemoStoreRoute: DemoStoreRoute,
-  DemoTableRoute: DemoTableRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  DemoTodoRoute: DemoTodoRoute,
+  IntegrationDrizzleRoute: IntegrationDrizzleRoute,
+  IntegrationStoreRoute: IntegrationStoreRoute,
+  IntegrationTableRoute: IntegrationTableRoute,
+  IntegrationTanstackQueryRoute: IntegrationTanstackQueryRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
   DemoApiMcpTodosRoute: DemoApiMcpTodosRoute,
-  DemoFormAddressRoute: DemoFormAddressRoute,
-  DemoFormSimpleRoute: DemoFormSimpleRoute,
   DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,
+  IntegrationFormAddressRoute: IntegrationFormAddressRoute,
+  IntegrationFormSimpleRoute: IntegrationFormSimpleRoute,
+  IntegrationI18nParaglideRoute: IntegrationI18nParaglideRoute,
+  IntegrationOrpcTodoRoute: IntegrationOrpcTodoRoute,
+  IntegrationTanstackDbChatRoute: IntegrationTanstackDbChatRoute,
+  IntegrationTanstackDbChatApiRoute: IntegrationTanstackDbChatApiRoute,
+  UiActionButtonRoute: UiActionButtonRoute,
   DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
+  IntegrationBetterAuthIndexRoute: IntegrationBetterAuthIndexRoute,
   DemoApiAiChatRoute: DemoApiAiChatRoute,
   DemoApiAiImageRoute: DemoApiAiImageRoute,
   DemoApiAiStructuredRoute: DemoApiAiStructuredRoute,

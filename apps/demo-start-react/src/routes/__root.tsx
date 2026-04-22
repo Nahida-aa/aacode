@@ -1,22 +1,25 @@
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import {
 	createRootRouteWithContext,
 	HeadContent,
 	Scripts,
+	useLocation,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { createServerFn } from '@tanstack/react-start';
 import { getCookie } from '@tanstack/react-start/server';
 import { DemoHeader } from '#/components/app/Header.tsx';
 import { DemoSidebar } from '#/components/app/sidebar.tsx';
+import { ThemeProvider } from '#/components/app/theme-provider.tsx';
 import {
 	SIDEBAR_COOKIE_NAME,
 	SidebarProvider,
 } from '#/components/ui/sidebar.tsx';
+import { scrollbarDefault } from '#/css.ts';
 import { getLocale } from '#/paraglide/runtime';
 import { DemoFooter } from '../components/app/Footer';
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
 import StoreDevtools from '../lib/demo-store-devtools';
 import appCss from '../styles.css?url';
 
@@ -67,24 +70,27 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const { sidebarOpen } = Route.useLoaderData();
+	const pathname = useLocation({ select: (loc) => loc.pathname });
 	return (
 		<html lang={getLocale()} suppressHydrationWarning>
 			<head>
 				<script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
 				<HeadContent />
 			</head>
-			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
-				<SidebarProvider defaultOpen={sidebarOpen}>
-					<DemoSidebar />
-					<section className="flex h-screen max-h-screen flex-col overflow-hidden w-full">
-						<DemoHeader />
+			<body className="font-sans antialiased wrap-anywhere h-svh overflow-hidden selection:bg-[rgba(79,184,178,0.24)]">
+				<ThemeProvider>
+					<SidebarProvider defaultOpen={sidebarOpen}>
+						<DemoSidebar />
+						<div className="flex-1 flex h-svh max-h-svh min-h-svh flex-col overflow-hidden ">
+							<DemoHeader />
 
-						<div className="flex-1 overflow-y-auto ">
-							{children}
-							<DemoFooter />
+							<div className={`flex-1 overflow-y-auto ${scrollbarDefault}`}>
+								{children}
+								{pathname === '/' && <DemoFooter />}
+							</div>
 						</div>
-					</section>
-				</SidebarProvider>
+					</SidebarProvider>
+				</ThemeProvider>
 				<TanStackDevtools
 					config={{
 						position: 'bottom-right',
@@ -95,7 +101,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							render: <TanStackRouterDevtoolsPanel />,
 						},
 						StoreDevtools,
-						TanStackQueryDevtools,
+						{
+							name: 'Tanstack Query',
+							render: <ReactQueryDevtoolsPanel />,
+						},
 					]}
 				/>
 				<Scripts />

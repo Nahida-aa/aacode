@@ -5,8 +5,8 @@ import {
 	type RegisteredRouter,
 } from '@tanstack/react-router';
 import { ChevronRight, FileIcon, Folder } from 'lucide-react';
+import ParaglideLocaleSwitcher from '#/components/app/LocaleSwitcher.tsx';
 import ThemeToggle from '#/components/app/ThemeToggle.tsx';
-import ParaglideLocaleSwitcher from '#/components/LocaleSwitcher.tsx';
 import {
 	Collapsible,
 	CollapsibleContent,
@@ -31,6 +31,7 @@ import BetterAuthHeader, { BetterAuthHeaderLoading } from './header-user';
 type NavLeafNode = {
 	title: string;
 	link: LinkOptions<RegisteredRouter>['to'];
+	href?: string;
 	params?: LinkOptions<RegisteredRouter>['params'];
 	children?: undefined;
 };
@@ -48,15 +49,26 @@ function Tree({ item, depth = 0 }: { item: DemoNav; depth?: number }) {
 	if (!item?.children) {
 		return (
 			<SidebarMenuButton asChild>
-				<Link
-					to={item.link!}
-					params={item.params}
-					className={`rounded-none  `}
-					style={getButtonPx(depth)}
-				>
-					<FileIcon />
-					{item.title}
-				</Link>
+				{item.link ? (
+					<Link
+						to={item.link!}
+						params={item.params}
+						className={`rounded-none  `}
+						style={getButtonPx(depth)}
+					>
+						<FileIcon />
+						{item.title}
+					</Link>
+				) : (
+					<a
+						href={item.href}
+						className={`rounded-none  `}
+						style={getButtonPx(depth)}
+					>
+						<FileIcon />
+						{item.title}
+					</a>
+				)}
 			</SidebarMenuButton>
 		);
 	}
@@ -116,53 +128,95 @@ function flattenItems(nodes: DemoNav[]): DemoNav[] {
 export function DemoSidebar() {
 	const items: DemoNav[] = [
 		{
-			title: '集成', // integrations
+			title: 'Demo',
 			children: [
+				{
+					title: 'Todo',
+					link: '/demo/todo',
+				},
+			],
+		},
+		{
+			title: 'Integration', // integrations
+			children: [
+				{
+					title: 'TanStack Store',
+					link: '/integration/store',
+				},
+				{
+					title: 'TanStack DB',
+					children: [
+						{
+							title: 'tanstack-db Chat',
+							link: '/integration/tanstack-db/chat',
+						},
+					],
+				},
+				{
+					title: 'TanStack Query',
+					link: '/integration/tanstack-query',
+				},
+				{
+					title: 'oRPC',
+					children: [
+						{
+							title: 'oRPC Todo',
+							link: '/integration/orpc/todo',
+						},
+						{
+							title: 'OpenAPI',
+							href: '/api',
+						},
+					],
+				},
+				{
+					title: 'TanStack Form',
+					children: [
+						{ title: 'Simple Form', link: '/integration/form/simple' },
+						{
+							title: 'Address Form',
+							link: '/integration/form/address',
+						},
+					],
+				},
+				{
+					title: 'TanStack Table',
+					link: '/integration/table',
+				},
 				// {
 				// 	title: 'Neon',
 				// 	link: '/demo/integration/neon',
 				// },
-				// {
-				// 	title: 'Drizzle',
-				// 	link: '/demo/integration/drizzle',
-				// },
 				{
-					title: 'I18n example',
-					link: '/demo/integration/i18n',
-				},
-				// {
-				// 	title: 'TanStack Table',
-				// 	link: '/demo/table',
-				// },
-				{
-					title: 'TanStack Store',
-					link: '/demo/integration/store',
+					title: 'Drizzle',
+					link: '/integration/drizzle',
 				},
 				{
 					title: 'Better Auth',
-					link: '/demo/integration/better-auth',
+					children: [
+						{ title: 'Sign In', link: '/integration/better-auth' },
+						{
+							title: 'OpenAPI',
+
+							href: '/api/auth/reference',
+						},
+					],
 				},
 				{
-					title: 'Better Auth (openapi)',
-					link: '/api/auth/$',
-					params: { _splat: 'reference' },
+					title: 'I18n',
+					children: [
+						{
+							title: 'I18n paraglide',
+							link: '/integration/i18n/paraglide',
+						},
+					],
 				},
-				// {
-				// 	title: 'oRPC Todo',
-				// 	link: '/demo/orpc_todo',
-				// },
+
 				// {
 				// 	title: 'oRPC Batch',
 				// 	link: '/demo/orpc_batch',
 				// },
-				{
-					title: 'openapi(by orpc)',
-					link: '/api/$',
-				},
-				// {
-				// 	title: 'TanStack Query',
-				// 	link: '/demo/rq',
-				// },
+
 				// {
 				// 	title: 'TanStack Query (Suspense)',
 				// 	link: '/demo/rq_suspense',
@@ -171,17 +225,8 @@ export function DemoSidebar() {
 				// 	link: '/demo/hook/useResizeObserver',
 				// },
 				// { link: '/demo/ui/stackModal' },
-				{
-					title: 'Simple Form',
-					link: '/demo/integration/form/simple',
-				},
-				{
-					title: 'Address Form',
-					link: '/demo/integration/form/address',
-				},
 			],
 		},
-
 		{
 			title: 'UI',
 			children: [
@@ -248,13 +293,14 @@ export function DemoSidebar() {
 				{/* <SidebarGroup />
 				<SidebarGroup /> */}
 			</SidebarContent>
-			<SidebarFooter>
-				<ParaglideLocaleSwitcher />
+			<SidebarFooter className="flex-row  items-center justify-between">
 				<ClientOnly fallback={<BetterAuthHeaderLoading />}>
 					<BetterAuthHeader />
 				</ClientOnly>
-
-				<ThemeToggle />
+				<div className="flex items-center gap-x-2">
+					<ParaglideLocaleSwitcher />
+					<ThemeToggle />
+				</div>
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>

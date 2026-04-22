@@ -7,4 +7,5 @@ import {
 	verification,
 } from '#/lib/auth.table';
 
+export * from './db.relations';
 export { account, session, todo, twoFactor, user, verification };

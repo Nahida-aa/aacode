@@ -19,8 +19,15 @@ const config = defineConfig({
 			// cookieName: 'PARAGLIDE_LOCALE',
 			routeStrategies: [{ match: '/api/:path(.*)?', exclude: true }],
 		}),
-		// cloudflare({ viteEnvironment: { name: 'ssr' } }),
-		nitro({ preset: 'cloudflare-module', cloudflare: {} }),
+		cloudflare({ viteEnvironment: { name: 'ssr' } }),
+		// nitro({
+		// 	preset: 'cloudflare-module',
+		// 	cloudflare: {
+		// 		wrangler: {
+		// 			compatibility_flags: ['nodejs_compat', "nodejs_compat_populate_process_env"],
+		// 		},
+		// 	},
+		// }),
 		tailwindcss(),
 		tanstackStart(),
 		react(),
@@ -28,8 +35,14 @@ const config = defineConfig({
 			presets: [reactCompilerPreset()],
 		}),
 	],
-	environments: {
-		ssr: { build: { rollupOptions: { input: './src/server.ts' } } },
+	// environments: {
+	// 	ssr: { build: { rollupOptions: { input: './src/server.ts' } } },
+	// },
+	ssr: {
+		noExternal: ['drizzle-orm'],
+	},
+	server: {
+		port: 4001,
 	},
 });
 
