@@ -5,7 +5,16 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", ".vercel/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".vercel/**"],
+      "env": [
+        "VITE_APP_URL",
+        "BETTER_AUTH_SECRET",
+        "DATABASE_URL",
+        "ELECTRIC_URL",
+        "ELECTRIC_SOURCE_ID",
+        "ELECTRIC_SECRET",
+        "VITE_S3_URL"
+      ]
     },
     "lint": {
       "dependsOn": ["^lint"]
