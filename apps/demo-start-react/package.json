@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && cp instrument.server.mjs .vercel/output/functions/__server.func",
     "preview": "vite preview",
     "test": "vitest run",
     "format": "biome format",
@@ -66,6 +66,7 @@
     "better-auth": "^1.6.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "@sentry/tanstackstart-react": "^10.49.0",
     "date-fns": "^4.1.0",
     "drizzle-kit": "^0.31.9",
     "drizzle-orm": "^0.45.2",
