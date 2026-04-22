@@ -16,8 +16,8 @@ const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
 	throw new Error(`DATABASE_URL is not set`);
 }
-const pool = new Pool({ connectionString: databaseUrl });
-export const db = drizzle({ client: pool, schema });
+const client = new Pool({ connectionString: databaseUrl });
+export const db = drizzle({ client, schema, casing: `snake_case` });
 
 type _Db = NodePgDatabase<typeof schema>;
 export type Tx = Parameters<Parameters<_Db['transaction']>[0]>[0];

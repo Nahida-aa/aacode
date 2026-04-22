@@ -37,6 +37,7 @@ function TodoListClient() {
 	);
 	console.log({
 		isDate: todos?.[0]?.updated_at instanceof Date,
+		length: todos?.length,
 	});
 	return (
 		<div className="p-2 flex flex-col gap-2">
