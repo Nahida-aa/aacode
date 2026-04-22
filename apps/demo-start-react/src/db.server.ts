@@ -1,6 +1,7 @@
-import { drizzle, type NeonHttpDatabase } from 'drizzle-orm/neon-http';
-import { env } from '#/env.ts';
+import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
 import * as schema from './db.schema.ts';
+
 // // 🟢 防止开发模式下重复创建客户端
 // declare global {
 // 	var __db_client__: ReturnType<typeof postgres> | undefined;
@@ -11,9 +12,13 @@ import * as schema from './db.schema.ts';
 // 	postgres(env.DATABASE_URL, {
 // 		max: 10,
 // 	});
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+	throw new Error(`DATABASE_URL is not set`);
+}
+const pool = new Pool({ connectionString: databaseUrl });
+export const db = drizzle({ client: pool, schema });
 
-export const db = drizzle(env.DATABASE_URL, { schema });
-
-type _Db = NeonHttpDatabase<typeof schema>;
+type _Db = NodePgDatabase<typeof schema>;
 export type Tx = Parameters<Parameters<_Db['transaction']>[0]>[0];
 export type Db = typeof db | Tx;
