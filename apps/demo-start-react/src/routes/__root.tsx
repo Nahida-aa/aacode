@@ -1,0 +1,105 @@
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import type { QueryClient } from '@tanstack/react-query';
+import {
+	createRootRouteWithContext,
+	HeadContent,
+	Scripts,
+} from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { createServerFn } from '@tanstack/react-start';
+import { getCookie } from '@tanstack/react-start/server';
+import { DemoHeader } from '#/components/app/Header.tsx';
+import { DemoSidebar } from '#/components/app/sidebar.tsx';
+import {
+	SIDEBAR_COOKIE_NAME,
+	SidebarProvider,
+} from '#/components/ui/sidebar.tsx';
+import { getLocale } from '#/paraglide/runtime';
+import { DemoFooter } from '../components/app/Footer';
+import TanStackQueryDevtools from '../integrations/tanstack-query/devtools';
+import StoreDevtools from '../lib/demo-store-devtools';
+import appCss from '../styles.css?url';
+
+interface MyRouterContext {
+	queryClient: QueryClient;
+}
+
+const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`;
+
+const getSidebarOpen = createServerFn().handler(
+	() => getCookie(SIDEBAR_COOKIE_NAME) !== 'false',
+);
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+	beforeLoad: async () => {
+		// Other redirect strategies are possible; see
+		// https://github.com/TanStack/router/tree/main/examples/react/i18n-paraglide#offline-redirect
+		if (typeof document !== 'undefined') {
+			document.documentElement.setAttribute('lang', getLocale());
+		}
+	},
+	loader: async ({ context }) => {
+		return {
+			sidebarOpen: await getSidebarOpen(),
+		};
+	},
+	head: () => ({
+		meta: [
+			{
+				charSet: 'utf-8',
+			},
+			{
+				name: 'viewport',
+				content: 'width=device-width, initial-scale=1',
+			},
+			{
+				title: 'demo TanStack Start react',
+			},
+		],
+		links: [
+			{
+				rel: 'stylesheet',
+				href: appCss,
+			},
+		],
+	}),
+	shellComponent: RootDocument,
+});
+
+function RootDocument({ children }: { children: React.ReactNode }) {
+	const { sidebarOpen } = Route.useLoaderData();
+	return (
+		<html lang={getLocale()} suppressHydrationWarning>
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+				<HeadContent />
+			</head>
+			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
+				<SidebarProvider defaultOpen={sidebarOpen}>
+					<DemoSidebar />
+					<section className="flex h-screen max-h-screen flex-col overflow-hidden w-full">
+						<DemoHeader />
+
+						<div className="flex-1 overflow-y-auto ">
+							{children}
+							<DemoFooter />
+						</div>
+					</section>
+				</SidebarProvider>
+				<TanStackDevtools
+					config={{
+						position: 'bottom-right',
+					}}
+					plugins={[
+						{
+							name: 'Tanstack Router',
+							render: <TanStackRouterDevtoolsPanel />,
+						},
+						StoreDevtools,
+						TanStackQueryDevtools,
+					]}
+				/>
+				<Scripts />
+			</body>
+		</html>
+	);
+}

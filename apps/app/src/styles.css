@@ -1,0 +1,292 @@
+@import 'tailwindcss' source('../');
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+	--background: 0 0% 100%;
+	--foreground: 240 10% 3.9%;
+
+	--muted: 240 4.8% 95.9%;
+	--muted-foreground: 240 3.8% 46.1%;
+
+	--popover: 0 0% 100%;
+	--popover-foreground: 240 10% 3.9%;
+
+	--border: 240 5.9% 90%;
+	--input: 240 5.9% 90%;
+
+	--card: 0 0% 100%;
+	--card-foreground: 240 10% 3.9%;
+
+	--primary: 240 5.9% 10%;
+	--primary-foreground: 0 0% 98%;
+
+	--secondary: 240 4.8% 95.9%;
+	--secondary-foreground: 240 5.9% 10%;
+
+	--accent: 240 4.8% 95.9%;
+	--accent-foreground: 240 5.9% 10%;
+
+	--destructive: 0 84.2% 60.2%;
+	--destructive-foreground: 0 0% 98%;
+
+	--info: 204 94% 94%;
+	--info-foreground: 199 89% 48%;
+
+	--success: 149 80% 90%;
+	--success-foreground: 160 84% 39%;
+
+	--warning: 48 96% 89%;
+	--warning-foreground: 25 95% 53%;
+
+	--error: 0 93% 94%;
+	--error-foreground: 0 84% 60%;
+
+	--ring: 240 5.9% 10%;
+
+	--radius: 0.5rem;
+}
+
+.dark,
+[data-kb-theme='dark'] {
+	--ctp-mauve: hsl(267deg, 84%, 81%);
+	--ctp-lavender: hsl(232deg, 97%, 85%);
+	--ctp-red2: hsl(343, 100%, 69%);
+	--ctp-red1: hsl(358, 100%, 76%);
+	--ctp-red: hsl(343deg, 81%, 75%);
+	--ctp-blue: hsl(217deg, 92%, 76%);
+	--ctp-yellow: hsl(41deg, 86%, 83%);
+	--ctp-green: hsl(115deg, 54%, 76%);
+	--ctp-text1: hsl(226 57% 95%); /* accent-foreground */
+	--ctp-text: hsl(226deg 64% 88%); /* text, card-foreground */
+	--ctp-subtext1: hsl(227deg, 35%, 80%); /* secondary-foreground */ /* mocha */
+	--ctp-subtext0: hsl(227deg, 27%, 72%);
+	--ctp-overlay2: hsl(228deg, 17%, 64%);
+	--ctp-overlay1: hsl(230deg, 13%, 55%); /* muted-foreground */
+	--ctp-surface1: hsl(231deg, 16%, 34%); /* accent */
+	--ctp-surface0: hsl(237deg, 16%, 23%); /* secondary,popover,toast,muted */
+	--ctp-base: hsl(232deg, 23%, 18%); /* card,  bg */
+	--ctp-mantle: hsl(233deg, 23%, 15%); /*sidebar */
+	--ctp-crust: hsl(236deg, 23%, 12%); /* input */
+	--accent-foreground: var(--ctp-text1); /* 比 text 亮 */
+	--foreground: var(--ctp-text); /* ctp-text */
+	--secondary-foreground: var(--ctp-subtext1);
+	--muted-foreground: var(--ctp-overlay1); /* ctp-subtext0 */
+	/* 强调/装饰元素: surface1 足够用，视觉柔和 标签、Badge、选中状态、气泡背景 */
+	--accent: var(--ctp-surface1);
+	--sidebar-accent: var(--ctp-surface1);
+	--border: var(--ctp-surface1);
+	--secondary: var(--ctp-surface0);
+	--button: var(--ctp-surface0);
+	--muted: var(--ctp-surface0); /* TODO: */
+	--input: var(--ctp-surface0);
+	--card: var(--ctp-base);
+	--popover: var(--ctp-base);
+	--background: var(--ctp-base);
+	--sidebar: var(--ctp-mantle);
+	--card-foreground: oklch(0.985 0 0);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: var(--ctp-lavender);
+	--primary-foreground: oklch(0.21 0.006 285.885);
+	--destructive: var(--ctp-red1);
+	--destructive-foreground: var(--ctp-surface0);
+	--ring: var(--ctp-lavender); /* 同 primary */
+	--chart-1: oklch(0.488 0.243 264.376);
+	--chart-2: oklch(0.696 0.17 162.48);
+	--chart-3: oklch(0.769 0.188 70.08);
+	--chart-4: oklch(0.627 0.265 303.9);
+	--chart-5: oklch(0.645 0.246 16.439);
+
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: var(--ctp-green);
+	--sidebar-ring: oklch(0.442 0.017 285.786);
+
+	--info: 204 94% 94%;
+	--info-foreground: 199 89% 48%;
+
+	--success: 149 80% 90%;
+	--success-foreground: 160 84% 39%;
+
+	--warning: 48 96% 89%;
+	--warning-foreground: 25 95% 53%;
+
+	--error: 0 93% 94%;
+	--error-foreground: 0 84% 60%;
+
+	--radius: 0.5rem;
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-button: var(--button);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+		font-feature-settings:
+			'rlig' 1,
+			'calt' 1;
+	}
+}
+
+@layer utilities {
+	.step {
+		counter-increment: step;
+	}
+
+	.step:before {
+		@apply absolute w-9 h-9 bg-muted rounded-full font-mono font-medium text-center text-base inline-flex items-center justify-center -indent-px border-4 border-background;
+		@apply ml-[-50px] mt-[-4px];
+		content: counter(step);
+	}
+}
+
+@media (max-width: 640px) {
+	.container {
+		@apply px-4;
+	}
+}
+
+::-webkit-scrollbar {
+	width: 16px;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 9999px;
+	border: 4px solid transparent;
+	background-clip: content-box;
+	@apply bg-accent;
+}
+
+::-webkit-scrollbar-corner {
+	display: none;
+}
+
+
+html {
+	color-scheme: light dark;
+}
+
+.logo.vite:hover {
+	filter: drop-shadow(0 0 2em #747bff);
+}
+
+.logo.solid:hover {
+	filter: drop-shadow(0 0 2em #2f5d90);
+}
+:root {
+	font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+	font-size: 16px;
+	line-height: 24px;
+	font-weight: 400;
+
+	font-synthesis: none;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-text-size-adjust: 100%;
+}
+
+.container {
+	margin: 0;
+	padding-top: 10vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	text-align: center;
+}
+
+.logo {
+	height: 6em;
+	padding: 1.5em;
+	will-change: filter;
+	transition: 0.75s;
+}
+
+.logo.tauri:hover {
+	filter: drop-shadow(0 0 2em #24c8db);
+}
+
+.row {
+	display: flex;
+	justify-content: center;
+}
+
+h1 {
+	text-align: center;
+}
+
+input,
+button {
+	font-size: 1em;
+	font-weight: 500;
+	font-family: inherit;
+}
+
+button {
+	cursor: pointer;
+}
+
+button:hover {
+	border-color: #396cd8;
+}
+button:active {
+	border-color: #396cd8;
+	background-color: #e8e8e8;
+}
+
+input,
+button {
+	outline: none;
+}
+
+#greet-input {
+	margin-right: 5px;
+}

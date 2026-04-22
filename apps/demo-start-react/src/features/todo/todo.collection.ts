@@ -1,0 +1,84 @@
+import { electricCollectionOptions } from '@tanstack/electric-db-collection';
+import { createCollection } from '@tanstack/react-db';
+import { isServer } from '@tanstack/react-query';
+import { createSelectSchema } from 'drizzle-zod';
+import { nanoid } from 'nanoid';
+import type { z } from 'zod';
+import { getUrl, getUrlStr } from '#/env.url.ts';
+import { selectTodoSchema } from '#/features/todo/todo.schema.ts';
+import { todo } from '#/features/todo/todo.table.ts';
+import { orpc } from '#/orpc._client.ts';
+
+// 在文件顶部定义一个全局队列
+const mutationQueue = Promise.resolve();
+
+export const todoCollection = createCollection(
+	electricCollectionOptions({
+		id: 'todo',
+		schema: selectTodoSchema.extend({
+			id: selectTodoSchema.shape.id.default(nanoid),
+			created_at: selectTodoSchema.shape.created_at.default(() => new Date()),
+			updated_at: selectTodoSchema.shape.updated_at.default(() => new Date()),
+			completed: selectTodoSchema.shape.completed.default(false),
+		}),
+		getKey: (item) => item.id,
+		shapeOptions: {
+			url: getUrlStr('/api/todo'),
+			liveSse: true,
+			params: { table: 'todo' },
+			parser: {
+				timestamptz: (date: string) => {
+					return new Date(date);
+				},
+			},
+		},
+		onInsert: async ({ transaction }) => {
+			const { modified: newItem } = transaction.mutations[0];
+			const ret = await orpc.addTodo.call(newItem);
+
+			// Return txid to wait for sync
+			return { txid: ret.txid };
+		},
+		onUpdate: async ({ transaction }) => {
+			const { modified } = transaction.mutations[0];
+			console.log('todoCollection.onUpdate', modified, {
+				isServer: window === undefined,
+			});
+			const ret = await orpc.updateTodo.call({
+				id: modified.id,
+				title: modified.title,
+				content: modified.content,
+				completed: modified.completed,
+			});
+			return { txid: ret.txid };
+		},
+		onDelete: async ({ transaction }) => {
+			const { original } = transaction.mutations[0];
+			const ret = await orpc.deleteTodo.call({ id: original.id });
+			return { txid: ret.txid };
+		},
+		// onInsert: async ({ transaction }) => {
+		// 	// 强制排队，确保上一个请求彻底结束后再开始下一个
+		// 	return mutationQueue
+		// 		.then(async () => {
+		// 			const {modified:newItem} = transaction.mutations[0];
+		// 			const res = await orpc.addTodo.call(newItem);
+		// 			return { txid: res.txid };
+		// 		})
+		// 		.catch((err) => {
+		// 			console.error('Mutation failed', err);
+		// 			throw err; // 抛出错误以防队列死掉
+		// 		});
+		// },
+
+		// onUpdate: async ({ transaction }) => {
+		//   const { original, changes } = transaction.mutations[0]
+		//   const response = await api.todos.update({
+		//     where: { id: original.id },
+		//     data: changes
+		//   })
+
+		//   return { txid: response.txid }
+		// }
+	}),
+);

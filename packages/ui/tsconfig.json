@@ -1,9 +1,23 @@
 {
-  "extends": "@repo/typescript-config/react-library.json",
+ "$schema": "https://json.schemastore.org/tsconfig",
+
   "compilerOptions": {
-    "outDir": "dist",
-    "strictNullChecks": true
+ // General
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js",
+    "target": "ESNext",
+    // Modules
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "lib": ["es2023", "dom", "dom.iterable"],
+    // Type Checking & Safety
+    "strict": true,
+    "types": ["vite/client", "bun"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.stories.*", "**/*.mdx"]
 }
