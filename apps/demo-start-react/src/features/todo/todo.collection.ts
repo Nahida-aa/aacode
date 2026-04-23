@@ -1,5 +1,9 @@
 import { electricCollectionOptions } from '@tanstack/electric-db-collection';
-import { BasicIndex, createCollection } from '@tanstack/react-db';
+import {
+	BasicIndex,
+	createCollection,
+	type InferCollectionType,
+} from '@tanstack/react-db';
 import { isServer } from '@tanstack/react-query';
 import { createSelectSchema } from 'drizzle-zod';
 import { nanoid } from 'nanoid';
@@ -83,5 +87,5 @@ export const todoCollection = createCollection(
 		// }
 	}),
 );
-
+export type TodoRow = InferCollectionType<typeof todoCollection>;
 todoCollection.createIndex((row) => row.updated_at, { indexType: BasicIndex });

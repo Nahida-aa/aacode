@@ -26,6 +26,7 @@ import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as IntegrationBetterAuthIndexRouteImport } from './routes/integration/better-auth/index'
 import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
 import { Route as UiActionButtonRouteImport } from './routes/ui/action/button'
+import { Route as IntegrationTanstackDbErrorRouteImport } from './routes/integration/tanstack-db/error'
 import { Route as IntegrationTanstackDbChatApiRouteImport } from './routes/integration/tanstack-db/chat-api'
 import { Route as IntegrationTanstackDbChatRouteImport } from './routes/integration/tanstack-db/chat'
 import { Route as IntegrationOrpcTodoRouteImport } from './routes/integration/orpc/todo'
@@ -129,6 +130,12 @@ const UiActionButtonRoute = UiActionButtonRouteImport.update({
   path: '/ui/action/button',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationTanstackDbErrorRoute =
+  IntegrationTanstackDbErrorRouteImport.update({
+    id: '/integration/tanstack-db/error',
+    path: '/integration/tanstack-db/error',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const IntegrationTanstackDbChatApiRoute =
   IntegrationTanstackDbChatApiRouteImport.update({
     id: '/integration/tanstack-db/chat-api',
@@ -233,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
+  '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
   '/ui/action/button': typeof UiActionButtonRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
@@ -267,6 +275,7 @@ export interface FileRoutesByTo {
   '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
+  '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
   '/ui/action/button': typeof UiActionButtonRoute
   '/demo/guitars': typeof DemoGuitarsIndexRoute
   '/integration/better-auth': typeof IntegrationBetterAuthIndexRoute
@@ -302,6 +311,7 @@ export interface FileRoutesById {
   '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
+  '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
   '/ui/action/button': typeof UiActionButtonRoute
   '/demo/guitars/': typeof DemoGuitarsIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/integration/orpc/todo'
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
+    | '/integration/tanstack-db/error'
     | '/ui/action/button'
     | '/demo/guitars/'
     | '/integration/better-auth/'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/integration/orpc/todo'
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
+    | '/integration/tanstack-db/error'
     | '/ui/action/button'
     | '/demo/guitars'
     | '/integration/better-auth'
@@ -406,6 +418,7 @@ export interface FileRouteTypes {
     | '/integration/orpc/todo'
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
+    | '/integration/tanstack-db/error'
     | '/ui/action/button'
     | '/demo/guitars/'
     | '/integration/better-auth/'
@@ -441,6 +454,7 @@ export interface RootRouteChildren {
   IntegrationOrpcTodoRoute: typeof IntegrationOrpcTodoRoute
   IntegrationTanstackDbChatRoute: typeof IntegrationTanstackDbChatRoute
   IntegrationTanstackDbChatApiRoute: typeof IntegrationTanstackDbChatApiRoute
+  IntegrationTanstackDbErrorRoute: typeof IntegrationTanstackDbErrorRoute
   UiActionButtonRoute: typeof UiActionButtonRoute
   DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
   IntegrationBetterAuthIndexRoute: typeof IntegrationBetterAuthIndexRoute
@@ -570,6 +584,13 @@ declare module '@tanstack/react-router' {
       path: '/ui/action/button'
       fullPath: '/ui/action/button'
       preLoaderRoute: typeof UiActionButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/tanstack-db/error': {
+      id: '/integration/tanstack-db/error'
+      path: '/integration/tanstack-db/error'
+      fullPath: '/integration/tanstack-db/error'
+      preLoaderRoute: typeof IntegrationTanstackDbErrorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integration/tanstack-db/chat-api': {
@@ -705,6 +726,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationOrpcTodoRoute: IntegrationOrpcTodoRoute,
   IntegrationTanstackDbChatRoute: IntegrationTanstackDbChatRoute,
   IntegrationTanstackDbChatApiRoute: IntegrationTanstackDbChatApiRoute,
+  IntegrationTanstackDbErrorRoute: IntegrationTanstackDbErrorRoute,
   UiActionButtonRoute: UiActionButtonRoute,
   DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
   IntegrationBetterAuthIndexRoute: IntegrationBetterAuthIndexRoute,

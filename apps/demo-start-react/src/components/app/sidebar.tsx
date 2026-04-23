@@ -150,6 +150,10 @@ export function DemoSidebar() {
 							title: 'tanstack-db Chat',
 							link: '/integration/tanstack-db/chat',
 						},
+						{
+							title: 'tanstack-db Error',
+							link: '/integration/tanstack-db/error',
+						},
 					],
 				},
 				{

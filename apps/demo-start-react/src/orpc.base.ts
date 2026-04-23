@@ -1,4 +1,4 @@
-import { onError, os } from '@orpc/server';
+import { ORPCError, onError, os } from '@orpc/server';
 import type {
 	RequestHeadersPluginContext,
 	ResponseHeadersPluginContext,
@@ -11,23 +11,60 @@ interface ORPCContext
 		ResponseHeadersPluginContext {}
 
 export const base = os.$context<ORPCContext>().errors({
-	// <-- common errors
+	// 400: Input/schema validation failed, malformed request, invalid params.
+	// Usage: throw errors.BAD_REQUEST({ message: 'Invalid payload' })
 	BAD_REQUEST: {},
+	// 404: Resource does not exist.
+	// Usage: throw errors.NOT_FOUND({ message: 'Todo not found' })
 	NOT_FOUND: {},
+	// 401: No valid session/token.
+	// Usage: throw errors.UNAUTHORIZED({ message: 'Login required' })
 	UNAUTHORIZED: {},
+	// 409: State conflict, duplicate key, optimistic concurrency conflict.
+	// Usage: throw errors.CONFLICT({ message: 'Todo already exists' })
 	CONFLICT: {},
+	// 403: Authenticated but not allowed (RBAC/ownership check failed).
+	// Usage: throw errors.FORBIDDEN({ message: 'Not enough permission' })
 	FORBIDDEN: {},
+	// 429: Too many requests. Include retryAfter to help clients back off.
+	// Usage: throw errors.TOO_MANY_REQUESTS({ data: { retryAfter: 30 } })
 	TOO_MANY_REQUESTS: {
 		data: z.object({
 			retryAfter: z.number(),
 		}),
 	},
+	// 500: Unexpected server error; default fallback in catch-all handlers.
+	// Usage: throw errors.INTERNAL_SERVER_ERROR({ message: 'Unexpected error' })
 	INTERNAL_SERVER_ERROR: {},
+	// RATE_LIMITED is NOT a built-in common oRPC code.
+	// If you need it, keep it as custom and ensure client/server handle it consistently.
 	// RATE_LIMITED: {
-	// 	data: z.object({
-	// 		retryAfter: z.number(),
-	// 	}),
+	// 	data: z.object({ retryAfter: z.number() }),
 	// },
+	// 502: Upstream dependency failed.
+	BAD_GATEWAY: {},
+	// 504: Upstream timeout.
+	GATEWAY_TIMEOUT: {},
+	// 499: Client aborted request (proxy/server style code, optional).
+	CLIENT_CLOSED_REQUEST: {},
+	// 405: HTTP method not supported for this route.
+	METHOD_NOT_SUPPORTED: {},
+	// 406: Cannot satisfy requested Accept header/content negotiation.
+	NOT_ACCEPTABLE: {},
+	// 501: Endpoint exists but not implemented yet.
+	NOT_IMPLEMENTED: {},
+	// 413: Request body too large.
+	PAYLOAD_TOO_LARGE: {},
+	// 412: Preconditions failed (etag/version/if-match scenarios).
+	PRECONDITION_FAILED: {},
+	// 503: Service temporarily unavailable (maintenance/overload).
+	SERVICE_UNAVAILABLE: {},
+	// 408: Request timed out.
+	TIMEOUT: {},
+	// 422: Semantically invalid input (business rule violation).
+	UNPROCESSABLE_CONTENT: {},
+	// 415: Unsupported Content-Type or media format.
+	UNSUPPORTED_MEDIA_TYPE: {},
 });
 
 const logMiddleware = base.middleware(
@@ -37,7 +74,6 @@ const logMiddleware = base.middleware(
 		return next();
 	},
 );
-
 
 export const Fn = base
 	.route({})
@@ -64,14 +100,15 @@ export const Fn = base
 				cause: error.cause,
 				stack: error.stack,
 			});
+			if (error instanceof ORPCError) throw error; // 已经是 ORPCError 了，就直接抛出去，不需要再包装一层了
 			throw errors.INTERNAL_SERVER_ERROR({
-				message:error.message,
-				cause:error.cause,
+				message: error.message,
+				cause: error.cause,
 				data: {
-				name:error.name,
-stack:error.stack,
-				}
-			})
+					name: error.name,
+					stack: error.stack,
+				},
+			});
 		}),
 	);
 export const getFn = Fn.route({ method: 'GET' });

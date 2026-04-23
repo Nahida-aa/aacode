@@ -1,13 +1,16 @@
 import { queryOnce, useLiveInfiniteQuery } from '@tanstack/react-db';
 import { ClientOnly, createFileRoute } from '@tanstack/react-router';
-import type { z } from 'better-auth';
 import { Check, HistoryIcon, PlusIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useIntersectionObserver } from 'usehooks-ts';
+import type { z } from 'zod';
 import { Button } from '#/components/ui/button.tsx';
 import { useAppForm } from '#/components/uix/form/useAppForm.tsx';
 import { Description } from '#/components/uix/label.tsx';
-import { todoCollection } from '#/features/todo/todo.collection.ts';
+import {
+	type TodoRow,
+	todoCollection,
+} from '#/features/todo/todo.collection.ts';
 import { addTodoSchema, type Todo } from '#/features/todo/todo.schema.ts';
 import { formatToNow } from '#/lib/utils.timeFormat.ts';
 
@@ -85,9 +88,11 @@ function TodoListFallback() {
 	return <div>Loading todos...</div>;
 }
 
-function TodoCard({ todo }: { todo: Todo }) {
+function TodoCard({ todo }: { todo: TodoRow }) {
 	return (
-		<div className="bg-muted p-2 rounded-md">
+		<div
+			className={`bg-muted p-2 rounded-md  ${!todo.$synced && 'animate-pulse'}`}
+		>
 			<div className="flex justify-between items-center">
 				<div className="flex items-center gap-2">
 					<button
@@ -108,6 +113,7 @@ function TodoCard({ todo }: { todo: Todo }) {
 						<Check size={14} />
 					</button>
 					<h3>{todo.title}</h3>
+					<span>{todo.id}</span>
 				</div>
 				<Button
 					size={'sm'}
@@ -130,7 +136,7 @@ function AddTodoCard() {
 	const initialValuesRef = useRef<FormValues | null>(null);
 	if (initialValuesRef.current === null) {
 		try {
-			const raw = window.localStorage.getItem('AddTodoCard');
+			const raw = localStorage.getItem('AddTodoCard');
 			initialValuesRef.current = raw
 				? (JSON.parse(raw) as FormValues)
 				: ({} as FormValues);
@@ -144,11 +150,11 @@ function AddTodoCard() {
 		validators: {
 			onChange: addTodoSchema,
 		},
-		onSubmit: async ({ value, formApi }) => {
+		onSubmit: async ({ value, formApi, meta }) => {
 			const tx = todoCollection.insert(value);
 			await tx.isPersisted.promise;
 			formApi.reset();
-			window.localStorage.removeItem('AddTodoCard');
+			localStorage.removeItem('AddTodoCard');
 			setFormKey((prev) => prev + 1);
 		},
 	});

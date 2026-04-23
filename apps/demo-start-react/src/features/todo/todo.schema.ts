@@ -13,6 +13,7 @@ export const updateTodoSchema = createUpdateSchema(todo).pick({
 });
 export const addTodoSchema = selectTodoSchema
 	.pick({
+		id: true,
 		title: true,
 		content: true,
 	})
