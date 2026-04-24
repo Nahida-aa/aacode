@@ -21,24 +21,19 @@ import {
 	jsonToDocument,
 	mdToDocument,
 } from '#/components/uix/prosemirror/utils.tsx';
-import {
-	blockQuoteRule,
-	bulletListRule,
-	codeBlockBoundaryArrowDown,
-	codeBlockBoundaryArrowUp,
-	codeBlockEnter,
-	codeBlockRule,
-	createCodeBlockBackspace,
-	documentSchema,
-	exampleSetup,
-	headingRule,
-	orderedListRule,
-} from './config';
+import { exampleSetup } from './config';
 // 引入一個你喜歡的高亮主題
 // import 'highlight.js/styles/github-dark.css';
 import '@catppuccin/highlightjs/css/catppuccin-macchiato.css';
 import { keymap } from 'prosemirror-keymap';
 import { splitListItem } from 'prosemirror-schema-list';
+import { documentSchema } from '#/components/uix/prosemirror/documentSchema.ts';
+import {
+	codeBlockBoundaryArrowDown,
+	codeBlockBoundaryArrowUp,
+	codeBlockEnter,
+	createCodeBlockBackspace,
+} from '#/components/uix/prosemirror/keymap.ts';
 
 type EditorProps = {
 	initialValue?: any;
@@ -95,9 +90,11 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 					return false;
 				}
 				console.log('有items或者没有html');
+				let ret = false;
 				for (const item of items) {
 					console.log('可能是本地图片');
 					if (item.kind === 'file' && item.type.startsWith('image')) {
+						// event.preventDefault(); // 阻止默认粘贴行为，避免生成 Base64
 						const file = item.getAsFile();
 						if (!file) continue;
 						console.log('有file', file);
@@ -105,18 +102,31 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 						const localUrl = URL.createObjectURL(file);
 						// 【关键】将文件存入缓存，等待提交
 						imageFileCache.set(localUrl, file);
-						// 2. 插入圖片節點（暫時使用本地 URL）
+						// 2. 插入图片节点（暂时使用本地 URL）
 						const { image } = editorRef.current.state.schema.nodes;
-						const tr = view.state.tr.replaceSelectionWith(
-							image.create({ src: localUrl }),
-						);
-						console.log('插入图片节点');
-						view.dispatch(tr);
+						// 诊断：检查 image node 是否存在
+						console.log('🔍 image node:', image);
+						const node = image.create({ src: localUrl });
 
-						return true; // 拦截默认行為，防止生成 Base64
+						// 诊断：检查创建的 node 是否有效
+						console.log('🔍 创建的 node:', node);
+
+						const tr = view.state.tr.replaceSelectionWith(node);
+						// 诊断：检查 transaction 是否成功
+						console.log('🔍 tr.docChanged:', tr.docChanged);
+						console.log('🔍 tr.steps:', tr.steps.length);
+
+						// 诊断：如果失败了，看看具体错误
+						if (!tr.docChanged) {
+							console.log('❌ transaction 没有变化，插入可能失败了');
+						}
+						view.dispatch(tr);
+						ret = true; // 拦截默认行為，防止生成 Base64
 					}
+					console.log('不是图片');
+					ret = true;
 				}
-				return false;
+				return ret;
 			},
 			[imageFileCache.set],
 		);
@@ -132,11 +142,11 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 					plugins: [
 						inputRules({
 							rules: [
-								headingRule(6),
-								blockQuoteRule(),
-								bulletListRule(),
-								orderedListRule(),
-								codeBlockRule(), // 加入代碼塊規則
+								// headingRule(6),
+								// blockQuoteRule(),
+								// bulletListRule(),
+								// orderedListRule(),
+								// codeBlockRule(), // 加入代碼塊規則
 							],
 						}),
 						keymap({
@@ -157,9 +167,11 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 						class: 'p-4 cursor-text',
 					},
 					handleDOMEvents: {
+						// handleDOMEvents - 通用 DOM 事件拦截器; 设计目的是「在 ProseMirror 处理之前拦截」
 						click(_view, event) {},
-						paste: handlePaste,
+						// paste: handlePaste,
 					},
+					handlePaste, // handlePaste - 专用 paste 处理器 返回 true → 自动 preventDefault()
 				});
 			}
 			return () => {

@@ -5,7 +5,7 @@ import type { EditorView } from 'prosemirror-view';
 import type { RefObject } from 'react';
 import { renderToString } from 'react-dom/server';
 import { MessageResponse } from '#/components/ai-elements/message';
-import { documentSchema } from '#/components/uix/prosemirror/config.tsx';
+import { documentSchema } from '#/components/uix/prosemirror/documentSchema.ts';
 
 export const mdToDocument = (content: string): Node => {
 	const parser = DOMParser.fromSchema(documentSchema);

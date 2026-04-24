@@ -35,8 +35,14 @@ export const getImgSrc = (src?: string | null, options?: ImgSrcOptions) => {
 		return getDefaultAvatar(options?.name, options?.size);
 	}
 	if (src.startsWith('key://')) {
-		return buildFileUrl(src);
-	} else {
+		return buildFileUrl(src.slice(6));
+	} else if (
+		src.startsWith('http') ||
+		src.startsWith('blob:') ||
+		src.startsWith('data:')
+	) {
 		return src;
+	} else {
+		return buildFileUrl(src);
 	}
 };

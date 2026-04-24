@@ -207,7 +207,7 @@
 	::before,
 	::backdrop,
 	::file-selector-button {
-		@apply border-border outline-ring/50 caret-primary;
+		@apply border-border outline-ring/50 caret-primary leading-[1.15];
 	}
 	body {
 		background-color: var(--background);
@@ -324,9 +324,14 @@
 		@apply text-xs font-medium text-accent-foreground;
 	}
 
-	.ProseMirror {
-		@apply focus-visible:outline-0 focus-visible:outline-none focus-visible:outline-transparent;
-		white-space: pre-wrap;
+	.prose {
+		.ProseMirror {
+			@apply focus-visible:outline-0 focus-visible:outline-none focus-visible:outline-transparent;
+			white-space: pre-wrap;
+			img {
+				@apply inline;
+			}
+		}
 	}
 
 	/* 默认隐藏锚点符号 */
@@ -343,7 +348,7 @@
 		opacity: 1;
 	}
 	.prose pre {
-		border: 1px solid var(--line);
+		/* border: 1px solid var(--line); */
 		border-radius: 12px;
 		background: #1d2e45;
 		color: #e8efff;
@@ -355,6 +360,12 @@
 		:is(h1, h2, h3, h4, h5, h6) a {
 			/* position: relative; */
 			@apply no-underline; /* 彻底取消下划线 */
+		}
+		:where(img):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+			@apply my-0;
+		}
+		:where(p):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+			@apply my-4;
 		}
 	}
 }
