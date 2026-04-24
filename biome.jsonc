@@ -73,7 +73,8 @@
 			"suspicious": {
 				"noExplicitAny": "off",
 				"noArrayIndexKey": "info",
-				"noNonNullAssertedOptionalChain": "info"
+				"noNonNullAssertedOptionalChain": "info",
+				 "noDoubleEquals": "info"
 			},
 			"a11y": {
 				"useButtonType": "off",

@@ -19,7 +19,7 @@ export const uploadSingleFile = async (file: File, group?: FileGroup) => {
 		files: [{ name: file.name, type: file.type, size: file.size }],
 		group,
 	});
-	await uploadFile(signedUrls[0].url, file);
+	await uploadFile(signedUrls[0].signedUrl, file);
 	return buildFileUrl(signedUrls[0].storageKey);
 };
 

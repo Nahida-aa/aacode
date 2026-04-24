@@ -34,11 +34,9 @@ export const getImgSrc = (src?: string | null, options?: ImgSrcOptions) => {
 	if (!src) {
 		return getDefaultAvatar(options?.name, options?.size);
 	}
-	// 判断是否 http 开头
-	if (src.startsWith('http')) {
-		return src;
-	} else {
-		// 说明是 storageKey
+	if (src.startsWith('key://')) {
 		return buildFileUrl(src);
+	} else {
+		return src;
 	}
 };

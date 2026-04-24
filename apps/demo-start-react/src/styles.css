@@ -326,6 +326,7 @@
 
 	.ProseMirror {
 		@apply focus-visible:outline-0 focus-visible:outline-none focus-visible:outline-transparent;
+		white-space: pre-wrap;
 	}
 
 	/* 默认隐藏锚点符号 */

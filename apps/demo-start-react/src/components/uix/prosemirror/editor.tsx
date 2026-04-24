@@ -1,5 +1,4 @@
 import hljs from 'highlight.js';
-import { exampleSetup } from 'prosemirror-example-setup';
 import { highlightPlugin } from 'prosemirror-highlightjs';
 import { inputRules } from 'prosemirror-inputrules';
 import { EditorState } from 'prosemirror-state';
@@ -22,9 +21,25 @@ import {
 	jsonToDocument,
 	mdToDocument,
 } from '#/components/uix/prosemirror/utils.tsx';
-import { codeBlockRule, documentSchema, headingRule } from './config';
+import {
+	blockQuoteRule,
+	bulletListRule,
+	codeBlockBoundaryArrowDown,
+	codeBlockBoundaryArrowUp,
+	codeBlockEnter,
+	codeBlockRule,
+	createCodeBlockBackspace,
+	documentSchema,
+	exampleSetup,
+	headingRule,
+	orderedListRule,
+} from './config';
 // 引入一個你喜歡的高亮主題
-import 'highlight.js/styles/github-dark.css';
+// import 'highlight.js/styles/github-dark.css';
+import '@catppuccin/highlightjs/css/catppuccin-macchiato.css';
+import { keymap } from 'prosemirror-keymap';
+import { splitListItem } from 'prosemirror-schema-list';
+
 type EditorProps = {
 	initialValue?: any;
 	onSave?: (json: any) => void;
@@ -32,6 +47,7 @@ type EditorProps = {
 };
 export interface EditorRef {
 	save: () => { json: any; md: string };
+	getFileCache: () => Map<string, File>;
 }
 const PureEditor = forwardRef<EditorRef, EditorProps>(
 	(
@@ -58,28 +74,79 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 				md: documentToMd(doc),
 			};
 		};
+		const imageFileCache = new Map<string, File>();
+		const handlePaste = useCallback(
+			(view: EditorView, event: ClipboardEvent) => {
+				if (!editorRef.current) {
+					console.warn('Editor not initialized yet');
+					return false;
+				}
+				console.log('handlePaste');
+				const items = event.clipboardData?.items;
+				const html = event.clipboardData?.getData('text/html');
+
+				if (!items) {
+					console.log('没有items');
+					return false;
+				}
+				if (html) {
+					// 如果是 html 说明可能是网络图片 自带 网络链接
+					console.log('有html', html);
+					return false;
+				}
+				console.log('有items或者没有html');
+				for (const item of items) {
+					console.log('可能是本地图片');
+					if (item.kind === 'file' && item.type.startsWith('image')) {
+						const file = item.getAsFile();
+						if (!file) continue;
+						console.log('有file', file);
+						// 1. 創建本地預覽 URL (避免 Base64 佔用內存)
+						const localUrl = URL.createObjectURL(file);
+						// 【关键】将文件存入缓存，等待提交
+						imageFileCache.set(localUrl, file);
+						// 2. 插入圖片節點（暫時使用本地 URL）
+						const { image } = editorRef.current.state.schema.nodes;
+						const tr = view.state.tr.replaceSelectionWith(
+							image.create({ src: localUrl }),
+						);
+						console.log('插入图片节点');
+						view.dispatch(tr);
+
+						return true; // 拦截默认行為，防止生成 Base64
+					}
+				}
+				return false;
+			},
+			[imageFileCache.set],
+		);
 		// 暴露给外部的方法
 		useImperativeHandle(ref, () => ({
 			save,
+			getFileCache: () => imageFileCache,
 		}));
 		useEffect(() => {
 			if (containerRef.current && !editorRef.current) {
 				const state = EditorState.create({
 					doc: jsonToDocument(initialValue),
 					plugins: [
-						...exampleSetup({ schema: documentSchema, menuBar: false }),
-						highlightPlugin(hljs),
 						inputRules({
 							rules: [
-								headingRule(1),
-								headingRule(2),
-								headingRule(3),
-								headingRule(4),
-								headingRule(5),
 								headingRule(6),
+								blockQuoteRule(),
+								bulletListRule(),
+								orderedListRule(),
 								codeBlockRule(), // 加入代碼塊規則
 							],
 						}),
+						keymap({
+							Enter: codeBlockEnter,
+							Backspace: createCodeBlockBackspace(),
+							ArrowUp: codeBlockBoundaryArrowUp,
+							ArrowDown: codeBlockBoundaryArrowDown,
+						}),
+						...exampleSetup({ schema: documentSchema, menuBar: false }),
+						highlightPlugin(hljs),
 					],
 				});
 
@@ -91,37 +158,41 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 					},
 					handleDOMEvents: {
 						click(_view, event) {},
-					},
-					dispatchTransaction(transaction) {
-						if (!editorRef?.current) return;
-						const newState = this.state.apply(transaction);
-						editorRef.current.updateState(newState);
-						// 3. 內容有變動時，觸發防抖
-						if (transaction.docChanged) {
-							debouncedSave();
-						}
+						paste: handlePaste,
 					},
 				});
 			}
-
 			return () => {
 				if (editorRef.current) {
 					editorRef.current.destroy();
 					editorRef.current = null;
 				}
 			};
-		}, [initialValue, debouncedSave]);
+		}, [initialValue, handlePaste]);
+		useEffect(() => {
+			if (!editorRef.current) return;
+
+			editorRef.current.setProps({
+				dispatchTransaction: (transaction) => {
+					const newState = editorRef.current!.state.apply(transaction);
+					editorRef.current!.updateState(newState);
+					// 3. 內容有變動時，觸發防抖
+					if (transaction.docChanged) {
+						debouncedSave();
+					}
+				},
+			});
+		}, [debouncedSave]);
 
 		return (
 			<div className={`relative max-w-none ${className}`} ref={containerRef} />
-		);
+		); // <div>2</div>
 	},
 );
 function areEqual(prevProps: EditorProps, nextProps: EditorProps) {
 	return (
 		prevProps.className === nextProps.className &&
-		prevProps.onSave === nextProps.onSave &&
-		prevProps.initialValue === nextProps.initialValue
+		prevProps.onSave === nextProps.onSave
 	);
 }
 

@@ -17,7 +17,7 @@ function GuitarsIndex() {
 						className="w-full md:w-[calc(50%-1.5rem)] xl:w-[calc(33.333%-2rem)] relative mb-24"
 					>
 						<Link
-							to="/demo/guitars/$guitarId"
+							to="/integration/guitars/$guitarId"
 							params={{
 								guitarId: guitar.id.toString(),
 							}}

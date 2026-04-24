@@ -8,7 +8,7 @@ import {
 	XCircle,
 } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
-import { Button } from '#/components/uix/button';
+import { Button } from '#/components/uix/button/index.tsx';
 import { toastError } from '../toast';
 import { Modal } from './modal';
 import { useModal } from './renderer';

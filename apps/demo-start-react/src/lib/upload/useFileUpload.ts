@@ -63,20 +63,26 @@ export const useFileUpload = (group?: FileGroup) => {
 				});
 
 				const uploadPromises = files.map(async (file, index) => {
-					const { url, storageKey } = signedUrlsWithMeta[index];
-					if (!url) throw new Error(`No URL for ${file.name}`);
+					const { signedUrl, storageKey } = signedUrlsWithMeta[index];
+					if (!signedUrl) throw new Error(`No URL for ${file.name}`);
 
 					// 用你的函数 + 自定义 onProgress（更新分文件 + 总进度）
-					await uploadFileWithProgress(url, file, (percent, loaded, total) => {
-						perFileProgress[file.name] = { percent, loaded, total };
-						totalLoaded += loaded; // 累加总 loaded
-						const overallPercent = Math.round((totalLoaded / totalSize) * 100);
-						setStatus((prev) => ({
-							...prev,
-							progress: overallPercent,
-							perFileProgress: { ...perFileProgress },
-						}));
-					});
+					await uploadFileWithProgress(
+						signedUrl,
+						file,
+						(percent, loaded, total) => {
+							perFileProgress[file.name] = { percent, loaded, total };
+							totalLoaded += loaded; // 累加总 loaded
+							const overallPercent = Math.round(
+								(totalLoaded / totalSize) * 100,
+							);
+							setStatus((prev) => ({
+								...prev,
+								progress: overallPercent,
+								perFileProgress: { ...perFileProgress },
+							}));
+						},
+					);
 
 					return {
 						...signedUrlsWithMeta[index],

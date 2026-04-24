@@ -21,12 +21,16 @@ const genSignedUrls = authFn
 				const id = nanoid();
 				const name = sanitizeFilename(file.name);
 				const storageKey = `${basePath}/${id}/${name}`;
-				const url = await genSignedUploadUrl(storageKey, file.type, file.size);
+				const signedUrl = await genSignedUploadUrl(
+					storageKey,
+					file.type,
+					file.size,
+				);
 				return {
 					id,
 					name: file.name,
 					storageKey,
-					url,
+					signedUrl,
 					type: file.type,
 					size: file.size,
 					uploaderId: context.user.id,
