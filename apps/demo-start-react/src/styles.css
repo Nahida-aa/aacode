@@ -179,13 +179,35 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 }
+@keyframes google-caret {
+	0%,
+	100% {
+		caret-color: #4285f4;
+	} /* Blue */
+	25% {
+		caret-color: #ea4335;
+	} /* Red */
+	50% {
+		caret-color: #fbbc05;
+	} /* Yellow */
+	75% {
+		caret-color: #34a853;
+	} /* Green */
+}
+
+* {
+	animation: google-caret 2s infinite;
+	caret-color: #4285f4; /* Initial color */
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+
 @layer base {
 	*,
 	::after,
 	::before,
 	::backdrop,
 	::file-selector-button {
-		@apply border-border outline-ring/50;
+		@apply border-border outline-ring/50 caret-primary;
 	}
 	body {
 		background-color: var(--background);
@@ -300,6 +322,10 @@
 	}
 	h6 {
 		@apply text-xs font-medium text-accent-foreground;
+	}
+
+	.ProseMirror {
+		@apply focus-visible:outline-0 focus-visible:outline-none focus-visible:outline-transparent;
 	}
 
 	/* 默认隐藏锚点符号 */

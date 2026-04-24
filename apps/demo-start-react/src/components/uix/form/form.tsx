@@ -267,15 +267,24 @@ export const FormFloatingSaveBar = ({
 // 同步到 localStorage
 export const SyncToLocalStorage = () => {
 	const form = useFormContext();
-	const values = useStore(form.store, (state) => state.values);
-	type FormValues = typeof values;
-	const [value, setValue, removeValue] = useLocalStorage<FormValues>(
-		form.formId,
-		{} as FormValues,
-	);
+	const { values, isDirty } = useStore(form.store, (state) => ({
+		values: state.values,
+		isDirty: state.isDirty,
+	}));
 	useEffect(() => {
-		setValue(values);
-	}, [values, setValue]);
+		if (!isDirty) {
+			const saved = localStorage.getItem(form.formId);
+			if (saved) {
+				form.baseStore.setState((s) => ({
+					...s,
+					values: JSON.parse(saved),
+				}));
+			}
+		}
+	}, [isDirty, form.formId, form.baseStore.setState]);
+	useEffect(() => {
+		localStorage.setItem(form.formId, JSON.stringify(values));
+	}, [values, form.formId]);
 
 	return null;
 };

@@ -134,6 +134,10 @@ export function DemoSidebar() {
 					title: 'Todo',
 					link: '/demo/todo',
 				},
+				{
+					title: 'Chat',
+					link: '/demo/chat',
+				},
 			],
 		},
 		{
@@ -239,7 +243,20 @@ export function DemoSidebar() {
 					children: [
 						{
 							title: 'Button',
-							link: '/demo/ui/action/button',
+							link: '/ui/action/button',
+						},
+					],
+				},
+				{
+					title: 'Display',
+					children: [
+						{
+							title: 'Markdown',
+							link: '/ui/display/md/',
+						},
+						{
+							title: 'ProseMirror',
+							link: '/ui/display/md/prosemirror/',
 						},
 					],
 				},

@@ -15,33 +15,37 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as IntegrationTanstackQueryRouteImport } from './routes/integration/tanstack-query'
 import { Route as IntegrationTableRouteImport } from './routes/integration/table'
 import { Route as IntegrationStoreRouteImport } from './routes/integration/store'
+import { Route as IntegrationMcpTodosRouteImport } from './routes/integration/mcp-todos'
 import { Route as IntegrationDrizzleRouteImport } from './routes/integration/drizzle'
+import { Route as IntegrationAiStructuredRouteImport } from './routes/integration/ai-structured'
+import { Route as IntegrationAiImageRouteImport } from './routes/integration/ai-image'
+import { Route as IntegrationAiChatRouteImport } from './routes/integration/ai-chat'
 import { Route as DemoTodoRouteImport } from './routes/demo/todo'
-import { Route as DemoMcpTodosRouteImport } from './routes/demo/mcp-todos'
-import { Route as DemoAiStructuredRouteImport } from './routes/demo/ai-structured'
-import { Route as DemoAiImageRouteImport } from './routes/demo/ai-image'
-import { Route as DemoAiChatRouteImport } from './routes/demo/ai-chat'
 import { Route as ApiTodoRouteImport } from './routes/api/todo'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as IntegrationGuitarsIndexRouteImport } from './routes/integration/guitars/index'
 import { Route as IntegrationBetterAuthIndexRouteImport } from './routes/integration/better-auth/index'
-import { Route as DemoGuitarsIndexRouteImport } from './routes/demo/guitars/index'
+import { Route as DemoChatIndexRouteImport } from './routes/demo/chat/index'
 import { Route as UiActionButtonRouteImport } from './routes/ui/action/button'
 import { Route as IntegrationTanstackDbErrorRouteImport } from './routes/integration/tanstack-db/error'
 import { Route as IntegrationTanstackDbChatApiRouteImport } from './routes/integration/tanstack-db/chat-api'
 import { Route as IntegrationTanstackDbChatRouteImport } from './routes/integration/tanstack-db/chat'
 import { Route as IntegrationOrpcTodoRouteImport } from './routes/integration/orpc/todo'
 import { Route as IntegrationI18nParaglideRouteImport } from './routes/integration/i18n/paraglide'
+import { Route as IntegrationGuitarsGuitarIdRouteImport } from './routes/integration/guitars/$guitarId'
 import { Route as IntegrationFormSimpleRouteImport } from './routes/integration/form/simple'
 import { Route as IntegrationFormAddressRouteImport } from './routes/integration/form/address'
-import { Route as DemoGuitarsGuitarIdRouteImport } from './routes/demo/guitars/$guitarId'
-import { Route as DemoApiMcpTodosRouteImport } from './routes/demo/api.mcp-todos'
+import { Route as IntegrationApiMcpTodosRouteImport } from './routes/integration/api.mcp-todos'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as DemoApiAiTtsRouteImport } from './routes/demo/api.ai.tts'
-import { Route as DemoApiAiTranscriptionRouteImport } from './routes/demo/api.ai.transcription'
-import { Route as DemoApiAiStructuredRouteImport } from './routes/demo/api.ai.structured'
-import { Route as DemoApiAiImageRouteImport } from './routes/demo/api.ai.image'
-import { Route as DemoApiAiChatRouteImport } from './routes/demo/api.ai.chat'
+import { Route as UiDisplayMdIndexRouteImport } from './routes/ui/display/md/index'
+import { Route as UiDisplayMdTiptapRouteImport } from './routes/ui/display/md/tiptap'
+import { Route as IntegrationApiAiTtsRouteImport } from './routes/integration/api.ai.tts'
+import { Route as IntegrationApiAiTranscriptionRouteImport } from './routes/integration/api.ai.transcription'
+import { Route as IntegrationApiAiStructuredRouteImport } from './routes/integration/api.ai.structured'
+import { Route as IntegrationApiAiImageRouteImport } from './routes/integration/api.ai.image'
+import { Route as IntegrationApiAiChatRouteImport } from './routes/integration/api.ai.chat'
+import { Route as UiDisplayMdProsemirrorIndexRouteImport } from './routes/ui/display/md/prosemirror/index'
 
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
@@ -74,34 +78,34 @@ const IntegrationStoreRoute = IntegrationStoreRouteImport.update({
   path: '/integration/store',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationMcpTodosRoute = IntegrationMcpTodosRouteImport.update({
+  id: '/integration/mcp-todos',
+  path: '/integration/mcp-todos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntegrationDrizzleRoute = IntegrationDrizzleRouteImport.update({
   id: '/integration/drizzle',
   path: '/integration/drizzle',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationAiStructuredRoute = IntegrationAiStructuredRouteImport.update({
+  id: '/integration/ai-structured',
+  path: '/integration/ai-structured',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationAiImageRoute = IntegrationAiImageRouteImport.update({
+  id: '/integration/ai-image',
+  path: '/integration/ai-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationAiChatRoute = IntegrationAiChatRouteImport.update({
+  id: '/integration/ai-chat',
+  path: '/integration/ai-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoTodoRoute = DemoTodoRouteImport.update({
   id: '/demo/todo',
   path: '/demo/todo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoMcpTodosRoute = DemoMcpTodosRouteImport.update({
-  id: '/demo/mcp-todos',
-  path: '/demo/mcp-todos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiStructuredRoute = DemoAiStructuredRouteImport.update({
-  id: '/demo/ai-structured',
-  path: '/demo/ai-structured',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiImageRoute = DemoAiImageRouteImport.update({
-  id: '/demo/ai-image',
-  path: '/demo/ai-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoAiChatRoute = DemoAiChatRouteImport.update({
-  id: '/demo/ai-chat',
-  path: '/demo/ai-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTodoRoute = ApiTodoRouteImport.update({
@@ -114,15 +118,20 @@ const ApiSplatRoute = ApiSplatRouteImport.update({
   path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationGuitarsIndexRoute = IntegrationGuitarsIndexRouteImport.update({
+  id: '/integration/guitars/',
+  path: '/integration/guitars/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IntegrationBetterAuthIndexRoute =
   IntegrationBetterAuthIndexRouteImport.update({
     id: '/integration/better-auth/',
     path: '/integration/better-auth/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const DemoGuitarsIndexRoute = DemoGuitarsIndexRouteImport.update({
-  id: '/demo/guitars/',
-  path: '/demo/guitars/',
+const DemoChatIndexRoute = DemoChatIndexRouteImport.update({
+  id: '/demo/chat/',
+  path: '/demo/chat/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UiActionButtonRoute = UiActionButtonRouteImport.update({
@@ -159,6 +168,12 @@ const IntegrationI18nParaglideRoute =
     path: '/integration/i18n/paraglide',
     getParentRoute: () => rootRouteImport,
   } as any)
+const IntegrationGuitarsGuitarIdRoute =
+  IntegrationGuitarsGuitarIdRouteImport.update({
+    id: '/integration/guitars/$guitarId',
+    path: '/integration/guitars/$guitarId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const IntegrationFormSimpleRoute = IntegrationFormSimpleRouteImport.update({
   id: '/integration/form/simple',
   path: '/integration/form/simple',
@@ -169,14 +184,9 @@ const IntegrationFormAddressRoute = IntegrationFormAddressRouteImport.update({
   path: '/integration/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoGuitarsGuitarIdRoute = DemoGuitarsGuitarIdRouteImport.update({
-  id: '/demo/guitars/$guitarId',
-  path: '/demo/guitars/$guitarId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoApiMcpTodosRoute = DemoApiMcpTodosRouteImport.update({
-  id: '/demo/api/mcp-todos',
-  path: '/demo/api/mcp-todos',
+const IntegrationApiMcpTodosRoute = IntegrationApiMcpTodosRouteImport.update({
+  id: '/integration/api/mcp-todos',
+  path: '/integration/api/mcp-todos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
@@ -189,31 +199,49 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiTtsRoute = DemoApiAiTtsRouteImport.update({
-  id: '/demo/api/ai/tts',
-  path: '/demo/api/ai/tts',
+const UiDisplayMdIndexRoute = UiDisplayMdIndexRouteImport.update({
+  id: '/ui/display/md/',
+  path: '/ui/display/md/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiTranscriptionRoute = DemoApiAiTranscriptionRouteImport.update({
-  id: '/demo/api/ai/transcription',
-  path: '/demo/api/ai/transcription',
+const UiDisplayMdTiptapRoute = UiDisplayMdTiptapRouteImport.update({
+  id: '/ui/display/md/tiptap',
+  path: '/ui/display/md/tiptap',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiStructuredRoute = DemoApiAiStructuredRouteImport.update({
-  id: '/demo/api/ai/structured',
-  path: '/demo/api/ai/structured',
+const IntegrationApiAiTtsRoute = IntegrationApiAiTtsRouteImport.update({
+  id: '/integration/api/ai/tts',
+  path: '/integration/api/ai/tts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiImageRoute = DemoApiAiImageRouteImport.update({
-  id: '/demo/api/ai/image',
-  path: '/demo/api/ai/image',
+const IntegrationApiAiTranscriptionRoute =
+  IntegrationApiAiTranscriptionRouteImport.update({
+    id: '/integration/api/ai/transcription',
+    path: '/integration/api/ai/transcription',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const IntegrationApiAiStructuredRoute =
+  IntegrationApiAiStructuredRouteImport.update({
+    id: '/integration/api/ai/structured',
+    path: '/integration/api/ai/structured',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const IntegrationApiAiImageRoute = IntegrationApiAiImageRouteImport.update({
+  id: '/integration/api/ai/image',
+  path: '/integration/api/ai/image',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoApiAiChatRoute = DemoApiAiChatRouteImport.update({
-  id: '/demo/api/ai/chat',
-  path: '/demo/api/ai/chat',
+const IntegrationApiAiChatRoute = IntegrationApiAiChatRouteImport.update({
+  id: '/integration/api/ai/chat',
+  path: '/integration/api/ai/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UiDisplayMdProsemirrorIndexRoute =
+  UiDisplayMdProsemirrorIndexRouteImport.update({
+    id: '/ui/display/md/prosemirror/',
+    path: '/ui/display/md/prosemirror/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -221,34 +249,38 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
   '/api/todo': typeof ApiTodoRoute
-  '/demo/ai-chat': typeof DemoAiChatRoute
-  '/demo/ai-image': typeof DemoAiImageRoute
-  '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/todo': typeof DemoTodoRoute
+  '/integration/ai-chat': typeof IntegrationAiChatRoute
+  '/integration/ai-image': typeof IntegrationAiImageRoute
+  '/integration/ai-structured': typeof IntegrationAiStructuredRoute
   '/integration/drizzle': typeof IntegrationDrizzleRoute
+  '/integration/mcp-todos': typeof IntegrationMcpTodosRoute
   '/integration/store': typeof IntegrationStoreRoute
   '/integration/table': typeof IntegrationTableRoute
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
-  '/demo/api/mcp-todos': typeof DemoApiMcpTodosRoute
-  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
+  '/integration/guitars/$guitarId': typeof IntegrationGuitarsGuitarIdRoute
   '/integration/i18n/paraglide': typeof IntegrationI18nParaglideRoute
   '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
   '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
   '/ui/action/button': typeof UiActionButtonRoute
-  '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/demo/chat/': typeof DemoChatIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
-  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
-  '/demo/api/ai/image': typeof DemoApiAiImageRoute
-  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
-  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
-  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
+  '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
+  '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
+  '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
+  '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
+  '/integration/api/ai/transcription': typeof IntegrationApiAiTranscriptionRoute
+  '/integration/api/ai/tts': typeof IntegrationApiAiTtsRoute
+  '/ui/display/md/tiptap': typeof UiDisplayMdTiptapRoute
+  '/ui/display/md/': typeof UiDisplayMdIndexRoute
+  '/ui/display/md/prosemirror/': typeof UiDisplayMdProsemirrorIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -256,34 +288,38 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
   '/api/todo': typeof ApiTodoRoute
-  '/demo/ai-chat': typeof DemoAiChatRoute
-  '/demo/ai-image': typeof DemoAiImageRoute
-  '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/todo': typeof DemoTodoRoute
+  '/integration/ai-chat': typeof IntegrationAiChatRoute
+  '/integration/ai-image': typeof IntegrationAiImageRoute
+  '/integration/ai-structured': typeof IntegrationAiStructuredRoute
   '/integration/drizzle': typeof IntegrationDrizzleRoute
+  '/integration/mcp-todos': typeof IntegrationMcpTodosRoute
   '/integration/store': typeof IntegrationStoreRoute
   '/integration/table': typeof IntegrationTableRoute
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
-  '/demo/api/mcp-todos': typeof DemoApiMcpTodosRoute
-  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
+  '/integration/guitars/$guitarId': typeof IntegrationGuitarsGuitarIdRoute
   '/integration/i18n/paraglide': typeof IntegrationI18nParaglideRoute
   '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
   '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
   '/ui/action/button': typeof UiActionButtonRoute
-  '/demo/guitars': typeof DemoGuitarsIndexRoute
+  '/demo/chat': typeof DemoChatIndexRoute
   '/integration/better-auth': typeof IntegrationBetterAuthIndexRoute
-  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
-  '/demo/api/ai/image': typeof DemoApiAiImageRoute
-  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
-  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
-  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
+  '/integration/guitars': typeof IntegrationGuitarsIndexRoute
+  '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
+  '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
+  '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
+  '/integration/api/ai/transcription': typeof IntegrationApiAiTranscriptionRoute
+  '/integration/api/ai/tts': typeof IntegrationApiAiTtsRoute
+  '/ui/display/md/tiptap': typeof UiDisplayMdTiptapRoute
+  '/ui/display/md': typeof UiDisplayMdIndexRoute
+  '/ui/display/md/prosemirror': typeof UiDisplayMdProsemirrorIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -292,34 +328,38 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
   '/api/todo': typeof ApiTodoRoute
-  '/demo/ai-chat': typeof DemoAiChatRoute
-  '/demo/ai-image': typeof DemoAiImageRoute
-  '/demo/ai-structured': typeof DemoAiStructuredRoute
-  '/demo/mcp-todos': typeof DemoMcpTodosRoute
   '/demo/todo': typeof DemoTodoRoute
+  '/integration/ai-chat': typeof IntegrationAiChatRoute
+  '/integration/ai-image': typeof IntegrationAiImageRoute
+  '/integration/ai-structured': typeof IntegrationAiStructuredRoute
   '/integration/drizzle': typeof IntegrationDrizzleRoute
+  '/integration/mcp-todos': typeof IntegrationMcpTodosRoute
   '/integration/store': typeof IntegrationStoreRoute
   '/integration/table': typeof IntegrationTableRoute
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
-  '/demo/api/mcp-todos': typeof DemoApiMcpTodosRoute
-  '/demo/guitars/$guitarId': typeof DemoGuitarsGuitarIdRoute
+  '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
+  '/integration/guitars/$guitarId': typeof IntegrationGuitarsGuitarIdRoute
   '/integration/i18n/paraglide': typeof IntegrationI18nParaglideRoute
   '/integration/orpc/todo': typeof IntegrationOrpcTodoRoute
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
   '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
   '/ui/action/button': typeof UiActionButtonRoute
-  '/demo/guitars/': typeof DemoGuitarsIndexRoute
+  '/demo/chat/': typeof DemoChatIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
-  '/demo/api/ai/chat': typeof DemoApiAiChatRoute
-  '/demo/api/ai/image': typeof DemoApiAiImageRoute
-  '/demo/api/ai/structured': typeof DemoApiAiStructuredRoute
-  '/demo/api/ai/transcription': typeof DemoApiAiTranscriptionRoute
-  '/demo/api/ai/tts': typeof DemoApiAiTtsRoute
+  '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
+  '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
+  '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
+  '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
+  '/integration/api/ai/transcription': typeof IntegrationApiAiTranscriptionRoute
+  '/integration/api/ai/tts': typeof IntegrationApiAiTtsRoute
+  '/ui/display/md/tiptap': typeof UiDisplayMdTiptapRoute
+  '/ui/display/md/': typeof UiDisplayMdIndexRoute
+  '/ui/display/md/prosemirror/': typeof UiDisplayMdProsemirrorIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -329,34 +369,38 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/api/$'
     | '/api/todo'
-    | '/demo/ai-chat'
-    | '/demo/ai-image'
-    | '/demo/ai-structured'
-    | '/demo/mcp-todos'
     | '/demo/todo'
+    | '/integration/ai-chat'
+    | '/integration/ai-image'
+    | '/integration/ai-structured'
     | '/integration/drizzle'
+    | '/integration/mcp-todos'
     | '/integration/store'
     | '/integration/table'
     | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
-    | '/demo/api/mcp-todos'
-    | '/demo/guitars/$guitarId'
+    | '/integration/api/mcp-todos'
     | '/integration/form/address'
     | '/integration/form/simple'
+    | '/integration/guitars/$guitarId'
     | '/integration/i18n/paraglide'
     | '/integration/orpc/todo'
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
     | '/integration/tanstack-db/error'
     | '/ui/action/button'
-    | '/demo/guitars/'
+    | '/demo/chat/'
     | '/integration/better-auth/'
-    | '/demo/api/ai/chat'
-    | '/demo/api/ai/image'
-    | '/demo/api/ai/structured'
-    | '/demo/api/ai/transcription'
-    | '/demo/api/ai/tts'
+    | '/integration/guitars/'
+    | '/integration/api/ai/chat'
+    | '/integration/api/ai/image'
+    | '/integration/api/ai/structured'
+    | '/integration/api/ai/transcription'
+    | '/integration/api/ai/tts'
+    | '/ui/display/md/tiptap'
+    | '/ui/display/md/'
+    | '/ui/display/md/prosemirror/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -364,34 +408,38 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/api/$'
     | '/api/todo'
-    | '/demo/ai-chat'
-    | '/demo/ai-image'
-    | '/demo/ai-structured'
-    | '/demo/mcp-todos'
     | '/demo/todo'
+    | '/integration/ai-chat'
+    | '/integration/ai-image'
+    | '/integration/ai-structured'
     | '/integration/drizzle'
+    | '/integration/mcp-todos'
     | '/integration/store'
     | '/integration/table'
     | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
-    | '/demo/api/mcp-todos'
-    | '/demo/guitars/$guitarId'
+    | '/integration/api/mcp-todos'
     | '/integration/form/address'
     | '/integration/form/simple'
+    | '/integration/guitars/$guitarId'
     | '/integration/i18n/paraglide'
     | '/integration/orpc/todo'
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
     | '/integration/tanstack-db/error'
     | '/ui/action/button'
-    | '/demo/guitars'
+    | '/demo/chat'
     | '/integration/better-auth'
-    | '/demo/api/ai/chat'
-    | '/demo/api/ai/image'
-    | '/demo/api/ai/structured'
-    | '/demo/api/ai/transcription'
-    | '/demo/api/ai/tts'
+    | '/integration/guitars'
+    | '/integration/api/ai/chat'
+    | '/integration/api/ai/image'
+    | '/integration/api/ai/structured'
+    | '/integration/api/ai/transcription'
+    | '/integration/api/ai/tts'
+    | '/ui/display/md/tiptap'
+    | '/ui/display/md'
+    | '/ui/display/md/prosemirror'
   id:
     | '__root__'
     | '/'
@@ -399,34 +447,38 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/api/$'
     | '/api/todo'
-    | '/demo/ai-chat'
-    | '/demo/ai-image'
-    | '/demo/ai-structured'
-    | '/demo/mcp-todos'
     | '/demo/todo'
+    | '/integration/ai-chat'
+    | '/integration/ai-image'
+    | '/integration/ai-structured'
     | '/integration/drizzle'
+    | '/integration/mcp-todos'
     | '/integration/store'
     | '/integration/table'
     | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
-    | '/demo/api/mcp-todos'
-    | '/demo/guitars/$guitarId'
+    | '/integration/api/mcp-todos'
     | '/integration/form/address'
     | '/integration/form/simple'
+    | '/integration/guitars/$guitarId'
     | '/integration/i18n/paraglide'
     | '/integration/orpc/todo'
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
     | '/integration/tanstack-db/error'
     | '/ui/action/button'
-    | '/demo/guitars/'
+    | '/demo/chat/'
     | '/integration/better-auth/'
-    | '/demo/api/ai/chat'
-    | '/demo/api/ai/image'
-    | '/demo/api/ai/structured'
-    | '/demo/api/ai/transcription'
-    | '/demo/api/ai/tts'
+    | '/integration/guitars/'
+    | '/integration/api/ai/chat'
+    | '/integration/api/ai/image'
+    | '/integration/api/ai/structured'
+    | '/integration/api/ai/transcription'
+    | '/integration/api/ai/tts'
+    | '/ui/display/md/tiptap'
+    | '/ui/display/md/'
+    | '/ui/display/md/prosemirror/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -435,34 +487,38 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   ApiSplatRoute: typeof ApiSplatRoute
   ApiTodoRoute: typeof ApiTodoRoute
-  DemoAiChatRoute: typeof DemoAiChatRoute
-  DemoAiImageRoute: typeof DemoAiImageRoute
-  DemoAiStructuredRoute: typeof DemoAiStructuredRoute
-  DemoMcpTodosRoute: typeof DemoMcpTodosRoute
   DemoTodoRoute: typeof DemoTodoRoute
+  IntegrationAiChatRoute: typeof IntegrationAiChatRoute
+  IntegrationAiImageRoute: typeof IntegrationAiImageRoute
+  IntegrationAiStructuredRoute: typeof IntegrationAiStructuredRoute
   IntegrationDrizzleRoute: typeof IntegrationDrizzleRoute
+  IntegrationMcpTodosRoute: typeof IntegrationMcpTodosRoute
   IntegrationStoreRoute: typeof IntegrationStoreRoute
   IntegrationTableRoute: typeof IntegrationTableRoute
   IntegrationTanstackQueryRoute: typeof IntegrationTanstackQueryRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
-  DemoApiMcpTodosRoute: typeof DemoApiMcpTodosRoute
-  DemoGuitarsGuitarIdRoute: typeof DemoGuitarsGuitarIdRoute
+  IntegrationApiMcpTodosRoute: typeof IntegrationApiMcpTodosRoute
   IntegrationFormAddressRoute: typeof IntegrationFormAddressRoute
   IntegrationFormSimpleRoute: typeof IntegrationFormSimpleRoute
+  IntegrationGuitarsGuitarIdRoute: typeof IntegrationGuitarsGuitarIdRoute
   IntegrationI18nParaglideRoute: typeof IntegrationI18nParaglideRoute
   IntegrationOrpcTodoRoute: typeof IntegrationOrpcTodoRoute
   IntegrationTanstackDbChatRoute: typeof IntegrationTanstackDbChatRoute
   IntegrationTanstackDbChatApiRoute: typeof IntegrationTanstackDbChatApiRoute
   IntegrationTanstackDbErrorRoute: typeof IntegrationTanstackDbErrorRoute
   UiActionButtonRoute: typeof UiActionButtonRoute
-  DemoGuitarsIndexRoute: typeof DemoGuitarsIndexRoute
+  DemoChatIndexRoute: typeof DemoChatIndexRoute
   IntegrationBetterAuthIndexRoute: typeof IntegrationBetterAuthIndexRoute
-  DemoApiAiChatRoute: typeof DemoApiAiChatRoute
-  DemoApiAiImageRoute: typeof DemoApiAiImageRoute
-  DemoApiAiStructuredRoute: typeof DemoApiAiStructuredRoute
-  DemoApiAiTranscriptionRoute: typeof DemoApiAiTranscriptionRoute
-  DemoApiAiTtsRoute: typeof DemoApiAiTtsRoute
+  IntegrationGuitarsIndexRoute: typeof IntegrationGuitarsIndexRoute
+  IntegrationApiAiChatRoute: typeof IntegrationApiAiChatRoute
+  IntegrationApiAiImageRoute: typeof IntegrationApiAiImageRoute
+  IntegrationApiAiStructuredRoute: typeof IntegrationApiAiStructuredRoute
+  IntegrationApiAiTranscriptionRoute: typeof IntegrationApiAiTranscriptionRoute
+  IntegrationApiAiTtsRoute: typeof IntegrationApiAiTtsRoute
+  UiDisplayMdTiptapRoute: typeof UiDisplayMdTiptapRoute
+  UiDisplayMdIndexRoute: typeof UiDisplayMdIndexRoute
+  UiDisplayMdProsemirrorIndexRoute: typeof UiDisplayMdProsemirrorIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -509,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationStoreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integration/mcp-todos': {
+      id: '/integration/mcp-todos'
+      path: '/integration/mcp-todos'
+      fullPath: '/integration/mcp-todos'
+      preLoaderRoute: typeof IntegrationMcpTodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integration/drizzle': {
       id: '/integration/drizzle'
       path: '/integration/drizzle'
@@ -516,39 +579,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationDrizzleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integration/ai-structured': {
+      id: '/integration/ai-structured'
+      path: '/integration/ai-structured'
+      fullPath: '/integration/ai-structured'
+      preLoaderRoute: typeof IntegrationAiStructuredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/ai-image': {
+      id: '/integration/ai-image'
+      path: '/integration/ai-image'
+      fullPath: '/integration/ai-image'
+      preLoaderRoute: typeof IntegrationAiImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/ai-chat': {
+      id: '/integration/ai-chat'
+      path: '/integration/ai-chat'
+      fullPath: '/integration/ai-chat'
+      preLoaderRoute: typeof IntegrationAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/todo': {
       id: '/demo/todo'
       path: '/demo/todo'
       fullPath: '/demo/todo'
       preLoaderRoute: typeof DemoTodoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/mcp-todos': {
-      id: '/demo/mcp-todos'
-      path: '/demo/mcp-todos'
-      fullPath: '/demo/mcp-todos'
-      preLoaderRoute: typeof DemoMcpTodosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai-structured': {
-      id: '/demo/ai-structured'
-      path: '/demo/ai-structured'
-      fullPath: '/demo/ai-structured'
-      preLoaderRoute: typeof DemoAiStructuredRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai-image': {
-      id: '/demo/ai-image'
-      path: '/demo/ai-image'
-      fullPath: '/demo/ai-image'
-      preLoaderRoute: typeof DemoAiImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/ai-chat': {
-      id: '/demo/ai-chat'
-      path: '/demo/ai-chat'
-      fullPath: '/demo/ai-chat'
-      preLoaderRoute: typeof DemoAiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/todo': {
@@ -565,6 +621,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integration/guitars/': {
+      id: '/integration/guitars/'
+      path: '/integration/guitars'
+      fullPath: '/integration/guitars/'
+      preLoaderRoute: typeof IntegrationGuitarsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integration/better-auth/': {
       id: '/integration/better-auth/'
       path: '/integration/better-auth'
@@ -572,11 +635,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationBetterAuthIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/guitars/': {
-      id: '/demo/guitars/'
-      path: '/demo/guitars'
-      fullPath: '/demo/guitars/'
-      preLoaderRoute: typeof DemoGuitarsIndexRouteImport
+    '/demo/chat/': {
+      id: '/demo/chat/'
+      path: '/demo/chat'
+      fullPath: '/demo/chat/'
+      preLoaderRoute: typeof DemoChatIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ui/action/button': {
@@ -621,6 +684,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationI18nParaglideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integration/guitars/$guitarId': {
+      id: '/integration/guitars/$guitarId'
+      path: '/integration/guitars/$guitarId'
+      fullPath: '/integration/guitars/$guitarId'
+      preLoaderRoute: typeof IntegrationGuitarsGuitarIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integration/form/simple': {
       id: '/integration/form/simple'
       path: '/integration/form/simple'
@@ -635,18 +705,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/guitars/$guitarId': {
-      id: '/demo/guitars/$guitarId'
-      path: '/demo/guitars/$guitarId'
-      fullPath: '/demo/guitars/$guitarId'
-      preLoaderRoute: typeof DemoGuitarsGuitarIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/api/mcp-todos': {
-      id: '/demo/api/mcp-todos'
-      path: '/demo/api/mcp-todos'
-      fullPath: '/demo/api/mcp-todos'
-      preLoaderRoute: typeof DemoApiMcpTodosRouteImport
+    '/integration/api/mcp-todos': {
+      id: '/integration/api/mcp-todos'
+      path: '/integration/api/mcp-todos'
+      fullPath: '/integration/api/mcp-todos'
+      preLoaderRoute: typeof IntegrationApiMcpTodosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/rpc/$': {
@@ -663,39 +726,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/tts': {
-      id: '/demo/api/ai/tts'
-      path: '/demo/api/ai/tts'
-      fullPath: '/demo/api/ai/tts'
-      preLoaderRoute: typeof DemoApiAiTtsRouteImport
+    '/ui/display/md/': {
+      id: '/ui/display/md/'
+      path: '/ui/display/md'
+      fullPath: '/ui/display/md/'
+      preLoaderRoute: typeof UiDisplayMdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/transcription': {
-      id: '/demo/api/ai/transcription'
-      path: '/demo/api/ai/transcription'
-      fullPath: '/demo/api/ai/transcription'
-      preLoaderRoute: typeof DemoApiAiTranscriptionRouteImport
+    '/ui/display/md/tiptap': {
+      id: '/ui/display/md/tiptap'
+      path: '/ui/display/md/tiptap'
+      fullPath: '/ui/display/md/tiptap'
+      preLoaderRoute: typeof UiDisplayMdTiptapRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/structured': {
-      id: '/demo/api/ai/structured'
-      path: '/demo/api/ai/structured'
-      fullPath: '/demo/api/ai/structured'
-      preLoaderRoute: typeof DemoApiAiStructuredRouteImport
+    '/integration/api/ai/tts': {
+      id: '/integration/api/ai/tts'
+      path: '/integration/api/ai/tts'
+      fullPath: '/integration/api/ai/tts'
+      preLoaderRoute: typeof IntegrationApiAiTtsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/image': {
-      id: '/demo/api/ai/image'
-      path: '/demo/api/ai/image'
-      fullPath: '/demo/api/ai/image'
-      preLoaderRoute: typeof DemoApiAiImageRouteImport
+    '/integration/api/ai/transcription': {
+      id: '/integration/api/ai/transcription'
+      path: '/integration/api/ai/transcription'
+      fullPath: '/integration/api/ai/transcription'
+      preLoaderRoute: typeof IntegrationApiAiTranscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/api/ai/chat': {
-      id: '/demo/api/ai/chat'
-      path: '/demo/api/ai/chat'
-      fullPath: '/demo/api/ai/chat'
-      preLoaderRoute: typeof DemoApiAiChatRouteImport
+    '/integration/api/ai/structured': {
+      id: '/integration/api/ai/structured'
+      path: '/integration/api/ai/structured'
+      fullPath: '/integration/api/ai/structured'
+      preLoaderRoute: typeof IntegrationApiAiStructuredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/api/ai/image': {
+      id: '/integration/api/ai/image'
+      path: '/integration/api/ai/image'
+      fullPath: '/integration/api/ai/image'
+      preLoaderRoute: typeof IntegrationApiAiImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/api/ai/chat': {
+      id: '/integration/api/ai/chat'
+      path: '/integration/api/ai/chat'
+      fullPath: '/integration/api/ai/chat'
+      preLoaderRoute: typeof IntegrationApiAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ui/display/md/prosemirror/': {
+      id: '/ui/display/md/prosemirror/'
+      path: '/ui/display/md/prosemirror'
+      fullPath: '/ui/display/md/prosemirror/'
+      preLoaderRoute: typeof UiDisplayMdProsemirrorIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -707,34 +791,38 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   ApiSplatRoute: ApiSplatRoute,
   ApiTodoRoute: ApiTodoRoute,
-  DemoAiChatRoute: DemoAiChatRoute,
-  DemoAiImageRoute: DemoAiImageRoute,
-  DemoAiStructuredRoute: DemoAiStructuredRoute,
-  DemoMcpTodosRoute: DemoMcpTodosRoute,
   DemoTodoRoute: DemoTodoRoute,
+  IntegrationAiChatRoute: IntegrationAiChatRoute,
+  IntegrationAiImageRoute: IntegrationAiImageRoute,
+  IntegrationAiStructuredRoute: IntegrationAiStructuredRoute,
   IntegrationDrizzleRoute: IntegrationDrizzleRoute,
+  IntegrationMcpTodosRoute: IntegrationMcpTodosRoute,
   IntegrationStoreRoute: IntegrationStoreRoute,
   IntegrationTableRoute: IntegrationTableRoute,
   IntegrationTanstackQueryRoute: IntegrationTanstackQueryRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
-  DemoApiMcpTodosRoute: DemoApiMcpTodosRoute,
-  DemoGuitarsGuitarIdRoute: DemoGuitarsGuitarIdRoute,
+  IntegrationApiMcpTodosRoute: IntegrationApiMcpTodosRoute,
   IntegrationFormAddressRoute: IntegrationFormAddressRoute,
   IntegrationFormSimpleRoute: IntegrationFormSimpleRoute,
+  IntegrationGuitarsGuitarIdRoute: IntegrationGuitarsGuitarIdRoute,
   IntegrationI18nParaglideRoute: IntegrationI18nParaglideRoute,
   IntegrationOrpcTodoRoute: IntegrationOrpcTodoRoute,
   IntegrationTanstackDbChatRoute: IntegrationTanstackDbChatRoute,
   IntegrationTanstackDbChatApiRoute: IntegrationTanstackDbChatApiRoute,
   IntegrationTanstackDbErrorRoute: IntegrationTanstackDbErrorRoute,
   UiActionButtonRoute: UiActionButtonRoute,
-  DemoGuitarsIndexRoute: DemoGuitarsIndexRoute,
+  DemoChatIndexRoute: DemoChatIndexRoute,
   IntegrationBetterAuthIndexRoute: IntegrationBetterAuthIndexRoute,
-  DemoApiAiChatRoute: DemoApiAiChatRoute,
-  DemoApiAiImageRoute: DemoApiAiImageRoute,
-  DemoApiAiStructuredRoute: DemoApiAiStructuredRoute,
-  DemoApiAiTranscriptionRoute: DemoApiAiTranscriptionRoute,
-  DemoApiAiTtsRoute: DemoApiAiTtsRoute,
+  IntegrationGuitarsIndexRoute: IntegrationGuitarsIndexRoute,
+  IntegrationApiAiChatRoute: IntegrationApiAiChatRoute,
+  IntegrationApiAiImageRoute: IntegrationApiAiImageRoute,
+  IntegrationApiAiStructuredRoute: IntegrationApiAiStructuredRoute,
+  IntegrationApiAiTranscriptionRoute: IntegrationApiAiTranscriptionRoute,
+  IntegrationApiAiTtsRoute: IntegrationApiAiTtsRoute,
+  UiDisplayMdTiptapRoute: UiDisplayMdTiptapRoute,
+  UiDisplayMdIndexRoute: UiDisplayMdIndexRoute,
+  UiDisplayMdProsemirrorIndexRoute: UiDisplayMdProsemirrorIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

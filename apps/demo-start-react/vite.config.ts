@@ -46,11 +46,11 @@ const config = defineConfig({
 	// 	ssr: { build: { rollupOptions: { input: './src/server.ts' } } },
 	// },
 	ssr: {
-		noExternal: ['drizzle-orm'],
+		// noExternal: ['drizzle-orm'],
 	},
-	server: {
-		port: 4001,
-	},
+	// server: {
+	// 	port: 4001,
+	// },
 });
 
 export default config;

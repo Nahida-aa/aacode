@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { generateSpeech } from '@tanstack/ai'
 import { openaiSpeech } from '@tanstack/ai-openai'
 
-export const Route = createFileRoute('/demo/api/ai/tts')({
+export const Route = createFileRoute('/integration/api/ai/tts')({
   server: {
     handlers: {
       POST: async ({ request }) => {

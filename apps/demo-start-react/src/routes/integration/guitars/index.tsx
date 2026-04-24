@@ -2,7 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 
 import guitars from '#/data/demo-guitars';
 
-export const Route = createFileRoute('/demo/guitars/')({
+export const Route = createFileRoute('/integration/guitars/')({
 	component: GuitarsIndex,
 });
 

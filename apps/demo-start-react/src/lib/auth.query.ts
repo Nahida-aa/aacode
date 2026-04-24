@@ -6,7 +6,7 @@ import { getSession } from '#/lib/auth.func';
 export const authKeys = {
 	session: ['session'] as const,
 };
-export const authQ = {
+export const authOptions = {
 	session: queryOptions({
 		queryKey: authKeys.session,
 		queryFn: async () => {

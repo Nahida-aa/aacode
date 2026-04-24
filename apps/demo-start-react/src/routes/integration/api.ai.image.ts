@@ -2,7 +2,7 @@ import { createImageOptions, generateImage } from '@tanstack/ai';
 import { openaiImage } from '@tanstack/ai-openai';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/demo/api/ai/image')({
+export const Route = createFileRoute('/integration/api/ai/image')({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {

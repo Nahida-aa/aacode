@@ -49,5 +49,6 @@
 		"package.json": "package-lock.json, nodemon.json, pnpm*, .yarnrc*, yarn*, bun.lock,  .eslint*, eslint*,  .oxlint*, oxlint*, .prettier*,  prettier*, .editorconfig, .npmrc, drizzle.config.ts, components.json, .cta.json,  auth-schema.ts, .nvmrc",
 		"README.md": "CHANGELOG.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, readme.*, *.http, *.rest, migrate-from-next-js.md",
 		"AGENTS.md": ".cursorrules"
-	}
+	},
+	"typescript.native-preview.tsdk": "/home/aa/repos/env_ls/aacode/node_modules/@typescript/native-preview"
 }

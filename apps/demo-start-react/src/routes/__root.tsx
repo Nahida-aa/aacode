@@ -18,6 +18,7 @@ import {
 	SIDEBAR_COOKIE_NAME,
 	SidebarProvider,
 } from '#/components/ui/sidebar.tsx';
+import { TooltipProvider } from '#/components/ui/tooltip.tsx';
 import { scrollbarDefault } from '#/css.ts';
 import { getLocale } from '#/paraglide/runtime';
 import { DemoFooter } from '../components/app/Footer';
@@ -80,17 +81,19 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="font-sans antialiased wrap-anywhere h-svh overflow-hidden selection:bg-[rgba(79,184,178,0.24)]">
 				<ThemeProvider>
-					<SidebarProvider defaultOpen={sidebarOpen}>
-						<DemoSidebar />
-						<div className="flex-1 flex h-svh max-h-svh min-h-svh flex-col overflow-hidden ">
-							<DemoHeader />
+					<TooltipProvider>
+						<SidebarProvider defaultOpen={sidebarOpen}>
+							<DemoSidebar />
+							<div className="flex-1 flex h-svh max-h-svh min-h-svh flex-col overflow-hidden ">
+								<DemoHeader />
 
-							<div className={`flex-1 overflow-y-auto ${scrollbarDefault}`}>
-								{children}
-								{pathname === '/' && <DemoFooter />}
+								<div className={`flex-1 overflow-y-auto ${scrollbarDefault}`}>
+									{children}
+									{pathname === '/' && <DemoFooter />}
+								</div>
 							</div>
-						</div>
-					</SidebarProvider>
+						</SidebarProvider>
+					</TooltipProvider>
 				</ThemeProvider>
 				<TanStackDevtools
 					config={{

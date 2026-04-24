@@ -24,7 +24,7 @@ IMPORTANT:
 - Do NOT describe the guitar yourself - let the recommendGuitar tool do it
 `;
 
-export const Route = createFileRoute('/demo/api/ai/chat')({
+export const Route = createFileRoute('/integration/api/ai/chat')({
 	server: {
 		handlers: {
 			POST: async ({ request }) => {
