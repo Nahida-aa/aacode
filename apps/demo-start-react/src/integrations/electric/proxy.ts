@@ -1,5 +1,5 @@
 import { ELECTRIC_PROTOCOL_QUERY_PARAMS } from '@electric-sql/client';
-import { env } from '#/env.ts';
+import { serverEnv } from '#/env.server.ts';
 
 /**
  * Gets the Electric SQL endpoint URL based on environment configuration.
@@ -31,8 +31,8 @@ export function prepareElectricUrl(requestUrl: string): URL {
 	});
 
 	// Add Electric Cloud authentication if configured
-  originUrl.searchParams.set(`source_id`, env.ELECTRIC_SOURCE_ID);
-  originUrl.searchParams.set(`secret`, env.ELECTRIC_SECRET)
+	originUrl.searchParams.set(`source_id`, serverEnv.ELECTRIC_SOURCE_ID);
+	originUrl.searchParams.set(`secret`, serverEnv.ELECTRIC_SECRET);
 
 	return originUrl;
 }

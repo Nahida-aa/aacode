@@ -2,7 +2,9 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @plugin '@tailwindcss/typography';
-
+/* // 引入一個你喜歡的高亮主題 */
+/* // import 'highlight.js/styles/github-dark.css'; */
+@import '@catppuccin/highlightjs/css/catppuccin-macchiato.css';
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -179,25 +181,8 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 }
-@keyframes google-caret {
-	0%,
-	100% {
-		caret-color: #4285f4;
-	} /* Blue */
-	25% {
-		caret-color: #ea4335;
-	} /* Red */
-	50% {
-		caret-color: #fbbc05;
-	} /* Yellow */
-	75% {
-		caret-color: #34a853;
-	} /* Green */
-}
 
 * {
-	animation: google-caret 2s infinite;
-	caret-color: #4285f4; /* Initial color */
 	-webkit-font-smoothing: subpixel-antialiased;
 }
 
@@ -207,7 +192,7 @@
 	::before,
 	::backdrop,
 	::file-selector-button {
-		@apply border-border outline-ring/50 caret-primary leading-[1.15];
+		@apply border-border outline-ring/50 caret-primary leading-[1.15] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar]:h-1;
 	}
 	body {
 		background-color: var(--background);
@@ -347,11 +332,12 @@
 	.prose :is(h1, h2, h3, h4, h5, h6):hover a::after {
 		opacity: 1;
 	}
-	.prose pre {
-		/* border: 1px solid var(--line); */
-		border-radius: 12px;
-		background: #1d2e45;
-		color: #e8efff;
+}
+.prose {
+	pre {
+		&:first-child {
+			@apply mt-0 mb-0;
+		}
 	}
 }
 @layer utilities {
@@ -366,6 +352,15 @@
 		}
 		:where(p):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
 			@apply my-4;
+			&:first-child {
+				@apply my-0;
+			}
+		}
+		pre {
+			/* border: 1px solid var(--line); */
+			/* border-radius: 12px; */
+			/* background: #1d2e45; */
+			/* color: #e8efff; */
 		}
 	}
 }

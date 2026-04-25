@@ -11,14 +11,16 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { createServerFn } from '@tanstack/react-start';
 import { getCookie } from '@tanstack/react-start/server';
+import { Toaster } from 'sonner';
 import { DemoHeader } from '#/components/app/Header.tsx';
 import { DemoSidebar } from '#/components/app/sidebar.tsx';
-import { ThemeProvider } from '#/components/app/theme-provider.tsx';
+import { ThemeProvider, useTheme } from '#/components/app/theme-provider.tsx';
 import {
 	SIDEBAR_COOKIE_NAME,
 	SidebarProvider,
 } from '#/components/ui/sidebar.tsx';
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
+import { ModalRenderer } from '#/components/uix/modal/renderer.tsx';
 import { scrollbarDefault } from '#/css.ts';
 import { getLocale } from '#/paraglide/runtime';
 import { DemoFooter } from '../components/app/Footer';
@@ -73,6 +75,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootDocument({ children }: { children: React.ReactNode }) {
 	const { sidebarOpen } = Route.useLoaderData();
 	const pathname = useLocation({ select: (loc) => loc.pathname });
+	const { theme, systemTheme } = useTheme();
 	return (
 		<html lang={getLocale()} suppressHydrationWarning>
 			<head>
@@ -93,6 +96,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 								</div>
 							</div>
 						</SidebarProvider>
+						<ModalRenderer />
+						<Toaster
+							theme={theme === 'system' ? systemTheme : theme}
+							position="top-right"
+							richColors
+							className="bg-transparent pointer-events-auto!"
+							duration={60000}
+							// style={{ pointerEvents: "auto" }}
+						/>
 					</TooltipProvider>
 				</ThemeProvider>
 				<TanStackDevtools

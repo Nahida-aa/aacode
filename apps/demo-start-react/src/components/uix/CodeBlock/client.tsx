@@ -77,8 +77,8 @@ export default function CodeBlock({
 					<div
 						style={{ '--highlight-color': '#ff3333' } as React.CSSProperties}
 						className={cn(
-							'bg-ctp-crust min-h-0 h-full w-full overflow-auto font-mono text-xs',
-							'[&>pre]:h-full  [&>pre]:py-2', // [&>pre]:w-screen!
+							' min-h-0 h-full w-full overflow-auto font-mono text-xs',
+							'[&>pre]:h-full [&>pre]:bg-ctp-crust! [&>pre]:py-2', // [&>pre]:w-screen!
 							scrollbarDefault,
 							'[&>pre>code]:inline-block! [&>pre>code]:w-full!',
 							'[&>pre>code>span]:inline-block! [&>pre>code>span]:w-full [&>pre>code>span]:px-4 [&>pre>code>span]:py-0.5',
@@ -120,7 +120,7 @@ export default function CodeBlock({
 		<div
 			data-slot="CodeBlock"
 			className={cn(
-				`rounded-md  bg-ctp-crust min-w-0 max-w-full  h-fit`,
+				`rounded-md overflow-hidden bg-ctp-crust min-w-0 max-w-full  h-fit`,
 				className,
 			)}
 		>

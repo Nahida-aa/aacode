@@ -1,8 +1,10 @@
 import { createSelectSchema, createUpdateSchema } from 'drizzle-zod';
-import type { z } from 'zod';
+import { z } from 'zod';
 import { todo } from '#/features/todo/todo.table.ts';
 
-export const selectTodoSchema = createSelectSchema(todo).partial({
+export const selectTodoSchema = createSelectSchema(todo, {
+	content: z.any().optional(),
+}).partial({
 	title: true,
 	content: true,
 });

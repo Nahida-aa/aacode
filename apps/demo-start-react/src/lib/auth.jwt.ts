@@ -1,7 +1,7 @@
 import { type JWTPayload, jwtVerify, SignJWT } from 'jose';
-import { env } from '#/env';
+import { serverEnv } from '#/env.server.ts';
 
-const secretKey = env.BETTER_AUTH_SECRET;
+const secretKey = serverEnv.BETTER_AUTH_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
 export async function jwtEncrypt(payload: JWTPayload) {

@@ -5,7 +5,7 @@ import {
 	useStore,
 } from '@tanstack/react-form';
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Toaster, toast } from 'sonner';
 import { useLocalStorage } from 'usehooks-ts';
 import { useTheme } from '#/components/app/theme-provider';
@@ -80,7 +80,7 @@ export const SubmitButton = ({
 					form={formId}
 				>
 					{icon ? (
-						<span className={`shrink-0 ${isSubmitting && 'animate-spin'}`}>
+						<span className={`shrink-0  ${isSubmitting ? 'animate-spin' : ''}`}>
 							{icon}
 						</span>
 					) : (
@@ -267,24 +267,16 @@ export const FormFloatingSaveBar = ({
 // 同步到 localStorage
 export const SyncToLocalStorage = () => {
 	const form = useFormContext();
-	const { values, isDirty } = useStore(form.store, (state) => ({
-		values: state.values,
-		isDirty: state.isDirty,
-	}));
+	const values = useStore(form.store, (state) => state.values);
 	useEffect(() => {
-		if (!isDirty) {
-			const saved = localStorage.getItem(form.formId);
-			if (saved) {
-				form.baseStore.setState((s) => ({
-					...s,
-					values: JSON.parse(saved),
-				}));
-			}
-		}
-	}, [isDirty, form.formId, form.baseStore.setState]);
-	useEffect(() => {
+		// 如果是 空对象 或 { k: undefined } 这种形式，说明没有实际的值，避免误覆盖 localStorage 中的有效数据
+		if (
+			Object.keys(values).length === 0 ||
+			Object.values(values).every((v) => v === undefined)
+		)
+			return;
+		console.log('SyncToLocalStorage.useEffect:', values);
 		localStorage.setItem(form.formId, JSON.stringify(values));
 	}, [values, form.formId]);
-
 	return null;
 };

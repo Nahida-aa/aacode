@@ -1,12 +1,12 @@
 import { AwsClient } from 'aws4fetch';
-import { env } from '#/env';
+import { serverEnv } from '#/env.server';
 
 const config = {
 	region: 'auto',
-	endpoint: env.R2_S3_ENDPOINT, // https://账户id.r2.cloudflarestorage.com
+	endpoint: serverEnv.R2_S3_ENDPOINT, // https://账户id.r2.cloudflarestorage.com
 	credentials: {
-		accessKeyId: env.R2_ACCESS_KEY_ID,
-		secretAccessKey: env.R2_SECRET_ACCESS_KEY,
+		accessKeyId: serverEnv.R2_ACCESS_KEY_ID,
+		secretAccessKey: serverEnv.R2_SECRET_ACCESS_KEY,
 	},
 };
 // 初始化 AwsClient，R2 的 region 建议填 "auto"
@@ -29,7 +29,9 @@ async function getPresignedUrl(
 ): Promise<string> {
 	// 构建完整的 R2 终端节点 URL: https://<bucket>.<account-id>://<key>
 	// 注意：env.R2_S3_ENDPOINT 通常不带 bucket，需要拼入
-	const url = new URL(`${config.endpoint}/${env.R2_BUCKET_NAME}/${storageKey}`);
+	const url = new URL(
+		`${config.endpoint}/${serverEnv.R2_BUCKET_NAME}/${storageKey}`,
+	);
 
 	// 添加过期时间参数
 	url.searchParams.set('X-Amz-Expires', expiresIn.toString());
@@ -96,7 +98,7 @@ export async function generatePresignedDownloadUrl(
  * 删除R2文件 (直接执行删除，不是生成链接)
  */
 export async function deleteFile(key: string): Promise<void> {
-	const url = `${config.endpoint}/${env.R2_BUCKET_NAME}/${key}`;
+	const url = `${config.endpoint}/${serverEnv.R2_BUCKET_NAME}/${key}`;
 	try {
 		const response = await aws.fetch(url, { method: 'DELETE' });
 		if (!response.ok) {

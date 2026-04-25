@@ -5,8 +5,9 @@ import { useLocalStorage } from 'usehooks-ts';
 import { z } from 'zod';
 import { useAppForm } from '#/components/uix/form/useAppForm.tsx';
 import {
-	Editor,
-	type EditorRef,
+	findBlobUrls,
+	TextEditor,
+	type TextEditorRef,
 } from '#/components/uix/prosemirror/editor.tsx';
 import { useFileUpload } from '#/lib/upload/useFileUpload.ts';
 
@@ -17,7 +18,7 @@ export const Route = createFileRoute('/ui/display/md/prosemirror/')({
 function RouteComponent() {
 	return (
 		<div>
-			<Editor className="bg-input/50 prose dark:prose-invert prose-neutral" />
+			<TextEditor className="bg-input/50 prose dark:prose-invert prose-neutral" />
 			<ClientOnly>
 				<MsgInput />
 			</ClientOnly>
@@ -29,14 +30,14 @@ const MsgInput = () => {
 	const formSchema = z.object({
 		content: z.any(),
 	});
-	const editorRef = useRef<EditorRef>(null);
+	const editorRef = useRef<TextEditorRef>(null);
 	type FormValues = z.infer<typeof formSchema>;
 	// const [value, setValue] = useLocalStorage<FormValues>(
 	// 	'prosemirror',
 	// 	{} as FormValues,
 	// );
 
-	const { uploadFiles, status } = useFileUpload();
+	const { uploadFiles, state } = useFileUpload();
 	const initialValuesRef = useRef<FormValues | null>(null);
 	if (initialValuesRef.current === null) {
 		try {
@@ -55,41 +56,36 @@ const MsgInput = () => {
 			onChange: formSchema,
 		},
 		onSubmit: async ({ value }) => {
-			// 2. 通過 ref 拿到內部的 Map
-			const cache = editorRef.current?.getFileCache();
-			// 1. 找出真正存在於文檔中的 blobUrls 和對應的 Files
-			const activeEntries =
-				cache && cache.size > 0
-					? Array.from(cache.entries()).filter(([url]) =>
-							value.content.includes(url),
-						)
-					: [];
-			if (activeEntries.length > 0) {
-				const blobUrls = activeEntries.map(([url]) => url);
-				const files = activeEntries.map(([_, file]) => file);
-				console.log(`正在批量上傳 ${files.length} 張圖片...`);
-
-				// 2. 呼叫你的批量上傳函數
-				const uploadedResults = await uploadFiles(files);
-
-				// 3. 遍历结果，替换本地结果
-				// 注意：uploadFiles 返回的順序通常與傳入的 files 順序一致
-				uploadedResults.forEach((result, index) => {
-					const localUrl = blobUrls[index];
-					const remoteUrl = `key://${result.storageKey}`; // 替換成實際的遠程 URL，可能需要根據你的後端返回值調整
-
-					if (localUrl && remoteUrl) {
-						// 全局替換 JSON 字符串中的本地鏈接
-						value.content = value.content.split(localUrl).join(remoteUrl);
-
-						// 釋放內存
-						URL.revokeObjectURL(localUrl);
-						cache?.delete(localUrl);
-					}
-				});
-			}
-
 			console.log(value);
+			// 1. 通过 ref 拿到內部的 Map
+			const cache = editorRef.current?.getFileCache();
+
+			const activeUrls = findBlobUrls(value.content);
+			console.log('activeUrls', activeUrls);
+			// if (activeEntries.length > 0) {
+			// 	const blobUrls = activeEntries.map(([url]) => url);
+			// 	const files = activeEntries.map(([_, file]) => file);
+			// 	console.log(`正在批量上傳 ${files.length} 張圖片...`);
+
+			// 	// 2. 呼叫你的批量上傳函數
+			// 	const uploadedResults = await uploadFiles(files);
+
+			// 	// 3. 遍历结果，替换本地结果
+			// 	// 注意：uploadFiles 返回的順序通常與傳入的 files 順序一致
+			// 	// uploadedResults.forEach((result, index) => {
+			// 	// 	const localUrl = blobUrls[index];
+			// 	// 	const remoteUrl = `key://${result.storageKey}`; // 替換成實際的遠程 URL，可能需要根據你的後端返回值調整
+
+			// 	// 	if (localUrl && remoteUrl) {
+			// 	// 		// 全局替換 JSON 字符串中的本地鏈接
+			// 	// 		value.content = value.content.split(localUrl).join(remoteUrl);
+
+			// 	// 		// 釋放內存
+			// 	// 		URL.revokeObjectURL(localUrl);
+			// 	// 		cache?.delete(localUrl);
+			// 	// 	}
+			// 	// });
+			// }
 		},
 	});
 	// https://avatars.githubusercontent.com/u/188596056?v=4&size=64
@@ -102,11 +98,24 @@ const MsgInput = () => {
 						name="content"
 						children={(field) => (
 							// <ClientOnly>
-							<Editor
+							<TextEditor
 								ref={editorRef}
 								initialValue={initialValuesRef.current?.content}
 								onSave={field.handleChange}
-								className="bg-input/50 prose dark:prose-invert prose-neutral"
+								onKeydown={(v, e) => {
+									if (
+										e.key === 'Enter' &&
+										!e.shiftKey &&
+										!e.ctrlKey &&
+										!e.altKey &&
+										!e.metaKey
+									) {
+										console.log('Enter pressed', e.key);
+										e.preventDefault();
+										form.handleSubmit();
+									}
+								}}
+								className="bg-input/50 py-2 px-3 prose dark:prose-invert prose-neutral"
 							/>
 							// </ClientOnly>
 						)}

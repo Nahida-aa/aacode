@@ -46,7 +46,11 @@ export const uploadFileWithProgress = (
 			else reject(new Error(`Upload failed with status ${xhr.status}`));
 		};
 
-		xhr.onerror = () => reject(new Error('Network error during upload'));
+		xhr.onerror = () =>
+			reject((reason: any) => {
+				console.warn(reason);
+				throw new Error(`Network error during upload ${reason}`);
+			});
 		xhr.onabort = () => reject(new Error('Upload aborted'));
 
 		xhr.send(file);

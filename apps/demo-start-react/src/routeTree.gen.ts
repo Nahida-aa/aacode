@@ -36,6 +36,7 @@ import { Route as IntegrationGuitarsGuitarIdRouteImport } from './routes/integra
 import { Route as IntegrationFormSimpleRouteImport } from './routes/integration/form/simple'
 import { Route as IntegrationFormAddressRouteImport } from './routes/integration/form/address'
 import { Route as IntegrationApiMcpTodosRouteImport } from './routes/integration/api.mcp-todos'
+import { Route as BaseHttpXhrRouteImport } from './routes/base/http/xhr'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as UiDisplayMdIndexRouteImport } from './routes/ui/display/md/index'
@@ -45,6 +46,7 @@ import { Route as IntegrationApiAiTranscriptionRouteImport } from './routes/inte
 import { Route as IntegrationApiAiStructuredRouteImport } from './routes/integration/api.ai.structured'
 import { Route as IntegrationApiAiImageRouteImport } from './routes/integration/api.ai.image'
 import { Route as IntegrationApiAiChatRouteImport } from './routes/integration/api.ai.chat'
+import { Route as BaseHttpApiErrRouteImport } from './routes/base/http/api.err'
 import { Route as UiDisplayMdProsemirrorIndexRouteImport } from './routes/ui/display/md/prosemirror/index'
 
 const McpRoute = McpRouteImport.update({
@@ -189,6 +191,11 @@ const IntegrationApiMcpTodosRoute = IntegrationApiMcpTodosRouteImport.update({
   path: '/integration/api/mcp-todos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BaseHttpXhrRoute = BaseHttpXhrRouteImport.update({
+  id: '/base/http/xhr',
+  path: '/base/http/xhr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   id: '/api/rpc/$',
   path: '/api/rpc/$',
@@ -236,6 +243,11 @@ const IntegrationApiAiChatRoute = IntegrationApiAiChatRouteImport.update({
   path: '/integration/api/ai/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BaseHttpApiErrRoute = BaseHttpApiErrRouteImport.update({
+  id: '/base/http/api/err',
+  path: '/base/http/api/err',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UiDisplayMdProsemirrorIndexRoute =
   UiDisplayMdProsemirrorIndexRouteImport.update({
     id: '/ui/display/md/prosemirror/',
@@ -260,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/base/http/xhr': typeof BaseHttpXhrRoute
   '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
@@ -273,6 +286,7 @@ export interface FileRoutesByFullPath {
   '/demo/chat/': typeof DemoChatIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
+  '/base/http/api/err': typeof BaseHttpApiErrRoute
   '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
   '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
   '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
@@ -299,6 +313,7 @@ export interface FileRoutesByTo {
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/base/http/xhr': typeof BaseHttpXhrRoute
   '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
@@ -312,6 +327,7 @@ export interface FileRoutesByTo {
   '/demo/chat': typeof DemoChatIndexRoute
   '/integration/better-auth': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars': typeof IntegrationGuitarsIndexRoute
+  '/base/http/api/err': typeof BaseHttpApiErrRoute
   '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
   '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
   '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
@@ -339,6 +355,7 @@ export interface FileRoutesById {
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/base/http/xhr': typeof BaseHttpXhrRoute
   '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
@@ -352,6 +369,7 @@ export interface FileRoutesById {
   '/demo/chat/': typeof DemoChatIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
+  '/base/http/api/err': typeof BaseHttpApiErrRoute
   '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
   '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
   '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
@@ -380,6 +398,7 @@ export interface FileRouteTypes {
     | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/base/http/xhr'
     | '/integration/api/mcp-todos'
     | '/integration/form/address'
     | '/integration/form/simple'
@@ -393,6 +412,7 @@ export interface FileRouteTypes {
     | '/demo/chat/'
     | '/integration/better-auth/'
     | '/integration/guitars/'
+    | '/base/http/api/err'
     | '/integration/api/ai/chat'
     | '/integration/api/ai/image'
     | '/integration/api/ai/structured'
@@ -419,6 +439,7 @@ export interface FileRouteTypes {
     | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/base/http/xhr'
     | '/integration/api/mcp-todos'
     | '/integration/form/address'
     | '/integration/form/simple'
@@ -432,6 +453,7 @@ export interface FileRouteTypes {
     | '/demo/chat'
     | '/integration/better-auth'
     | '/integration/guitars'
+    | '/base/http/api/err'
     | '/integration/api/ai/chat'
     | '/integration/api/ai/image'
     | '/integration/api/ai/structured'
@@ -458,6 +480,7 @@ export interface FileRouteTypes {
     | '/integration/tanstack-query'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/base/http/xhr'
     | '/integration/api/mcp-todos'
     | '/integration/form/address'
     | '/integration/form/simple'
@@ -471,6 +494,7 @@ export interface FileRouteTypes {
     | '/demo/chat/'
     | '/integration/better-auth/'
     | '/integration/guitars/'
+    | '/base/http/api/err'
     | '/integration/api/ai/chat'
     | '/integration/api/ai/image'
     | '/integration/api/ai/structured'
@@ -498,6 +522,7 @@ export interface RootRouteChildren {
   IntegrationTanstackQueryRoute: typeof IntegrationTanstackQueryRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
+  BaseHttpXhrRoute: typeof BaseHttpXhrRoute
   IntegrationApiMcpTodosRoute: typeof IntegrationApiMcpTodosRoute
   IntegrationFormAddressRoute: typeof IntegrationFormAddressRoute
   IntegrationFormSimpleRoute: typeof IntegrationFormSimpleRoute
@@ -511,6 +536,7 @@ export interface RootRouteChildren {
   DemoChatIndexRoute: typeof DemoChatIndexRoute
   IntegrationBetterAuthIndexRoute: typeof IntegrationBetterAuthIndexRoute
   IntegrationGuitarsIndexRoute: typeof IntegrationGuitarsIndexRoute
+  BaseHttpApiErrRoute: typeof BaseHttpApiErrRoute
   IntegrationApiAiChatRoute: typeof IntegrationApiAiChatRoute
   IntegrationApiAiImageRoute: typeof IntegrationApiAiImageRoute
   IntegrationApiAiStructuredRoute: typeof IntegrationApiAiStructuredRoute
@@ -712,6 +738,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationApiMcpTodosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/base/http/xhr': {
+      id: '/base/http/xhr'
+      path: '/base/http/xhr'
+      fullPath: '/base/http/xhr'
+      preLoaderRoute: typeof BaseHttpXhrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/rpc/$': {
       id: '/api/rpc/$'
       path: '/api/rpc/$'
@@ -775,6 +808,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationApiAiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/base/http/api/err': {
+      id: '/base/http/api/err'
+      path: '/base/http/api/err'
+      fullPath: '/base/http/api/err'
+      preLoaderRoute: typeof BaseHttpApiErrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ui/display/md/prosemirror/': {
       id: '/ui/display/md/prosemirror/'
       path: '/ui/display/md/prosemirror'
@@ -802,6 +842,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationTanstackQueryRoute: IntegrationTanstackQueryRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
+  BaseHttpXhrRoute: BaseHttpXhrRoute,
   IntegrationApiMcpTodosRoute: IntegrationApiMcpTodosRoute,
   IntegrationFormAddressRoute: IntegrationFormAddressRoute,
   IntegrationFormSimpleRoute: IntegrationFormSimpleRoute,
@@ -815,6 +856,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoChatIndexRoute: DemoChatIndexRoute,
   IntegrationBetterAuthIndexRoute: IntegrationBetterAuthIndexRoute,
   IntegrationGuitarsIndexRoute: IntegrationGuitarsIndexRoute,
+  BaseHttpApiErrRoute: BaseHttpApiErrRoute,
   IntegrationApiAiChatRoute: IntegrationApiAiChatRoute,
   IntegrationApiAiImageRoute: IntegrationApiAiImageRoute,
   IntegrationApiAiStructuredRoute: IntegrationApiAiStructuredRoute,

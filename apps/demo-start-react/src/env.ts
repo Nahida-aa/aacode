@@ -3,17 +3,10 @@
 // import packageJson from '../package.json';
 
 export const env = {
-	DATABASE_URL: process.env.DATABASE_URL!,
-	BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
-	ELECTRIC_SOURCE_ID: process.env.ELECTRIC_SOURCE_ID!,
-	ELECTRIC_SECRET: process.env.ELECTRIC_SECRET!,
 	VITE_APP_URL: import.meta.env.DEV
 		? `http://localhost:${process.env.PORT || 3000}`
 		: import.meta.env.VITE_APP_URL,
-	R2_S3_ENDPOINT: process.env.R2_S3_ENDPOINT!,
-	R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
-	R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
-	R2_BUCKET_NAME: process.env.R2_BUCKET_NAME!,
+
 	VITE_S3_URL: import.meta.env.VITE_S3_URL,
 };
 // export const env = createEnv({

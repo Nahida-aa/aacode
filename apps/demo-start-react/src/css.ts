@@ -53,7 +53,7 @@ export const buttonVariants = cva(
 				secondary:
 					'rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				ghost:
-					' hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+					'rounded-md hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
 				link: 'text-primary underline-offset-4 hover:underline',
 				noStyle: '',
 				primaryIcon: 'hover:bg-accent text-primary rounded-full size-9',

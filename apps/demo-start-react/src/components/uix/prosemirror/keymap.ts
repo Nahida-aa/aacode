@@ -6,6 +6,7 @@ import {
 	lift,
 	selectParentNode,
 	setBlockType,
+	splitBlock,
 	toggleMark,
 	wrapIn,
 } from 'prosemirror-commands';
@@ -237,6 +238,7 @@ export function buildKeymap(
 	bind('Mod-z', undo);
 	bind('Shift-Mod-z', redo);
 	bind('Backspace', undoInputRule);
+	bind('Mod-Shift-Enter', splitBlock);
 	if (!mac) bind('Mod-y', redo);
 
 	bind('Alt-ArrowUp', joinUp);
@@ -270,15 +272,24 @@ export function buildKeymap(
 		schemaType = schema.nodes.blockquote;
 		bind('Ctrl->', wrapIn(schemaType));
 	}
+	/**
+| 快捷键         | 实际行为（exampleSetup）                      |
+| ------------- | --------------------------------------- |
+| `Enter`       | `splitBlock` → 段落中插入**新段落**；代码块中插入 `\n` |
+| `Shift+Enter` | `insertHardBreak` → 插入 `<br>` **硬换行**   |
+| `Mod+Enter`   | `exitCode` → **仅对代码块有效**：退出代码块          |
+
+	 */
 	if (schema.nodes.hard_break) {
+		// Mod: macOS(Cmd), Windows \ Linux (Ctrl)
 		schemaType = schema.nodes.hard_break;
 		const br = schemaType;
-
+		// exitCode: 光标在代码块 则 向下创建 新的段落，否则 插入硬换行
 		const cmd = chainCommands(exitCode, (state, dispatch) => {
 			if (dispatch)
 				dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView());
 			return true;
-		});
+		}); // 按顺序尝试执行命令; 如果 exitCode 返回 false，就执行 dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
 		bind('Mod-Enter', cmd);
 		bind('Shift-Enter', cmd);
 		if (mac) bind('Ctrl-Enter', cmd);

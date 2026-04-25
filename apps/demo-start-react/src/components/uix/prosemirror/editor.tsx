@@ -1,6 +1,9 @@
 import hljs from 'highlight.js';
 import { highlightPlugin } from 'prosemirror-highlightjs';
 import { inputRules } from 'prosemirror-inputrules';
+import { keymap } from 'prosemirror-keymap';
+import { DOMParser, type Node, Schema } from 'prosemirror-model';
+import { splitListItem } from 'prosemirror-schema-list';
 import { EditorState } from 'prosemirror-state';
 import { type Decoration, DecorationSet, EditorView } from 'prosemirror-view';
 import {
@@ -14,19 +17,6 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { useDebounceCallback } from 'usehooks-ts';
-import {
-	buildNullDocument,
-	documentToMd,
-	handleTransaction,
-	jsonToDocument,
-	mdToDocument,
-} from '#/components/uix/prosemirror/utils.tsx';
-import { exampleSetup } from './config';
-// 引入一個你喜歡的高亮主題
-// import 'highlight.js/styles/github-dark.css';
-import '@catppuccin/highlightjs/css/catppuccin-macchiato.css';
-import { keymap } from 'prosemirror-keymap';
-import { splitListItem } from 'prosemirror-schema-list';
 import { documentSchema } from '#/components/uix/prosemirror/documentSchema.ts';
 import {
 	codeBlockBoundaryArrowDown,
@@ -34,22 +24,76 @@ import {
 	codeBlockEnter,
 	createCodeBlockBackspace,
 } from '#/components/uix/prosemirror/keymap.ts';
+import {
+	buildNullDocument,
+	documentToMd,
+	jsonToDocument,
+	mdToDocument,
+} from '#/components/uix/prosemirror/utils.tsx';
+import { exampleSetup } from './config';
 
 type EditorProps = {
 	initialValue?: any;
 	onSave?: (json: any) => void;
+	onKeydown?: (view: EditorView, event: KeyboardEvent) => void | boolean;
 	className?: string;
 };
-export interface EditorRef {
+export interface TextEditorRef {
 	save: () => { json: any; md: string };
 	getFileCache: () => Map<string, File>;
 }
-const PureEditor = forwardRef<EditorRef, EditorProps>(
+type JsonNode = {
+	type: string;
+	attrs?: Record<string, any>;
+	content?: JsonNode[];
+};
+export function findBlobUrls(
+	node: JsonNode | undefined,
+	blobUrls: string[] = [],
+): string[] {
+	if (!node) return blobUrls;
+	if (typeof node === 'string') return blobUrls;
+	if (node.type === 'image' && node.attrs?.src?.startsWith('blob:')) {
+		blobUrls.push(node.attrs.src);
+	}
+	if (node.content) {
+		for (const child of node.content) {
+			findBlobUrls(child, blobUrls);
+		}
+	}
+	return blobUrls;
+}
+// 2. 递归替换 URL
+export function replaceUrlsInContent(
+	node: JsonNode,
+	oldUrl: string,
+	newUrl: string,
+): JsonNode {
+	if (!node || typeof node !== 'object') return node;
+
+	if (node.type === 'image' && node.attrs?.src === oldUrl) {
+		return { ...node, attrs: { ...node.attrs, src: newUrl } };
+	}
+
+	if (node.content) {
+		return {
+			...node,
+			content: node.content.map((child) =>
+				replaceUrlsInContent(child, oldUrl, newUrl),
+			),
+		};
+	}
+
+	return node;
+}
+
+const PureEditor = forwardRef<TextEditorRef, EditorProps>(
 	(
 		{
 			initialValue,
 			onSave,
-			className = 'prose dark:prose-invert prose-neutral',
+			onKeydown,
+			className = 'p-4 prose dark:prose-invert prose-neutral',
 		},
 		ref,
 	) => {
@@ -69,7 +113,8 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 				md: documentToMd(doc),
 			};
 		};
-		const imageFileCache = new Map<string, File>();
+
+		const imageFileCacheRef = useRef<Map<string, File>>(new Map());
 		const handlePaste = useCallback(
 			(view: EditorView, event: ClipboardEvent) => {
 				if (!editorRef.current) {
@@ -98,10 +143,10 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 						const file = item.getAsFile();
 						if (!file) continue;
 						console.log('有file', file);
-						// 1. 創建本地預覽 URL (避免 Base64 佔用內存)
+						// 1. 創建本地预览 URL (避免 Base64 佔用內存)
 						const localUrl = URL.createObjectURL(file);
 						// 【关键】将文件存入缓存，等待提交
-						imageFileCache.set(localUrl, file);
+						imageFileCacheRef.current.set(localUrl, file);
 						// 2. 插入图片节点（暂时使用本地 URL）
 						const { image } = editorRef.current.state.schema.nodes;
 						// 诊断：检查 image node 是否存在
@@ -124,16 +169,15 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 						ret = true; // 拦截默认行為，防止生成 Base64
 					}
 					console.log('不是图片');
-					ret = true;
 				}
 				return ret;
 			},
-			[imageFileCache.set],
+			[],
 		);
 		// 暴露给外部的方法
 		useImperativeHandle(ref, () => ({
 			save,
-			getFileCache: () => imageFileCache,
+			getFileCache: () => imageFileCacheRef.current,
 		}));
 		useEffect(() => {
 			if (containerRef.current && !editorRef.current) {
@@ -164,12 +208,15 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 					state,
 					attributes: {
 						// class: 'prose prose-slate max-w-none focus:outline-none min-h-[300px] p-4 cursor-text'
-						class: 'p-4 cursor-text',
+						class: 'cursor-text',
 					},
 					handleDOMEvents: {
 						// handleDOMEvents - 通用 DOM 事件拦截器; 设计目的是「在 ProseMirror 处理之前拦截」
 						click(_view, event) {},
 						// paste: handlePaste,
+						keydown: (view, event) => {
+							return onKeydown?.(view, event) ?? false;
+						},
 					},
 					handlePaste, // handlePaste - 专用 paste 处理器 返回 true → 自动 preventDefault()
 				});
@@ -180,7 +227,7 @@ const PureEditor = forwardRef<EditorRef, EditorProps>(
 					editorRef.current = null;
 				}
 			};
-		}, [initialValue, handlePaste]);
+		}, [initialValue, handlePaste, onKeydown]);
 		useEffect(() => {
 			if (!editorRef.current) return;
 
@@ -208,4 +255,4 @@ function areEqual(prevProps: EditorProps, nextProps: EditorProps) {
 	);
 }
 
-export const Editor = memo(PureEditor, areEqual);
+export const TextEditor = memo(PureEditor, areEqual);

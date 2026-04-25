@@ -156,6 +156,7 @@ function BetterAuthDemo() {
 							onChange={(e) => setEmail(e.target.value)}
 							className="flex h-9 w-full border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 text-sm focus:outline-none focus:border-neutral-900 dark:focus:border-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
 							required
+							autoComplete="email"
 						/>
 					</div>
 

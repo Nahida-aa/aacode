@@ -8,10 +8,18 @@ import { Button } from '#/components/ui/button.tsx';
 import { useAppForm } from '#/components/uix/form/useAppForm.tsx';
 import { Description } from '#/components/uix/label.tsx';
 import {
+	findBlobUrls,
+	replaceUrlsInContent,
+	TextEditor,
+	type TextEditorRef,
+} from '#/components/uix/prosemirror/editor.tsx';
+import { TextPreview } from '#/components/uix/prosemirror/preview.tsx';
+import {
 	type TodoRow,
 	todoCollection,
 } from '#/features/todo/todo.collection.ts';
 import { addTodoSchema, type Todo } from '#/features/todo/todo.schema.ts';
+import { useFileUpload } from '#/lib/upload/useFileUpload.ts';
 import { formatToNow } from '#/lib/utils.timeFormat.ts';
 
 export const Route = createFileRoute('/demo/todo')({
@@ -123,7 +131,8 @@ function TodoCard({ todo }: { todo: TodoRow }) {
 					Delete
 				</Button>
 			</div>
-			{todo.content}
+			{/* {todo.content} */}
+			<TextPreview docJson={todo.content} />
 			<Description className="flex items-center gap-1">
 				<HistoryIcon size={16} /> {formatToNow(todo.updated_at)}
 			</Description>
@@ -144,6 +153,7 @@ function AddTodoCard() {
 			initialValuesRef.current = {} as FormValues;
 		}
 	}
+	const { uploadFiles, state } = useFileUpload();
 	const form = useAppForm({
 		formId: 'AddTodoCard',
 		defaultValues: initialValuesRef.current,
@@ -151,13 +161,57 @@ function AddTodoCard() {
 			onChange: addTodoSchema,
 		},
 		onSubmit: async ({ value, formApi, meta }) => {
+			// 通过 ref 拿到內部的 Map
+			const cache = editorRef.current?.getFileCache();
+			if (!cache) throw new Error('没有文件缓存实例, 请重试');
+			// 1. 找出真正存在於文檔中的 blobUrls 和對應的 Files
+			const blobUrls = findBlobUrls(value.content);
+			console.log('blobUrls', blobUrls);
+			if (blobUrls.length > 0) {
+				const files = blobUrls.map((url) => {
+					const file = cache.get(url);
+					if (!file) {
+						console.warn(`找不到对应的文件: ${url}`);
+						throw new Error(`找不到对应的文件: ${url}`);
+					}
+					return file;
+				});
+				console.log('正在批量上传图片...', { blobUrls, files });
+				const uploadedResults = await uploadFiles(files);
+				//遍历结果，替换本地结果
+				//注意：uploadFiles 返回的顺序通常与传入的 files 顺序一致
+				let hasUploadError = false;
+				uploadedResults?.forEach((r, index) => {
+					if (r.status === 'rejected') {
+						console.warn(`上传文件失败: ${r.reason}`);
+						hasUploadError = true;
+						return;
+					}
+					const localUrl = blobUrls[index];
+					const remoteUrl = `key://${r.value.storageKey}`; // 替換成實際的遠程 URL，可能需要根據你的後端返回值調整
+					// 全局替換 JSON 字符串中的本地鏈接
+					value.content = replaceUrlsInContent(
+						value.content,
+						localUrl,
+						remoteUrl,
+					);
+					// 釋放內存
+					URL.revokeObjectURL(localUrl);
+					cache?.delete(localUrl);
+				});
+				if (hasUploadError)
+					throw new Error(state.error || '存在上传失败的文件');
+			}
 			const tx = todoCollection.insert(value);
 			await tx.isPersisted.promise;
 			formApi.reset();
-			localStorage.removeItem('AddTodoCard');
+			formApi.setFieldValue('title', undefined);
+			formApi.setFieldValue('content', undefined);
 			setFormKey((prev) => prev + 1);
+			localStorage.removeItem('AddTodoCard');
 		},
 	});
+	const editorRef = useRef<TextEditorRef>(null);
 	return (
 		<form.AppForm key={formKey}>
 			<form.Form
@@ -165,17 +219,43 @@ function AddTodoCard() {
 				className="flex flex-col gap-3 bg-card rounded-md p-2"
 			>
 				<form.SyncToLocalStorage />
-				<form.AppField name="title">
-					{(field) => <field.FieldInput placeholder="Title" />}
-				</form.AppField>
+				<div className="flex gap-2 items-center">
+					<form.AppField name="title">
+						{(field) => <field.FieldInput placeholder="Title" />}
+					</form.AppField>
+					<form.SubmitButton
+						label="Add"
+						canSubmitDefault
+						icon={<PlusIcon size={20} />}
+					/>
+				</div>
 				<form.AppField name="content">
-					{(field) => <field.FieldTextarea placeholder="Content" />}
+					{(field) => (
+						<TextEditor
+							ref={editorRef}
+							initialValue={field.state.value}
+							onSave={field.handleChange}
+							onKeydown={(v, e) => {
+								if (
+									e.key === 'Enter' &&
+									!e.shiftKey &&
+									!e.ctrlKey &&
+									!e.altKey &&
+									!e.metaKey
+								) {
+									console.log('Enter pressed', e.key);
+									e.preventDefault();
+									form.handleSubmit();
+								}
+							}}
+							className="bg-input/50 py-2 px-3 prose dark:prose-invert prose-neutral rounded-md"
+						/>
+					)}
 				</form.AppField>
-				<form.SubmitButton
-					label="Add"
-					canSubmitDefault
-					icon={<PlusIcon size={20} />}
-				/>
+
+				<Button onClick={() => localStorage.removeItem('AddTodoCard')}>
+					清除缓存
+				</Button>
 			</form.Form>
 		</form.AppForm>
 	);

@@ -1,5 +1,6 @@
+import hljs from 'highlight.js';
 import { defaultMarkdownSerializer } from 'prosemirror-markdown';
-import { DOMParser, type Node, Schema } from 'prosemirror-model';
+import { DOMParser, DOMSerializer, type Node, Schema } from 'prosemirror-model';
 import type { Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { RefObject } from 'react';
@@ -33,53 +34,24 @@ export const jsonToDocument = (json?: any): Node => {
 		return buildNullDocument();
 	}
 };
+export const jsonToHtml = (json?: any): string => {
+	const doc = jsonToDocument(json);
+	try {
+		const serializer = DOMSerializer.fromSchema(documentSchema);
+		const fragment = serializer.serializeFragment(doc.content);
+		// DocumentFragment → HTML 字符串
+		const div = document.createElement('div');
+		div.appendChild(fragment);
+		// 手动对代码块执行 highlight.js 高亮
+		div.querySelectorAll('pre code').forEach((block) => {
+			hljs.highlightElement(block as HTMLElement);
+		});
+		return div.innerHTML;
+	} catch {
+		return '<p>[无法显示的消息]</p>';
+	}
+};
 // ProseMirror document node -> Markdown content
 export const documentToMd = (document: Node): string => {
 	return defaultMarkdownSerializer.serialize(document);
-};
-
-/**
- * ###  **交易处理器** (`handleTransaction`)
- * **参数说明**：
-- `transaction`：编辑器状态变更
-- `editorRef`：编辑器实例引用
-- `onSaveContent`：保存内容的回调函数
-
-* **处理流程**：
-1. ✅ 检查编辑器是否存在
-2. 🔄 应用交易，更新编辑器状态
-3. 💾 如果文档内容改变（`docChanged`）且未标记 `no-save`：
-   - 构建更新后的内容
-   - 判断是否需要防抖（debounce）
-   - 触发 `onSaveContent` 回调
-
-* **特殊标记**：
-- `"no-save"`：标记的交易不触发保存
-- `"no-debounce"`：立即保存，不等待防抖
- */
-export const handleTransaction = ({
-	transaction,
-	editorRef,
-	onSaveContent,
-}: {
-	transaction: Transaction;
-	editorRef: RefObject<EditorView | null>;
-	onSaveContent: (updatedContent: string, debounce: boolean) => void;
-}) => {
-	if (!editorRef?.current) {
-		return;
-	}
-
-	const newState = editorRef.current.state.apply(transaction);
-	editorRef.current.updateState(newState);
-
-	if (transaction.docChanged && !transaction.getMeta('no-save')) {
-		const updatedContent = documentToMd(newState.doc);
-
-		if (transaction.getMeta('no-debounce')) {
-			onSaveContent(updatedContent, false);
-		} else {
-			onSaveContent(updatedContent, true);
-		}
-	}
 };

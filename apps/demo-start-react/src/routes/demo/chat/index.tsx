@@ -49,6 +49,7 @@ function MessageInput({
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
+			console.log('Enter pressed', e.key);
 			e.preventDefault();
 			handleSend();
 		}

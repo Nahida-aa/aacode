@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { uploadFileWithProgress } from '#/lib/upload/_client';
 import type { FileGroup } from '#/lib/upload/upload.const';
 import { buildFileUrl } from '#/lib/upload/upload.utils';
+import { to } from '#/lib/utils/fp.ts';
 import { orpc } from '#/orpc._client';
 
 interface PerFileProgress {
@@ -19,7 +20,7 @@ interface UploadStatus {
 }
 
 export const useFileUpload = (group?: FileGroup) => {
-	const [status, setStatus] = useState<UploadStatus>({
+	const [state, setState] = useState<UploadStatus>({
 		status: 'idle',
 		progress: 0,
 		perFileProgress: {},
@@ -28,7 +29,7 @@ export const useFileUpload = (group?: FileGroup) => {
 
 	const abortUpload = useCallback(() => {
 		// 如果需取消，需改你的函数加 AbortController（xhr.abort()）
-		setStatus((prev) => ({
+		setState((prev) => ({
 			...prev,
 			status: 'error',
 			error: 'Upload aborted',
@@ -41,7 +42,7 @@ export const useFileUpload = (group?: FileGroup) => {
 		async (files: File[]) => {
 			if (files.length === 0) return [];
 
-			setStatus((prev) => ({
+			setState((prev) => ({
 				...prev,
 				status: 'uploading',
 				perFileProgress: {},
@@ -51,78 +52,76 @@ export const useFileUpload = (group?: FileGroup) => {
 			let totalLoaded = 0;
 			const totalSize = files.reduce((sum, f) => sum + f.size, 0);
 
-			try {
-				// genSignedUrls: 1. get signed url 2. insert db
-				const signedUrlsWithMeta = await orpc.genSignedUrls.call({
+			// genSignedUrls: 1. get signed url 2. insert db
+			const [signedUrlsWithMeta, err] = await to(
+				orpc.genSignedUrls.call({
 					files: files.map((f) => ({
 						name: f.name,
 						type: f.type,
 						size: f.size,
 					})),
 					group,
-				});
-
-				const uploadPromises = files.map(async (file, index) => {
-					const { signedUrl, storageKey } = signedUrlsWithMeta[index];
-					if (!signedUrl) throw new Error(`No URL for ${file.name}`);
-
-					// 用你的函数 + 自定义 onProgress（更新分文件 + 总进度）
-					await uploadFileWithProgress(
-						signedUrl,
-						file,
-						(percent, loaded, total) => {
-							perFileProgress[file.name] = { percent, loaded, total };
-							totalLoaded += loaded; // 累加总 loaded
-							const overallPercent = Math.round(
-								(totalLoaded / totalSize) * 100,
-							);
-							setStatus((prev) => ({
-								...prev,
-								progress: overallPercent,
-								perFileProgress: { ...perFileProgress },
-							}));
-						},
-					);
-
-					return {
-						...signedUrlsWithMeta[index],
-						downloadUrl: buildFileUrl(storageKey),
-					};
-				});
-
-				const results = await Promise.allSettled(uploadPromises);
-				const successful = results
-					.filter((r) => r.status === 'fulfilled')
-					.map((r) => r.value);
-
-				if (successful.length === files.length) {
-					setStatus({
-						status: 'success',
-						progress: 100,
-						perFileProgress: {},
-						urls: successful.map((f) => f.downloadUrl),
-					});
-					return successful;
-				} else {
-					const failed = results.filter((r) => r.status === 'rejected');
-					throw new Error(
-						`失败文件: ${failed.map((r) => (r as PromiseRejectedResult).reason).join(', ')}`,
-					);
-				}
-			} catch (error) {
-				const err = error as Error;
-				setStatus({
+				}),
+			);
+			if (err) {
+				setState({
 					status: 'error',
 					progress: 0,
 					perFileProgress: {},
 					error: err.message,
 				});
-				console.log('uploadFiles error', err);
+				console.log('genSignedUrls error', err);
 				throw err;
 			}
+			const uploadPromises = files.map(async (file, index) => {
+				const { signedUrl, storageKey } = signedUrlsWithMeta[index];
+
+				// 用你的函数 + 自定义 onProgress（更新分文件 + 总进度）
+				await uploadFileWithProgress(
+					signedUrl,
+					file,
+					(percent, loaded, total) => {
+						perFileProgress[file.name] = { percent, loaded, total };
+						totalLoaded += loaded; // 累加总 loaded
+						const overallPercent = Math.round((totalLoaded / totalSize) * 100);
+						setState((prev) => ({
+							...prev,
+							progress: overallPercent,
+							perFileProgress: { ...perFileProgress },
+						}));
+					},
+				);
+
+				return {
+					...signedUrlsWithMeta[index],
+					downloadUrl: buildFileUrl(storageKey),
+				};
+			});
+
+			const results = await Promise.allSettled(uploadPromises);
+
+			const successful = results.filter((r) => r.status === 'fulfilled');
+			if (successful.length === files.length) {
+				setState({
+					status: 'success',
+					progress: 100,
+					perFileProgress: {},
+					urls: successful.map((r) => r.value.downloadUrl),
+				});
+			} else {
+				const failed = results.filter((r) => r.status === 'rejected');
+				setState({
+					status: 'error',
+					progress: 0,
+					perFileProgress: {},
+					error: `${failed.map((r) => (r as PromiseRejectedResult).reason).join(', ')}`,
+					//  Network error during upload
+				});
+			}
+			return results;
 		},
 		[group],
 	);
 
-	return { uploadFiles, abortUpload, status }; // status 有总 progress + perFileProgress
+	return { uploadFiles, abortUpload, state }; // state 有总 progress + perFileProgress
 };

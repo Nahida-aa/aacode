@@ -54,7 +54,7 @@ export const toastError = (error: unknown, title?: string) => {
 	});
 	// sonnerToast.error(title, { description });
 	sonnerToast.custom((t) => (
-		<div className="bg-popover flex flex-col gap-2 rounded-md border p-4 w-89 z-100">
+		<div className="bg-popover flex flex-col gap-2 rounded-md  p-4 w-89 z-100">
 			<UxAlert variant="destructive" title={title} />
 			{description && <Pre json={description} />}
 			<Button

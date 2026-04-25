@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 import { cn } from '#/lib/utils';
+
 // Boring Mode
 const alertVariants = cva(
 	cn(
@@ -44,7 +45,7 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
 		<div
 			data-slot="alert-title"
 			className={cn(
-				'col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight',
+				'col-start-2 line-clamp-1 flex items-center truncate min-h-4 font-medium tracking-tight',
 				className,
 			)}
 			{...props}
