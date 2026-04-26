@@ -10,7 +10,6 @@ import { nitro } from 'nitro/vite';
 import { defineConfig } from 'vite';
 
 const config = defineConfig({
-	resolve: { tsconfigPaths: true },
 	plugins: [
 		devtools(),
 		paraglideVitePlugin({
@@ -51,6 +50,12 @@ const config = defineConfig({
 	// server: {
 	// 	port: 4001,
 	// },
+
+	// 	test: {
+	//   optimizeDeps: {
+	//     exclude: ['@opentelemetry/api']
+	//   }
+	// }
 });
 
 export default config;

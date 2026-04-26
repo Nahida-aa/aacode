@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { authClient } from '#/lib/auth.auth-client.ts';
+import { authClient } from '#/lib/auth/auth-client.ts';
 export const BetterAuthHeaderLoading = () => (
 	<div className="h-8 w-8 bg-neutral-100 dark:bg-neutral-800 animate-pulse" />
 );

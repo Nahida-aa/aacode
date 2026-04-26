@@ -26,7 +26,9 @@ import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as IntegrationGuitarsIndexRouteImport } from './routes/integration/guitars/index'
 import { Route as IntegrationBetterAuthIndexRouteImport } from './routes/integration/better-auth/index'
 import { Route as DemoChatIndexRouteImport } from './routes/demo/chat/index'
+import { Route as BaseS3IndexRouteImport } from './routes/base/s3/index'
 import { Route as UiActionButtonRouteImport } from './routes/ui/action/button'
+import { Route as IntegrationZodFileRouteImport } from './routes/integration/zod/file'
 import { Route as IntegrationTanstackDbErrorRouteImport } from './routes/integration/tanstack-db/error'
 import { Route as IntegrationTanstackDbChatApiRouteImport } from './routes/integration/tanstack-db/chat-api'
 import { Route as IntegrationTanstackDbChatRouteImport } from './routes/integration/tanstack-db/chat'
@@ -136,9 +138,19 @@ const DemoChatIndexRoute = DemoChatIndexRouteImport.update({
   path: '/demo/chat/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BaseS3IndexRoute = BaseS3IndexRouteImport.update({
+  id: '/base/s3/',
+  path: '/base/s3/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UiActionButtonRoute = UiActionButtonRouteImport.update({
   id: '/ui/action/button',
   path: '/ui/action/button',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationZodFileRoute = IntegrationZodFileRouteImport.update({
+  id: '/integration/zod/file',
+  path: '/integration/zod/file',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IntegrationTanstackDbErrorRoute =
@@ -282,7 +294,9 @@ export interface FileRoutesByFullPath {
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
   '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
+  '/integration/zod/file': typeof IntegrationZodFileRoute
   '/ui/action/button': typeof UiActionButtonRoute
+  '/base/s3/': typeof BaseS3IndexRoute
   '/demo/chat/': typeof DemoChatIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
@@ -323,7 +337,9 @@ export interface FileRoutesByTo {
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
   '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
+  '/integration/zod/file': typeof IntegrationZodFileRoute
   '/ui/action/button': typeof UiActionButtonRoute
+  '/base/s3': typeof BaseS3IndexRoute
   '/demo/chat': typeof DemoChatIndexRoute
   '/integration/better-auth': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars': typeof IntegrationGuitarsIndexRoute
@@ -365,7 +381,9 @@ export interface FileRoutesById {
   '/integration/tanstack-db/chat': typeof IntegrationTanstackDbChatRoute
   '/integration/tanstack-db/chat-api': typeof IntegrationTanstackDbChatApiRoute
   '/integration/tanstack-db/error': typeof IntegrationTanstackDbErrorRoute
+  '/integration/zod/file': typeof IntegrationZodFileRoute
   '/ui/action/button': typeof UiActionButtonRoute
+  '/base/s3/': typeof BaseS3IndexRoute
   '/demo/chat/': typeof DemoChatIndexRoute
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
@@ -408,7 +426,9 @@ export interface FileRouteTypes {
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
     | '/integration/tanstack-db/error'
+    | '/integration/zod/file'
     | '/ui/action/button'
+    | '/base/s3/'
     | '/demo/chat/'
     | '/integration/better-auth/'
     | '/integration/guitars/'
@@ -449,7 +469,9 @@ export interface FileRouteTypes {
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
     | '/integration/tanstack-db/error'
+    | '/integration/zod/file'
     | '/ui/action/button'
+    | '/base/s3'
     | '/demo/chat'
     | '/integration/better-auth'
     | '/integration/guitars'
@@ -490,7 +512,9 @@ export interface FileRouteTypes {
     | '/integration/tanstack-db/chat'
     | '/integration/tanstack-db/chat-api'
     | '/integration/tanstack-db/error'
+    | '/integration/zod/file'
     | '/ui/action/button'
+    | '/base/s3/'
     | '/demo/chat/'
     | '/integration/better-auth/'
     | '/integration/guitars/'
@@ -532,7 +556,9 @@ export interface RootRouteChildren {
   IntegrationTanstackDbChatRoute: typeof IntegrationTanstackDbChatRoute
   IntegrationTanstackDbChatApiRoute: typeof IntegrationTanstackDbChatApiRoute
   IntegrationTanstackDbErrorRoute: typeof IntegrationTanstackDbErrorRoute
+  IntegrationZodFileRoute: typeof IntegrationZodFileRoute
   UiActionButtonRoute: typeof UiActionButtonRoute
+  BaseS3IndexRoute: typeof BaseS3IndexRoute
   DemoChatIndexRoute: typeof DemoChatIndexRoute
   IntegrationBetterAuthIndexRoute: typeof IntegrationBetterAuthIndexRoute
   IntegrationGuitarsIndexRoute: typeof IntegrationGuitarsIndexRoute
@@ -668,11 +694,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoChatIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/base/s3/': {
+      id: '/base/s3/'
+      path: '/base/s3'
+      fullPath: '/base/s3/'
+      preLoaderRoute: typeof BaseS3IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ui/action/button': {
       id: '/ui/action/button'
       path: '/ui/action/button'
       fullPath: '/ui/action/button'
       preLoaderRoute: typeof UiActionButtonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integration/zod/file': {
+      id: '/integration/zod/file'
+      path: '/integration/zod/file'
+      fullPath: '/integration/zod/file'
+      preLoaderRoute: typeof IntegrationZodFileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/integration/tanstack-db/error': {
@@ -852,7 +892,9 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationTanstackDbChatRoute: IntegrationTanstackDbChatRoute,
   IntegrationTanstackDbChatApiRoute: IntegrationTanstackDbChatApiRoute,
   IntegrationTanstackDbErrorRoute: IntegrationTanstackDbErrorRoute,
+  IntegrationZodFileRoute: IntegrationZodFileRoute,
   UiActionButtonRoute: UiActionButtonRoute,
+  BaseS3IndexRoute: BaseS3IndexRoute,
   DemoChatIndexRoute: DemoChatIndexRoute,
   IntegrationBetterAuthIndexRoute: IntegrationBetterAuthIndexRoute,
   IntegrationGuitarsIndexRoute: IntegrationGuitarsIndexRoute,

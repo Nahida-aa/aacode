@@ -11,8 +11,11 @@ export const uploadFile = async (signedUrl: string, file: File) => {
 			// 'Content-Length': file.size.toString(), // NOTE: 这里不需要设置 Content-Length，因为浏览器会忽视此头部,然后根据body自动计算并添加, https://github.com/Nahida-aa/Nahida-aa.github.io/blob/main/docs/web/http.md#request-header
 		},
 		body: file,
-	});
-	if (!res.ok) throw new Error('Failed to upload file');
+	}); //  has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. // 权限不够也可能导致响应头没有 'Access-Control-Allow-Origin'
+	if (!res.ok) {
+		console.error('Failed to upload file', res.status, res.statusText);
+		throw new Error('Failed to upload file');
+	}
 };
 export const uploadSingleFile = async (file: File, group?: FileGroup) => {
 	const signedUrls = await orpc.genSignedUrls.call({
@@ -47,10 +50,7 @@ export const uploadFileWithProgress = (
 		};
 
 		xhr.onerror = () =>
-			reject((reason: any) => {
-				console.warn(reason);
-				throw new Error(`Network error during upload ${reason}`);
-			});
+			reject(new Error('Network error, no response received from server'));
 		xhr.onabort = () => reject(new Error('Upload aborted'));
 
 		xhr.send(file);

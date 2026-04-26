@@ -40,10 +40,6 @@ function MessageInput({
 }) {
 	const pathname = usePathname();
 	const [isSending, setIsSending] = useState(false);
-	const fileInputRef = useRef<HTMLInputElement>(null);
-
-	const handleFilesSelected = (selectedFiles: File[]) => {};
-	const removeFile = (fileName: string) => {};
 
 	const handleSend = async () => {};
 
@@ -55,72 +51,36 @@ function MessageInput({
 		}
 	};
 	return (
-		<>
-			<input
-				ref={fileInputRef}
-				type="file"
-				multiple
-				className="hidden"
+		<div className={`flex items-end m-2 mt-0 gap-2 ${className}`}>
+			<Textarea
+				placeholder="发送消息..."
+				className="flex-1 border-0  focus-visible:ring-0 focus-visible:ring-offset-0 md:text-base resize-none min-h-6 max-h-52 overflow-y-auto"
+				rows={1}
 				onChange={(e) => {
-					if (!e.target.files) return;
-					handleFilesSelected(Array.from(e.target.files));
+					const target = e.target;
+					target.style.height = 'auto';
+					target.style.height = `${Math.min(target.scrollHeight, 208)}px`;
 				}}
+				onKeyDown={handleKeyDown}
+				disabled={isSending}
 			/>
-			<div className={`flex items-end m-2 mt-0 gap-2 ${className}`}>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="secondary"
-							className="shrink-0 size-10 p-1 [&_svg]:size-6 "
-						>
-							<Plus className="size-6" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="start">
-						<DropdownMenuItem onSelect={(e) => fileInputRef.current?.click()}>
-							<FileUpIcon className=" shrink-0 " />
-							<span>上传文件</span>
-						</DropdownMenuItem>
-						<DropdownMenuItem
-							onSelect={(e) => {
-								toast.info('正在开发中...');
-							}}
-						>
-							<MixIcon className=" shrink-0 " />
-							<span>使用app</span>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-				<Textarea
-					placeholder="发送消息..."
-					className="flex-1 border-0  focus-visible:ring-0 focus-visible:ring-offset-0 md:text-base resize-none min-h-6 max-h-52 overflow-y-auto"
-					rows={1}
-					onChange={(e) => {
-						const target = e.target;
-						target.style.height = 'auto';
-						target.style.height = `${Math.min(target.scrollHeight, 208)}px`;
-					}}
-					onKeyDown={handleKeyDown}
-					disabled={isSending}
-				/>
 
-				{/* // 如果未登录用户，显示登录提示 */}
-				{!session ? (
-					<Button className="h-10" color="primary">
-						请登录后发送消息
-					</Button>
-				) : (
-					<Button
-						className="px-3 h-10"
-						onClick={handleSend}
-						color="primary"
-						disabled={isSending}
-					>
-						<SendIcon className={`${isSending && 'animate-spin'}`} />
-						{isSending ? '发送中...' : '发送'}
-					</Button>
-				)}
-			</div>
-		</>
+			{/* // 如果未登录用户，显示登录提示 */}
+			{!session ? (
+				<Button className="h-10" color="primary">
+					请登录后发送消息
+				</Button>
+			) : (
+				<Button
+					className="px-3 h-10"
+					onClick={handleSend}
+					color="primary"
+					disabled={isSending}
+				>
+					<SendIcon className={`${isSending && 'animate-spin'}`} />
+					{isSending ? '发送中...' : '发送'}
+				</Button>
+			)}
+		</div>
 	);
 }

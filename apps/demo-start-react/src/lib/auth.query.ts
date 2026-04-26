@@ -1,6 +1,6 @@
 import { environmentManager, queryOptions } from '@tanstack/react-query';
 import type { AuthSession } from '#/lib/auth';
-import { authClient } from '#/lib/auth.auth-client';
+import { authClient } from '#/lib/auth/auth-client.ts';
 import { getSession } from '#/lib/auth.func';
 
 export const authKeys = {

@@ -1,21 +1,17 @@
-import { todo } from '#/features/todo/todo.table';
-import {
+export { channel, dmMember, dmRoom } from '#/features/channel/channel.table';
+export {
+	friend,
+	friendRequest,
+	friendTag,
+	friendToTag,
+} from '#/features/friend/friend.table';
+export { todo } from '#/features/todo/todo.table';
+export {
 	account,
 	session,
 	twoFactor,
 	user,
 	verification,
 } from '#/lib/auth.table';
-import { download, file } from '#/lib/upload/upload.table';
-
+export { download, file } from '#/lib/upload/upload.table';
 export * from './db.relations';
-export {
-	account,
-	download,
-	file,
-	session,
-	todo,
-	twoFactor,
-	user,
-	verification,
-};

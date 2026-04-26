@@ -62,7 +62,7 @@ export const genSignedUrlFile = z.object({
 		.min(1, '文件大小必须大于0')
 		.max(100 * 1024 * 1024, '文件大小不能超过100MB'), // 100MB限制
 });
-export const genSignedUrlJson = z.object({
+export const genSignedUrlIn = z.object({
 	files: genSignedUrlFile.array().min(1, '至少需要一个文件'),
 	group: z.enum(fileGroup).default('other').optional(),
 });

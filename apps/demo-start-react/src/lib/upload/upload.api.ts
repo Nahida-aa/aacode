@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { db } from '#/db.server';
 import { genSignedUploadUrl } from '#/lib/upload/sdk.server';
-import { genSignedUrlJson, type InsertFile } from '#/lib/upload/upload.schema';
+import { genSignedUrlIn, type InsertFile } from '#/lib/upload/upload.schema';
 import { file } from '#/lib/upload/upload.table';
 import { sanitizeFilename } from '#/lib/upload/upload.utils';
 import { authFn } from '#/orpc.base';
@@ -11,7 +11,7 @@ const _insertFile = async (data: InsertFile[]) => {
 };
 
 const genSignedUrls = authFn
-	.input(genSignedUrlJson)
+	.input(genSignedUrlIn)
 	.handler(async ({ input, context }) => {
 		const { files, group = 'other' } = input;
 		const basePath = `user/${context.user.id}/${group}`;

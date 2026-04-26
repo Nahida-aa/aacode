@@ -19,6 +19,7 @@ import {
 	todoCollection,
 } from '#/features/todo/todo.collection.ts';
 import { addTodoSchema, type Todo } from '#/features/todo/todo.schema.ts';
+import { authClient } from '#/lib/auth/auth-client.ts';
 import { useFileUpload } from '#/lib/upload/useFileUpload.ts';
 import { formatToNow } from '#/lib/utils.timeFormat.ts';
 
@@ -140,6 +141,7 @@ function TodoCard({ todo }: { todo: TodoRow }) {
 	);
 }
 function AddTodoCard() {
+	const { data: session } = authClient.useSession();
 	type FormValues = z.input<typeof addTodoSchema>;
 	const [formKey, setFormKey] = useState(0);
 	const initialValuesRef = useRef<FormValues | null>(null);
@@ -161,6 +163,7 @@ function AddTodoCard() {
 			onChange: addTodoSchema,
 		},
 		onSubmit: async ({ value, formApi, meta }) => {
+			if (!session) throw new Error('请先登录');
 			// 通过 ref 拿到內部的 Map
 			const cache = editorRef.current?.getFileCache();
 			if (!cache) throw new Error('没有文件缓存实例, 请重试');
@@ -202,7 +205,8 @@ function AddTodoCard() {
 				if (hasUploadError)
 					throw new Error(state.error || '存在上传失败的文件');
 			}
-			const tx = todoCollection.insert(value);
+
+			const tx = todoCollection.insert({ ...value, user_id: session?.user.id });
 			await tx.isPersisted.promise;
 			formApi.reset();
 			formApi.setFieldValue('title', undefined);

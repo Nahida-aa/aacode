@@ -7,12 +7,15 @@ const config = {
 	credentials: {
 		accessKeyId: serverEnv.R2_ACCESS_KEY_ID,
 		secretAccessKey: serverEnv.R2_SECRET_ACCESS_KEY,
+		sessionToken: serverEnv.R2_SESSION_TOKEN,
 	},
 };
 // 初始化 AwsClient，R2 的 region 建议填 "auto"
 const aws = new AwsClient({
 	accessKeyId: config.credentials.accessKeyId,
 	secretAccessKey: config.credentials.secretAccessKey,
+	// Retrieve your S3 API credentials for your R2 bucket via API tokens (see: https://developers.cloudflare.com/r2/api/tokens)
+	// sessionToken: config.credentials.sessionToken,
 	service: 's3',
 	region: config.region,
 });
@@ -63,7 +66,7 @@ export async function genSignedUploadUrl(
 ): Promise<string> {
 	const headers: Record<string, string> = {};
 	if (mimeType) headers['Content-Type'] = mimeType;
-	// 如果需要约束 fileSize，可以添加 headers['Content-Length'] = fileSize.toString();
+	if (fileSize) headers['Content-Length'] = fileSize.toString();
 
 	try {
 		return await getPresignedUrl('PUT', storageKey, expiresIn, {}, headers);

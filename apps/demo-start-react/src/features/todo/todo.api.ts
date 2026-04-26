@@ -1,35 +1,56 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 import { todo } from '#/db.schema.ts';
 import { db } from '#/db.server.ts';
-import { addTodoSchema, selectTodoSchema, updateTodoSchema } from '#/features/todo/todo.schema.ts';
+import {
+	addTodoSchema,
+	selectTodoSchema,
+	updateTodoSchema,
+} from '#/features/todo/todo.schema.ts';
 import { generateTxId } from '#/integrations/electric/genTxid.ts';
-import { Fn } from '#/orpc.base';
+import { authFn, Fn } from '#/orpc.base';
 
 export const todoApi = {
-	addTodo: Fn.input(addTodoSchema).handler(({ input }) =>db.transaction(async (tx)  => {
+	addTodo: authFn.input(addTodoSchema).handler(({ input, context }) =>
+		db.transaction(async (tx) => {
 			const txid = await generateTxId(tx);
-			const [newTodo] = await tx.insert(todo).values(input).returning();
+			const [newTodo] = await tx
+				.insert(todo)
+				.values({ ...input, user_id: context.user.id })
+				.returning();
 			return { txid, item: newTodo };
-		})),
-	updateTodo: Fn.input(updateTodoSchema.extend({ id: z.string() })).handler(
-		({ input }) =>
+		}),
+	),
+	updateTodo: authFn
+		.input(updateTodoSchema.extend({ id: z.string() }))
+		.handler(({ input, context, errors }) =>
 			db.transaction(async (tx) => {
 				const txid = await generateTxId(tx);
 				const { id, ...updateData } = input;
 				const [updatedTodo] = await tx
 					.update(todo)
 					.set(updateData)
-					.where(eq(todo.id, id))
+					.where(and(eq(todo.id, id), eq(todo.user_id, context.user.id)))
 					.returning();
+				if (!updatedTodo) {
+					throw errors.NOT_FOUND({ message: '你没有这个todo' });
+				}
 				return { txid, item: updatedTodo };
 			}),
-	),
-	deleteTodo: Fn.input(z.object({ id: z.string() })).handler(
-		 ({ input }) =>db.transaction(async (tx) => {
+		),
+	deleteTodo: authFn
+		.input(z.object({ id: z.string() }))
+		.handler(({ input, context, errors }) =>
+			db.transaction(async (tx) => {
 				const txid = await generateTxId(tx);
-				await tx.delete(todo).where(eq(todo.id, input.id));
+				const [deletedTodo] = await tx
+					.delete(todo)
+					.where(and(eq(todo.id, input.id), eq(todo.user_id, context.user.id)))
+					.returning({ id: todo.id });
+				if (!deletedTodo) {
+					throw errors.NOT_FOUND({ message: '你没有这个todo' });
+				}
 				return { txid };
-			})
-	),
+			}),
+		),
 };

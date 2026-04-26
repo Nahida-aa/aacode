@@ -211,13 +211,8 @@ export function DemoSidebar() {
 					],
 				},
 				{
-					title: 'I18n',
-					children: [
-						{
-							title: 'I18n paraglide',
-							link: '/integration/i18n/paraglide',
-						},
-					],
+					title: 'I18n paraglide',
+					link: '/integration/i18n/paraglide',
 				},
 
 				// {
@@ -259,6 +254,19 @@ export function DemoSidebar() {
 							link: '/ui/display/md/prosemirror/',
 						},
 					],
+				},
+			],
+		},
+		{
+			title: 'Base',
+			children: [
+				{
+					title: 'http/xhr',
+					link: '/base/http/xhr',
+				},
+				{
+					title: 's3',
+					link: '/base/s3',
 				},
 			],
 		},

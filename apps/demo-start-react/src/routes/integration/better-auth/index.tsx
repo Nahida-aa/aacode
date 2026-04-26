@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { authClient } from '#/lib/auth.auth-client.ts';
+import { authClient } from '#/lib/auth/auth-client.ts';
 
 export const Route = createFileRoute('/integration/better-auth/')({
 	component: BetterAuthDemo,
