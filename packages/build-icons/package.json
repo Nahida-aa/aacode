@@ -1,0 +1,10 @@
+{
+  "name": "@aa/build-icons",
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "dependencies": {
+    "svgson": "^5.3.1"
+  }
+}

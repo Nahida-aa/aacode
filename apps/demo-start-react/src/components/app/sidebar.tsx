@@ -137,6 +137,12 @@ export function DemoSidebar() {
 				{
 					title: 'Chat',
 					link: '/demo/chat',
+					children: [
+						{
+							title: 'DM',
+							link: '/demo/chat/dm',
+						},
+					],
 				},
 			],
 		},

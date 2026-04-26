@@ -1,103 +1,57 @@
-import { and, eq, ilike, ne, or, sql } from 'drizzle-orm';
-import z from 'zod';
-import { pickColumns } from '#/db.helpers';
+import { and, ilike, lt, or, ne, desc } from 'drizzle-orm';
+import { z } from 'zod/v4';
 import { db } from '#/db.server';
-import { userUpdateZ } from '#/features/user/user.schema';
-import { profile } from '#/features/user/user.table';
 import { user } from '#/lib/auth.table';
-import { searchQuery } from '#/lib/utils/zod.ts';
-import { authFn, Fn, getAuthFn, getAuthOrNotFn, getFn } from '#/orpc.base';
+import { authOrNotFn } from '#/orpc.base';
 
-const getUser = async (id: string) => {
-	const userProfile = await db
-		.select({
-			...pickColumns(user, {
-				id: true,
-				name: true,
-				email: true,
-				image: true,
-				username: true,
-				displayUsername: true,
-				phoneNumber: true,
-			}),
-			...pickColumns(profile, {
-				summary: true,
-				birthday: true,
-				personalizedRecommendation: true,
-				color: true,
-				banner: true,
-			}),
-		})
-		.from(user)
-		.leftJoin(profile, eq(user.id, profile.userId))
-		.where(eq(user.id, id));
-	if (userProfile.length === 0) {
-		// throw AppErr('用户不存在')
-		return null;
-	}
-	return userProfile[0];
-};
-export type UserProfile = NonNullable<Awaited<ReturnType<typeof getUser>>>;
+const searchUserSchema = z.object({
+	q: z.string().min(1),
+	cursor: z.string().optional(),
+	limit: z.coerce.number().int().min(1).max(50).optional().default(20),
+});
 
-const updateUser = authFn
-	.input(userUpdateZ)
-	.handler(
-		async ({
-			input: { username, displayUsername, name, image, ...data },
-			context,
-		}) => {
-			return await db.transaction(async (tx) => {
-				await tx
-					.update(user)
-					.set({
-						username: username,
-						displayUsername: displayUsername,
-						name: name || displayUsername || undefined,
-						image: image,
-					})
-					.where(eq(user.id, context.user.id));
-				// 如果 data 字段全部为空，则不更新 profile 表
-				if (!Object.values(data).some((v) => v !== undefined)) return true;
-				await tx
-					.insert(profile)
-					.values({
-						userId: context.user.id,
-						...data,
-					})
-					.onConflictDoUpdate({
-						target: profile.userId,
-						set: data,
-					});
-				return true;
-			});
-		},
-	);
+export const searchUser = authOrNotFn
+	.input(searchUserSchema)
+	.handler(async ({ input, context }) => {
+		const filters = [
+			or(
+				ilike(user.username, `%${input.q}%`),
+				ilike(user.displayUsername, `%${input.q}%`),
+			),
+		];
+
+		if (input.cursor) {
+			filters.push(lt(user.createdAt, new Date(input.cursor)));
+		}
+
+		if (context.user) {
+			filters.push(ne(user.id, context.user.id));
+		}
+
+		const users = await db
+			.select({
+				id: user.id,
+				name: user.name,
+				username: user.username,
+				displayUsername: user.displayUsername,
+				image: user.image,
+				createdAt: user.createdAt,
+			})
+			.from(user)
+			.where(and(...filters))
+			.orderBy(desc(user.createdAt))
+			.limit(input.limit + 1);
+
+		const hasMore = users.length > input.limit;
+		const items = hasMore ? users.slice(0, -1) : users;
+		const nextCursor = hasMore ? items[items.length - 1]?.createdAt : undefined;
+
+		return {
+			items,
+			nextCursor: nextCursor ? String(nextCursor) : undefined,
+		};
+	});
 
 export const userApi = {
-	getUser: getFn
-		.input(z.object({ id: z.string() }))
-		.handler(async ({ input }) => await getUser(input.id)),
-	// getMe: authFn
-	searchUser: getAuthOrNotFn
-		.input(searchQuery.extend({}))
-		.handler(async ({ input, context }) => {
-			const filter = [
-				or(
-					ilike(user.username, `%${input.q}%`),
-					ilike(user.displayUsername, `%${input.q}%`),
-					eq(user.phoneNumber, `+86${input.q}`),
-				),
-			];
-			if (context.user) {
-				// 已登录用户需要排除自己
-				filter.push(ne(user.id, context.user.id));
-			}
-			const users = await db
-				.select()
-				.from(user)
-				.where(and(...filter));
-			return users;
-		}),
-
-	updateUser,
+	searchUser,
 };

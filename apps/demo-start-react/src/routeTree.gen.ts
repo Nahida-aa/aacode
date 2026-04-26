@@ -41,6 +41,7 @@ import { Route as IntegrationApiMcpTodosRouteImport } from './routes/integration
 import { Route as BaseHttpXhrRouteImport } from './routes/base/http/xhr'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as DemoChatDmRouteRouteImport } from './routes/demo/chat/_dm/route'
 import { Route as UiDisplayMdIndexRouteImport } from './routes/ui/display/md/index'
 import { Route as UiDisplayMdTiptapRouteImport } from './routes/ui/display/md/tiptap'
 import { Route as IntegrationApiAiTtsRouteImport } from './routes/integration/api.ai.tts'
@@ -48,6 +49,7 @@ import { Route as IntegrationApiAiTranscriptionRouteImport } from './routes/inte
 import { Route as IntegrationApiAiStructuredRouteImport } from './routes/integration/api.ai.structured'
 import { Route as IntegrationApiAiImageRouteImport } from './routes/integration/api.ai.image'
 import { Route as IntegrationApiAiChatRouteImport } from './routes/integration/api.ai.chat'
+import { Route as DemoChatDmDmRouteImport } from './routes/demo/chat/_dm/dm'
 import { Route as BaseHttpApiErrRouteImport } from './routes/base/http/api.err'
 import { Route as UiDisplayMdProsemirrorIndexRouteImport } from './routes/ui/display/md/prosemirror/index'
 
@@ -218,6 +220,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoChatDmRouteRoute = DemoChatDmRouteRouteImport.update({
+  id: '/demo/chat/_dm',
+  path: '/demo/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UiDisplayMdIndexRoute = UiDisplayMdIndexRouteImport.update({
   id: '/ui/display/md/',
   path: '/ui/display/md/',
@@ -255,6 +262,11 @@ const IntegrationApiAiChatRoute = IntegrationApiAiChatRouteImport.update({
   path: '/integration/api/ai/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DemoChatDmDmRoute = DemoChatDmDmRouteImport.update({
+  id: '/dm',
+  path: '/dm',
+  getParentRoute: () => DemoChatDmRouteRoute,
+} as any)
 const BaseHttpApiErrRoute = BaseHttpApiErrRouteImport.update({
   id: '/base/http/api/err',
   path: '/base/http/api/err',
@@ -282,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/integration/store': typeof IntegrationStoreRoute
   '/integration/table': typeof IntegrationTableRoute
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
+  '/demo/chat': typeof DemoChatDmRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/base/http/xhr': typeof BaseHttpXhrRoute
@@ -301,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
   '/base/http/api/err': typeof BaseHttpApiErrRoute
+  '/demo/chat/dm': typeof DemoChatDmDmRoute
   '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
   '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
   '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
@@ -325,6 +339,7 @@ export interface FileRoutesByTo {
   '/integration/store': typeof IntegrationStoreRoute
   '/integration/table': typeof IntegrationTableRoute
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
+  '/demo/chat': typeof DemoChatIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/base/http/xhr': typeof BaseHttpXhrRoute
@@ -340,10 +355,10 @@ export interface FileRoutesByTo {
   '/integration/zod/file': typeof IntegrationZodFileRoute
   '/ui/action/button': typeof UiActionButtonRoute
   '/base/s3': typeof BaseS3IndexRoute
-  '/demo/chat': typeof DemoChatIndexRoute
   '/integration/better-auth': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars': typeof IntegrationGuitarsIndexRoute
   '/base/http/api/err': typeof BaseHttpApiErrRoute
+  '/demo/chat/dm': typeof DemoChatDmDmRoute
   '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
   '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
   '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
@@ -369,6 +384,7 @@ export interface FileRoutesById {
   '/integration/store': typeof IntegrationStoreRoute
   '/integration/table': typeof IntegrationTableRoute
   '/integration/tanstack-query': typeof IntegrationTanstackQueryRoute
+  '/demo/chat/_dm': typeof DemoChatDmRouteRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/base/http/xhr': typeof BaseHttpXhrRoute
@@ -388,6 +404,7 @@ export interface FileRoutesById {
   '/integration/better-auth/': typeof IntegrationBetterAuthIndexRoute
   '/integration/guitars/': typeof IntegrationGuitarsIndexRoute
   '/base/http/api/err': typeof BaseHttpApiErrRoute
+  '/demo/chat/_dm/dm': typeof DemoChatDmDmRoute
   '/integration/api/ai/chat': typeof IntegrationApiAiChatRoute
   '/integration/api/ai/image': typeof IntegrationApiAiImageRoute
   '/integration/api/ai/structured': typeof IntegrationApiAiStructuredRoute
@@ -414,6 +431,7 @@ export interface FileRouteTypes {
     | '/integration/store'
     | '/integration/table'
     | '/integration/tanstack-query'
+    | '/demo/chat'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/base/http/xhr'
@@ -433,6 +451,7 @@ export interface FileRouteTypes {
     | '/integration/better-auth/'
     | '/integration/guitars/'
     | '/base/http/api/err'
+    | '/demo/chat/dm'
     | '/integration/api/ai/chat'
     | '/integration/api/ai/image'
     | '/integration/api/ai/structured'
@@ -457,6 +476,7 @@ export interface FileRouteTypes {
     | '/integration/store'
     | '/integration/table'
     | '/integration/tanstack-query'
+    | '/demo/chat'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/base/http/xhr'
@@ -472,10 +492,10 @@ export interface FileRouteTypes {
     | '/integration/zod/file'
     | '/ui/action/button'
     | '/base/s3'
-    | '/demo/chat'
     | '/integration/better-auth'
     | '/integration/guitars'
     | '/base/http/api/err'
+    | '/demo/chat/dm'
     | '/integration/api/ai/chat'
     | '/integration/api/ai/image'
     | '/integration/api/ai/structured'
@@ -500,6 +520,7 @@ export interface FileRouteTypes {
     | '/integration/store'
     | '/integration/table'
     | '/integration/tanstack-query'
+    | '/demo/chat/_dm'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/base/http/xhr'
@@ -519,6 +540,7 @@ export interface FileRouteTypes {
     | '/integration/better-auth/'
     | '/integration/guitars/'
     | '/base/http/api/err'
+    | '/demo/chat/_dm/dm'
     | '/integration/api/ai/chat'
     | '/integration/api/ai/image'
     | '/integration/api/ai/structured'
@@ -544,6 +566,7 @@ export interface RootRouteChildren {
   IntegrationStoreRoute: typeof IntegrationStoreRoute
   IntegrationTableRoute: typeof IntegrationTableRoute
   IntegrationTanstackQueryRoute: typeof IntegrationTanstackQueryRoute
+  DemoChatDmRouteRoute: typeof DemoChatDmRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
   BaseHttpXhrRoute: typeof BaseHttpXhrRoute
@@ -799,6 +822,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/chat/_dm': {
+      id: '/demo/chat/_dm'
+      path: '/demo/chat'
+      fullPath: '/demo/chat'
+      preLoaderRoute: typeof DemoChatDmRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ui/display/md/': {
       id: '/ui/display/md/'
       path: '/ui/display/md'
@@ -848,6 +878,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationApiAiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/demo/chat/_dm/dm': {
+      id: '/demo/chat/_dm/dm'
+      path: '/dm'
+      fullPath: '/demo/chat/dm'
+      preLoaderRoute: typeof DemoChatDmDmRouteImport
+      parentRoute: typeof DemoChatDmRouteRoute
+    }
     '/base/http/api/err': {
       id: '/base/http/api/err'
       path: '/base/http/api/err'
@@ -865,6 +902,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DemoChatDmRouteRouteChildren {
+  DemoChatDmDmRoute: typeof DemoChatDmDmRoute
+}
+
+const DemoChatDmRouteRouteChildren: DemoChatDmRouteRouteChildren = {
+  DemoChatDmDmRoute: DemoChatDmDmRoute,
+}
+
+const DemoChatDmRouteRouteWithChildren = DemoChatDmRouteRoute._addFileChildren(
+  DemoChatDmRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -880,6 +929,7 @@ const rootRouteChildren: RootRouteChildren = {
   IntegrationStoreRoute: IntegrationStoreRoute,
   IntegrationTableRoute: IntegrationTableRoute,
   IntegrationTanstackQueryRoute: IntegrationTanstackQueryRoute,
+  DemoChatDmRouteRoute: DemoChatDmRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
   BaseHttpXhrRoute: BaseHttpXhrRoute,
