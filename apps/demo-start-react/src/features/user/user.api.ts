@@ -5,6 +5,7 @@ import { db } from '#/db.server';
 import { userUpdateZ } from '#/features/user/user.schema';
 import { profile } from '#/features/user/user.table';
 import { user } from '#/lib/auth.table';
+import { searchQuery } from '#/lib/utils/zod.ts';
 import { authFn, Fn, getAuthFn, getAuthOrNotFn, getFn } from '#/orpc.base';
 
 const getUser = async (id: string) => {
@@ -78,7 +79,7 @@ export const userApi = {
 		.handler(async ({ input }) => await getUser(input.id)),
 	// getMe: authFn
 	searchUser: getAuthOrNotFn
-		.input(z.object({ q: z.string().min(1) }))
+		.input(searchQuery.extend({}))
 		.handler(async ({ input, context }) => {
 			const filter = [
 				or(
