@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { AArrowDown } from '@aa/icons-react';
 import {
 	Route as RouteIcon,
 	Server,
@@ -42,6 +43,11 @@ function App() {
 			icon: <Sparkles className="w-12 h-12 text-cyan-400" />,
 			title: m.next_generation_ready_title(),
 			description: m.next_generation_ready_description(),
+		},
+		{
+			icon: <AArrowDown size={48} className="text-cyan-400" />,
+			title: 'Custom Icons Test',
+			description: 'Test @aa/icons-react package',
 		},
 	];
 

@@ -1,0 +1,7 @@
+{
+  "name": "@aa/icons-react",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "react": "^19.0.0"
+  }
+}
