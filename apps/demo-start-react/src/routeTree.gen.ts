@@ -37,6 +37,7 @@ import { Route as IntegrationI18nParaglideRouteImport } from './routes/integrati
 import { Route as IntegrationGuitarsGuitarIdRouteImport } from './routes/integration/guitars/$guitarId'
 import { Route as IntegrationFormSimpleRouteImport } from './routes/integration/form/simple'
 import { Route as IntegrationFormAddressRouteImport } from './routes/integration/form/address'
+import { Route as IntegrationBetterAuthWebauthnRouteImport } from './routes/integration/better-auth/webauthn'
 import { Route as IntegrationApiMcpTodosRouteImport } from './routes/integration/api.mcp-todos'
 import { Route as BaseHttpXhrRouteImport } from './routes/base/http/xhr'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
@@ -200,6 +201,12 @@ const IntegrationFormAddressRoute = IntegrationFormAddressRouteImport.update({
   path: '/integration/form/address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IntegrationBetterAuthWebauthnRoute =
+  IntegrationBetterAuthWebauthnRouteImport.update({
+    id: '/integration/better-auth/webauthn',
+    path: '/integration/better-auth/webauthn',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const IntegrationApiMcpTodosRoute = IntegrationApiMcpTodosRouteImport.update({
   id: '/integration/api/mcp-todos',
   path: '/integration/api/mcp-todos',
@@ -299,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/base/http/xhr': typeof BaseHttpXhrRoute
   '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
+  '/integration/better-auth/webauthn': typeof IntegrationBetterAuthWebauthnRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
   '/integration/guitars/$guitarId': typeof IntegrationGuitarsGuitarIdRoute
@@ -344,6 +352,7 @@ export interface FileRoutesByTo {
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/base/http/xhr': typeof BaseHttpXhrRoute
   '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
+  '/integration/better-auth/webauthn': typeof IntegrationBetterAuthWebauthnRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
   '/integration/guitars/$guitarId': typeof IntegrationGuitarsGuitarIdRoute
@@ -389,6 +398,7 @@ export interface FileRoutesById {
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/base/http/xhr': typeof BaseHttpXhrRoute
   '/integration/api/mcp-todos': typeof IntegrationApiMcpTodosRoute
+  '/integration/better-auth/webauthn': typeof IntegrationBetterAuthWebauthnRoute
   '/integration/form/address': typeof IntegrationFormAddressRoute
   '/integration/form/simple': typeof IntegrationFormSimpleRoute
   '/integration/guitars/$guitarId': typeof IntegrationGuitarsGuitarIdRoute
@@ -436,6 +446,7 @@ export interface FileRouteTypes {
     | '/api/rpc/$'
     | '/base/http/xhr'
     | '/integration/api/mcp-todos'
+    | '/integration/better-auth/webauthn'
     | '/integration/form/address'
     | '/integration/form/simple'
     | '/integration/guitars/$guitarId'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/api/rpc/$'
     | '/base/http/xhr'
     | '/integration/api/mcp-todos'
+    | '/integration/better-auth/webauthn'
     | '/integration/form/address'
     | '/integration/form/simple'
     | '/integration/guitars/$guitarId'
@@ -525,6 +537,7 @@ export interface FileRouteTypes {
     | '/api/rpc/$'
     | '/base/http/xhr'
     | '/integration/api/mcp-todos'
+    | '/integration/better-auth/webauthn'
     | '/integration/form/address'
     | '/integration/form/simple'
     | '/integration/guitars/$guitarId'
@@ -571,6 +584,7 @@ export interface RootRouteChildren {
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
   BaseHttpXhrRoute: typeof BaseHttpXhrRoute
   IntegrationApiMcpTodosRoute: typeof IntegrationApiMcpTodosRoute
+  IntegrationBetterAuthWebauthnRoute: typeof IntegrationBetterAuthWebauthnRoute
   IntegrationFormAddressRoute: typeof IntegrationFormAddressRoute
   IntegrationFormSimpleRoute: typeof IntegrationFormSimpleRoute
   IntegrationGuitarsGuitarIdRoute: typeof IntegrationGuitarsGuitarIdRoute
@@ -794,6 +808,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IntegrationFormAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/integration/better-auth/webauthn': {
+      id: '/integration/better-auth/webauthn'
+      path: '/integration/better-auth/webauthn'
+      fullPath: '/integration/better-auth/webauthn'
+      preLoaderRoute: typeof IntegrationBetterAuthWebauthnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/integration/api/mcp-todos': {
       id: '/integration/api/mcp-todos'
       path: '/integration/api/mcp-todos'
@@ -934,6 +955,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRpcSplatRoute: ApiRpcSplatRoute,
   BaseHttpXhrRoute: BaseHttpXhrRoute,
   IntegrationApiMcpTodosRoute: IntegrationApiMcpTodosRoute,
+  IntegrationBetterAuthWebauthnRoute: IntegrationBetterAuthWebauthnRoute,
   IntegrationFormAddressRoute: IntegrationFormAddressRoute,
   IntegrationFormSimpleRoute: IntegrationFormSimpleRoute,
   IntegrationGuitarsGuitarIdRoute: IntegrationGuitarsGuitarIdRoute,

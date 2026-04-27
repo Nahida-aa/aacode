@@ -211,8 +211,11 @@ export function DemoSidebar() {
 						{ title: 'Sign In', link: '/integration/better-auth' },
 						{
 							title: 'OpenAPI',
-
 							href: '/api/auth/reference',
+						},
+						{
+							title: 'WebAuthn',
+							link: '/integration/better-auth/webauthn',
 						},
 					],
 				},
