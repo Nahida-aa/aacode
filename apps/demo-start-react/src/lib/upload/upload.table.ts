@@ -8,7 +8,7 @@ import {
 	varchar,
 } from 'drizzle-orm/pg-core';
 import { pgNanoid } from '#/db.helpers';
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 import { fileGroup } from '#/lib/upload/upload.const';
 
 // 文件存储表 - 统一管理所有上传的文件

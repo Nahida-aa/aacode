@@ -1,6 +1,6 @@
 import { boolean, json, jsonb, pgTable, text } from 'drizzle-orm/pg-core';
 import { nanoidWithTimestamps } from '#/db.helpers.ts';
-import { user } from '#/lib/auth.table.ts';
+import { user } from '#/lib/auth/auth.table.ts';
 
 export const todo = pgTable('todo', {
 	...nanoidWithTimestamps,

@@ -20,7 +20,7 @@ import type {
 	PermissionOverwrite,
 } from '#/features/channel/channel.const';
 
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 
 // 频道表 - 社区/项目/团队的频道
 export const channel = pgTable(

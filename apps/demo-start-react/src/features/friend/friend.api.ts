@@ -14,7 +14,7 @@ import {
 	friendTag,
 } from '#/features/friend/friend.table';
 import { userItemFields } from '#/features/user/user.schema';
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 import { authFn, getAuthFn } from '#/orpc.base';
 
 const sendFriendRequest = authFn

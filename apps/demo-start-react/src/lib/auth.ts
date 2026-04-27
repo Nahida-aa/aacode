@@ -1,4 +1,5 @@
 import { i18n } from '@better-auth/i18n';
+import { passkey } from '@better-auth/passkey';
 import { type BetterAuthOptions, betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import {
@@ -21,116 +22,6 @@ import { sendSms } from '#/lib/auth.phone.sendSms';
 import { getTempEmail, getTempName } from '#/lib/auth.schema';
 
 const options = {
-	baseURL: env.VITE_APP_URL,
-	advanced: {
-		cookiePrefix: 'mcc',
-	},
-	session: {
-		expiresIn: 60 * 60 * 24 * 30, // 30 days
-		updateAge: 60 * 60 * 24 * 2, // 1 day (every 2 day the session expiration is updated)
-		// https://www.better-auth.com/docs/concepts/session-management#cookie-cache
-		// 使用 类似 jwt 的机制将 session 缓存到 cookie 中, 避免一次请求多次查询数据库(可以用react.cache 进行缓存, 但对于非 jsx 渲染的 部分 不适用, 例如 ws 接口)
-		cookieCache: {
-			enabled: true,
-			maxAge: 15 * 60, // Cache duration in seconds (15 minutes)
-			strategy: 'jwt', // can be "compact" or "jwt" or "jwe"
-			// refreshCache: true, // Enable stateless refresh
-			// refreshCache: {
-			//   updateAge: 60, // Refresh when 60 seconds remain before expiry
-			// },
-		},
-	},
-	account: {
-		storeStateStrategy: 'cookie',
-		storeAccountCookie: true, // Store account data after OAuth flow in a cookie (useful for database-less flows)
-	},
-	rateLimit: {
-		enabled: true, // 开发环境下也开启限制
-		window: 60, // time window in seconds
-		max: 100, // max requests in the window
-		customRules: {
-			'/phone-number/send-otp': {
-				window: 45,
-				max: 1,
-			},
-			// "/sign-in/email": {
-			//   window: 10,
-			//   max: 3,
-			// },
-			// "/two-factor/*": async (request) => {
-			//   // custom function to return rate limit window and max
-			//   return {
-			//     window: 10,
-			//     max: 3,
-			//   };
-			// },
-		},
-	},
-	database: drizzleAdapter(db, {
-		provider: 'pg', // or "mysql", "sqlite"
-		// schema: {
-		//   // ...schema,
-		//   user: schema.user,
-		// },
-		schema: schema,
-	}),
-	experimental: { joins: true },
-	user: {
-		additionalFields: {
-			realNameVerified: {
-				type: 'boolean',
-				defaultValue: false,
-				required: false,
-				input: false, // don't allow user to set
-			},
-			eduVerified: {
-				type: 'boolean',
-				defaultValue: false,
-				required: false,
-				input: false,
-			},
-			// summary: {
-			//   type: 'string',
-			//   required: false,
-			// },
-			// description: {
-			//   type: 'string',
-			//   required: false,
-			// },
-			// // 生日
-			// birthday: {
-			//   type: 'date',
-			//   required: false,
-			// },
-			// personalizedRecommendation: {
-			//   type: 'boolean',
-			//   defaultValue: false,
-			// },
-			// color: {
-			//   type: 'string',
-			//   required: false,
-			// },
-			// banner: {
-			//   type: 'string',
-			//   required: false,
-			// },
-		},
-		deleteUser: {
-			enabled: true,
-		},
-	},
-	trustedOrigins: [
-		'http://localhost:3000',
-		'http://localhost:3001',
-		'http://localhost:3002',
-		'http://localhost:3003',
-		'http://localhost:3333',
-		'https://xn--2qqt0eizbxcx84dyq3c.cn',
-	],
-	emailAndPassword: {
-		enabled: true,
-	},
-
 	plugins: [
 		tanstackStartCookies(),
 		i18n({
@@ -244,8 +135,118 @@ const options = {
 		//     },
 		//   },
 		// }),
+		passkey(),
 		openAPI(), // basePath/reference: open-api doc
 	],
+	baseURL: env.VITE_APP_URL,
+	advanced: {
+		cookiePrefix: 'mcc',
+	},
+	session: {
+		expiresIn: 60 * 60 * 24 * 30, // 30 days
+		updateAge: 60 * 60 * 24 * 2, // 1 day (every 2 day the session expiration is updated)
+		// https://www.better-auth.com/docs/concepts/session-management#cookie-cache
+		// 使用 类似 jwt 的机制将 session 缓存到 cookie 中, 避免一次请求多次查询数据库(可以用react.cache 进行缓存, 但对于非 jsx 渲染的 部分 不适用, 例如 ws 接口)
+		cookieCache: {
+			enabled: true,
+			maxAge: 15 * 60, // Cache duration in seconds (15 minutes)
+			strategy: 'jwt', // can be "compact" or "jwt" or "jwe"
+			// refreshCache: true, // Enable stateless refresh
+			// refreshCache: {
+			//   updateAge: 60, // Refresh when 60 seconds remain before expiry
+			// },
+		},
+	},
+	account: {
+		storeStateStrategy: 'cookie',
+		storeAccountCookie: true, // Store account data after OAuth flow in a cookie (useful for database-less flows)
+	},
+	rateLimit: {
+		enabled: true, // 开发环境下也开启限制
+		window: 60, // time window in seconds
+		max: 100, // max requests in the window
+		customRules: {
+			'/phone-number/send-otp': {
+				window: 45,
+				max: 1,
+			},
+			// "/sign-in/email": {
+			//   window: 10,
+			//   max: 3,
+			// },
+			// "/two-factor/*": async (request) => {
+			//   // custom function to return rate limit window and max
+			//   return {
+			//     window: 10,
+			//     max: 3,
+			//   };
+			// },
+		},
+	},
+	database: drizzleAdapter(db, {
+		provider: 'pg', // or "mysql", "sqlite"
+		// schema: {
+		//   // ...schema,
+		//   user: schema.user,
+		// },
+		schema: schema,
+	}),
+	experimental: { joins: true },
+	user: {
+		additionalFields: {
+			realNameVerified: {
+				type: 'boolean',
+				defaultValue: false,
+				required: false,
+				input: false, // don't allow user to set
+			},
+			eduVerified: {
+				type: 'boolean',
+				defaultValue: false,
+				required: false,
+				input: false,
+			},
+			// summary: {
+			//   type: 'string',
+			//   required: false,
+			// },
+			// description: {
+			//   type: 'string',
+			//   required: false,
+			// },
+			// // 生日
+			// birthday: {
+			//   type: 'date',
+			//   required: false,
+			// },
+			// personalizedRecommendation: {
+			//   type: 'boolean',
+			//   defaultValue: false,
+			// },
+			// color: {
+			//   type: 'string',
+			//   required: false,
+			// },
+			// banner: {
+			//   type: 'string',
+			//   required: false,
+			// },
+		},
+		deleteUser: {
+			enabled: true,
+		},
+	},
+	trustedOrigins: [
+		'http://localhost:3000',
+		'http://localhost:3001',
+		'http://localhost:3002',
+		'http://localhost:3003',
+		'http://localhost:3333',
+		'https://xn--2qqt0eizbxcx84dyq3c.cn',
+	],
+	emailAndPassword: {
+		enabled: true,
+	},
 } satisfies BetterAuthOptions;
 export const auth = betterAuth({
 	...options,

@@ -1,3 +1,4 @@
+import { passkeyClient } from '@better-auth/passkey/client';
 import {
 	adminClient,
 	anonymousClient,
@@ -34,6 +35,7 @@ export const authClient = createAuthClient({
 		emailOTPClient(),
 		adminClient(),
 		// organizationClient(),
+		passkeyClient(),
 		customSessionClient<typeof auth>(),
 	],
 });

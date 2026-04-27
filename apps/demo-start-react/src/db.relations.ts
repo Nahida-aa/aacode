@@ -1,10 +1,17 @@
 import { relations } from 'drizzle-orm';
-import { account, session, twoFactor, user } from '#/lib/auth.table.ts';
+import {
+	account,
+	passkey,
+	session,
+	twoFactor,
+	user,
+} from '#/lib/auth/auth.table.ts';
 
 export const userRelations = relations(user, ({ many }) => ({
 	sessions: many(session),
 	accounts: many(account),
 	twoFactors: many(twoFactor),
+	passkeys: many(passkey),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -24,6 +31,13 @@ export const accountRelations = relations(account, ({ one }) => ({
 export const twoFactorRelations = relations(twoFactor, ({ one }) => ({
 	user: one(user, {
 		fields: [twoFactor.userId],
+		references: [user.id],
+	}),
+}));
+
+export const passkeyRelations = relations(passkey, ({ one }) => ({
+	user: one(user, {
+		fields: [passkey.userId],
 		references: [user.id],
 	}),
 }));

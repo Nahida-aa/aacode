@@ -8,7 +8,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { nanoidWithTimestamps } from '#/db.helpers';
 import { friendStatuses } from '#/features/friend/friend.const';
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 
 export const friendRequest = pgTable(
 	'friend_request',

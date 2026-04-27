@@ -17,7 +17,7 @@ import {
 } from '#/features/channel/channel.table';
 import { friend } from '#/features/friend/friend.table';
 import { userItemFields } from '#/features/user/user.schema';
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 
 export const insertChannel = async (db: Db, data: ChannelInsert[]) =>
 	await db.insert(channel).values(data).returning();

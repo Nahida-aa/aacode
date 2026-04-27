@@ -1,5 +1,5 @@
 import { profile } from '#/features/user/user.table';
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 export const userSelectZ = createSelectSchema(user);
 export type UserSelect = typeof user.$inferSelect;
 export const userInsertZ = createInsertSchema(user);

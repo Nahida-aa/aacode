@@ -29,9 +29,9 @@
     "intent:stale": "bun x @tanstack/intent@latest stale"
   },
   "dependencies": {
-    "@aa/icons-react": "workspace:*",
     "@base-ui/react": "^1.4.1",
     "@better-auth/i18n": "^1.6.7",
+    "@better-auth/passkey": "^1.6.9",
     "@cloudflare/vite-plugin": "^1.26.0",
     "@electric-sql/client": "^1.5.15",
     "@faker-js/faker": "^10.3.0",

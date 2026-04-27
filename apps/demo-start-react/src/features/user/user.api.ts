@@ -1,7 +1,7 @@
-import { and, ilike, lt, or, ne, desc } from 'drizzle-orm';
+import { and, desc, ilike, lt, ne, or } from 'drizzle-orm';
 import { z } from 'zod/v4';
 import { db } from '#/db.server';
-import { user } from '#/lib/auth.table';
+import { user } from '#/lib/auth/auth.table.ts';
 import { authOrNotFn } from '#/orpc.base';
 
 const searchUserSchema = z.object({
