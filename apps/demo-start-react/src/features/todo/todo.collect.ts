@@ -11,6 +11,7 @@ import type { z } from 'zod';
 import { getUrl, getUrlStr } from '#/env.url.ts';
 import { selectTodoSchema } from '#/features/todo/todo.schema.ts';
 import { todo } from '#/features/todo/todo.table.ts';
+import { createShapeOptions } from '#/integrations/electric/utils.ts';
 import { orpc } from '#/orpc._client.ts';
 
 // 在文件顶部定义一个全局队列
@@ -27,16 +28,7 @@ export const todoCollect = createCollection(
 			completed: selectTodoSchema.shape.completed.default(false),
 		}),
 		getKey: (item) => item.id,
-		shapeOptions: {
-			url: getUrlStr('/api/todo'),
-			liveSse: true,
-			params: { table: 'todo' },
-			parser: {
-				timestamptz: (date: string) => {
-					return new Date(date);
-				},
-			},
-		},
+		shapeOptions: createShapeOptions('todo'),
 		onInsert: async ({ transaction }) => {
 			const { modified: newItem } = transaction.mutations[0];
 			const ret = await orpc.addTodo.call(newItem);

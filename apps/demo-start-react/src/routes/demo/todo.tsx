@@ -14,7 +14,7 @@ import {
 	type TextEditorRef,
 } from '#/components/uix/prosemirror/editor.tsx';
 import { TextPreview } from '#/components/uix/prosemirror/preview.tsx';
-import { type TodoRow, todoCollect } from '#/features/todo/todo.collection.ts';
+import { type TodoRow, todoCollect } from '#/features/todo/todo.collect.ts';
 import { addTodoSchema, type Todo } from '#/features/todo/todo.schema.ts';
 import { authClient } from '#/lib/auth/auth-client.ts';
 import { useFileUpload } from '#/lib/upload/useFileUpload.ts';
