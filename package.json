@@ -13,6 +13,7 @@
     "typescript": "latest",
     "@types/node": "latest",
     "vite": "latest",
+    "@tanstack/router-plugin": "latest",
     "@tailwindcss/vite": "latest",
     "tailwindcss": "latest",
     "solid-js": "latest",

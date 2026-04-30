@@ -1,27 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { createMiddleware } from '@tanstack/react-start';
 import {
 	prepareElectricUrl,
 	proxyElectricRequest,
 } from '#/integrations/electric/proxy.ts';
-import { auth } from '#/lib/auth.ts';
-
-const authMiddleware = createMiddleware().server(async ({ request, next }) => {
-	const session = await auth.api.getSession({ headers: request.headers });
-	if (!session) {
-		return new Response(JSON.stringify({ error: `Unauthorized` }), {
-			status: 401,
-			headers: { 'content-type': `application/json` },
-		});
-	}
-	return next({
-		context: { user: session.user },
-	});
-});
+import { reqAuthMiddle } from '#/lib/middleware/req.ts';
 
 export const Route = createFileRoute('/api/todo')({
 	server: {
-		middleware: [authMiddleware],
+		middleware: [reqAuthMiddle],
 		handlers: {
 			GET: async ({ request, context }) => {
 				const originUrl = prepareElectricUrl(request.url);

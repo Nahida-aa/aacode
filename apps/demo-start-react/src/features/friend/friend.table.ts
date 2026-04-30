@@ -10,26 +10,26 @@ import { nanoidWithTimestamps } from '#/db.helpers';
 import { friendStatuses } from '#/features/friend/friend.const';
 import { user } from '#/lib/auth/auth.table.ts';
 
-export const friendRequest = pgTable(
+export const friendRequestTable = pgTable(
 	'friend_request',
 	{
 		...nanoidWithTimestamps,
-		emitterId: text('emitter_id')
+		emitter_id: text('emitter_id')
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
-		receiverId: text('receiver_id')
+		receiver_id: text('receiver_id')
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
 		status: text({ enum: friendStatuses }).default('pending').notNull(),
-		acceptedAt: timestamp('accepted_at', { mode: 'string' }),
+		accepted_at: timestamp('accepted_at', { mode: 'string' }),
 		message: text('message'),
 		nickname: text('nickname'), // emitter 为 receiver 提前起的昵称, 后续需要复制到 friend 表
 		tags: text('tags').array(), // emitter 为 receiver 选择的tags, 后续需要 插入 link 表
 	},
-	(t) => [uniqueIndex('emitter_receiver_idx').on(t.emitterId, t.receiverId)],
+	(t) => [uniqueIndex('emitter_receiver_idx').on(t.emitter_id, t.receiver_id)],
 );
 // 采用 双向插入 比 智能查询 的 查询性能高, 且 理解起来更简单
-export const friend = pgTable(
+export const friendTable = pgTable(
 	'friend',
 	{
 		...nanoidWithTimestamps,
@@ -52,7 +52,7 @@ export const friend = pgTable(
 );
 
 // 用户的好友 tag
-export const friendTag = pgTable(
+export const friendTagTable = pgTable(
 	'friend_tag',
 	{
 		...nanoidWithTimestamps,
@@ -76,10 +76,10 @@ export const friendToTag = pgTable(
 	{
 		friendId: text('friend_id')
 			.notNull()
-			.references(() => friend.id, { onDelete: 'cascade' }),
+			.references(() => friendTable.id, { onDelete: 'cascade' }),
 		friendTagId: text('friend_tag_id')
 			.notNull()
-			.references(() => friendTag.id, { onDelete: 'cascade' }),
+			.references(() => friendTagTable.id, { onDelete: 'cascade' }),
 	},
 	(t) => [
 		uniqueIndex('friend_to_tag_unique_idx').on(t.friendId, t.friendTagId), // 防止重复关联

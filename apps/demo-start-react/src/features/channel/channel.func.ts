@@ -15,7 +15,6 @@ import {
 	dmRoom,
 	message,
 } from '#/features/channel/channel.table';
-import { friend } from '#/features/friend/friend.table';
 import { userItemFields } from '#/features/user/user.schema';
 import { user } from '#/lib/auth/auth.table.ts';
 

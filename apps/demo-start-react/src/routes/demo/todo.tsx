@@ -14,10 +14,7 @@ import {
 	type TextEditorRef,
 } from '#/components/uix/prosemirror/editor.tsx';
 import { TextPreview } from '#/components/uix/prosemirror/preview.tsx';
-import {
-	type TodoRow,
-	todoCollection,
-} from '#/features/todo/todo.collection.ts';
+import { type TodoRow, todoCollect } from '#/features/todo/todo.collection.ts';
 import { addTodoSchema, type Todo } from '#/features/todo/todo.schema.ts';
 import { authClient } from '#/lib/auth/auth-client.ts';
 import { useFileUpload } from '#/lib/upload/useFileUpload.ts';
@@ -27,7 +24,7 @@ export const Route = createFileRoute('/demo/todo')({
 	loader: async () => {
 		await queryOnce((q) =>
 			q
-				.from({ todo: todoCollection })
+				.from({ todo: todoCollect })
 				.orderBy(({ todo }) => todo.updated_at, 'desc')
 				.orderBy(({ todo }) => todo.id, 'desc')
 				.limit(10),
@@ -61,7 +58,7 @@ function TodoListClient() {
 	} = useLiveInfiniteQuery(
 		(q) =>
 			q
-				.from({ todo: todoCollection })
+				.from({ todo: todoCollect })
 				.orderBy(({ todo }) => todo.updated_at, 'desc')
 				.orderBy(({ todo }) => todo.id, 'desc'),
 		{ pageSize: 10 },
@@ -106,7 +103,7 @@ function TodoCard({ todo }: { todo: TodoRow }) {
 				<div className="flex items-center gap-2">
 					<button
 						onClick={() =>
-							todoCollection.update(todo.id, (draft) => {
+							todoCollect.update(todo.id, (draft) => {
 								console.log('UpdatingTodo.draft', draft);
 								draft.completed = !todo.completed;
 								draft.created_at = new Date(draft.created_at!);
@@ -127,7 +124,7 @@ function TodoCard({ todo }: { todo: TodoRow }) {
 				<Button
 					size={'sm'}
 					variant={'destructive'}
-					onClick={() => todoCollection.delete(todo.id)}
+					onClick={() => todoCollect.delete(todo.id)}
 				>
 					Delete
 				</Button>
@@ -206,7 +203,7 @@ function AddTodoCard() {
 					throw new Error(state.error || '存在上传失败的文件');
 			}
 
-			const tx = todoCollection.insert({ ...value, user_id: session?.user.id });
+			const tx = todoCollect.insert({ ...value, user_id: session?.user.id });
 			await tx.isPersisted.promise;
 			formApi.reset();
 			formApi.setFieldValue('title', undefined);

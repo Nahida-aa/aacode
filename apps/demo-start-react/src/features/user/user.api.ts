@@ -2,7 +2,7 @@ import { and, desc, ilike, lt, ne, or } from 'drizzle-orm';
 import { z } from 'zod/v4';
 import { db } from '#/db.server';
 import { user } from '#/lib/auth/auth.table.ts';
-import { authOrNotFn } from '#/orpc.base';
+import { authOrNotFn, getFn } from '#/orpc.base';
 
 const searchUserSchema = z.object({
 	q: z.string().min(1),
@@ -54,4 +54,5 @@ export const searchUser = authOrNotFn
 
 export const userApi = {
 	searchUser,
+	select: getFn.handler(() => db.select().from(user)),
 };

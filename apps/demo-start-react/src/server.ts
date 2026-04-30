@@ -6,7 +6,6 @@ import { paraglideMiddleware } from './paraglide/server.js';
 export default createServerEntry(
 	wrapFetchWithSentry({
 		fetch(req) {
-			console.log(`Received request`);
 			return paraglideMiddleware(req, () => handler.fetch(req));
 		},
 	}),

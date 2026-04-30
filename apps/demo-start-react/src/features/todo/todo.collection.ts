@@ -16,7 +16,7 @@ import { orpc } from '#/orpc._client.ts';
 // 在文件顶部定义一个全局队列
 // const mutationQueue = Promise.resolve();
 
-export const todoCollection = createCollection(
+export const todoCollect = createCollection(
 	electricCollectionOptions({
 		id: 'todo',
 		syncMode: 'progressive',
@@ -46,7 +46,7 @@ export const todoCollection = createCollection(
 		},
 		onUpdate: async ({ transaction }) => {
 			const { modified } = transaction.mutations[0];
-			console.log('todoCollection.onUpdate', modified, {
+			console.log('todoCollect.onUpdate', modified, {
 				isServer: window === undefined,
 			});
 			const ret = await orpc.updateTodo.call({
@@ -87,5 +87,5 @@ export const todoCollection = createCollection(
 		// }
 	}),
 );
-export type TodoRow = InferCollectionType<typeof todoCollection>;
-todoCollection.createIndex((row) => row.updated_at, { indexType: BasicIndex });
+export type TodoRow = InferCollectionType<typeof todoCollect>;
+todoCollect.createIndex((row) => row.updated_at, { indexType: BasicIndex });

@@ -1,13 +1,22 @@
+import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
+import { z } from 'zod/v4';
 import { authClient } from '#/lib/auth/auth-client.ts';
+import { authOptions } from '#/lib/auth.query.ts';
 
 export const Route = createFileRoute('/integration/better-auth/')({
+	validateSearch: z.object({
+		callbackURL: z.string().default('/'),
+	}),
 	component: BetterAuthDemo,
 });
 
 function BetterAuthDemo() {
-	const { data: session, isPending } = authClient.useSession();
+	const callbackURL = Route.useSearch({ select: (s) => s.callbackURL });
+	const navigate = Route.useNavigate();
+	const { data: session, isPending, refetch } = useQuery(authOptions.session);
+	// const { data: session, isPending } = authClient.useSession();
 	const [isSignUp, setIsSignUp] = useState(false);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -93,6 +102,7 @@ function BetterAuthDemo() {
 					email,
 					password,
 					name,
+					displayUsername: name,
 				});
 				if (result.error) {
 					setError(result.error.message || 'Sign up failed');
@@ -110,6 +120,8 @@ function BetterAuthDemo() {
 			setError('An unexpected error occurred');
 		} finally {
 			setLoading(false);
+			await refetch();
+			navigate({ to: callbackURL });
 		}
 	};
 

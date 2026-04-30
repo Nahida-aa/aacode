@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { desc } from 'drizzle-orm';
 import { db } from '#/db.server.ts';
 import { todo } from '#/features/todo/todo.table.ts';
+import { authMiddle } from '#/lib/middleware/func.ts';
 
 const getTodos = createServerFn({
 	method: 'GET',
@@ -15,9 +16,12 @@ const getTodos = createServerFn({
 const createTodo = createServerFn({
 	method: 'POST',
 })
+	.middleware([authMiddle])
 	.inputValidator((data: { title: string }) => data)
-	.handler(async ({ data }) => {
-		await db.insert(todo).values({ title: data.title });
+	.handler(async ({ data, context }) => {
+		await db
+			.insert(todo)
+			.values({ title: data.title, user_id: context.user.id });
 		return { success: true };
 	});
 

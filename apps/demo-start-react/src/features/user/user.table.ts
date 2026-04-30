@@ -2,8 +2,7 @@ import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { pgNanoid } from '#/db.helpers';
 import { user } from '#/lib/auth/auth.table.ts';
 
-// 由于可能存在命名冲突( console.profile  ), 因此补充后缀 Table, 改名: profile -> profile
-export const profile = pgTable('profile', {
+export const profileTable = pgTable('profile', {
 	id: pgNanoid(),
 	userId: text('user_id')
 		.references(() => user.id, { onDelete: 'cascade' })

@@ -35,7 +35,7 @@ function MessageInput({
 	session,
 	className = '',
 }: {
-	session?: AuthSession;
+	session?: AuthSession | null;
 	className?: string;
 }) {
 	const pathname = usePathname();

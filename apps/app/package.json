@@ -34,7 +34,7 @@
   "devDependencies": {
     "@tailwindcss/vite": "catalog:",
     "@tanstack/devtools-vite": "^0.6.0",
-    "@tanstack/router-plugin": "^1.167.22",
+    "@tanstack/router-plugin": "catalog:",
     "@tanstack/solid-devtools": "^0.8.2",
     "@tauri-apps/cli": "^2",
     "@types/bun": "catalog:",

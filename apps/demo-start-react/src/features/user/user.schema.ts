@@ -1,7 +1,7 @@
-import { profile } from '#/features/user/user.table';
+import { profileTable } from '#/features/user/user.table';
 import { user } from '#/lib/auth/auth.table.ts';
-export const userSelectZ = createSelectSchema(user);
-export type UserSelect = typeof user.$inferSelect;
+export const selectUserZ = createSelectSchema(user);
+export type SelectUser = z.infer<typeof selectUserZ>;
 export const userInsertZ = createInsertSchema(user);
 export type UserInsert = typeof user.$inferInsert;
 export const _userUpdateZ = createUpdateSchema(user);
@@ -15,7 +15,7 @@ import {
 } from 'drizzle-zod';
 import { z } from 'zod/v4';
 
-export const userRes = userSelectZ.extend({
+export const userRes = selectUserZ.extend({
 	created_at: z.string().or(z.date()),
 	updated_at: z.string().or(z.date()),
 	banExpires: z.string().or(z.date()).nullable(),
@@ -31,10 +31,10 @@ export const userItemFields = {
 	email: true,
 	image: true,
 } as const;
-export const userItemZ = userSelectZ.pick(userItemFields);
+export const userItemZ = selectUserZ.pick(userItemFields);
 export type UserItem = z.infer<typeof userItemZ>;
 
-const _profileUpdateZ = createUpdateSchema(profile);
+const _profileUpdateZ = createUpdateSchema(profileTable);
 export const userUpdateZ = _userUpdateZ.extend(_profileUpdateZ.shape).pick({
 	name: true,
 	// email: true,

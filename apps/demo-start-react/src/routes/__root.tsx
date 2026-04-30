@@ -22,7 +22,8 @@ import {
 import { TooltipProvider } from '#/components/ui/tooltip.tsx';
 import { ModalRenderer } from '#/components/uix/modal/renderer.tsx';
 import { scrollbarDefault } from '#/css.ts';
-import { getLocale } from '#/paraglide/runtime';
+import { authOptions } from '#/lib/auth.query.ts';
+import { getLocale } from '#/paraglide/runtime.js';
 import { DemoFooter } from '../components/app/Footer';
 import StoreDevtools from '../lib/demo-store-devtools';
 import appCss from '../styles.css?url';
@@ -37,12 +38,14 @@ const getSidebarOpen = createServerFn().handler(
 	() => getCookie(SIDEBAR_COOKIE_NAME) !== 'false',
 );
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	beforeLoad: async () => {
+	beforeLoad: async ({ context: { queryClient } }) => {
+		const session = await queryClient.ensureQueryData(authOptions.session);
 		// Other redirect strategies are possible; see
 		// https://github.com/TanStack/router/tree/main/examples/react/i18n-paraglide#offline-redirect
 		if (typeof document !== 'undefined') {
 			document.documentElement.setAttribute('lang', getLocale());
 		}
+		return { user: session?.user || null };
 	},
 	loader: async ({ context }) => {
 		return {

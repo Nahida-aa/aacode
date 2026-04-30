@@ -22,6 +22,7 @@ import { Route as IntegrationAiImageRouteImport } from './routes/integration/ai-
 import { Route as IntegrationAiChatRouteImport } from './routes/integration/ai-chat'
 import { Route as DemoTodoRouteImport } from './routes/demo/todo'
 import { Route as ApiTodoRouteImport } from './routes/api/todo'
+import { Route as ApiFriend_requestRouteImport } from './routes/api/friend_request'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as IntegrationGuitarsIndexRouteImport } from './routes/integration/guitars/index'
 import { Route as IntegrationBetterAuthIndexRouteImport } from './routes/integration/better-auth/index'
@@ -118,6 +119,11 @@ const DemoTodoRoute = DemoTodoRouteImport.update({
 const ApiTodoRoute = ApiTodoRouteImport.update({
   id: '/api/todo',
   path: '/api/todo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFriend_requestRoute = ApiFriend_requestRouteImport.update({
+  id: '/api/friend_request',
+  path: '/api/friend_request',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSplatRoute = ApiSplatRouteImport.update({
@@ -291,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/friend_request': typeof ApiFriend_requestRoute
   '/api/todo': typeof ApiTodoRoute
   '/demo/todo': typeof DemoTodoRoute
   '/integration/ai-chat': typeof IntegrationAiChatRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/friend_request': typeof ApiFriend_requestRoute
   '/api/todo': typeof ApiTodoRoute
   '/demo/todo': typeof DemoTodoRoute
   '/integration/ai-chat': typeof IntegrationAiChatRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/mcp': typeof McpRoute
   '/api/$': typeof ApiSplatRoute
+  '/api/friend_request': typeof ApiFriend_requestRoute
   '/api/todo': typeof ApiTodoRoute
   '/demo/todo': typeof DemoTodoRoute
   '/integration/ai-chat': typeof IntegrationAiChatRoute
@@ -431,6 +440,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/mcp'
     | '/api/$'
+    | '/api/friend_request'
     | '/api/todo'
     | '/demo/todo'
     | '/integration/ai-chat'
@@ -477,6 +487,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/mcp'
     | '/api/$'
+    | '/api/friend_request'
     | '/api/todo'
     | '/demo/todo'
     | '/integration/ai-chat'
@@ -522,6 +533,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/mcp'
     | '/api/$'
+    | '/api/friend_request'
     | '/api/todo'
     | '/demo/todo'
     | '/integration/ai-chat'
@@ -569,6 +581,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   McpRoute: typeof McpRoute
   ApiSplatRoute: typeof ApiSplatRoute
+  ApiFriend_requestRoute: typeof ApiFriend_requestRoute
   ApiTodoRoute: typeof ApiTodoRoute
   DemoTodoRoute: typeof DemoTodoRoute
   IntegrationAiChatRoute: typeof IntegrationAiChatRoute
@@ -701,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/api/todo'
       fullPath: '/api/todo'
       preLoaderRoute: typeof ApiTodoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/friend_request': {
+      id: '/api/friend_request'
+      path: '/api/friend_request'
+      fullPath: '/api/friend_request'
+      preLoaderRoute: typeof ApiFriend_requestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$': {
@@ -940,6 +960,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   McpRoute: McpRoute,
   ApiSplatRoute: ApiSplatRoute,
+  ApiFriend_requestRoute: ApiFriend_requestRoute,
   ApiTodoRoute: ApiTodoRoute,
   DemoTodoRoute: DemoTodoRoute,
   IntegrationAiChatRoute: IntegrationAiChatRoute,

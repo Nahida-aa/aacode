@@ -29,7 +29,7 @@
 	// "explorer.autoReveal": false,
 	"explorer.fileNesting.expand": false,
 	"explorer.fileNesting.patterns": {
-		"*.api.ts": "$(capture).*api.ts, $(capture).func.ts, $(capture).table.ts, $(capture).tables.ts, $(capture).schema.ts, $(capture).schemas.ts, $(capture).collection.ts, $(capture).*const.ts, $(capture).utils.ts, $(capture).permission*.ts, $(capture).*service.ts, $(capture).*sdk.ts",
+		"*.api.ts": "$(capture).*api.ts, $(capture).func.ts, $(capture).table.ts, $(capture).tables.ts, $(capture).schema.ts, $(capture).schemas.ts, $(capture).collection.ts, $(capture).collect.ts, $(capture).*const.ts, $(capture).utils.ts, $(capture).permission*.ts, $(capture).*service.ts, $(capture).*sdk.ts",
 		"*.tsx": "$(capture).*.tsx, $(capture).rq.ts, $(capture).mutate.ts, $(capture).*hook.ts, $(capture).*context.ts, $(capture).*store.ts, -$(capture).*, $(capture)*.css",
 		"*.ts": "$(capture).*.ts, $(capture).*.tsx",
 		"*.$.ts": "$(capture).*.ts",

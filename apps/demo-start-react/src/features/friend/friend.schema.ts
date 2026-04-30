@@ -1,6 +1,11 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { nanoid } from 'nanoid';
 import z from 'zod';
-import { friendRequest } from '#/features/friend/friend.table';
+import {
+	friendRequestTable,
+	friendTable,
+	friendTagTable,
+} from '#/features/friend/friend.table';
 
 // export const friendItemZ = friendSelectZ
 //   .omit({ created_at: true, updated_at: true, status: true, reason: true })
@@ -9,35 +14,72 @@ import { friendRequest } from '#/features/friend/friend.table';
 //     user2: userItemZ.nullable(),
 //   });
 // export type FriendItem = z.infer<typeof friendItemZ>;
-export const friendColumns = {
-	id: true,
-	user1Id: true,
-	user2Id: true,
-	status: true,
-	reason: true,
-	// nicknameFromUser1: true,
-	// nicknameFromUser2: true,
-	created_at: true,
-	updated_at: true,
-} as const;
 
-const createFriendZ = createSelectSchema(friendRequest).pick({
-	emitterId: true,
-	receiverId: true,
+export const selectFriendZ = createSelectSchema(friendTable, {
+	id: (s) => s.default(() => nanoid()),
+	created_at: (s) => s.default(() => new Date()),
+	updated_at: (s) => s.default(() => new Date()),
+	nickname: (s) => s.optional(),
+});
+export type SelectFriend = z.infer<typeof selectFriendZ>;
+export const selectFriendRequestZ = createSelectSchema(friendRequestTable, {
+	id: (s) => s.default(() => nanoid()),
+	created_at: (s) => s.default(() => new Date()),
+	updated_at: (s) => s.default(() => new Date()),
+	accepted_at: (s) => s.nullable().default(null),
+	message: (s) => s.nullable().default(null),
+	nickname: (s) => s.optional(),
+	tags: (s) => s.optional(),
+});
+export type SelectFriendRequest = z.infer<typeof selectFriendRequestZ>;
+
+export const selectFriendTagZ = createSelectSchema(friendTagTable, {
+	id: (s) => s.default(() => nanoid()),
+	created_at: (s) => s.default(() => new Date()),
+	updated_at: (s) => s.default(() => new Date()),
+	order: (s) => s.default(0),
+});
+export type SelectFriendTag = z.input<typeof selectFriendTagZ>;
+
+const createFriendZ = createSelectSchema(friendRequestTable).pick({
+	emitter_id: true,
+	receiver_id: true,
 	nickname: true,
 	tags: true,
 });
 export type CreateFriend = z.infer<typeof createFriendZ>;
 
-const friendRequestInsertZ = createInsertSchema(friendRequest);
+const friendRequestInsertZ = createInsertSchema(friendRequestTable);
 
 export const sendFriendRequestZ = friendRequestInsertZ.pick({
-	receiverId: true,
+	emitter_id: true,
+	receiver_id: true,
 	message: true,
 	nickname: true,
 	tags: true,
 });
 export type SendFriendRequest = z.infer<typeof sendFriendRequestZ>;
+
+export const sendFriendRequestIn = sendFriendRequestZ.omit({
+	emitter_id: true,
+});
+export type SendFriendRequestIn = z.input<typeof sendFriendRequestIn>;
+
+export const acceptFriendRequestZ = selectFriendRequestZ.pick({
+	id: true,
+	receiver_id: true,
+});
+export type AcceptFriendRequest = z.infer<typeof acceptFriendRequestZ>;
+
+export const acceptFriendRequestIn = acceptFriendRequestZ.omit({
+	receiver_id: true,
+});
+
+export const rejectFriendRequestZ = selectFriendRequestZ.pick({
+	id: true,
+	receiver_id: true,
+});
+export type RejectFriendRequest = z.infer<typeof rejectFriendRequestZ>;
 
 export const friendRequestZ = z.object({
 	targetId: z.string(),

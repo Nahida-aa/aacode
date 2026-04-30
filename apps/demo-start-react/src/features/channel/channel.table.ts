@@ -29,29 +29,29 @@ export const channel = pgTable(
 		...nanoidWithTimestamps,
 		type: text('type').$type<ChannelType>().default('chat').notNull(),
 		// 直接拥有者
-		ownerType: text('owner_type').notNull().default('community'), // 'community' | 'project' | 'team'
-		ownerId: text('owner_id').notNull(), // 指向 owner 的 id
+		owner_type: text().notNull().default('community'), // 'community' | 'project' | 'team'
+		owner_id: text().notNull(), // 指向 owner 的 id
 
-		name: text('name'),
-		description: text('description'),
-		sort: integer('sort').default(0).notNull(),
+		name: text(),
+		description: text(),
+		sort: integer().default(0).notNull(),
 
 		// 是否私有频道 - 私有频道需要成员权限才能访问
-		isPrivate: boolean('is_private').default(false).notNull(),
+		is_private: boolean().default(false).notNull(),
 		// 权限覆盖规则 - 针对角色或用户的自定义权限设置，支持细粒度访问控制
-		permissionOverwrites: jsonb('permission_overwrites')
+		permission_overwrites: jsonb('permission_overwrites')
 			.$type<PermissionOverwrite[]>()
 			.default([])
 			.notNull(),
 
 		// 是否为成人内容频道 - 前端可据此显示年龄限制提示
-		isNsfw: boolean('is_nsfw').default(false).notNull(),
+		is_nsfw: boolean().default(false).notNull(),
 		// 用户发言频率限制（秒）- 防止刷屏，0 表示无限制
-		rateLimitPerUser: integer('rate_limit_per_user').default(0).notNull(),
+		rate_limit_per_user: integer().default(0).notNull(),
 	},
 	(table) => [
-		index('channel_owner_idx').on(table.ownerType, table.ownerId),
-		index('channel_sort_idx').on(table.ownerId, table.sort),
+		index('channel_owner_idx').on(table.owner_type, table.owner_id),
+		index('channel_sort_idx').on(table.owner_id, table.sort),
 	],
 );
 
@@ -63,9 +63,9 @@ export const dmRoom = pgTable(
 		type: text('type', { enum: ['single', 'group'] })
 			.default('single')
 			.notNull(),
-		name: varchar('name', { length: 100 }), // 群名，single 无需填写
+		name: varchar({ length: 100 }), // 群名，single 无需填写
 		// 群头像，single 无需
-		icon: text('icon'),
+		icon: text(),
 	},
 	(table) => [index('dm_room_type_idx').on(table.type)],
 );

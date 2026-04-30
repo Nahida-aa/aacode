@@ -1,22 +1,25 @@
 import type { Db } from '#/db.server';
-import { friend, friendRequest } from '#/features/friend/friend.table';
-import type { CreateFriend, SendFriendRequest } from './friend.schema';
+import {
+	friendRequestTable,
+	friendTable,
+} from '#/features/friend/friend.table';
+import type { CreateFriend, SendFriendRequestIn } from './friend.schema';
 export const _sendFriendRequest = (
 	db: Db,
 	authId: string,
-	data: SendFriendRequest,
+	data: SendFriendRequestIn,
 ) =>
 	db
-		.insert(friendRequest)
+		.insert(friendRequestTable)
 		.values({
-			emitterId: authId, // 发送请求的用户
-			receiverId: data.receiverId, // 接收请求的用户
+			emitter_id: authId, // 发送请求的用户
+			receiver_id: data.receiver_id, // 接收请求的用户
 			status: 'pending',
 			message: data.message,
 			nickname: data.nickname,
 		})
 		.onConflictDoUpdate({
-			target: [friendRequest.emitterId, friendRequest.receiverId],
+			target: [friendRequestTable.emitter_id, friendRequestTable.receiver_id],
 			set: {
 				status: 'pending',
 				message: data.message,
@@ -28,11 +31,11 @@ export const _sendFriendRequest = (
 // 创建好友关系: 双向插入
 export const _createFriend = async (
 	db: Db,
-	{ emitterId, receiverId, nickname }: CreateFriend,
+	{ emitter_id, receiver_id, nickname }: CreateFriend,
 ) => {
-	await db.insert(friend).values([
-		{ userId: emitterId, friendId: receiverId, nickname },
-		{ userId: receiverId, friendId: emitterId },
+	await db.insert(friendTable).values([
+		{ userId: emitter_id, friendId: receiver_id, nickname },
+		{ userId: receiver_id, friendId: emitter_id },
 	]);
 };
 

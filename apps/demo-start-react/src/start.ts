@@ -38,6 +38,7 @@ const debugMiddleware = createMiddleware().server(async ({ request, next }) => {
 // 全局中间件
 export const startInstance = createStart(() => {
 	return {
-		requestMiddleware: [debugMiddleware],
+		// requestMiddleware: [debugMiddleware],
+		defaultSsr: 'data-only',
 	};
 });
