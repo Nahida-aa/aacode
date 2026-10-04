@@ -61,14 +61,16 @@ GPUI 桌面（`packages/app` + `packages/workspace` + `packages/ui`）是唯一�
 
 ### project 特别说明（语义层面）
 
-除了结构性拆分外，`packages/project` 相对 `crates/project` 还存在以下语义层面的有意改动：
-- **函数签名调整**：部分函数参数、返回类型、可见性（pub/pub(crate)）在 aacode 中做了本地调整，以适配 aacode 的接口设计
-- **主动删除函数**：部分在 zed 中存在的函数在 aacode 中被主动移除（有意裁剪）
-- **可能漏实现**：在 port 过程中也可能存在本应保留但实际未实现的函数（需结合实际用法判断是否有意）
-- **接口/trait 实现差异**：部分 trait impl、内部 API 结构不同
+除了结构性拆分外，`packages/project` 相对 `crates/project` 还存在语义层面的有意改动，包括函数签名调整、主动删除部分函数、接口/trait 实现差异等。这些差异需要结合符号级比对来判断，而不是靠行文比对。
+
+**已核对的文件（符号一致性）**：
+- `packages/project/src/lsp_store/mod.rs` ↔ `crates/project/src/lsp_store.rs`：函数名集合完全一致（159 个）
+- `packages/project/src/terminals.rs` ↔ `crates/project/src/terminals.rs`：函数名集合完全一致（11 个）
 
 **rev→rev 同步要点**：
-- 对 `packages/project/src/project/*`（SPLIT）文件，不能简单整文件替换。区间内若 `crates/project/src/project.rs` 有改动，需先用 ast-grep/结构化分析提取受影响的符号（函数/struct/trait impl），再逐一核对 aacode 对应拆分文件中是否存在同名符号、签名是否一致、是否已实现。
+- 对 `packages/project/src/project/*`（SPLIT）文件，不能简单整文件替换。区间内若 `crates/project/src/project.rs` 有改动，**必须先用 ast-grep 提取受影响的符号（函数/方法/struct/enum/trait impl 等）清单**，再逐一核对 aacode 对应拆分文件中是否存在同名符号、签名是否一致、是否已实现。
+- 符号级比对优先于全文 diff。对于 SPLIT 组尤其需要按符号清单逐项核对，而不是假设文件内容对应。
 - 遇到符号在 aacode 中不存在但在上游区间改动中涉及时：**先暂停并提问**，判断是「主动删除」（有意）还是「漏实现」（需补充）。
 - 遇到签名不一致时：**先暂停并提问**，判断是否为有意调整。
 - 对 L2 文件（归一化后仍有差异）也要优先考虑语义变动而非行文差异。
+- 具体的符号差异清单**按需生成**（处理区间变更时针对受影响范围分析），避免事先穷尽列出所有差异。
