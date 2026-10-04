@@ -135,8 +135,9 @@ pub fn init(cx: &mut App) {
         });
     });
 
-    // TODO(aacode): About 窗口需要独立实现（Zed `zed.rs::open_about_window`，含
-    // app-icon 资源与版本信息），暂未移植，菜单里的 "About aacode" 目前无响应。
+    cx.on_action(|_: &aacode_actions::About, cx| {
+        crate::core::open_about_window(cx);
+    });
 }
 
 /// 对齐 Zed `crates/zed/src/zed.rs::quit`（L1753）。
