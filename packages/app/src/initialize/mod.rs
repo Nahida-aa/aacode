@@ -101,7 +101,8 @@ pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
 /// - 左：search_button、lsp_button、diagnostic_summary、active_file_name、git_blame_status、
 ///   merge_conflict_indicator、activity_indicator
 /// - 右：edit_prediction_ui、active_buffer_encoding、active_buffer_language、
-///   active_toolchain_language、cursor_position、image_info、vim_mode_indicator
+///   active_toolchain_language、line_ending_indicator、cursor_position、image_info、
+///   vim_mode_indicator、pending_keystrokes_indicator
 fn register_status_bar_items(
     workspace: &mut workspace::Workspace,
     window: &mut Window,
@@ -140,10 +141,14 @@ fn register_status_bar_items(
         cx.new(|_| language_selector::ActiveBufferLanguage::new(workspace));
     let active_toolchain_language =
         cx.new(|cx| toolchain_selector::ActiveToolchain::new(workspace, window, cx));
+    let line_ending_indicator =
+        cx.new(|_| line_ending_selector::LineEndingIndicator::default());
     let cursor_position =
         cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
     let image_info = cx.new(|_cx| image_viewer::ImageInfo::new(workspace));
     let vim_mode_indicator = cx.new(|cx| vim::ModeIndicator::new(window, cx));
+    let pending_keystrokes_indicator =
+        cx.new(|cx| which_key::PendingKeystrokesIndicator::new(window, cx));
 
     // —— 统一注册进 StatusBar（顺序对齐 Zed）——
     let status_bar = workspace.status_bar().clone();
@@ -160,9 +165,11 @@ fn register_status_bar_items(
         status_bar.add_right_item(active_buffer_encoding, window, cx);
         status_bar.add_right_item(active_buffer_language, window, cx);
         status_bar.add_right_item(active_toolchain_language, window, cx);
+        status_bar.add_right_item(line_ending_indicator, window, cx);
         status_bar.add_right_item(cursor_position, window, cx);
         status_bar.add_right_item(image_info, window, cx);
-        // 保持 vim 模式指示器在最右侧（Zed 原版也放在最后）
+        // 保持 vim 模式指示器与 pending_keystrokes 在最右侧（Zed 原版也放在最后）
         status_bar.add_right_item(vim_mode_indicator, window, cx);
+        status_bar.add_right_item(pending_keystrokes_indicator, window, cx);
     });
 }
