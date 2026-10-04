@@ -13,6 +13,9 @@
 use gpui::{App, Menu, MenuItem, NoAction, OsAction, actions};
 use settings::Settings;
 
+// Zed 把这些 app 级 action 定义在 `crates/zed/src/zed.rs:121` 的 `actions!(zed, [...])`
+// 里；aacode 没有 zed.rs 等价文件，集中定义在此。
+// handler 注册见 `initialize::init`（对齐 Zed `zed.rs::init`）。
 actions!(
     app,
     [
@@ -22,24 +25,18 @@ actions!(
         HideOthers,
         /// Minimizes the current window.
         Minimize,
+        /// Opens the default settings file.
+        OpenDefaultSettings,
         /// Shows all hidden windows.
         ShowAll,
+        /// Shows the default semantic token rules (read-only).
+        ShowDefaultSemanticTokenRules,
         /// Toggles fullscreen mode.
         ToggleFullScreen,
         /// Zooms the window.
         Zoom,
     ]
 );
-
-/// 注册 App 级菜单 action（对齐 Zed `zed.rs:195-199`）。
-/// `HideOthers` / `ShowAll` 只有 macOS 语义，所以照 Zed 用 cfg 门控。
-pub fn init(cx: &mut App) {
-    cx.on_action(|_: &Hide, cx| cx.hide());
-    #[cfg(target_os = "macos")]
-    cx.on_action(|_: &HideOthers, cx| cx.hide_other_apps());
-    #[cfg(target_os = "macos")]
-    cx.on_action(|_: &ShowAll, cx| cx.unhide_other_apps());
-}
 
 pub fn app_menus(cx: &mut App) -> Vec<Menu> {
     let mut view_items = vec![

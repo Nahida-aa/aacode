@@ -7,187 +7,301 @@
 //! 之所以要在 `cx.defer` 里创建，是因为 MultiWorkspace::new / Workspace::new 的订阅
 //! 链需要先建立好，再注入子 entity（Sidebar 等）。
 
-use gpui::{App, AppContext, Context, KeyBinding, Window};
-use std::sync::Arc;
-use ui::{ContextMenu, PopoverMenuHandle};
+use gpui::{App, AppContext, Context, KeyBinding, PromptLevel, Window, TaskExt as _};
+use gpui_util::ResultExt as _;
+use util::asset_str;
+use workspace::with_active_or_new_workspace;
+use std::borrow::Cow;
+use std::path::Path;
 
+use language::Capability;
 use settings::Settings as _;
 use vim_mode_setting::HelixModeSetting;
+use workspace::{MultiWorkspace, Workspace};
 
 pub mod panels;
+pub mod workspace_init;
 
-/// 注册两个 observe_new：
-/// - **MultiWorkspace** → `cx.defer` 里创建 Sidebar + register_sidebar
-/// - **Workspace** → 创建 Dock Panel（agent/project/git 等）+ 注册 StatusBar 按钮
-pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
-    // —— MultiWorkspace observe_new → Sidebar ——
-    cx.observe_new(|multi_workspace: &mut workspace::MultiWorkspace, window, cx| {
-        let Some(window) = window else {
-            return;
-        };
+pub use workspace_init::initialize_workspace;
 
-        let window_handle = window.window_handle();
-        let multi_workspace_handle = cx.entity();
+/// 注册 App 级 action handler —— 对齐 Zed `crates/zed/src/zed.rs::init`（L193-L334）。
+///
+/// Zed 把这些 handler 放在 `zed.rs::init` 里，由 `main.rs` 在 crate init 链之后调用。
+/// aacode 原先完全没有这一层（`core::init` 是空壳且从未被调用），导致菜单里绑的
+/// `Quit` / `About` / `OpenLicenses` 等 action 点了没反应。
+///
+/// 与 `initialize_workspace` 的区别：后者注册的是 `observe_new` 回调（workspace 创建
+/// 时注入 UI），本函数注册的是 **App 全局** action handler，不依赖 workspace 是否已存在
+/// （需要 workspace 的会内部走 `with_active_or_new_workspace`）。
+pub fn init(cx: &mut App) {
+    cx.on_action(|_: &crate::app_menus::Hide, cx| cx.hide());
+    #[cfg(target_os = "macos")]
+    cx.on_action(|_: &crate::app_menus::HideOthers, cx| cx.hide_other_apps());
+    #[cfg(target_os = "macos")]
+    cx.on_action(|_: &crate::app_menus::ShowAll, cx| cx.unhide_other_apps());
+    cx.on_action(quit);
 
-        cx.defer(move |cx| {
-            window_handle
-                .update(cx, |_, window, cx| {
-                    let sidebar = cx.new(|cx| {
-                        sidebar::Sidebar::new(multi_workspace_handle.clone(), window, cx)
-                    });
-                    multi_workspace_handle.update(cx, |mw, cx| {
-                        mw.register_sidebar(sidebar, cx);
-                    });
-                })
-                .ok();
-        });
-    })
-    .detach();
+    cx.on_action(|_: &aacode_actions::OpenTelemetryLog, cx| {
+        cx.reveal_path(paths::log_file().as_path());
+    });
 
-    // —— Workspace observe_new → StatusBar 按钮 + Dock Panels ——
-    let app_state_for_workspace = app_state.clone();
-    let edit_prediction_menu_handle = PopoverMenuHandle::default();
-    let lsp_button_menu_handle = PopoverMenuHandle::default();
-    cx.observe_new({
-        let edit_prediction_menu_handle = edit_prediction_menu_handle.clone();
-        let lsp_button_menu_handle = lsp_button_menu_handle.clone();
-        move |workspace: &mut workspace::Workspace, window, cx| {
-            let Some(window) = window else {
-                return;
-            };
-
-            // 对齐 Zed `crates/zed/src/zed.rs`：EditPredictionButton 的菜单由
-            // `ToggleMenu` action 通过 PopoverMenuHandle 切换。
-            workspace.register_action({
-                let handle = edit_prediction_menu_handle.clone();
-                move |_, _: &edit_prediction_ui::ToggleMenu, window, cx| {
-                    handle.toggle(window, cx);
-                }
-            });
-
-            // 同上：LspButton 的菜单由 `lsp_button::ToggleMenu` 切换。
-            workspace.register_action({
-                let handle = lsp_button_menu_handle.clone();
-                move |_, _: &language_tools::lsp_button::ToggleMenu, window, cx| {
-                    handle.toggle(window, cx);
-                }
-            });
-
-            // 对齐 Zed `crates/zed/src/zed.rs L1024-L1041`：Window 菜单的窗口级
-            // action 需要 `&mut Window`，所以在 workspace 上注册。
-            workspace
-                .register_action(|_, _: &crate::app_menus::Minimize, window, _| {
-                    window.minimize_window();
-                })
-                .register_action(|_, _: &crate::app_menus::Zoom, window, _| {
-                    window.zoom_window();
-                })
-                .register_action(|_, _: &crate::app_menus::ToggleFullScreen, window, _| {
-                    window.toggle_fullscreen();
-                });
-
-            let app_state = app_state_for_workspace.clone();
-            register_status_bar_items(
-                workspace,
+    cx.on_action(|_: &aacode_actions::OpenSettingsFile, cx| {
+        with_active_or_new_workspace(cx, |_, window, cx| {
+            open_settings_file(
+                paths::settings_file(),
+                || settings::initial_user_settings_content().as_ref().into(),
                 window,
                 cx,
-                &app_state,
-                edit_prediction_menu_handle.clone(),
-                lsp_button_menu_handle.clone(),
             );
-
-        // 对齐 Zed `crates/zed/src/zed.rs L901-L906` — 注册 AgentPanel 相关 action。
-        // 放在主应用层而不是 agent_ui crate 的 init 里，避免重复注册。
-        workspace
-            .register_action(agent_ui::AgentPanel::toggle_focus)
-            .register_action(agent_ui::AgentPanel::focus)
-            .register_action(agent_ui::AgentPanel::toggle);
-
-        let panels_task = panels::initialize_panels(window, cx);
-        workspace.set_panels_task(panels_task);
-    }
+        });
     })
-    .detach();
+    .on_action(|_: &aacode_actions::OpenKeymapFile, cx| {
+        with_active_or_new_workspace(cx, |_, window, cx| {
+            open_settings_file(
+                paths::keymap_file(),
+                || settings::initial_keymap_content().as_ref().into(),
+                window,
+                cx,
+            );
+        });
+    })
+    .on_action(|_: &aacode_actions::OpenProjectTasks, cx| {
+        with_active_or_new_workspace(cx, |_, window, cx| {
+            open_settings_file(
+                paths::tasks_file(),
+                || settings::initial_tasks_content().as_ref().into(),
+                window,
+                cx,
+            );
+        });
+    })
+    .on_action(|_: &aacode_actions::OpenProjectDebugTasks, cx| {
+        with_active_or_new_workspace(cx, |_, window, cx| {
+            open_settings_file(
+                paths::debug_scenarios_file(),
+                || settings::initial_debug_tasks_content().as_ref().into(),
+                window,
+                cx,
+            );
+        });
+    });
+
+    cx.on_action(|_: &aacode_actions::OpenLicenses, cx| {
+        with_active_or_new_workspace(cx, |workspace, window, cx| {
+            open_bundled_file(
+                workspace,
+                asset_str::<aa_gpui_kit_assets::Assets>("licenses.md"),
+                "Open Source License Attribution",
+                "Markdown",
+                window,
+                cx,
+            );
+        });
+    })
+    .on_action(|_: &aacode_actions::OpenDefaultKeymap, cx| {
+        with_active_or_new_workspace(cx, |workspace, window, cx| {
+            open_bundled_file(
+                workspace,
+                settings::default_keymap(),
+                "Default Key Bindings",
+                "JSON",
+                window,
+                cx,
+            );
+        });
+    })
+    .on_action(|_: &crate::app_menus::OpenDefaultSettings, cx| {
+        with_active_or_new_workspace(cx, |workspace, window, cx| {
+            open_bundled_file(
+                workspace,
+                settings::default_settings(),
+                "Default Settings",
+                "JSON",
+                window,
+                cx,
+            );
+        });
+    })
+    .on_action(|_: &crate::app_menus::ShowDefaultSemanticTokenRules, cx| {
+        with_active_or_new_workspace(cx, |workspace, window, cx| {
+            open_bundled_file(
+                workspace,
+                settings::default_semantic_token_rules(),
+                "Default Semantic Token Rules",
+                "JSONC",
+                window,
+                cx,
+            );
+        });
+    });
+
+    // TODO(aacode): About 窗口需要独立实现（Zed `zed.rs::open_about_window`，含
+    // app-icon 资源与版本信息），暂未移植，菜单里的 "About aacode" 目前无响应。
 }
 
-/// 对齐 Zed `crates/zed/src/zed.rs L602-L652`。
-/// 在 Workspace 创建后、initialize_panels 前，把所有非 dock 的状态栏按钮注册进 StatusBar。
+/// 对齐 Zed `crates/zed/src/zed.rs::quit`（L1753）。
 ///
-/// 已显示项（aacode 已有 crate，顺序对齐 Zed）：
-/// - 左：search_button、lsp_button、diagnostic_summary、active_file_name、git_blame_status、
-///   merge_conflict_indicator、activity_indicator
-/// - 右：edit_prediction_ui、active_buffer_encoding、active_buffer_language、
-///   active_toolchain_language、line_ending_indicator、cursor_position、image_info、
-///   vim_mode_indicator、pending_keystrokes_indicator
-fn register_status_bar_items(
-    workspace: &mut workspace::Workspace,
+/// 与 `workspace::core::lifecycle::reload` 是同一套模板：按 `confirm_quit`
+/// 设置弹确认框 → `prepare_windows_to_quit` 处理未保存文件 → 真正退出。
+fn quit(_: &aacode_actions::Quit, cx: &mut App) {
+    let should_confirm = workspace::WorkspaceSettings::get_global(cx).confirm_quit;
+    let mut workspace_windows = cx
+        .windows()
+        .into_iter()
+        .filter_map(|window| window.downcast::<MultiWorkspace>())
+        .collect::<Vec<_>>();
+
+    // 多个窗口都有未保存改动时，先在当前激活窗口弹提示，避免跳窗口。
+    workspace_windows.sort_by_key(|window| window.is_active(cx) == Some(false));
+
+    let mut prompt = None;
+    if let (true, Some(window)) = (should_confirm, workspace_windows.first()) {
+        prompt = window
+            .update(cx, |_, window, cx| {
+                window.prompt(
+                    PromptLevel::Info,
+                    "Are you sure you want to quit?",
+                    None,
+                    &["Quit", "Cancel"],
+                    cx,
+                )
+            })
+            .ok();
+    }
+
+    cx.spawn(async move |cx| {
+        if let Some(prompt) = prompt {
+            let answer = prompt.await?;
+            if answer != 0 {
+                return anyhow::Ok(());
+            }
+        }
+
+        if !workspace::workspace::core::lifecycle::prepare_windows_to_quit(&workspace_windows, cx).await {
+            return anyhow::Ok(());
+        }
+        cx.update(|cx| cx.quit());
+        anyhow::Ok(())
+    })
+    .detach_and_log_err(cx);
+}
+
+/// 对齐 Zed `crates/zed/src/zed.rs::open_settings_file`（L2723）。
+///
+/// 为 settings 单独建 worktree，避免每次开合都重启 LSP。
+fn open_settings_file(
+    abs_path: &'static Path,
+    default_content: impl 'static + Send + FnOnce() -> rope::Rope,
     window: &mut Window,
-    cx: &mut Context<workspace::Workspace>,
-    app_state: &workspace::AppState,
-    edit_prediction_menu_handle: PopoverMenuHandle<ContextMenu>,
-    lsp_button_menu_handle: PopoverMenuHandle<ContextMenu>,
+    cx: &mut Context<Workspace>,
 ) {
-    // —— Left side ——
-    let search_button = cx.new(|_| search::search_status_button::SearchButton::new());
-    let lsp_button = cx.new(|cx| {
-        language_tools::lsp_button::LspButton::new(workspace, lsp_button_menu_handle, window, cx)
-    });
-    let diagnostic_summary =
-        cx.new(|cx| diagnostics::items::DiagnosticIndicator::new(workspace, cx));
-    let active_file_name = cx.new(|_| workspace::active_file_name::ActiveFileName::new());
-    let activity_indicator =
-        activity_indicator::ActivityIndicator::new(workspace, window, cx);
-    let git_blame_status = cx.new(|_| git_ui::GitBlameStatus::default());
-    let merge_conflict_indicator =
-        cx.new(|cx| git_ui::MergeConflictIndicator::new(workspace, cx));
+    cx.spawn_in(window, async move |workspace, cx| {
+        workspace
+            .update_in(cx, |workspace, window, cx| {
+                workspace.with_local_or_wsl_workspace(window, cx, move |workspace, window, cx| {
+                    let project = workspace.project().clone();
 
-    // —— Right side ——
-    let edit_prediction_ui = cx.new(|cx| {
-        edit_prediction_ui::EditPredictionButton::new(
-            app_state.fs.clone(),
-            app_state.user_store.clone(),
-            edit_prediction_menu_handle,
-            workspace.project().clone(),
-            cx,
-        )
-    });
-    let active_buffer_encoding =
-        cx.new(|_| encoding_selector::ActiveBufferEncoding::new(workspace));
-    let active_buffer_language =
-        cx.new(|_| language_selector::ActiveBufferLanguage::new(workspace));
-    let active_toolchain_language =
-        cx.new(|cx| toolchain_selector::ActiveToolchain::new(workspace, window, cx));
-    let line_ending_indicator =
-        cx.new(|_| line_ending_selector::LineEndingIndicator::default());
-    let cursor_position =
-        cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
-    let image_info = cx.new(|_cx| image_viewer::ImageInfo::new(workspace));
-    let vim_mode_indicator = cx.new(|cx| vim::ModeIndicator::new(window, cx));
-    let pending_keystrokes_indicator =
-        cx.new(|cx| which_key::PendingKeystrokesIndicator::new(window, cx));
+                    cx.spawn_in(window, async move |workspace, cx| {
+                        // 只为建 worktree（避免每次开合 settings 都重启 LSP），
+                        // 句柄本身不需要持有。
+                        let (_worktree, _) = project
+                            .update(cx, |project, cx| {
+                                project.find_or_create_worktree(paths::config_dir(), false, cx)
+                            })
+                            .await?;
 
-    // —— 统一注册进 StatusBar（顺序对齐 Zed）——
-    let status_bar = workspace.status_bar().clone();
-    status_bar.update(cx, |status_bar, cx| {
-        status_bar.add_left_item(search_button, window, cx);
-        status_bar.add_left_item(lsp_button, window, cx);
-        status_bar.add_left_item(diagnostic_summary, window, cx);
-        status_bar.add_left_item(active_file_name, window, cx);
-        status_bar.add_left_item(git_blame_status, window, cx);
-        status_bar.add_left_item(merge_conflict_indicator, window, cx);
-        status_bar.add_left_item(activity_indicator, window, cx);
+                        workspace
+                            .update_in(cx, |_, window, cx| {
+                                workspace::workspace::open::file::create_and_open_local_file(
+                                    abs_path,
+                                    window,
+                                    cx,
+                                    default_content,
+                                )
+                            })?
+                            .await?;
 
-        status_bar.add_right_item(edit_prediction_ui, window, cx);
-        status_bar.add_right_item(active_buffer_encoding, window, cx);
-        status_bar.add_right_item(active_buffer_language, window, cx);
-        status_bar.add_right_item(active_toolchain_language, window, cx);
-        status_bar.add_right_item(line_ending_indicator, window, cx);
-        status_bar.add_right_item(cursor_position, window, cx);
-        status_bar.add_right_item(image_info, window, cx);
-        // 保持 vim 模式指示器与 pending_keystrokes 在最右侧（Zed 原版也放在最后）
-        status_bar.add_right_item(vim_mode_indicator, window, cx);
-        status_bar.add_right_item(pending_keystrokes_indicator, window, cx);
-    });
+                        anyhow::Ok(())
+                    })
+                })
+            })?
+            .await
+    })
+    .detach_and_log_err(cx);
+}
+
+/// 对齐 Zed `crates/zed/src/zed.rs::open_bundled_file`（L2655）。
+///
+/// 打开一个只读的内嵌文本（licenses / 默认 keymap 等）；已打开则直接激活。
+fn open_bundled_file(
+    workspace: &mut Workspace,
+    text: Cow<'static, str>,
+    title: &'static str,
+    language: &'static str,
+    window: &mut Window,
+    cx: &mut Context<Workspace>,
+) {
+    let existing = workspace
+        .items_of_type::<editor::Editor>(cx)
+        .find(|editor| {
+            editor.read_with(cx, |editor, cx| {
+                editor.read_only(cx)
+                    && editor.title(cx).as_ref() == title
+                    && editor
+                        .buffer()
+                        .read(cx)
+                        .as_singleton()
+                        .is_some_and(|buffer| buffer.read(cx).file().is_none())
+            })
+        });
+    if let Some(existing) = existing {
+        workspace.activate_item(&existing, true, true, window, cx);
+        return;
+    }
+
+    let language = workspace.app_state().languages.language_for_name(language);
+    cx.spawn_in(window, async move |workspace, cx| {
+        let language = language.await.log_err();
+        workspace
+            .update_in(cx, move |workspace, window, cx| {
+                let project = workspace.project().clone();
+                let buffer = project.update(cx, move |project, cx| {
+                    project.create_buffer(language, false, cx)
+                });
+                cx.spawn_in(window, async move |workspace, cx| {
+                    let buffer = buffer.await?;
+                    buffer.update(cx, |buffer, cx| {
+                        buffer.set_text(text.into_owned(), cx);
+                        buffer.set_capability(Capability::ReadOnly, cx);
+                    });
+                    let buffer = cx.new(|cx| {
+                        multi_buffer::MultiBuffer::singleton(buffer, cx).with_title(title.into())
+                    });
+                    workspace.update_in(cx, |workspace, window, cx| {
+                        workspace.add_item_to_active_pane(
+                            Box::new(cx.new(|cx| {
+                                let mut editor = editor::Editor::for_multibuffer(
+                                    buffer,
+                                    Some(project.clone()),
+                                    window,
+                                    cx,
+                                );
+                                editor.set_read_only(true);
+                                editor.set_should_serialize(false, cx);
+                                editor.set_breadcrumb_header(title.into());
+                                editor
+                            })),
+                            None,
+                            true,
+                            window,
+                            cx,
+                        )
+                    })
+                })
+            })?
+            .await
+    })
+    .detach_and_log_err(cx);
 }
 
 /// 把内置默认快捷键（`assets/keymaps/default-{linux,macos,windows}.json`）绑定到全局
@@ -228,7 +342,7 @@ pub fn load_default_keymap(cx: &mut App) {
         cx.bind_keys(filter_disabled_ai_bindings(bindings, cx));
     }
 
-    if vim_mode_setting::HelixModeSetting::get_global(cx).0 {
+    if HelixModeSetting::get_global(cx).0 {
         let vim = settings::KeymapFile::load_asset_partial(
             settings::VIM_KEYMAP_PATH,
             Some(settings::KeybindSource::Vim),

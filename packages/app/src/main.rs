@@ -194,7 +194,8 @@ fn main() {
         // —— 设置应用菜单（application_menu 靠 cx.get_menus() 读取数据）——
         // 对齐 Zed：菜单体系由 app_menus.rs 构建；App 级 action 的 handler 在这里注册。
         // 放在 open_window 之前因为 title_bar::init 已在上面 observe 了 Workspace。
-        aa_app_lib::app_menus::init(cx);
+        // 对齐 Zed main.rs L587 `zed::init(cx)`：注册 App 级 action handler。
+        aa_app_lib::initialize::init(cx);
         // 对齐 Zed main.rs L856-L857：先取菜单再 set，避免 `&mut App` 借用冲突。
         let menus = aa_app_lib::app_menus::app_menus(cx);
         cx.set_menus(menus);
