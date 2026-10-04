@@ -12,8 +12,7 @@ Represents best-effort serialization of adapter state during last session (e.g. 
 ## Definition
 
 ```rust
-pub struct PersistedAdapterOptions
-{
+pub struct PersistedAdapterOptions {
     // Which exception breakpoints were enabled during the last session with this adapter?
     pub exception_breakpoints: BTreeMap<String, PersistedExceptionBreakpoint>,
 }

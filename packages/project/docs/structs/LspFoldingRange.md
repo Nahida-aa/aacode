@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/folding_ranges.rs:26`](../../../../
 ## Definition
 
 ```rust
-pub struct LspFoldingRange
-{
+pub struct LspFoldingRange {
     pub range: Range<Anchor>,
     pub collapsed_text: Option<SharedString>,
 }

@@ -1,9 +1,9 @@
 ---
-id: init_3
-title: init_3
+id: trusted_worktrees::init
+title: trusted_worktrees::init
 ---
 
-# Function: init_3
+# Function: trusted_worktrees::init
 
 ```rust
 pub fn init(db_trusted_paths: DbTrustedPaths, cx: &App)

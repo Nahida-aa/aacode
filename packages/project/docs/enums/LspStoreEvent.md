@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:4644`](../../../../packages/
 ## Definition
 
 ```rust
-pub enum LspStoreEvent
-{
+pub enum LspStoreEvent {
     LanguageServerAdded(LanguageServerId, LanguageServerName, Option<WorktreeId>),
     SupplementaryLanguageServerAdded(LanguageServerId, LanguageServerName),
     LanguageServerRemoved(LanguageServerId),

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_server_store.rs:36`](../../../../packag
 ## Definition
 
 ```rust
-pub struct AgentServerCommand
-{
+pub struct AgentServerCommand {
     pub path: PathBuf,
     pub args: Vec<String>,
     pub env: Option<HashMap<String, String>>,

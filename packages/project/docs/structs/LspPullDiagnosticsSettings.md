@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:661`](../../../../package
 ## Definition
 
 ```rust
-pub struct LspPullDiagnosticsSettings
-{
+pub struct LspPullDiagnosticsSettings {
     // Whether to pull for diagnostics or not. Default: true
     pub enabled: bool,
     // Minimum time to wait before pulling diagnostics from the language server(s). 0 turns the debounce off. Default: 50

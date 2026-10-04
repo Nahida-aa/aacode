@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:769`](../../../../package
 ## Definition
 
 ```rust
-pub struct CompletionsQuery
-{
+pub struct CompletionsQuery {
     pub query: String,
     pub column: u64,
     pub line: Option<u64>,

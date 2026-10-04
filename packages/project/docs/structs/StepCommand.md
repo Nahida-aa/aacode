@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/dap_command.rs:109`](../../../../pac
 ## Definition
 
 ```rust
-pub struct StepCommand
-{
+pub struct StepCommand {
     pub thread_id: i64,
     pub granularity: Option<SteppingGranularity>,
     pub single_thread: Option<bool>,

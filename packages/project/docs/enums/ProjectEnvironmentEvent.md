@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/environment.rs:32`](../../../../packages/proj
 ## Definition
 
 ```rust
-pub enum ProjectEnvironmentEvent
-{
+pub enum ProjectEnvironmentEvent {
     ErrorsUpdated,
 }
 ```

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/context_server_store/mod.rs:309`](../../../..
 ## Definition
 
 ```rust
-pub struct ServerStatusChangedEvent
-{
+pub struct ServerStatusChangedEvent {
     pub server_id: ContextServerId,
     pub status: ContextServerStatus,
 }

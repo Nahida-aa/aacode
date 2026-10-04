@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/dap_command.rs:1673`](../../../../pa
 ## Definition
 
 ```rust
-pub enum DataBreakpointContext
-{
+pub enum DataBreakpointContext {
     Variable{ .. },
     Expression{ .. },
     Address{ .. },

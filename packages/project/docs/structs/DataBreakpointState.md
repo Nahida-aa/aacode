@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:148`](../../../../package
 ## Definition
 
 ```rust
-pub struct DataBreakpointState
-{
+pub struct DataBreakpointState {
     pub dap: DataBreakpoint,
     pub is_enabled: bool,
     pub context: Arc<DataBreakpointContext>,

@@ -12,8 +12,7 @@ Breakpoint for location within source code.
 ## Definition
 
 ```rust
-pub struct SourceBreakpoint
-{
+pub struct SourceBreakpoint {
     pub row: u32,
     pub path: Arc<Path>,
     pub message: Option<Arc<str>>,

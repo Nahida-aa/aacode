@@ -12,8 +12,7 @@ A logic to apply when querying for new inlay hints and deciding what to do with 
 ## Definition
 
 ```rust
-pub enum InvalidationStrategy
-{
+pub enum InvalidationStrategy {
     // Language servers reset hints via <a href="https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#workspace_inlayHint_refresh">request</a>. Demands to re-query all inlay hints needed and invalidate all cached entries, but does not require instant update with invalidation. Despite nothing forbids language server from sending this request on every edit, it is expected to be sent only when certain internal server state update, invisible for the editor otherwise.
     RefreshRequested{ .. },
     // Multibuffer excerpt(s) and/or singleton buffer(s) were edited at least on one place. Neither editor nor LSP is able to tell which open file hints' are not affected, so all of them have to be invalidated, re-queried and do that fast enough to avoid being slow, but also debounce to avoid loading hints on every fast keystroke sequence.

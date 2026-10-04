@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:802`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct RemoteRepositoryState
-{
+pub struct RemoteRepositoryState {
     pub project_id: ProjectId,
     pub client: AnyProtoClient,
 }

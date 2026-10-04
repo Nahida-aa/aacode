@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:4540`](../../../../packages/
 ## Definition
 
 ```rust
-pub struct LspStore
-{
+pub struct LspStore {
     pub languages: Arc<LanguageRegistry>,
     pub language_server_statuses: BTreeMap<LanguageServerId, LanguageServerStatus>,
     pub lsp_server_capabilities: HashMap<LanguageServerId, ServerCapabilities>,

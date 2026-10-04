@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:242`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum FormatTrigger
-{
+pub enum FormatTrigger {
     Save,
     Manual,
 }

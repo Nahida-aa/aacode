@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/toolchain_store.rs:44`](../../../../packages/
 ## Definition
 
 ```rust
-pub struct Toolchains
-{
+pub struct Toolchains {
     // Auto-detected toolchains.
     pub toolchains: ToolchainList,
     // Path of the project root at which we ran the automatic toolchain detection.

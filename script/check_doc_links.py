@@ -14,7 +14,7 @@ docs_root = Path(sys.argv[1])
 # (docs_root, repo_root) both given; links are relative to the .md's own dir
 # so repo_root is only informational.
 
-LINK_RE = re.compile(r"\]\(((?:\.\./)+)?([A-Za-z0-9_./-]+\.(?:md|rs))(#[^)]*)?\)")
+LINK_RE = re.compile(r"\]\(((?:\./)*)?([A-Za-z0-9_:./-]+\.(?:md|rs))(#[^)]*)?\)")
 
 total = 0
 broken_md = 0

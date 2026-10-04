@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/emmet_ext.rs:59`](../../../../packa
 ## Definition
 
 ```rust
-pub struct ExpandAbbreviation
-{
+pub struct ExpandAbbreviation {
     pub abbreviation: String,
     pub text: Option<Vec<String>>,
     pub language: String,

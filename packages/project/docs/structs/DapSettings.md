@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:1611`](../../../../packag
 ## Definition
 
 ```rust
-pub struct DapSettings
-{
+pub struct DapSettings {
     pub binary: DapBinary,
     pub args: Option<Vec<String>>,
     pub env: Option<HashMap<String, String>>,

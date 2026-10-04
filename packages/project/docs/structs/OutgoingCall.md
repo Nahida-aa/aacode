@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:610`](../../../../packages
 ## Definition
 
 ```rust
-pub struct OutgoingCall
-{
+pub struct OutgoingCall {
     pub to: CallHierarchyItem,
     pub from_ranges: Vec<Location>,
 }

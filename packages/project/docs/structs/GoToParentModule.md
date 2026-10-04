@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:330`](../../../.
 ## Definition
 
 ```rust
-pub struct GoToParentModule
-{
+pub struct GoToParentModule {
     pub position: PointUtf16,
     pub server_id: LanguageServerId,
 }

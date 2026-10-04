@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/signature_help.rs:18`](../../../.
 ## Definition
 
 ```rust
-pub struct SignatureHelpData
-{
+pub struct SignatureHelpData {
     pub label: SharedString,
     pub documentation: Option<Entity<Markdown>>,
     pub highlights: Vec<(Range<usize>, HighlightStyle)>,

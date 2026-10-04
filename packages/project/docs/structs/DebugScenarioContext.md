@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/task_inventory.rs:36`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct DebugScenarioContext
-{
+pub struct DebugScenarioContext {
     pub task_context: SharedTaskContext,
     pub worktree_id: Option<WorktreeId>,
     pub active_buffer: Option<WeakEntity<Buffer>>,

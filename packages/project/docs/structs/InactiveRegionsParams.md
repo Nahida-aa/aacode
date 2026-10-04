@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/clangd_ext.rs:17`](../../../../pack
 ## Definition
 
 ```rust
-pub struct InactiveRegionsParams
-{
+pub struct InactiveRegionsParams {
     pub text_document: OptionalVersionedTextDocumentIdentifier,
     pub regions: Vec<Range>,
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:661`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct InitialGitGraphData
-{
+pub struct InitialGitGraphData {
     pub error: Option<SharedString>,
     pub commit_data: Vec<Arc<InitialGraphCommitData>>,
     pub commit_oid_to_index: HashMap<Oid, usize>,

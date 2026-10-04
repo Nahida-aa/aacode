@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:606`](../../../.
 ## Definition
 
 ```rust
-pub struct CargoRunnableArgs
-{
+pub struct CargoRunnableArgs {
     pub environment: HashMap<String, String>,
     pub cwd: PathBuf,
     // Command to be executed instead of cargo

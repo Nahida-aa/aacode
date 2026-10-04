@@ -1,9 +1,9 @@
 ---
-id: init_2
-title: init_2
+id: context_server_store::init
+title: context_server_store::init
 ---
 
-# Function: init_2
+# Function: context_server_store::init
 
 ```rust
 pub fn init(cx: &App)

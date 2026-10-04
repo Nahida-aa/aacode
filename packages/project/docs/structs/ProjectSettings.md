@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:41`](../../../../packages
 ## Definition
 
 ```rust
-pub struct ProjectSettings
-{
+pub struct ProjectSettings {
     // Configuration for language servers. The following settings can be overridden for specific language servers: - initialization_options To override settings for a language, add an entry for that language server's name to the lsp value. Default: null
     pub lsp: HashMap<LanguageServerName, LspSettings>,
     // Common language server settings.

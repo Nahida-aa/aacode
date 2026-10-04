@@ -15,8 +15,7 @@ a matching link.
 ## Definition
 
 ```rust
-pub enum ResolvedDocumentLink
-{
+pub enum ResolvedDocumentLink {
     Resolved(LspDocumentLink),
     Resolving(DocumentLinkResolveTask),
 }

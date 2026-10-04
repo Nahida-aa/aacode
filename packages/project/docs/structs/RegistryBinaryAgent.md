@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_registry_store.rs:40`](../../../../pack
 ## Definition
 
 ```rust
-pub struct RegistryBinaryAgent
-{
+pub struct RegistryBinaryAgent {
     pub metadata: RegistryAgentMetadata,
     pub targets: HashMap<String, RegistryTargetConfig>,
     pub supports_current_platform: bool,

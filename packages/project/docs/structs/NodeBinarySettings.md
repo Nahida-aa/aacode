@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:102`](../../../../package
 ## Definition
 
 ```rust
-pub struct NodeBinarySettings
-{
+pub struct NodeBinarySettings {
     // The path to the Node binary.
     pub path: Option<String>,
     // The path to the npm binary Zed should use (defaults to `.path/../npm`).

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:16279`](../../../../packages
 ## Definition
 
 ```rust
-pub enum ResolvedHint
-{
+pub enum ResolvedHint {
     Resolved(InlayHint),
     Resolving(Shared<Task<()>>),
 }

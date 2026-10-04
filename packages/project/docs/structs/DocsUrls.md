@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:184`](../../../.
 ## Definition
 
 ```rust
-pub struct DocsUrls
-{
+pub struct DocsUrls {
     pub web: Option<String>,
     pub local: Option<String>,
 }

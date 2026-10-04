@@ -1,17 +1,16 @@
 ---
-id: lsp_store--Event
-title: lsp_store--Event
+id: log_store::Event
+title: log_store::Event
 ---
 
-# Enum: lsp_store--Event
+# Enum: log_store::Event
 
 Defined in: [`packages/project/src/lsp_store/log_store.rs:37`](../../../../packages/project/src/lsp_store/log_store.rs#L37)
 
 ## Definition
 
 ```rust
-pub enum Event
-{
+pub enum Event {
     NewServerLogEntry{ .. },
 }
 ```

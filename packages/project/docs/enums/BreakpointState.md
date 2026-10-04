@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:936`](../../../.
 ## Definition
 
 ```rust
-pub enum BreakpointState
-{
+pub enum BreakpointState {
     Enabled,
     Disabled,
 }

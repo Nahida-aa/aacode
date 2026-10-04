@@ -16,8 +16,7 @@ Can be either local (for the project opened on the same host) or remote.(for col
 ## Definition
 
 ```rust
-pub enum Event
-{
+pub enum Event {
     LanguageServerAdded(LanguageServerId, LanguageServerName, Option<WorktreeId>),
     SupplementaryLanguageServerAdded(LanguageServerId, LanguageServerName),
     LanguageServerRemoved(LanguageServerId),

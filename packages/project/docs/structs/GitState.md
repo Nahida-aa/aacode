@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/telemetry_snapshot.rs:40`](../../../../packag
 ## Definition
 
 ```rust
-pub struct GitState
-{
+pub struct GitState {
     pub remote_url: Option<String>,
     pub head_sha: Option<String>,
     pub current_branch: Option<String>,

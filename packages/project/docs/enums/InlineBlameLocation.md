@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:537`](../../../../package
 ## Definition
 
 ```rust
-pub enum InlineBlameLocation
-{
+pub enum InlineBlameLocation {
     Inline,
     StatusBar,
 }

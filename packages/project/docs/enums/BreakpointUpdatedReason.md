@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:910`](../../../.
 ## Definition
 
 ```rust
-pub enum BreakpointUpdatedReason
-{
+pub enum BreakpointUpdatedReason {
     Toggled,
     FileSaved,
 }

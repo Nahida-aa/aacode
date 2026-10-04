@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_search.rs:72`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct SearchResults<T>
-{
+pub struct SearchResults<T> {
     pub task_handle: Task<()>,
     pub rx: Receiver<T>,
 }

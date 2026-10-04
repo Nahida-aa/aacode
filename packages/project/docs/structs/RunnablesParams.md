@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:578`](../../../.
 ## Definition
 
 ```rust
-pub struct RunnablesParams
-{
+pub struct RunnablesParams {
     pub text_document: TextDocumentIdentifier,
     pub position: Option<Position>,
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/job_debug_queue.rs:44`](../../../..
 ## Definition
 
 ```rust
-pub enum CompletedJobStatus
-{
+pub enum CompletedJobStatus {
     Finished,
     Skipped,
 }

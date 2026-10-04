@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/worktree_store.rs:222`](../../../../packages/
 ## Definition
 
 ```rust
-pub enum WorktreeStoreEvent
-{
+pub enum WorktreeStoreEvent {
     WorktreeAdded(Entity<Worktree>),
     WorktreeRemoved(EntityId, WorktreeId),
     WorktreeReleased(EntityId, WorktreeId),

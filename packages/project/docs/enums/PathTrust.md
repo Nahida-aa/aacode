@@ -14,8 +14,7 @@ See module-level documentation on the trust model.
 ## Definition
 
 ```rust
-pub enum PathTrust
-{
+pub enum PathTrust {
     // A worktree that is familiar to this workspace. Either a single file or a directory worktree.
     Worktree(WorktreeId),
     // A path that may be another worktree yet not loaded into any workspace (hence, without any `WorktreeId`), or a parent path coming out of the security modal.

@@ -13,8 +13,7 @@ or an AbsPath and that *exists*.
 ## Definition
 
 ```rust
-pub enum ResolvedPath
-{
+pub enum ResolvedPath {
     ProjectPath{ .. },
     AbsPath{ .. },
 }

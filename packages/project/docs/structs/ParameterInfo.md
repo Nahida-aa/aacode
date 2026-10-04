@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/signature_help.rs:27`](../../../.
 ## Definition
 
 ```rust
-pub struct ParameterInfo
-{
+pub struct ParameterInfo {
     pub label_range: Option<Range<usize>>,
     pub documentation: Option<Entity<Markdown>>,
 }

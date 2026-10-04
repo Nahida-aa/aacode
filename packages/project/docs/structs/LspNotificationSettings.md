@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:169`](../../../../package
 ## Definition
 
 ```rust
-pub struct LspNotificationSettings
-{
+pub struct LspNotificationSettings {
     // Timeout in milliseconds for automatically dismissing language server notifications. Set to 0 to disable auto-dismiss. Default: 5000
     pub dismiss_timeout_ms: Option<u64>,
 }

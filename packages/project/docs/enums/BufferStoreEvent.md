@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/buffer_store.rs:89`](../../../../packages/pro
 ## Definition
 
 ```rust
-pub enum BufferStoreEvent
-{
+pub enum BufferStoreEvent {
     BufferAdded(Entity<Buffer>),
     SharedBufferClosed(PeerId, BufferId),
     BufferDropped(BufferId),

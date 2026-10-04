@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:604`](../../../../packages
 ## Definition
 
 ```rust
-pub struct IncomingCall
-{
+pub struct IncomingCall {
     pub from: CallHierarchyItem,
     pub from_ranges: Vec<Location>,
 }

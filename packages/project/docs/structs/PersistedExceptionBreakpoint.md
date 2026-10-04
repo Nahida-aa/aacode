@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/dap_store.rs:107`](../../../../packa
 ## Definition
 
 ```rust
-pub struct PersistedExceptionBreakpoint
-{
+pub struct PersistedExceptionBreakpoint {
     pub enabled: bool,
 }
 ```

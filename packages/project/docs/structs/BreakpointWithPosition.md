@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:33`](../../../..
 ## Definition
 
 ```rust
-pub struct BreakpointWithPosition
-{
+pub struct BreakpointWithPosition {
     pub position: Anchor,
     pub bp: Breakpoint,
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/search/mod.rs:76`](../../../../packages/proje
 ## Definition
 
 ```rust
-pub enum SearchQuery
-{
+pub enum SearchQuery {
     Text{ .. },
     Regex{ .. },
 }

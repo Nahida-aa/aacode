@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/pending_op.rs:7`](../../../../packa
 ## Definition
 
 ```rust
-pub enum GitStatus
-{
+pub enum GitStatus {
     Staged,
     Unstaged,
     Reverted,

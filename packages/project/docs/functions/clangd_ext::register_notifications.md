@@ -1,9 +1,9 @@
 ---
-id: project--register_notifications
-title: project--register_notifications
+id: clangd_ext::register_notifications
+title: clangd_ext::register_notifications
 ---
 
-# Function: project--register_notifications
+# Function: clangd_ext::register_notifications
 
 ```rust
 pub fn register_notifications(lsp_store: WeakEntity<LspStore>, language_server: &LanguageServer, adapter: Arc<CachedLspAdapter>)

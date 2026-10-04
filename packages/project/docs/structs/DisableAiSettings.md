@@ -12,8 +12,7 @@ AI 功能的全局开关（对齐 Zed `project::DisableAiSettings`）。
 ## Definition
 
 ```rust
-pub struct DisableAiSettings
-{
+pub struct DisableAiSettings {
     pub disable_ai: bool,
 }
 ```

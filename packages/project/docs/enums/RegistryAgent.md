@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_registry_store.rs:55`](../../../../pack
 ## Definition
 
 ```rust
-pub enum RegistryAgent
-{
+pub enum RegistryAgent {
     Binary(RegistryBinaryAgent),
     Npx(RegistryNpxAgent),
 }

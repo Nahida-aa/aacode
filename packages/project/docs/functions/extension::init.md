@@ -1,9 +1,9 @@
 ---
-id: project--init
-title: project--init
+id: extension::init
+title: extension::init
 ---
 
-# Function: project--init
+# Function: extension::init
 
 ```rust
 pub fn init(cx: &App)

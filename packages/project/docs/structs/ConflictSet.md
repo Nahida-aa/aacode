@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/conflict_set.rs:5`](../../../../pac
 ## Definition
 
 ```rust
-pub struct ConflictSet
-{
+pub struct ConflictSet {
     pub has_conflict: bool,
     pub snapshot: ConflictSetSnapshot,
 }

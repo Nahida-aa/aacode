@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:600`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct RepositorySnapshot
-{
+pub struct RepositorySnapshot {
     pub id: RepositoryId,
     pub statuses_by_path: SumTree<StatusEntry>,
     pub work_directory_abs_path: Arc<Path>,

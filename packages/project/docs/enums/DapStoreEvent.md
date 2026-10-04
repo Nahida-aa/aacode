@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/dap_store.rs:59`](../../../../packag
 ## Definition
 
 ```rust
-pub enum DapStoreEvent
-{
+pub enum DapStoreEvent {
     DebugClientStarted(SessionId),
     DebugSessionInitialized(SessionId),
     DebugClientShutdown(SessionId),

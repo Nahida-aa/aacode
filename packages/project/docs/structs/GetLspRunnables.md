@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:635`](../../../.
 ## Definition
 
 ```rust
-pub struct GetLspRunnables
-{
+pub struct GetLspRunnables {
     pub buffer_id: BufferId,
     pub position: Option<Anchor>,
     pub server_id: LanguageServerId,

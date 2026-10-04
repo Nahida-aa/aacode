@@ -12,8 +12,7 @@ Represents a current state of a single debug adapter and provides ways to mutate
 ## Definition
 
 ```rust
-pub struct Session
-{
+pub struct Session {
     pub state: SessionState,
 }
 ```

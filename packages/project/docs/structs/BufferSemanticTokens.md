@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/semantic_tokens.rs:635`](../../../.
 ## Definition
 
 ```rust
-pub struct BufferSemanticTokens
-{
+pub struct BufferSemanticTokens {
     pub tokens: Option<HashMap<LanguageServerId, Arc<[BufferSemanticToken]>>>,
 }
 ```

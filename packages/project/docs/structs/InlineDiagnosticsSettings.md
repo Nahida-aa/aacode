@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:635`](../../../../package
 ## Definition
 
 ```rust
-pub struct InlineDiagnosticsSettings
-{
+pub struct InlineDiagnosticsSettings {
     // Whether or not to show inline diagnostics Default: false
     pub enabled: bool,
     // Whether to only show the inline diagnostics after a delay after the last editor event. Default: 150

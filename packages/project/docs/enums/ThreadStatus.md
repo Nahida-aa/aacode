@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:99`](../../../../packages
 ## Definition
 
 ```rust
-pub enum ThreadStatus
-{
+pub enum ThreadStatus {
     Running,
     Stopped,
     Stepping,

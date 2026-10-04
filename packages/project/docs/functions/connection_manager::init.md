@@ -1,9 +1,9 @@
 ---
-id: init
-title: init
+id: connection_manager::init
+title: connection_manager::init
 ---
 
-# Function: init()
+# Function: connection_manager::init
 
 ```rust
 pub fn init(client: Arc<Client>, cx: &App)

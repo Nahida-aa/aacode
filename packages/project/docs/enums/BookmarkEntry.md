@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/bookmark_store.rs:72`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum BookmarkEntry
-{
+pub enum BookmarkEntry {
     Loaded(BufferBookmarks),
     Unloaded(Vec<SerializedBookmark>),
 }

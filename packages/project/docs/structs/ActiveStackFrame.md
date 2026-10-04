@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:145`](../../../.
 ## Definition
 
 ```rust
-pub struct ActiveStackFrame
-{
+pub struct ActiveStackFrame {
     pub session_id: SessionId,
     pub thread_id: ThreadId,
     pub stack_frame_id: StackFrameId,

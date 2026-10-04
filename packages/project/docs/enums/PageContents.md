@@ -13,8 +13,7 @@ since they're going to make up the majority of the memory in a program space (ev
 ## Definition
 
 ```rust
-pub enum PageContents
-{
+pub enum PageContents {
     // Whole page is unreadable.
     Unmapped,
     Mapped(Arc<MappedPageContents>),

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/task_store.rs:26`](../../../../packages/proje
 ## Definition
 
 ```rust
-pub enum TaskStore
-{
+pub enum TaskStore {
     Functional(StoreState),
     Noop,
 }

@@ -13,8 +13,7 @@ Only contains worktrees that are visible and with their root being a directory.
 ## Definition
 
 ```rust
-pub struct TaskContexts
-{
+pub struct TaskContexts {
     // A context, related to the currently opened item. Item can be opened from an invisible worktree, or any other, not necessarily active worktree.
     pub active_item_context: Option<(Option<WorktreeId>, Option<Location>, TaskContext)>,
     // A worktree that corresponds to the active item, or the only worktree in the workspace.

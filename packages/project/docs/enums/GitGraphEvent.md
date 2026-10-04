@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:831`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum GitGraphEvent
-{
+pub enum GitGraphEvent {
     CountUpdated(usize),
     FullyLoaded,
     LoadingError,

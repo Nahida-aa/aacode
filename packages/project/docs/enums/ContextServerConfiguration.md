@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/context_server_store/mod.rs:158`](../../../..
 ## Definition
 
 ```rust
-pub enum ContextServerConfiguration
-{
+pub enum ContextServerConfiguration {
     Custom{ .. },
     Extension{ .. },
     Http{ .. },

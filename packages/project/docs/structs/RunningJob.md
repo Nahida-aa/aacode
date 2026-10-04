@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/job_debug_queue.rs:24`](../../../..
 ## Definition
 
 ```rust
-pub struct RunningJob
-{
+pub struct RunningJob {
     pub id: u64,
     pub description: SharedString,
     pub key: Option<SharedString>,

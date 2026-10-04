@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/conflict_set.rs:105`](../../../../p
 ## Definition
 
 ```rust
-pub struct ConflictRegion
-{
+pub struct ConflictRegion {
     pub ours_branch_name: SharedString,
     pub theirs_branch_name: SharedString,
     pub range: Range<Anchor>,

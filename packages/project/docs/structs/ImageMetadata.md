@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/image_store.rs:61`](../../../../packages/proj
 ## Definition
 
 ```rust
-pub struct ImageMetadata
-{
+pub struct ImageMetadata {
     pub width: u32,
     pub height: u32,
     pub file_size: u64,

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:633`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct JobInfo
-{
+pub struct JobInfo {
     pub start: Instant,
     pub message: SharedString,
 }

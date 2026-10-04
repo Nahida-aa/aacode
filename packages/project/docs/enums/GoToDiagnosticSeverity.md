@@ -12,8 +12,7 @@ Determines the severity of the diagnostic that should be moved to.
 ## Definition
 
 ```rust
-pub enum GoToDiagnosticSeverity
-{
+pub enum GoToDiagnosticSeverity {
     // Errors
     Error,
     // Warnings

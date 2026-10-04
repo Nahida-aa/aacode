@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/prettier_store.rs:796`](../../../../packages/
 ## Definition
 
 ```rust
-pub enum PrettierInstallation
-{
+pub enum PrettierInstallation {
     NotInstalled{ .. },
     Installed(PrettierInstance),
 }

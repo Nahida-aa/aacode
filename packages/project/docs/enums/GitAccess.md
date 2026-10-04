@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:449`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum GitAccess
-{
+pub enum GitAccess {
     // Either: - the user owns `.git` - the user doesn't own `.git`, but has both of: - OS-level read permissions - the directory is marked as safe (git config safe.directory)
     Yes,
     // The user is not the owner of `.git`, and one of the following is true: - the directory is not marked as safe (git config safe.directory) - the user does not have OS-level read permissions to `.git`

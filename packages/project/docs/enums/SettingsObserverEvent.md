@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:813`](../../../../package
 ## Definition
 
 ```rust
-pub enum SettingsObserverEvent
-{
+pub enum SettingsObserverEvent {
     LocalSettingsUpdated(Result<PathBuf, InvalidSettingsError>),
     LocalTasksUpdated(Result<PathBuf, InvalidSettingsError>),
     LocalDebugScenariosUpdated(Result<PathBuf, InvalidSettingsError>),

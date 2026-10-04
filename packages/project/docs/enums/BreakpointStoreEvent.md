@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:915`](../../../.
 ## Definition
 
 ```rust
-pub enum BreakpointStoreEvent
-{
+pub enum BreakpointStoreEvent {
     SetDebugLine,
     ClearDebugLines,
     BreakpointsUpdated(Arc<Path>, BreakpointUpdatedReason),

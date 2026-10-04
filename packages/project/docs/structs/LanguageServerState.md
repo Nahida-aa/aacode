@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/log_store.rs:135`](../../../../pack
 ## Definition
 
 ```rust
-pub struct LanguageServerState
-{
+pub struct LanguageServerState {
     // Distinguishes a re-registered key from the registration owned by an older view.
     pub generation: usize,
     pub name: Option<LanguageServerName>,

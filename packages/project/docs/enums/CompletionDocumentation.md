@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:16220`](../../../../packages
 ## Definition
 
 ```rust
-pub enum CompletionDocumentation
-{
+pub enum CompletionDocumentation {
     // There is no documentation for this completion.
     Undocumented,
     // A single line of documentation.

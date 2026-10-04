@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:195`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum ProgressToken
-{
+pub enum ProgressToken {
     Number(i32),
     String(SharedString),
 }

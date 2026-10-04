@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/diff_buffer_list.rs:53`](../../../.
 ## Definition
 
 ```rust
-pub enum BranchDiffEvent
-{
+pub enum BranchDiffEvent {
     FileListChanged,
     DiffBaseChanged,
 }

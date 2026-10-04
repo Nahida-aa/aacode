@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_server_store.rs:112`](../../../../packa
 ## Definition
 
 ```rust
-pub enum ExternalAgentSource
-{
+pub enum ExternalAgentSource {
     Custom,
     Registry,
 }

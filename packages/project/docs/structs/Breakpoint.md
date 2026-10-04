@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:962`](../../../.
 ## Definition
 
 ```rust
-pub struct Breakpoint
-{
+pub struct Breakpoint {
     pub message: Option<Arc<str>>,
     // How many times do we hit the breakpoint until we actually stop at it e.g. (2 = 2 times of the breakpoint action)
     pub hit_condition: Option<Arc<str>>,

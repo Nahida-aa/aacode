@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:584`](../../../../package
 ## Definition
 
 ```rust
-pub struct BlameSettings
-{
+pub struct BlameSettings {
     // Whether to show the avatar of the author of the commit. Default: true
     pub show_avatar: bool,
 }

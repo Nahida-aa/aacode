@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/log_store.rs:456`](../../../../pack
 ## Definition
 
 ```rust
-pub enum LogKind
-{
+pub enum LogKind {
     Rpc,
     Trace,
     Logs,

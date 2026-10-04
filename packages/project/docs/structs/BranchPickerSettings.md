@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:603`](../../../../package
 ## Definition
 
 ```rust
-pub struct BranchPickerSettings
-{
+pub struct BranchPickerSettings {
     // Whether to show author name as part of the commit information. Default: false
     pub show_author_name: bool,
 }

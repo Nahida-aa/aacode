@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/telemetry_snapshot.rs:12`](../../../../packag
 ## Definition
 
 ```rust
-pub struct TelemetrySnapshot
-{
+pub struct TelemetrySnapshot {
     pub worktree_snapshots: Vec<TelemetryWorktreeSnapshot>,
 }
 ```

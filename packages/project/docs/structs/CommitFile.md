@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:228`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct CommitFile
-{
+pub struct CommitFile {
     pub path: RepoPath,
     pub old_text: Option<String>,
     pub new_text: Option<String>,

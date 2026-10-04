@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:1630`](../../../../packag
 ## Definition
 
 ```rust
-pub enum DapBinary
-{
+pub enum DapBinary {
     Default,
     Custom(String),
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/git_traversal.rs:226`](../../../../
 ## Definition
 
 ```rust
-pub struct GitEntry
-{
+pub struct GitEntry {
     pub entry: Entry,
     pub git_summary: GitSummary,
 }

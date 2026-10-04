@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/path.rs:11`](../../../../packages/project/src
 ## Definition
 
 ```rust
-pub struct ProjectPath
-{
+pub struct ProjectPath {
     pub worktree_id: WorktreeId,
     pub path: Arc<RelPath>,
 }

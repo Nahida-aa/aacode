@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_registry_store.rs:28`](../../../../pack
 ## Definition
 
 ```rust
-pub struct RegistryAgentMetadata
-{
+pub struct RegistryAgentMetadata {
     pub id: AgentId,
     pub name: SharedString,
     pub description: SharedString,

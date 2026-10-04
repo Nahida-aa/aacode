@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:16176`](../../../../packages
 ## Definition
 
 ```rust
-pub struct DiagnosticSummary
-{
+pub struct DiagnosticSummary {
     pub error_count: usize,
     pub warning_count: usize,
 }

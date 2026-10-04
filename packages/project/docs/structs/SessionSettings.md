@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:85`](../../../../packages
 ## Definition
 
 ```rust
-pub struct SessionSettings
-{
+pub struct SessionSettings {
     // Whether or not to restore unsaved buffers on restart. If this is true, user won't be prompted whether to save/discard dirty files when closing the application. Default: true
     pub restore_unsaved_buffers: bool,
     // Whether or not to skip worktree trust checks. When trusted, project settings are synchronized automatically, language and MCP servers are downloaded and started automatically. Default: false

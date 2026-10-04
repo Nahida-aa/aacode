@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:594`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum CommitDataState
-{
+pub enum CommitDataState {
     Loading(Option<Shared<Receiver<Arc<CommitData>>>>),
     Loaded(Arc<CommitData>),
 }

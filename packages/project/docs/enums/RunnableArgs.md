@@ -13,8 +13,7 @@ comment on `Runnables` above for more discussion.
 ## Definition
 
 ```rust
-pub enum RunnableArgs
-{
+pub enum RunnableArgs {
     Cargo(CargoRunnableArgs),
     Shell(ShellRunnableArgs),
 }

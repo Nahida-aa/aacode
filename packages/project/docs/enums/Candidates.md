@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/fuzzy.rs:16`](../../../../packages/project/sr
 ## Definition
 
 ```rust
-pub enum Candidates
-{
+pub enum Candidates {
     // Only consider directories.
     Directories,
     // Only consider files.

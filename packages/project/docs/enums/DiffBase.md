@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/diff_buffer_list.rs:27`](../../../.
 ## Definition
 
 ```rust
-pub enum DiffBase
-{
+pub enum DiffBase {
     Head,
     Index,
     Staged,

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:46`](../../../..
 ## Definition
 
 ```rust
-pub struct ExpandedMacro
-{
+pub struct ExpandedMacro {
     pub name: String,
     pub expansion: String,
 }

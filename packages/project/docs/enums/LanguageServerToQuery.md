@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:15740`](../../../../packages
 ## Definition
 
 ```rust
-pub enum LanguageServerToQuery
-{
+pub enum LanguageServerToQuery {
     // Query language servers in order of users preference, up until one capable of handling the request is found.
     FirstCapable,
     // Query a specific language server.

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:325`](../../../.
 ## Definition
 
 ```rust
-pub struct SwitchSourceHeader
-{
+pub struct SwitchSourceHeader {
     pub server_id: LanguageServerId,
 }
 ```

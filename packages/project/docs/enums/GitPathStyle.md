@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:521`](../../../../package
 ## Definition
 
 ```rust
-pub enum GitPathStyle
-{
+pub enum GitPathStyle {
     FileNameFirst,
     FilePathFirst,
 }

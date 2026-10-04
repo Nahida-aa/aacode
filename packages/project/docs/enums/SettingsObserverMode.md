@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:807`](../../../../package
 ## Definition
 
 ```rust
-pub enum SettingsObserverMode
-{
+pub enum SettingsObserverMode {
     Local(Arc<dyn Fs>),
     Remote{ .. },
 }

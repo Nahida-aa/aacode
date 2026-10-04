@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/diff_buffer_list.rs:540`](../../../
 ## Definition
 
 ```rust
-pub struct DiffBuffer
-{
+pub struct DiffBuffer {
     pub repo_path: RepoPath,
     pub file_status: FileStatus,
     pub load: Task<Result<LoadedDiffBuffer>>,

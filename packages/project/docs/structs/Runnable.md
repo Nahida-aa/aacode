@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:586`](../../../.
 ## Definition
 
 ```rust
-pub struct Runnable
-{
+pub struct Runnable {
     pub label: String,
     pub location: Option<LocationLink>,
     pub args: RunnableArgs,

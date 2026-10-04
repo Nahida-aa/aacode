@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:177`](../../../.
 ## Definition
 
 ```rust
-pub struct OpenDocsParams
-{
+pub struct OpenDocsParams {
     pub text_document: TextDocumentIdentifier,
     pub position: Position,
 }

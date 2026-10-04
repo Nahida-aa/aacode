@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:175`](../../../../package
 ## Definition
 
 ```rust
-pub struct SessionQuirks
-{
+pub struct SessionQuirks {
     pub compact: bool,
     pub prefer_thread_name: bool,
 }

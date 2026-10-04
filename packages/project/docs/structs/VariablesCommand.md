@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/dap_command.rs:818`](../../../../pac
 ## Definition
 
 ```rust
-pub struct VariablesCommand
-{
+pub struct VariablesCommand {
     pub variables_reference: u64,
     pub filter: Option<VariablesArgumentsFilter>,
     pub start: Option<u64>,

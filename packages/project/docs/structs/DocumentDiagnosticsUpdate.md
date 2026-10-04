@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:292`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct DocumentDiagnosticsUpdate<'a, D>
-{
+pub struct DocumentDiagnosticsUpdate<'a, D> {
     pub diagnostics: D,
     pub result_id: Option<SharedString>,
     pub registration_id: Option<SharedString>,

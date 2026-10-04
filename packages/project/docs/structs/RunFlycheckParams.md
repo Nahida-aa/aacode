@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:851`](../../../.
 ## Definition
 
 ```rust
-pub struct RunFlycheckParams
-{
+pub struct RunFlycheckParams {
     pub text_document: Option<TextDocumentIdentifier>,
 }
 ```

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/image_store.rs:70`](../../../../packages/proj
 ## Definition
 
 ```rust
-pub struct ImageColorInfo
-{
+pub struct ImageColorInfo {
     pub channels: u8,
     pub bits_per_channel: u8,
 }

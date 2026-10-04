@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:180`](../../../../packages
 ## Definition
 
 ```rust
-pub struct EditPredictionDefinition
-{
+pub struct EditPredictionDefinition {
     pub path: ProjectPath,
     pub range: Range<Unclipped<PointUtf16>>,
 }

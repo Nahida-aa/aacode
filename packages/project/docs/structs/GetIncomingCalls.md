@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:616`](../../../../packages
 ## Definition
 
 ```rust
-pub struct GetIncomingCalls
-{
+pub struct GetIncomingCalls {
     pub item: CallHierarchyItem,
 }
 ```

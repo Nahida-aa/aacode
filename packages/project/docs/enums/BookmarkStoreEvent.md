@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/bookmark_store.rs:19`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum BookmarkStoreEvent
-{
+pub enum BookmarkStoreEvent {
     BookmarksChanged,
     LabelChanged,
 }

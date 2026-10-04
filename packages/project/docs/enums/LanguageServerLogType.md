@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:16017`](../../../../packages
 ## Definition
 
 ```rust
-pub enum LanguageServerLogType
-{
+pub enum LanguageServerLogType {
     Log(MessageType),
     Trace{ .. },
     Rpc{ .. },

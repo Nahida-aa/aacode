@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/image_store.rs:45`](../../../../packages/proj
 ## Definition
 
 ```rust
-pub enum ImageItemEvent
-{
+pub enum ImageItemEvent {
     ReloadNeeded,
     Reloaded,
     FileHandleChanged,

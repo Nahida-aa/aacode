@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/search/mod.rs:34`](../../../../packages/proje
 ## Definition
 
 ```rust
-pub enum SearchInputKind
-{
+pub enum SearchInputKind {
     Query,
     Include,
     Exclude,

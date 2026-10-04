@@ -45,7 +45,8 @@ LINK_TARGETS: dict[int, tuple[str, str]] = {}
 
 
 def assign_slugs(found: dict[str, list[dict]]) -> dict[int, str]:
-    """给每个 item 定文件名：不重名用 item 名，重名按模块路径消歧（末尾 2 段，必要时 3 段）。"""
+    """给每个 item 定文件名：不重名用 item 名，重名用 <模块路径>::<item 名>.md 消歧。
+    取 item 所在模块的尾部路径（1 → 全路径，逐级追加），保证组内唯一。"""
     by_name: dict[tuple[str, str], list[dict]] = defaultdict(list)
     for kind, items in found.items():
         for it in items:
@@ -55,14 +56,19 @@ def assign_slugs(found: dict[str, list[dict]]) -> dict[int, str]:
         if len(group) == 1:
             slugs[group[0]["id"]] = name
             continue
-        for nseg in (2, 3):
-            cand = [it["_path"][-nseg] + "--" + name if len(it["_path"]) >= nseg else name
-                    for it in group]
+        cand = [name] * len(group)
+        # 逐级取模块路径尾部 1..n 段（不含 crate 根段），直到组内唯一
+        for nseg in range(1, 64):  # 64 段足够深；超过则自然取全路径
+            cand = []
+            for it in group:
+                mod_segs = it["_path"][1:]                      # 去掉 crate 根段
+                tail = mod_segs[-nseg:] if nseg < len(mod_segs) else mod_segs
+                cand.append("::".join(tail + [name]) if tail else name)
             if len(set(cand)) == len(group):
                 break
         for it, s in zip(group, cand):
             slugs[it["id"]] = s
-    # 极端兜底：同模块内仍有重名（理论不会），再追加序号
+    # 全路径仍撞名（理论上不会，比如同 item 多路注册）时追加序号兑底
     for kind, items in found.items():
         used: dict[str, int] = defaultdict(int)
         for it in items:
@@ -468,7 +474,7 @@ def enum_definition_block(it: dict, docs: Docs) -> str:
         gen = "<" + ", ".join(ps) + ">"
     lines = [f"pub enum {it['name'] or '?'}{gen}"]
     if variants:
-        lines.append("{")
+        lines[-1] += " {"
         for vid in variants:
             v = docs.idx[vid]
             vk = v["inner"].get("variant", {}).get("kind") or {}
@@ -518,7 +524,7 @@ def struct_definition_block(it: dict, docs: Docs) -> str:
         gen = "<" + ", ".join(ps) + ">"
     lines = [f"pub {kw} {it['name'] or '?'}{gen}"]
     if fields:
-        lines.append("{")
+        lines[-1] += " {"
         for fid in fields:
             fl = docs.idx[fid]
             sf = fl["inner"].get("struct_field")

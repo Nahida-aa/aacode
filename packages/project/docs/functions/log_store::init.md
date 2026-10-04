@@ -1,9 +1,9 @@
 ---
-id: project--init_2
-title: project--init_2
+id: log_store::init
+title: log_store::init
 ---
 
-# Function: project--init_2
+# Function: log_store::init
 
 ```rust
 pub fn init(on_headless_host: bool, cx: &App) -> Entity<LogStore>

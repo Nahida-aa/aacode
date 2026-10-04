@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/locators/go.rs:13`](../../../../pack
 ## Definition
 
 ```rust
-pub struct DelveLaunchRequest
-{
+pub struct DelveLaunchRequest {
     pub request: String,
     pub mode: String,
     pub program: String,

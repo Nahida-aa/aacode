@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/document_colors.rs:32`](../../../..
 ## Definition
 
 ```rust
-pub struct DocumentColors
-{
+pub struct DocumentColors {
     pub colors: HashSet<DocumentColor>,
 }
 ```

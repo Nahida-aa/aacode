@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:676`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum UnshallowState
-{
+pub enum UnshallowState {
     Idle,
     InProgress,
     Unshallowed,

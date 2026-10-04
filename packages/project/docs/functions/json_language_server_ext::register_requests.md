@@ -1,9 +1,9 @@
 ---
-id: project--register_requests
-title: project--register_requests
+id: json_language_server_ext::register_requests
+title: json_language_server_ext::register_requests
 ---
 
-# Function: project--register_requests
+# Function: json_language_server_ext::register_requests
 
 ```rust
 pub fn register_requests(lsp_store: WeakEntity<LspStore>, language_server: &LanguageServer)

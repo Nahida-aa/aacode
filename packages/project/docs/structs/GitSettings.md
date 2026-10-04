@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:459`](../../../../package
 ## Definition
 
 ```rust
-pub struct GitSettings
-{
+pub struct GitSettings {
     // Whether or not git integration is enabled. Default: true
     pub enabled: GitEnabledSettings,
     // Whether or not to show the git gutter. Default: tracked_files

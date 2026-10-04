@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:15993`](../../../../packages
 ## Definition
 
 ```rust
-pub struct LanguageServerShowDocumentRequest
-{
+pub struct LanguageServerShowDocumentRequest {
     pub uri: Uri,
     pub external: bool,
     pub take_focus: bool,

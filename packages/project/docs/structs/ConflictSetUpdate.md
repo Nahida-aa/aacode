@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/conflict_set.rs:11`](../../../../pa
 ## Definition
 
 ```rust
-pub struct ConflictSetUpdate
-{
+pub struct ConflictSetUpdate {
     pub buffer_range: Option<Range<Anchor>>,
     pub old_range: Range<usize>,
     pub new_range: Range<usize>,

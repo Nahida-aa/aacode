@@ -12,8 +12,7 @@ A change of trust on a certain host.
 ## Definition
 
 ```rust
-pub enum TrustedWorktreesEvent
-{
+pub enum TrustedWorktreesEvent {
     Trusted(WeakEntity<WorktreeStore>, HashSet<PathTrust>),
     Restricted(WeakEntity<WorktreeStore>, HashSet<PathTrust>),
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:187`](../../../../package
 ## Definition
 
 ```rust
-pub enum ContextServerSettings
-{
+pub enum ContextServerSettings {
     Stdio{ .. },
     Http{ .. },
     Extension{ .. },

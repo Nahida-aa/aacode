@@ -12,8 +12,7 @@ Kind of a source the tasks are fetched from, used to display more source informa
 ## Definition
 
 ```rust
-pub enum TaskSourceKind
-{
+pub enum TaskSourceKind {
     // bash-like commands spawned by users, not associated with any path
     UserInput,
     // Tasks from the worktree's .zed/task.json

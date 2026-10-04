@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/pending_op.rs:36`](../../../../pack
 ## Definition
 
 ```rust
-pub struct PendingOpsSummary
-{
+pub struct PendingOpsSummary {
     pub staged_count: usize,
     pub staging_count: usize,
 }

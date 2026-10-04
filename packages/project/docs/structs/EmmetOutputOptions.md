@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/emmet_ext.rs:45`](../../../../packa
 ## Definition
 
 ```rust
-pub struct EmmetOutputOptions
-{
+pub struct EmmetOutputOptions {
     pub indent: String,
     pub base_indent: String,
     pub comment_enabled: Option<bool>,

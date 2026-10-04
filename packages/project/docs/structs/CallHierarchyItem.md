@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:334`](../../../../packages
 ## Definition
 
 ```rust
-pub struct CallHierarchyItem
-{
+pub struct CallHierarchyItem {
     pub buffer: Entity<Buffer>,
     pub server_id: LanguageServerId,
     pub name: String,

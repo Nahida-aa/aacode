@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:813`](../../../../package
 ## Definition
 
 ```rust
-pub enum SessionStateEvent
-{
+pub enum SessionStateEvent {
     Running,
     Shutdown,
     Restart,

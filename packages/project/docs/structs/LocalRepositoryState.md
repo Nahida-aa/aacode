@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:752`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct LocalRepositoryState
-{
+pub struct LocalRepositoryState {
     pub fs: Arc<dyn Fs>,
     pub backend: Arc<dyn GitRepository>,
     pub environment: Arc<HashMap<String, String>>,

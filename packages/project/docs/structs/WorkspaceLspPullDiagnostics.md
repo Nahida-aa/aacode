@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:5317`](../../../../package
 ## Definition
 
 ```rust
-pub struct WorkspaceLspPullDiagnostics
-{
+pub struct WorkspaceLspPullDiagnostics {
     pub version: Option<i32>,
     pub diagnostics: LspPullDiagnostics,
 }

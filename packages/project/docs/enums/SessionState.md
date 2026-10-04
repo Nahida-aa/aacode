@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:154`](../../../../package
 ## Definition
 
 ```rust
-pub enum SessionState
-{
+pub enum SessionState {
     // Represents a session that is building/initializing even if a session doesn't have a pre build task this state is used to run all the async tasks that are required to start the session
     Booting(Option<Task<Result<()>>>),
     Running(RunningMode),

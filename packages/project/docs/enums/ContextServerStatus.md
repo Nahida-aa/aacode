@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/context_server_store/mod.rs:49`](../../../../
 ## Definition
 
 ```rust
-pub enum ContextServerStatus
-{
+pub enum ContextServerStatus {
     Starting,
     Running,
     Stopped,

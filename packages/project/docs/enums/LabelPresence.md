@@ -23,8 +23,7 @@ such scan more than once.
 ## Definition
 
 ```rust
-pub enum LabelPresence
-{
+pub enum LabelPresence {
     KnownAbsent,
     Present,
 }

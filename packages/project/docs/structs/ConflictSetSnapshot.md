@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/conflict_set.rs:18`](../../../../pa
 ## Definition
 
 ```rust
-pub struct ConflictSetSnapshot
-{
+pub struct ConflictSetSnapshot {
     pub buffer_id: BufferId,
     pub conflicts: Arc<[ConflictRegion]>,
 }

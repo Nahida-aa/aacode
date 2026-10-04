@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/document_links.rs:29`](../../../../
 ## Definition
 
 ```rust
-pub struct LspDocumentLink
-{
+pub struct LspDocumentLink {
     pub range: Range<Anchor>,
     pub target: Option<SharedString>,
     pub tooltip: Option<SharedString>,

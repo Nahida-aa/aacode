@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:838`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum RepositoryEvent
-{
+pub enum RepositoryEvent {
     StatusesChanged,
     HeadChanged,
     BranchListChanged,

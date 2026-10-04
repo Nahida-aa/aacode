@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:325`](../../../../packages
 ## Definition
 
 ```rust
-pub struct GetDocumentDiagnostics
-{
+pub struct GetDocumentDiagnostics {
     // We cannot blindly rely on server's capabilities.diagnostic_provider, as they're a singular field, whereas a server can register multiple diagnostic providers post-mortem.
     pub registration_id: Option<SharedString>,
     pub identifier: Option<SharedString>,

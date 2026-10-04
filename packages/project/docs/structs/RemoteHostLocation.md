@@ -14,8 +14,7 @@ A host may contain more than one worktree or even project open concurrently.
 ## Definition
 
 ```rust
-pub struct RemoteHostLocation
-{
+pub struct RemoteHostLocation {
     pub user_name: Option<SharedString>,
     pub host_identifier: SharedString,
 }

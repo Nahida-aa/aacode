@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:140`](../../../../package
 ## Definition
 
 ```rust
-pub struct Watcher
-{
+pub struct Watcher {
     pub expression: SharedString,
     pub value: SharedString,
     pub variables_reference: u64,

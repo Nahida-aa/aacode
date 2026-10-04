@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:84`](../../../../packages
 ## Definition
 
 ```rust
-pub struct StackFrame
-{
+pub struct StackFrame {
     pub dap: StackFrame,
     pub scopes: Vec<Scope>,
 }

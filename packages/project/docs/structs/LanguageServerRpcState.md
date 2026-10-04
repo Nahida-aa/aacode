@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/log_store.rs:275`](../../../../pack
 ## Definition
 
 ```rust
-pub struct LanguageServerRpcState
-{
+pub struct LanguageServerRpcState {
     pub rpc_messages: VecDeque<RpcMessage>,
 }
 ```

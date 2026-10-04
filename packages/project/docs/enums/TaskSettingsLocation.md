@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/task_store.rs:54`](../../../../packages/proje
 ## Definition
 
 ```rust
-pub enum TaskSettingsLocation<'a>
-{
+pub enum TaskSettingsLocation<'a> {
     Global(&'a Path),
     Worktree(SettingsLocation<'a>),
 }

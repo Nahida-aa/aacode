@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/pending_op.rs:15`](../../../../pack
 ## Definition
 
 ```rust
-pub enum JobStatus
-{
+pub enum JobStatus {
     Running,
     Finished,
     Skipped,

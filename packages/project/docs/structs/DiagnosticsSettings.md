@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:620`](../../../../package
 ## Definition
 
 ```rust
-pub struct DiagnosticsSettings
-{
+pub struct DiagnosticsSettings {
     // Whether to show the project diagnostics button in the status bar.
     pub button: bool,
     // Whether or not to include warning diagnostics.

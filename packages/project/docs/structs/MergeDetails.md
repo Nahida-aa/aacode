@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:588`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct MergeDetails
-{
+pub struct MergeDetails {
     pub merge_heads_by_conflicted_path: TreeMap<RepoPath, Vec<Option<SharedString>>>,
     pub message: Option<SharedString>,
 }

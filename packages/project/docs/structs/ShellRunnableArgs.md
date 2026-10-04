@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:625`](../../../.
 ## Definition
 
 ```rust
-pub struct ShellRunnableArgs
-{
+pub struct ShellRunnableArgs {
     pub environment: HashMap<String, String>,
     pub cwd: PathBuf,
     pub program: String,

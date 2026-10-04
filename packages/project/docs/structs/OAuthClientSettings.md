@@ -13,8 +13,7 @@ Dynamic Client Registration.
 ## Definition
 
 ```rust
-pub struct OAuthClientSettings
-{
+pub struct OAuthClientSettings {
     // The OAuth client ID obtained from out-of-band registration with the authorization server.
     pub client_id: String,
     // The OAuth client secret, if this is a confidential client. For security, prefer providing this interactively; we will prompt and store it in the system keychain.

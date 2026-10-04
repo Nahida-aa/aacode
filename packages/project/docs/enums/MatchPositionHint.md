@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/search/mod.rs:50`](../../../../packages/proje
 ## Definition
 
 ```rust
-pub enum MatchPositionHint
-{
+pub enum MatchPositionHint {
     Line(u32),
     ByteOffset(usize),
 }

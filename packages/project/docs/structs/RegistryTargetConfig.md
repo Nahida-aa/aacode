@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_registry_store.rs:109`](../../../../pac
 ## Definition
 
 ```rust
-pub struct RegistryTargetConfig
-{
+pub struct RegistryTargetConfig {
     pub archive: String,
     pub cmd: String,
     pub args: Vec<String>,

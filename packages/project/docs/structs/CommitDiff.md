@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:222`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct CommitDiff
-{
+pub struct CommitDiff {
     pub files: Vec<CommitFile>,
     pub is_shallow_boundary: bool,
 }

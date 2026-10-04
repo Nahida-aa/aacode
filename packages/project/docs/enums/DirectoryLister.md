@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/directory.rs:21`](../../../../packages/projec
 ## Definition
 
 ```rust
-pub enum DirectoryLister
-{
+pub enum DirectoryLister {
     Project(Entity<Project>),
     Local(Entity<Project>, Arc<dyn Fs>),
 }

@@ -12,8 +12,7 @@ Determines the behavior to use when inserting a new query into the search histor
 ## Definition
 
 ```rust
-pub enum QueryInsertionBehavior
-{
+pub enum QueryInsertionBehavior {
     // Always insert the query to the search history.
     AlwaysInsert,
     // Replace the previous query in the search history, if the new query contains the previous query.

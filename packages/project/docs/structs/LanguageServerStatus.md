@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:4705`](../../../../packages/
 ## Definition
 
 ```rust
-pub struct LanguageServerStatus
-{
+pub struct LanguageServerStatus {
     pub name: LanguageServerName,
     pub language_name: Option<LanguageName>,
     pub server_version: Option<SharedString>,

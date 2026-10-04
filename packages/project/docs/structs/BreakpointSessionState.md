@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:58`](../../../..
 ## Definition
 
 ```rust
-pub struct BreakpointSessionState
-{
+pub struct BreakpointSessionState {
     // Session-specific identifier for the breakpoint, as assigned by Debug Adapter.
     pub id: u64,
     pub verified: bool,

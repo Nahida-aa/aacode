@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/pending_op.rs:23`](../../../../pack
 ## Definition
 
 ```rust
-pub struct PendingOps
-{
+pub struct PendingOps {
     pub repo_path: RepoPath,
     pub ops: Vec<PendingOp>,
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/lsp_ext_command.rs:39`](../../../..
 ## Definition
 
 ```rust
-pub struct ExpandMacroParams
-{
+pub struct ExpandMacroParams {
     pub text_document: TextDocumentIdentifier,
     pub position: Position,
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/bookmark_store.rs:31`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct SerializedBookmark
-{
+pub struct SerializedBookmark {
     pub row: u32,
     pub label: String,
 }

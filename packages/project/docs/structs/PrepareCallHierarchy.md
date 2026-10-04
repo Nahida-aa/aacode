@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:346`](../../../../packages
 ## Definition
 
 ```rust
-pub struct PrepareCallHierarchy
-{
+pub struct PrepareCallHierarchy {
     pub position: PointUtf16,
 }
 ```

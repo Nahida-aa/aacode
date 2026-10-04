@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_registry_store.rs:47`](../../../../pack
 ## Definition
 
 ```rust
-pub struct RegistryNpxAgent
-{
+pub struct RegistryNpxAgent {
     pub metadata: RegistryAgentMetadata,
     pub package: SharedString,
     pub args: Vec<String>,

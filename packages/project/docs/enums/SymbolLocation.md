@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:4733`](../../../../packages/
 ## Definition
 
 ```rust
-pub enum SymbolLocation
-{
+pub enum SymbolLocation {
     InProject(ProjectPath),
     OutsideProject{ .. },
 }

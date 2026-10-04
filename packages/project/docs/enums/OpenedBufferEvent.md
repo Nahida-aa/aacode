@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/event.rs:18`](../../../../packages/project/sr
 ## Definition
 
 ```rust
-pub enum OpenedBufferEvent
-{
+pub enum OpenedBufferEvent {
     Disconnected,
     Ok(BufferId),
     Err(BufferId, Arc<Error>),

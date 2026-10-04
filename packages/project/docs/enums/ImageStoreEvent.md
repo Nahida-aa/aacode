@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/image_store.rs:54`](../../../../packages/proj
 ## Definition
 
 ```rust
-pub enum ImageStoreEvent
-{
+pub enum ImageStoreEvent {
     ImageAdded(Entity<ImageItem>),
 }
 ```

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:247`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum LspFormatTarget
-{
+pub enum LspFormatTarget {
     Buffers,
     Ranges(BTreeMap<BufferId, Vec<Range<Anchor>>>),
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/image_store.rs:104`](../../../../packages/pro
 ## Definition
 
 ```rust
-pub struct ImageItem
-{
+pub struct ImageItem {
     pub id: ImageId,
     pub file: Arc<File>,
     pub image: Arc<Image>,

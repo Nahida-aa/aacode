@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/bookmark_store.rs:25`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct Bookmark
-{
+pub struct Bookmark {
     pub anchor: Anchor,
     pub label: String,
 }

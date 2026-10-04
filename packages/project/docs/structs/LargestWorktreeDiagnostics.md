@@ -12,8 +12,7 @@ Identifies the worktree with the largest current snapshot.
 ## Definition
 
 ```rust
-pub struct LargestWorktreeDiagnostics
-{
+pub struct LargestWorktreeDiagnostics {
     pub path: PathBuf,
     pub entries: usize,
     pub visible_entries: usize,

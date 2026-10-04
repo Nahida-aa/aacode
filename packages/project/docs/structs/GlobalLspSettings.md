@@ -12,8 +12,7 @@ Common language server settings.
 ## Definition
 
 ```rust
-pub struct GlobalLspSettings
-{
+pub struct GlobalLspSettings {
     // Whether to show the LSP servers button in the status bar. Default: `true`
     pub button: bool,
     // The maximum amount of time to wait for responses from language servers, in seconds. A value of `0` will result in no timeout being applied (causing all LSP responses to wait indefinitely until completed). This should not be used outside of serialization/de-serialization in favor of get_request_timeout. Default: `120`

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/toolchain_store.rs:473`](../../../../packages
 ## Definition
 
 ```rust
-pub enum ToolchainStoreEvent
-{
+pub enum ToolchainStoreEvent {
     ToolchainActivated,
     CustomToolchainsModified,
 }

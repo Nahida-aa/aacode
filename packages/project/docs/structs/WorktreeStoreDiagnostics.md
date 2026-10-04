@@ -12,8 +12,7 @@ Summarizes worktree ownership and current snapshot sizes.
 ## Definition
 
 ```rust
-pub struct WorktreeStoreDiagnostics
-{
+pub struct WorktreeStoreDiagnostics {
     pub worktree_slots: usize,
     pub live_worktrees: usize,
     pub visible_worktrees: usize,

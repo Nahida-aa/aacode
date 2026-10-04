@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:852`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum GitStoreEvent
-{
+pub enum GitStoreEvent {
     ActiveRepositoryChanged(Option<RepositoryId>),
     // Bool is true when the repository that's updated is the active repository
     RepositoryUpdated(RepositoryId, RepositoryEvent, bool),

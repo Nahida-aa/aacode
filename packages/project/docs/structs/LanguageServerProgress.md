@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:16165`](../../../../packages
 ## Definition
 
 ```rust
-pub struct LanguageServerProgress
-{
+pub struct LanguageServerProgress {
     pub is_disk_based_diagnostics_progress: bool,
     pub is_cancellable: bool,
     pub title: Option<String>,

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/breakpoint_store.rs:927`](../../../.
 ## Definition
 
 ```rust
-pub enum BreakpointEditAction
-{
+pub enum BreakpointEditAction {
     Toggle,
     InvertState,
     EditLogMessage(Arc<str>),

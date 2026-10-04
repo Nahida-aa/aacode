@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_server_store.rs:1534`](../../../../pack
 ## Definition
 
 ```rust
-pub enum CustomAgentServerSettings
-{
+pub enum CustomAgentServerSettings {
     Custom{ .. },
     Registry{ .. },
 }

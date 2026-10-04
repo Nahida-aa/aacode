@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:16109`](../../../../packages
 ## Definition
 
 ```rust
-pub enum LanguageServerState
-{
+pub enum LanguageServerState {
     Starting{ .. },
     Running{ .. },
 }

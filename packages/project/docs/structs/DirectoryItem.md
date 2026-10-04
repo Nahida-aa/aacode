@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/directory.rs:15`](../../../../packages/projec
 ## Definition
 
 ```rust
-pub struct DirectoryItem
-{
+pub struct DirectoryItem {
     pub path: PathBuf,
     pub is_dir: bool,
 }

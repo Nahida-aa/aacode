@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/toast.rs:4`](../../../../packages/project/src
 ## Definition
 
 ```rust
-pub struct ToastLink
-{
+pub struct ToastLink {
     pub label: &'static str,
     pub url: &'static str,
 }

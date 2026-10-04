@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:808`](../../../../packages/p
 ## Definition
 
 ```rust
-pub enum RepositoryState
-{
+pub enum RepositoryState {
     Local(LocalRepositoryState),
     Remote(RemoteRepositoryState),
 }

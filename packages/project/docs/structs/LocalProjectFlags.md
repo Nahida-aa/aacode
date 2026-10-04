@@ -12,8 +12,7 @@ Defined in: [`packages/project/src/project/state.rs:29`](../../../../packages/pr
 ## Definition
 
 ```rust
-pub struct LocalProjectFlags
-{
+pub struct LocalProjectFlags {
     pub init_worktree_trust: bool,
     pub watch_global_configs: bool,
 }

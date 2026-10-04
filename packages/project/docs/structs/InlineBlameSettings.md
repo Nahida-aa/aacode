@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:553`](../../../../package
 ## Definition
 
 ```rust
-pub struct InlineBlameSettings
-{
+pub struct InlineBlameSettings {
     // Whether or not to show git blame data inline in the currently focused line. Default: true
     pub enabled: bool,
     // Whether to only show the inline blame information after a delay once the cursor stops moving. Default: 0

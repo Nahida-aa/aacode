@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/search/mod.rs:23`](../../../../packages/proje
 ## Definition
 
 ```rust
-pub enum SearchResult
-{
+pub enum SearchResult {
     Buffer{ .. },
     LimitReached,
     WaitingForScan,

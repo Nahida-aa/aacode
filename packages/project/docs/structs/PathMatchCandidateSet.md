@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/fuzzy.rs:9`](../../../../packages/project/src
 ## Definition
 
 ```rust
-pub struct PathMatchCandidateSet
-{
+pub struct PathMatchCandidateSet {
     pub snapshot: Snapshot,
     pub include_ignored: bool,
     pub include_root_name: bool,

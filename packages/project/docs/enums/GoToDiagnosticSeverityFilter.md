@@ -12,8 +12,7 @@ Allows filtering diagnostics that should be moved to.
 ## Definition
 
 ```rust
-pub enum GoToDiagnosticSeverityFilter
-{
+pub enum GoToDiagnosticSeverityFilter {
     // Move to diagnostics of a specific severity.
     Only(GoToDiagnosticSeverity),
     // Specify a range of severities to include.

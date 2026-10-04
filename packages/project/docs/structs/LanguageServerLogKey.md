@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/log_store.rs:223`](../../../../pack
 ## Definition
 
 ```rust
-pub struct LanguageServerLogKey
-{
+pub struct LanguageServerLogKey {
     pub kind: LanguageServerKind,
     pub server_id: LanguageServerId,
 }

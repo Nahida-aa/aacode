@@ -12,8 +12,7 @@ A prompt requested by LSP server.
 ## Definition
 
 ```rust
-pub struct LanguageServerPromptRequest
-{
+pub struct LanguageServerPromptRequest {
     pub id: usize,
     pub level: PromptLevel,
     pub message: String,

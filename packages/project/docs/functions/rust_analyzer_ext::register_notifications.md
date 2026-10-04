@@ -1,9 +1,9 @@
 ---
-id: project--register_notifications_2
-title: project--register_notifications_2
+id: rust_analyzer_ext::register_notifications
+title: rust_analyzer_ext::register_notifications
 ---
 
-# Function: project--register_notifications_2
+# Function: rust_analyzer_ext::register_notifications
 
 ```rust
 pub fn register_notifications(lsp_store: WeakEntity<LspStore>, language_server: &LanguageServer)

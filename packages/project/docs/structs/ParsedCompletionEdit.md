@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:3474`](../../../../package
 ## Definition
 
 ```rust
-pub struct ParsedCompletionEdit
-{
+pub struct ParsedCompletionEdit {
     pub replace_range: Range<Anchor>,
     pub insert_range: Option<Range<Anchor>>,
     pub new_text: String,

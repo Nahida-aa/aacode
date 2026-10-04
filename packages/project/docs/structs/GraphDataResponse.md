@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:669`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct GraphDataResponse<'a>
-{
+pub struct GraphDataResponse<'a> {
     pub commits: &'a [Arc<InitialGraphCommitData>],
     pub is_loading: bool,
     pub error: Option<SharedString>,

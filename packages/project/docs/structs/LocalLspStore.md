@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:312`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct LocalLspStore
-{
+pub struct LocalLspStore {
     pub worktree_store: Entity<WorktreeStore>,
     pub language_servers: HashMap<LanguageServerId, LanguageServerState>,
 }

@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/project_settings.rs:351`](../../../../package
 ## Definition
 
 ```rust
-pub enum DiagnosticSeverity
-{
+pub enum DiagnosticSeverity {
     Off,
     Error,
     Warning,

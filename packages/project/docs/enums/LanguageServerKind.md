@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/log_store.rs:202`](../../../../pack
 ## Definition
 
 ```rust
-pub enum LanguageServerKind
-{
+pub enum LanguageServerKind {
     Local{ .. },
     Remote{ .. },
     LocalSsh{ .. },

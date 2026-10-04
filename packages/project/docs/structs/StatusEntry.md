@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/git_store/mod.rs:496`](../../../../packages/p
 ## Definition
 
 ```rust
-pub struct StatusEntry
-{
+pub struct StatusEntry {
     pub repo_path: RepoPath,
     pub status: FileStatus,
     pub diff_stat: Option<DiffStat>,

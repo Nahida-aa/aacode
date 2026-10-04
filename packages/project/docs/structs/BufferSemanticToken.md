@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_store/semantic_tokens.rs:643`](../../../.
 ## Definition
 
 ```rust
-pub struct BufferSemanticToken
-{
+pub struct BufferSemanticToken {
     // The range of the token in the buffer. Guaranteed to contain a buffer id.
     pub range: Range<Anchor>,
     pub token_type: TokenType,

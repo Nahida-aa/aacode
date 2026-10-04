@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:175`](../../../../packages
 ## Definition
 
 ```rust
-pub struct GetDefinitions
-{
+pub struct GetDefinitions {
     pub position: PointUtf16,
 }
 ```

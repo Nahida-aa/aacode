@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/agent_server_store.rs:187`](../../../../packa
 ## Definition
 
 ```rust
-pub struct AgentServerStore
-{
+pub struct AgentServerStore {
     pub external_agents: HashMap<AgentId, ExternalAgentEntry>,
 }
 ```

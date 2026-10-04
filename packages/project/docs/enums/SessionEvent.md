@@ -10,8 +10,7 @@ Defined in: [`packages/project/src/debugger/session.rs:793`](../../../../package
 ## Definition
 
 ```rust
-pub enum SessionEvent
-{
+pub enum SessionEvent {
     Modules,
     LoadedSources,
     Stopped(Option<ThreadId>),
