@@ -9,13 +9,14 @@
 
 use gpui::{App, AppContext, Context, Entity, Window};
 use std::sync::Arc;
+use ui::{ContextMenu, PopoverMenuHandle};
 
 pub mod panels;
 
 /// 注册两个 observe_new：
 /// - **MultiWorkspace** → `cx.defer` 里创建 Sidebar + register_sidebar
 /// - **Workspace** → 创建 Dock Panel（agent/project/git 等）+ 注册 StatusBar 按钮
-pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) {
+pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
     // —— MultiWorkspace observe_new → Sidebar ——
     cx.observe_new(|multi_workspace: &mut workspace::MultiWorkspace, window, cx| {
         let Some(window) = window else {
@@ -41,12 +42,26 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
     .detach();
 
     // —— Workspace observe_new → StatusBar 按钮 + Dock Panels ——
-    cx.observe_new(|workspace: &mut workspace::Workspace, window, cx| {
-        let Some(window) = window else {
-            return;
-        };
+    let app_state_for_workspace = app_state.clone();
+    let edit_prediction_menu_handle = PopoverMenuHandle::default();
+    cx.observe_new({
+        let edit_prediction_menu_handle = edit_prediction_menu_handle.clone();
+        move |workspace: &mut workspace::Workspace, window, cx| {
+            let Some(window) = window else {
+                return;
+            };
 
-        register_status_bar_items(workspace, window, cx);
+            // 对齐 Zed `crates/zed/src/zed.rs`：EditPredictionButton 的菜单由
+            // `ToggleMenu` action 通过 PopoverMenuHandle 切换。
+            workspace.register_action({
+                let handle = edit_prediction_menu_handle.clone();
+                move |_, _: &edit_prediction_ui::ToggleMenu, window, cx| {
+                    handle.toggle(window, cx);
+                }
+            });
+
+            let app_state = app_state_for_workspace.clone();
+            register_status_bar_items(workspace, window, cx, &app_state, edit_prediction_menu_handle.clone());
 
         // 对齐 Zed `crates/zed/src/zed.rs L901-L906` — 注册 AgentPanel 相关 action。
         // 放在主应用层而不是 agent_ui crate 的 init 里，避免重复注册。
@@ -57,6 +72,7 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
 
         let panels_task = panels::initialize_panels(window, cx);
         workspace.set_panels_task(panels_task);
+    }
     })
     .detach();
 }
@@ -64,16 +80,23 @@ pub fn initialize_workspace(_app_state: Arc<workspace::AppState>, cx: &mut App) 
 /// 对齐 Zed `crates/zed/src/zed.rs L602-L652`。
 /// 在 Workspace 创建后、initialize_panels 前，把所有非 dock 的状态栏按钮注册进 StatusBar。
 ///
-/// 目前只注册 aacode 已有 crate 里的类型；缺失 crate（diagnostics, encoding_selector,
-/// language_selector, toolchain_selector, language_tools, which_key, line_ending_selector）
-/// 需要逐个从 Zed 搬过来后再加。
+/// 已显示项（aacode 已有 crate）：
+/// - diagnostic_summary（左）、edit_prediction_ui（右）、active_buffer_encoding（右）、
+///   active_toolchain_language（右）
+///
+/// 暂未实现、无法显示：lsp_button（缺 language_tools crate）、image_info（image_viewer
+/// 尚无 StatusItemView）。
 fn register_status_bar_items(
     workspace: &mut workspace::Workspace,
     window: &mut Window,
     cx: &mut Context<workspace::Workspace>,
+    app_state: &workspace::AppState,
+    edit_prediction_menu_handle: PopoverMenuHandle<ContextMenu>,
 ) {
     // —— Left side ——
     let search_button = cx.new(|_| search::search_status_button::SearchButton::new());
+    let diagnostic_summary =
+        cx.new(|cx| diagnostics::items::DiagnosticIndicator::new(workspace, cx));
     let active_file_name = cx.new(|_| workspace::active_file_name::ActiveFileName::new());
     let activity_indicator =
         activity_indicator::ActivityIndicator::new(workspace, window, cx);
@@ -82,23 +105,40 @@ fn register_status_bar_items(
         cx.new(|cx| git_ui::MergeConflictIndicator::new(workspace, cx));
 
     // —— Right side ——
-    let cursor_position =
-        cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
+    let edit_prediction_ui = cx.new(|cx| {
+        edit_prediction_ui::EditPredictionButton::new(
+            app_state.fs.clone(),
+            app_state.user_store.clone(),
+            edit_prediction_menu_handle,
+            workspace.project().clone(),
+            cx,
+        )
+    });
+    let active_buffer_encoding =
+        cx.new(|_| encoding_selector::ActiveBufferEncoding::new(workspace));
     let active_buffer_language =
         cx.new(|_| language_selector::ActiveBufferLanguage::new(workspace));
+    let active_toolchain_language =
+        cx.new(|cx| toolchain_selector::ActiveToolchain::new(workspace, window, cx));
+    let cursor_position =
+        cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
     let vim_mode_indicator = cx.new(|cx| vim::ModeIndicator::new(window, cx));
 
-    // —— 统一注册进 StatusBar ——
+    // —— 统一注册进 StatusBar（顺序对齐 Zed）——
     let status_bar = workspace.status_bar().clone();
     status_bar.update(cx, |status_bar, cx| {
         status_bar.add_left_item(search_button, window, cx);
+        status_bar.add_left_item(diagnostic_summary, window, cx);
         status_bar.add_left_item(active_file_name, window, cx);
         status_bar.add_left_item(git_blame_status, window, cx);
         status_bar.add_left_item(merge_conflict_indicator, window, cx);
         status_bar.add_left_item(activity_indicator, window, cx);
 
-        status_bar.add_right_item(cursor_position, window, cx);
+        status_bar.add_right_item(edit_prediction_ui, window, cx);
+        status_bar.add_right_item(active_buffer_encoding, window, cx);
         status_bar.add_right_item(active_buffer_language, window, cx);
+        status_bar.add_right_item(active_toolchain_language, window, cx);
+        status_bar.add_right_item(cursor_position, window, cx);
         // 保持 vim 模式指示器在最右侧（Zed 原版也放在最后）
         status_bar.add_right_item(vim_mode_indicator, window, cx);
     });
