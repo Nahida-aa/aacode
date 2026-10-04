@@ -515,45 +515,4 @@ impl Project {
             this
         })
     }
-
-    #[cfg(feature = "test-support")]
-    pub async fn example(
-        root_paths: impl IntoIterator<Item = &std::path::Path>,
-        cx: &mut gpui::AsyncApp,
-    ) -> Entity<Project> {
-        use clock::FakeSystemClock;
-
-        let fs = RealFs::new(None, cx.background_executor().clone());
-        let languages = LanguageRegistry::test(cx.background_executor().clone());
-        let clock = Arc::new(FakeSystemClock::new());
-        let http_client = http_client::FakeHttpClient::with_404_response();
-        let client = cx.update(|cx| client::Client::new(clock, http_client.clone(), cx));
-        let user_store = cx.new(|cx| UserStore::new(client.clone(), cx));
-        let project = cx.update(|cx| {
-            Project::local(
-                client,
-                node_runtime::NodeRuntime::unavailable(),
-                user_store,
-                Arc::new(languages),
-                fs,
-                None,
-                LocalProjectFlags {
-                    init_worktree_trust: false,
-                    ..Default::default()
-                },
-                cx,
-            )
-        });
-        for path in root_paths {
-            let (tree, _): (Entity<Worktree>, _) = project
-                .update(cx, |project, cx| {
-                    project.find_or_create_worktree(path, true, cx)
-                })
-                .await
-                .unwrap();
-            tree.read_with(cx, |tree, _| tree.as_local().unwrap().scan_complete())
-                .await;
-        }
-        project
-    }
 }

@@ -18,6 +18,7 @@ use http_client::HttpClientWithUrl;
 use parking_lot::Mutex;
 use postage::watch;
 use rpc::Peer;
+use rpc::Connection;
 use rpc::ProtoMessageHandlerSet;
 
 use crate::credentials::{ClientCredentialsProvider, Credentials};

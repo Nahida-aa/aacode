@@ -124,4 +124,44 @@ impl Project {
     pub fn git_config(&self, path: Arc<Path>, args: Vec<String>, cx: &App) -> Task<Result<String>> {
         self.git_store.read(cx).git_config(path, args, cx)
     }
+
+    pub fn project_path_git_status(
+        &self,
+        project_path: &ProjectPath,
+        cx: &App,
+    ) -> Option<FileStatus> {
+        self.git_store
+            .read(cx)
+            .project_path_git_status(project_path, cx)
+    }
+
+    /// Opens the unstaged (index-vs-worktree) diff for the given buffer, along
+    /// with the worktree text buffer that is the diff's main buffer.
+    pub fn open_unstaged_diff(
+        &mut self,
+        buffer: Entity<Buffer>,
+        cx: &mut Context<Self>,
+    ) -> Task<Result<Entity<BufferDiff>>> {
+        if self.is_disconnected(cx) {
+            return Task::ready(Err(anyhow!(ErrorCode::Disconnected)));
+        }
+        self.git_store.update(cx, |git_store, cx| {
+            git_store.open_unstaged_diff(buffer, cx)
+        })
+    }
+
+    /// Opens the staged (HEAD-vs-index) diff for the given buffer, along with
+    /// the index text buffer that is the diff's main buffer.
+    pub fn open_staged_diff(
+        &mut self,
+        buffer: Entity<Buffer>,
+        cx: &mut Context<Self>,
+    ) -> Task<Result<(Entity<BufferDiff>, Entity<Buffer>)>> {
+        if self.is_disconnected(cx) {
+            return Task::ready(Err(anyhow!(ErrorCode::Disconnected)));
+        }
+        self.git_store.update(cx, |git_store, cx| {
+            git_store.open_staged_diff(buffer, cx)
+        })
+    }
 }

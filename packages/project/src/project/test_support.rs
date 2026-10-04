@@ -1,15 +1,19 @@
 use super::*;
 
+use ::rpc::proto;
+use anyhow::{Result, anyhow};
 use std::path::Path;
 
-use gpui::{App, AsyncApp, Context, Entity, TestAppContext};
+use gpui::{App, AppContext as _, AsyncApp, Context, Entity, TestAppContext};
 use language::LanguageRegistry;
 use node_runtime::NodeRuntime;
 use util::paths::PathStyle;
 
 use super::Project;
 use crate::ProjectEnvironmentEvent;
+use crate::lsp_store;
 use crate::types::*;
+use crate::{RealFs, Worktree};
 
 impl Project {
     pub fn client_subscriptions(&self) -> &Vec<client::Subscription> { &self.client_subscriptions }
@@ -134,7 +138,7 @@ impl Project {
         abs_path: &str,
         cx: &mut Context<Self>,
     ) -> Entity<Worktree> {
-        use rpc::NoopProtoClient;
+        use ::rpc::NoopProtoClient;
         use util::paths::PathStyle;
 
         let root_name = std::path::Path::new(abs_path)
@@ -195,6 +199,33 @@ impl Project {
                 project.register_buffer_with_language_servers(&buffer, cx)
             })?;
             Ok((buffer, handle))
+        })
+    }
+
+    /// 等待所有 worktree 的 git scan 完成，并等待各 repository 的 job barrier 清空。
+    ///
+    /// 仅测试使用：作为「git 状态已就绪」的同步屏障。
+    pub fn git_scans_complete(&self, cx: &Context<Self>) -> Task<()> {
+        use futures::future::join_all;
+        cx.spawn(async move |this, cx| {
+            let scans_complete = this
+                .read_with(cx, |this, cx| {
+                    this.worktrees(cx)
+                        .filter_map(|worktree| Some(worktree.read(cx).as_local()?.scan_complete()))
+                        .collect::<Vec<_>>()
+                })
+                .unwrap();
+            join_all(scans_complete).await;
+            let barriers = this
+                .update(cx, |this, cx| {
+                    let repos = this.repositories(cx).values().cloned().collect::<Vec<_>>();
+                    repos
+                        .into_iter()
+                        .map(|repo| repo.update(cx, |repo, _| repo.barrier()))
+                        .collect::<Vec<_>>()
+                })
+                .unwrap();
+            join_all(barriers).await;
         })
     }
 }

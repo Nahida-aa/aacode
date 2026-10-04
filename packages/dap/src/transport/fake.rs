@@ -250,14 +250,14 @@ impl FakeTransport {
 
 #[cfg(any(test, feature = "test-support"))]
 impl Transport for FakeTransport {
-    pub(crate) fn tcp_arguments(&self) -> Option<TcpArguments> {
+    fn tcp_arguments(&self) -> Option<TcpArguments> {
         match &self.kind {
             FakeTransportKind::Stdio { .. } => None,
             FakeTransportKind::Tcp { connection, .. } => Some(connection.clone()),
         }
     }
 
-    pub(crate) fn connect(
+    fn connect(
         &mut self,
     ) -> Task<
         Result<(
@@ -295,10 +295,10 @@ impl Transport for FakeTransport {
         Task::ready(result)
     }
 
-    pub(crate) fn has_adapter_logs(&self) -> bool { false }
+    fn has_adapter_logs(&self) -> bool { false }
 
-    pub(crate) fn kill(&mut self) { self.message_handler.take(); }
+    fn kill(&mut self) { self.message_handler.take(); }
 
     #[cfg(any(test, feature = "test-support"))]
-    pub(crate) fn as_fake(&self) -> &FakeTransport { self }
+    fn as_fake(&self) -> &FakeTransport { self }
 }

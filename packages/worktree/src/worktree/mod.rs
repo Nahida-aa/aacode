@@ -98,6 +98,12 @@ mod test_support;
 
 pub use constants::{FS_WATCH_LATENCY, ROOT_PATH_CHECK_INTERVAL};
 pub(crate) use constants::STREAM_BLOCK_BYTES;
+// `model_handle.rs` 经 `use super::*` 取用这两个 sentinel 重试工具与常量
+// （上游 zed 里它们和 flush_fs_events 同在 worktree.rs，拆分后需要在此转发）。
+#[cfg(feature = "test-support")]
+pub(crate) use constants::SENTINEL_RETRY_TICKS;
+#[cfg(feature = "test-support")]
+pub(crate) use test_support::{retouch_and_remove_sentinel, retouch_sentinel};
 pub use entry::{
     Entry, EntryKind, PathChange, ProjectEntryId, UpdatedEntriesSet, UpdatedGitRepositoriesSet,
     UpdatedGitRepository,

@@ -12,9 +12,11 @@ mod types;
 
 pub(crate) use delegate::TransportDelegate;
 #[cfg(any(test, feature = "test-support"))]
-pub use fake::{FakeTransport, FakeTransportKind, RequestHandling};
+pub use fake::{FakeTransport, FakeTransportKind};
 pub(crate) use pending::PendingRequests;
 pub use stdio::StdioTransport;
 pub use tcp::TcpTransport;
 pub use transport_trait::Transport;
 pub use types::{Command, IoHandler, IoKind, IoMessage, LogHandlers, LogKind};
+#[cfg(any(test, feature = "test-support"))]
+pub use types::RequestHandling;
