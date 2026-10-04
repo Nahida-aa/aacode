@@ -74,3 +74,39 @@ GPUI 桌面（`packages/app` + `packages/workspace` + `packages/ui`）是唯一�
 - 遇到签名不一致时：**先暂停并提问**，判断是否为有意调整。
 - 对 L2 文件（归一化后仍有差异）也要优先考虑语义变动而非行文差异。
 - 具体的符号差异清单**按需生成**（处理区间变更时针对受影响范围分析），避免事先穷尽列出所有差异。
+
+### 不要照搬 zed 的 dev-dependencies 自引用（已移除）
+
+`crates/project/Cargo.toml` 的 `[dev-dependencies]` 里有
+
+```toml
+project = {workspace = true, features = ["test-support"]}   # 指向自己
+```
+
+**这一行在 aacode 里已被移除，且不要在同步时加回来。**
+
+原因：rustc 遇到 crate 的 dev-dependency 指向自身时，会为 unit test 构建**两份**该crate——一份带 `cfg(test)`（给 lib 内测试访问私有 API），一份库版（给 dev-dep 用公开 API）。两份各自带一份 `inventory` section，同名 action 就被注册两次：
+
+```
+ActionRegistry::load_actions() -> insert_action()
+-> panic: Action with name `context_server::Restart` already registered
+```
+
+panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所以 `packages/project` 里**每一个** `#[gpui::test]` 都会 panic（不是某个测试的问题）。
+
+实测（用 `gpui::generate_list_of_all_registered_actions()` / `inventory::iter::<gpui::MacroActionBuilder>` 计数）：
+
+| | TOTAL | DISTINCT | DUP |
+|---|---|---|---|
+| 保留自引用 | 236 | 235 | `context_server::Restart x2`（两个 fn 指针不同） |
+| 移除自引用 | 235 | 235 | 0 |
+
+**为什么 aacode 可以安全移除，而 zed 需要它**：
+- zed 的 `crates/project/tests/integration/` 存在，integration test 需要以库的公开 API 链接一份带 test-support 的 project，因此需要自引用来统一 feature
+- aacode 的 `packages/project` **没有 `tests/`、`examples/`、`benches/`** 目录（integration 测试套件在同步时按「有意裁剪」处理掉了），自引用没有任何消费方
+
+**排查这类问题的可复用手法**（下次遇到 action/registry 重复注册直接照搬）：
+1. `gpui::generate_list_of_all_registered_actions()` 数 TOTAL / DISTINCT，确认是否真有重名
+2. `inventory::iter::<gpui::MacroActionBuilder>` 取每个 builder 的 `fn` 指针地址，`same_code` 判断是「同一份代码被调用两次」还是「两处独立声明」
+3. `grep -c '^name = "<crate>"' Cargo.lock` 与 `cargo tree -d` 排除「同名 crate 两个来源」（`-d` 里出现 workspace member 或 gpui_learn 包才算异常；第三方 crate 多版本属正常）
+4. 若确认是同一 crate 两份编译实例，检查该 crate 的 `[dev-dependencies]` 有没有指向自己
