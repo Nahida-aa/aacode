@@ -111,7 +111,7 @@ impl Project {
         Ok(proto::Ack {})
     }
 
-    async fn handle_update_buffer(
+    pub(crate) async fn handle_update_buffer(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::UpdateBuffer>,
         cx: AsyncApp,
@@ -145,7 +145,7 @@ impl Project {
         BufferStore::handle_update_buffer(buffer_store, envelope, cx).await
     }
 
-    async fn handle_synchronize_buffers(
+    pub(crate) async fn handle_synchronize_buffers(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::SynchronizeBuffers>,
         mut cx: AsyncApp,
@@ -162,7 +162,7 @@ impl Project {
 
     // Goes from client to host.
 
-    async fn handle_toggle_lsp_logs(
+    pub(crate) async fn handle_toggle_lsp_logs(
         project: Entity<Self>,
         envelope: TypedEnvelope<proto::ToggleLspLogs>,
         mut cx: AsyncApp,

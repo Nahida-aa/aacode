@@ -1046,11 +1046,11 @@ impl FakeFs {
             use git::Oid;
 
             state.merge_base_contents.clear();
-            let oids = (1..)
-                .map(|n| n.to_string())
-                .map(|n| Oid::from_bytes(n.repeat(20).as_bytes()).unwrap());
             let mut assigned = Vec::with_capacity(contents_by_path.len());
-            for ((path, content), oid) in contents_by_path.iter().zip(oids) {
+            for (index, (path, content)) in contents_by_path.iter().enumerate() {
+                let mut bytes = [0u8; 20];
+                bytes[..4].copy_from_slice(&((index as u32) + 1).to_be_bytes());
+                let oid = Oid::from_bytes(&bytes).unwrap();
                 state.merge_base_contents.insert(repo_path(path), oid);
                 state.oids.insert(oid, content.as_bytes().to_vec());
                 assigned.push(oid);

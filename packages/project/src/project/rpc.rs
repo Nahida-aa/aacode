@@ -29,7 +29,7 @@ use crate::worktree_store::WorktreeStore;
 use crate::{BufferOrderedMessage, DownloadingFile, Event, ProjectPath, SearchQuery};
 
 impl Project {
-    async fn handle_unshare_project(
+    pub(crate) async fn handle_unshare_project(
         this: Entity<Self>,
         _: TypedEnvelope<proto::UnshareProject>,
         mut cx: AsyncApp,
@@ -44,7 +44,7 @@ impl Project {
         })
     }
 
-    async fn handle_add_collaborator(
+    pub(crate) async fn handle_add_collaborator(
         this: Entity<Self>,
         mut envelope: TypedEnvelope<proto::AddProjectCollaborator>,
         mut cx: AsyncApp,
@@ -69,7 +69,7 @@ impl Project {
         Ok(())
     }
 
-    async fn handle_update_project_collaborator(
+    pub(crate) async fn handle_update_project_collaborator(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::UpdateProjectCollaborator>,
         mut cx: AsyncApp,
@@ -111,7 +111,7 @@ impl Project {
         })
     }
 
-    async fn handle_remove_collaborator(
+    pub(crate) async fn handle_remove_collaborator(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::RemoveProjectCollaborator>,
         mut cx: AsyncApp,
@@ -332,7 +332,7 @@ impl Project {
         })
     }
 
-    async fn handle_search_candidate_buffers(
+    pub(crate) async fn handle_search_candidate_buffers(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::FindSearchCandidates>,
         mut cx: AsyncApp,
@@ -413,7 +413,7 @@ impl Project {
         Ok(proto::Ack {})
     }
 
-    async fn handle_open_buffer_by_id(
+    pub(crate) async fn handle_open_buffer_by_id(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::OpenBufferById>,
         mut cx: AsyncApp,
@@ -426,7 +426,7 @@ impl Project {
         Project::respond_to_open_buffer_request(this, buffer, peer_id, &mut cx)
     }
 
-    async fn handle_open_buffer_by_path(
+    pub(crate) async fn handle_open_buffer_by_path(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::OpenBufferByPath>,
         mut cx: AsyncApp,
@@ -442,7 +442,7 @@ impl Project {
         Project::respond_to_open_buffer_request(this, open_buffer, peer_id, &mut cx)
     }
 
-    async fn handle_open_new_buffer(
+    pub(crate) async fn handle_open_new_buffer(
         this: Entity<Self>,
         envelope: TypedEnvelope<proto::OpenNewBuffer>,
         mut cx: AsyncApp,
@@ -455,7 +455,7 @@ impl Project {
         Project::respond_to_open_buffer_request(this, buffer, peer_id, &mut cx)
     }
 
-    fn respond_to_open_buffer_request(
+    pub(crate) fn respond_to_open_buffer_request(
         this: Entity<Self>,
         buffer: Entity<Buffer>,
         peer_id: proto::PeerId,
@@ -474,7 +474,7 @@ impl Project {
         })
     }
 
-    fn create_buffer_for_peer(
+    pub(crate) fn create_buffer_for_peer(
         &mut self,
         buffer: &Entity<Buffer>,
         peer_id: proto::PeerId,
