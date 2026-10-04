@@ -60,6 +60,9 @@ fn main() {
         terminal_view::init(cx);
         title_bar::init(cx); // 内部 observe_new(|ws| ws.set_titlebar_item)
         theme_selector::init(cx); // 注册 Toggle action handler
+        // 对齐 Zed main.rs：注册 zed_prompt_renderer，覆盖 gpui 的 fallback
+        // 弹窗（否则关闭未保存文件等 prompt 会是朴素白框样式）。
+        ui_prompt::init(cx);
 
         // —— Panel init（对齐 Zed zed.rs L6174-6176）——
         git_ui::init(cx);

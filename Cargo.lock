@@ -143,6 +143,7 @@ dependencies = [
  "toolchain_selector",
  "tracing",
  "tracing-subscriber",
+ "ui_prompt",
  "util",
  "uuid",
  "vim",
@@ -13537,7 +13538,6 @@ dependencies = [
  "postage",
  "prettier",
  "pretty_assertions",
- "project",
  "rand 0.9.5",
  "regex",
  "release_channel 0.1.0",
@@ -18348,6 +18348,20 @@ dependencies = [
 [[package]]
 name = "ui"
 version = "0.1.0"
+
+[[package]]
+name = "ui_prompt"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "gpui",
+ "markdown",
+ "menu",
+ "settings",
+ "theme_settings",
+ "workspace",
+]
 
 [[package]]
 name = "unarray"

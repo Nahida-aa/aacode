@@ -1,0 +1,24 @@
+[package]
+name = "ui_prompt"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+
+[lib]
+test = false
+doctest = false
+
+[features]
+default = []
+
+[dependencies]
+gpui.workspace = true
+markdown.workspace = true
+menu.workspace = true
+settings.workspace = true
+theme.workspace = true
+theme_settings.workspace = true
+ui.workspace = true
+workspace.workspace = true
