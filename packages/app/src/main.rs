@@ -68,6 +68,10 @@ fn main() {
         git_ui::init(cx);
         project_panel::init(cx);
         outline_panel::init(cx);
+        // 注册 aacode_actions::OpenKeymap 的 handler：标题栏「用户」菜单里的
+        // Keymap 项、welcome 里的 Keymap 卡片都 dispatch 这个 action，没有它
+        // 点击就毫无反应（面板类型已实现，缺的是这里的注册，见 zed main.rs L785）。
+        keymap_editor::init(cx);
 
         // —— Fs 全局 ——
         <dyn fs::Fs>::set_global(fs.clone(), cx);

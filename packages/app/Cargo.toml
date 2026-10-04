@@ -130,6 +130,7 @@ http_client.workspace = true
 image_viewer.workspace = true
 language_tools.workspace = true
 line_ending_selector.workspace = true
+keymap_editor.workspace = true
 which_key.workspace = true
 ui_prompt.workspace = true
 
