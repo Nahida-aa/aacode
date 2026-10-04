@@ -1,5 +1,7 @@
 use crate::fake_git_repo;
-use crate::fake_git_repo::{FakeCommitDataEntry, FakeGitRepository, FakeGitRepositoryState};
+use crate::fake_git_repo::{
+    FakeBlobReadGate, FakeCommitDataEntry, FakeGitRepository, FakeGitRepositoryState,
+};
 use crate::file_handle::FileHandle;
 use crate::fs_watcher;
 use crate::jobs::{JobEventReceiver, JobEventSender};
@@ -1039,7 +1041,7 @@ impl FakeFs {
         &self,
         dot_git: &Path,
         contents_by_path: &[(&str, String)],
-    ) {
+    ) -> Vec<git::Oid> {
         self.with_git_state(dot_git, true, |state| {
             use git::Oid;
 
@@ -1047,12 +1049,24 @@ impl FakeFs {
             let oids = (1..)
                 .map(|n| n.to_string())
                 .map(|n| Oid::from_bytes(n.repeat(20).as_bytes()).unwrap());
+            let mut assigned = Vec::with_capacity(contents_by_path.len());
             for ((path, content), oid) in contents_by_path.iter().zip(oids) {
                 state.merge_base_contents.insert(repo_path(path), oid);
                 state.oids.insert(oid, content.as_bytes().to_vec());
+                assigned.push(oid);
             }
+            assigned
+        })
+        .unwrap()
+    }
+
+    pub fn install_blob_read_gate_for_repo(&self, dot_git: &Path) -> FakeBlobReadGate {
+        let gate = FakeBlobReadGate::default();
+        self.with_git_state(dot_git, false, |state| {
+            state.blob_read_gate = Some(gate.clone());
         })
         .unwrap();
+        gate
     }
 
     pub fn set_blame_for_repo(&self, dot_git: &Path, blames: Vec<(RepoPath, git::blame::Blame)>) {

@@ -32,6 +32,8 @@ pub use watcher::{PathEvent, PathEventKind, Watcher};
 
 #[cfg(feature = "test-support")]
 pub use fake_fs::FakeFs;
+#[cfg(feature = "test-support")]
+pub use fake_git_repo::FakeBlobReadGate;
 
 struct GlobalFs(Arc<dyn Fs>);
 

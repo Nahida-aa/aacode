@@ -12335,6 +12335,178 @@ mod tests {
             repo_paths(&["submodule/a.txt", "submodule/nested/b.txt", "top_level.rs"])
         );
     }
+
+/// 装上 blob 读取闸门并等到 git scan 完成，返回闸门、active repository
+    /// 以及 `count` 个内容的 oid。三个并发上限测试共用。
+    async fn setup_gated_blob_reads(
+        cx: &mut TestAppContext,
+        count: usize,
+    ) -> (fs::FakeBlobReadGate, Entity<Repository>, Vec<git::Oid>) {
+        use util::path;
+
+        let project_root = Path::new(path!("/project"));
+        let dot_git = project_root.join(".git");
+        let fs = FakeFs::new(cx.executor());
+        fs.insert_tree(project_root, json!({ ".git": {} })).await;
+
+        let entries = (0..count)
+            .map(|index| (format!("f{index:02}.txt"), format!("blob-{index:02}\n")))
+            .collect::<Vec<_>>();
+        let entry_refs = entries
+            .iter()
+            .map(|(name, content)| (name.as_str(), content.clone()))
+            .collect::<Vec<_>>();
+        let oids = fs.set_merge_base_content_for_repo(&dot_git, &entry_refs);
+        let gate = fs.install_blob_read_gate_for_repo(&dot_git);
+
+        let project = Project::test(fs, [project_root], cx).await;
+        project
+            .update(cx, |project, cx| project.git_scans_complete(cx))
+            .await;
+        let repository =
+            project.read_with(cx, |project, cx| project.active_repository(cx).unwrap());
+        (gate, repository, oids)
+    }
+
+    #[gpui::test]
+    async fn test_blob_reads_are_bounded(cx: &mut TestAppContext) {
+        init_test(cx);
+        let (gate, repository, oids) =
+            setup_gated_blob_reads(cx, MAX_CONCURRENT_OBJECT_READS + 4).await;
+
+        let reads = oids
+            .iter()
+            .map(|oid| {
+                repository.update(cx, |repository, cx| repository.load_blob_content(*oid, cx))
+            })
+            .collect::<Vec<_>>();
+        cx.run_until_parked();
+
+        assert_eq!(gate.peak_concurrent(), MAX_CONCURRENT_OBJECT_READS);
+        assert_eq!(gate.waiting(), MAX_CONCURRENT_OBJECT_READS);
+
+        gate.open();
+        cx.run_until_parked();
+        for read in reads {
+            read.await.unwrap();
+        }
+    }
+
+    #[gpui::test]
+    async fn test_cancelled_blob_read_releases_permit(cx: &mut TestAppContext) {
+        init_test(cx);
+        let (gate, repository, oids) =
+            setup_gated_blob_reads(cx, MAX_CONCURRENT_OBJECT_READS + 1).await;
+
+        let mut holding = oids[..MAX_CONCURRENT_OBJECT_READS]
+            .iter()
+            .map(|oid| {
+                repository.update(cx, |repository, cx| repository.load_blob_content(*oid, cx))
+            })
+            .collect::<Vec<_>>();
+        cx.run_until_parked();
+        assert_eq!(gate.waiting(), MAX_CONCURRENT_OBJECT_READS);
+
+        // One more read can't get a permit, so it never reaches the backend.
+        let blocked_oid = oids[MAX_CONCURRENT_OBJECT_READS];
+        let _blocked = repository.update(cx, |repository, cx| {
+            repository.load_blob_content(blocked_oid, cx)
+        });
+        cx.run_until_parked();
+        assert!(!gate.is_waiting(blocked_oid));
+
+        let cancelled_oid = oids[0];
+        drop(holding.remove(0));
+        cx.run_until_parked();
+        assert!(gate.is_waiting(blocked_oid));
+        assert!(!gate.is_waiting(cancelled_oid));
+        assert_eq!(gate.waiting(), MAX_CONCURRENT_OBJECT_READS);
+        assert_eq!(gate.peak_concurrent(), MAX_CONCURRENT_OBJECT_READS);
+
+        gate.open();
+        cx.run_until_parked();
+    }
+
+    #[gpui::test]
+    async fn test_commit_reads_do_not_wait_on_job_queue(cx: &mut TestAppContext) {
+        init_test(cx);
+        let (_gate, repository, oids) = setup_gated_blob_reads(cx, 1).await;
+        let sha = oids[0].to_string();
+
+        // Hold the serial job queue the way an in-flight fetch does.
+        let (release_tx, release_rx) = oneshot::channel::<()>();
+        let held = repository.update(cx, |repository, _| {
+            repository.send_job("hold", None, move |_, _| async move {
+                release_rx.await.ok();
+            })
+        });
+
+        let details =
+            repository.update(cx, |repository, cx| repository.show_commit(sha.clone(), cx));
+        let diff = repository.update(cx, |repository, cx| {
+            repository.load_commit_diff(sha.clone(), false, cx)
+        });
+        let mut by_ref = repository.update(cx, |repository, _| repository.show(sha.clone()));
+        cx.run_until_parked();
+
+        let details = details
+            .now_or_never()
+            .expect("show_commit waited on the job queue")
+            .unwrap();
+        assert_eq!(details.sha.as_ref(), sha);
+        diff.now_or_never()
+            .expect("load_commit_diff waited on the job queue")
+            .unwrap();
+        assert!(
+            (&mut by_ref).now_or_never().is_none(),
+            "show skipped the job queue"
+        );
+
+        release_tx.send(()).ok();
+        held.await.unwrap();
+        cx.run_until_parked();
+        assert_eq!(by_ref.await.unwrap().unwrap().sha.as_ref(), sha);
+    }
+
+    #[gpui::test]
+    async fn test_commit_reads_share_object_read_limit(cx: &mut TestAppContext) {
+        init_test(cx);
+        let (gate, repository, oids) =
+            setup_gated_blob_reads(cx, MAX_CONCURRENT_OBJECT_READS).await;
+        let sha = oids[0].to_string();
+
+        let _holding = oids
+            .iter()
+            .map(|oid| {
+                repository.update(cx, |repository, cx| repository.load_blob_content(*oid, cx))
+            })
+            .collect::<Vec<_>>();
+        cx.run_until_parked();
+        assert_eq!(gate.waiting(), MAX_CONCURRENT_OBJECT_READS);
+
+        let mut details =
+            repository.update(cx, |repository, cx| repository.show_commit(sha.clone(), cx));
+        let mut diff = repository.update(cx, |repository, cx| {
+            repository.load_commit_diff(sha, false, cx)
+        });
+        cx.run_until_parked();
+        assert!(
+            (&mut details).now_or_never().is_none(),
+            "show_commit skipped the object read limit"
+        );
+        assert!(
+            (&mut diff).now_or_never().is_none(),
+            "load_commit_diff skipped the object read limit"
+        );
+
+        gate.release(oids[0]);
+        cx.run_until_parked();
+        details.await.unwrap();
+        diff.await.unwrap();
+
+        gate.open();
+        cx.run_until_parked();
+    }
 }
 
 /// This snapshot computes the repository state on the foreground thread while
