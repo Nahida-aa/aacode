@@ -34,7 +34,7 @@ aacode 在重命名层面做了以下映射（fork-sync 归一化时已考虑）
 - 终端/远程 shell 处理有本地调整（配合 proto/remote_server）
 - 部分功能有意裁剪或调整，导致与 zed old 存在大量归一化后仍不可解释的差异（L2）
 - `packages/project/src/project/*` 归类为 SPLIT（结构性拆分），不做文件级逐行比对，区间同步时按需核对
-- `packages/project/src/types/*`、`impls.rs`、`path.rs`、`protocol_helpers.rs`、`tests.rs`、`fuzzy.rs`、`event.rs`、`lib.rs` 等在 zed old（bd747337）不存在且区间无变更 → 标记为 `AACODE_LOCAL`
+- `packages/project/src/types/*`、`impls.rs`、`path.rs`、`protocol_helpers.rs`、`tests.rs`、`fuzzy.rs`、`event.rs`、`lib.rs` 等：源自结构性提取/拆分（aacode 基线重组时从原始大文件提取形成），在 zed old（bd747337）中无直接同名文件，且区间内未变更。同步时需结合原始大文件（如 `crates/project/src/project.rs`）按符号核对，而不是简单视为全新特性。
 
 ## 5. 主线范围约束
 
