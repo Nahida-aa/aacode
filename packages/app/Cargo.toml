@@ -127,6 +127,8 @@ diagnostics.workspace = true
 encoding_selector.workspace = true
 toolchain_selector.workspace = true
 http_client.workspace = true
+image_viewer.workspace = true
+language_tools.workspace = true
 
 
 languages = { workspace = true, features = ["load-grammars"] }
