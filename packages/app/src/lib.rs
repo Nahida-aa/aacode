@@ -5,6 +5,7 @@
 //! - `initialize` — observe_new 注册（Sidebar / Panels），对齐 Zed `zed.rs::initialize_workspace`
 //! - `reliability` — 可靠性 / 崩溃恢复（暂空）
 
+pub mod app_menus;
 pub mod core;
 pub mod initialize;
 pub mod reliability;

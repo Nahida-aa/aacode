@@ -73,6 +73,19 @@ pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
                 }
             });
 
+            // 对齐 Zed `crates/zed/src/zed.rs L1024-L1041`：Window 菜单的窗口级
+            // action 需要 `&mut Window`，所以在 workspace 上注册。
+            workspace
+                .register_action(|_, _: &crate::app_menus::Minimize, window, _| {
+                    window.minimize_window();
+                })
+                .register_action(|_, _: &crate::app_menus::Zoom, window, _| {
+                    window.zoom_window();
+                })
+                .register_action(|_, _: &crate::app_menus::ToggleFullScreen, window, _| {
+                    window.toggle_fullscreen();
+                });
+
             let app_state = app_state_for_workspace.clone();
             register_status_bar_items(
                 workspace,

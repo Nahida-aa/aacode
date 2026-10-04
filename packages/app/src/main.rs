@@ -10,8 +10,7 @@
 //! - Sidebar / TitleBar / Panels 全由 `observe_new` 自动注入。
 
 use gpui::{
-    App, AppContext, Menu, MenuItem, NoAction, SharedString,
-    WindowBackgroundAppearance, WindowDecorations, px, size,
+    App, AppContext, SharedString, WindowDecorations, px, size,
 };
 use gpui_platform::application;
 use std::sync::Arc;
@@ -193,72 +192,12 @@ fn main() {
         aa_app_lib::initialize::initialize_workspace(app_state.clone(), cx);
 
         // —— 设置应用菜单（application_menu 靠 cx.get_menus() 读取数据）——
-        // Zed 原版由 app_menus.rs 构建完整菜单体系；aacode 还没迁完整，
-        // 先提供简化版本让 application_menu 能渲染出来。
+        // 对齐 Zed：菜单体系由 app_menus.rs 构建；App 级 action 的 handler 在这里注册。
         // 放在 open_window 之前因为 title_bar::init 已在上面 observe 了 Workspace。
-        cx.set_menus(vec![
-            Menu {
-                name: "aacode".into(),
-                disabled: false,
-                items: vec![
-                    MenuItem::action("About aacode", NoAction),
-                    MenuItem::separator(),
-                    MenuItem::action("Settings", settings_ui::OpenSettings),
-                ],
-            },
-            Menu {
-                name: "File".into(),
-                disabled: false,
-                items: vec![
-                    MenuItem::action("New", NoAction),
-                    MenuItem::action("Open", NoAction),
-                    MenuItem::separator(),
-                    MenuItem::action("Save", NoAction),
-                    MenuItem::action("Save As", NoAction),
-                    MenuItem::separator(),
-                    MenuItem::action("Close", NoAction),
-                    MenuItem::action("Quit", NoAction),
-                ],
-            },
-            Menu {
-                name: "Edit".into(),
-                disabled: false,
-                items: vec![
-                    MenuItem::action("Undo", NoAction),
-                    MenuItem::action("Redo", NoAction),
-                    MenuItem::separator(),
-                    MenuItem::action("Cut", NoAction),
-                    MenuItem::action("Copy", NoAction),
-                    MenuItem::action("Paste", NoAction),
-                    MenuItem::separator(),
-                    MenuItem::action("Find", NoAction),
-                    MenuItem::action("Replace", NoAction),
-                ],
-            },
-            Menu {
-                name: "View".into(),
-                disabled: false,
-                items: vec![
-                    MenuItem::action("Toggle Terminal", NoAction),
-                    MenuItem::action("Toggle Sidebar", NoAction),
-                    MenuItem::separator(),
-                    MenuItem::action("Themes...", aacode_actions::theme_selector::Toggle { themes_filter: None }),
-                    MenuItem::action("Icon Themes...", aacode_actions::icon_theme_selector::Toggle { themes_filter: None }),
-                    MenuItem::separator(),
-                    MenuItem::action("Zoom In", NoAction),
-                    MenuItem::action("Zoom Out", NoAction),
-                    MenuItem::action("Reset Zoom", NoAction),
-                ],
-            },
-            Menu {
-                name: "Help".into(),
-                disabled: false,
-                items: vec![
-                    MenuItem::action("Documentation", NoAction),
-                    MenuItem::action("Report Issue", NoAction),
-                ],
-            },
-        ]);
+        aa_app_lib::app_menus::init(cx);
+        // 对齐 Zed main.rs L856-L857：先取菜单再 set，避免 `&mut App` 借用冲突。
+        let menus = aa_app_lib::app_menus::app_menus(cx);
+        cx.set_menus(menus);
 
         // —— 语法高亮：把当前主题灌进语言注册表（对齐 Zed main.rs L830-L839）——
         // LanguageRegistryState.theme 为 None 时，每个加载的语言都会跳过
