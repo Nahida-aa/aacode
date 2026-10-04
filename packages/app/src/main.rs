@@ -50,6 +50,11 @@ fn main() {
         // （theme_settings::init 需要 SettingsStore 存在才能读 ThemeSettings）
         gpui_tokio::init(cx);
         settings::init(cx);
+        // 绑定内置默认快捷键（default-<os>.json + base_keymap + vim）。
+        // 必须在 settings::init 之后——它要读 BaseKeymap 全局。
+        // 缺这步的话应用里一个默认快捷键都没有：backspace / ctrl-a / ctrl-s
+        // 之类全部静默失效（编辑器自身 on_key_down 的少数键仍可用）。
+        aa_app_lib::initialize::load_default_keymap(cx);
         // 传资产源：theme_settings 据此装载内嵌的 `themes/**/*.json`
         // （内置 Catppuccin 主题 —— 语法高亮的 102 个 capture 都来自那份 JSON）。
         theme_settings::init(

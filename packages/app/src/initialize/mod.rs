@@ -7,9 +7,12 @@
 //! 之所以要在 `cx.defer` 里创建，是因为 MultiWorkspace::new / Workspace::new 的订阅
 //! 链需要先建立好，再注入子 entity（Sidebar 等）。
 
-use gpui::{App, AppContext, Context, Window};
+use gpui::{App, AppContext, Context, KeyBinding, Window};
 use std::sync::Arc;
 use ui::{ContextMenu, PopoverMenuHandle};
+
+use settings::Settings as _;
+use vim_mode_setting::HelixModeSetting;
 
 pub mod panels;
 
@@ -172,4 +175,84 @@ fn register_status_bar_items(
         status_bar.add_right_item(vim_mode_indicator, window, cx);
         status_bar.add_right_item(pending_keystrokes_indicator, window, cx);
     });
+}
+
+/// 把内置默认快捷键（`assets/keymaps/default-{linux,macos,windows}.json`）绑定到全局
+/// `gpui::Keymap`。对齐 Zed `crates/zed/src/zed.rs::load_default_keymap`（L2347）。
+///
+/// 没有这一步，应用里就**一个默认快捷键都没有**：编辑器内建面板
+/// （`cx.bind_keys({...})`）之外的绑定——删除字符、全选、保存、查找——全部静默失效，
+/// 且不报任何错。表现为「输入 backspace / ctrl-a 没反应」，同时 KeymapEditor 面板
+/// 只有 action 列有内容（action 来自代码注册，绑定列要 keymap 数据才有）。
+///
+/// 加载顺序与 Zed 一致：default → base_keymap（如 vscode 方案）→ vim 模式。
+/// 后者覆盖前者，用户 keymap 最后加载再覆盖它们。
+///
+/// 调用点见 `main.rs`：必须在 `settings::init(cx)` 之后（要读 `BaseKeymap` 全局）。
+pub fn load_default_keymap(cx: &mut App) {
+    let base_keymap = *settings::BaseKeymap::get_global(cx);
+    if base_keymap == settings::BaseKeymap::None {
+        return;
+    }
+
+    let default = settings::KeymapFile::load_asset_partial(
+        settings::DEFAULT_KEYMAP_PATH,
+        Some(settings::KeybindSource::Default),
+        cx,
+    )
+    .unwrap_or_else(|e| {
+        panic!("failed to load built-in keymap {}: {e}", settings::DEFAULT_KEYMAP_PATH)
+    });
+    cx.bind_keys(filter_disabled_ai_bindings(default, cx));
+
+    if let Some(asset_path) = base_keymap.asset_path() {
+        let bindings = settings::KeymapFile::load_asset_partial(
+            asset_path,
+            Some(settings::KeybindSource::Base),
+            cx,
+        )
+        .unwrap_or_else(|e| panic!("failed to load base keymap {asset_path}: {e}"));
+        cx.bind_keys(filter_disabled_ai_bindings(bindings, cx));
+    }
+
+    if vim_mode_setting::HelixModeSetting::get_global(cx).0 {
+        let vim = settings::KeymapFile::load_asset_partial(
+            settings::VIM_KEYMAP_PATH,
+            Some(settings::KeybindSource::Vim),
+            cx,
+        )
+        .unwrap_or_else(|e| {
+            panic!("failed to load built-in keymap {}: {e}", settings::VIM_KEYMAP_PATH)
+        });
+        cx.bind_keys(filter_disabled_ai_bindings(vim, cx));
+    }
+}
+
+/// 用户开了 `disable_ai` 时，剥掉 AI 相关的绑定，避免按键被一个「handler 静默
+/// no-op」的 action 抢占（`ctrl-enter` 之类就无法正常触发）。对齐 Zed
+/// `crates/zed/src/zed.rs::filter_disabled_ai_bindings`（L2403）。
+fn filter_disabled_ai_bindings(bindings: Vec<KeyBinding>, cx: &App) -> Vec<KeyBinding> {
+    if !project::DisableAiSettings::get_global(cx).disable_ai {
+        return bindings;
+    }
+    bindings
+        .into_iter()
+        .filter(|binding| !is_ai_keybinding(binding))
+        .collect()
+}
+
+fn is_ai_keybinding(binding: &KeyBinding) -> bool {
+    /// 见 Zed `crates/zed/src/zed.rs::AI_ACTION_NAMESPACES`（L2387）。
+    const AI_ACTION_NAMESPACES: &[&str] = &[
+        "acp::",
+        "agent::",
+        "assistant::",
+        "edit_prediction::",
+        "inline_assistant::",
+        "zeta::",
+    ];
+    let name = binding.action().name();
+    AI_ACTION_NAMESPACES
+        .iter()
+        .any(|namespace| name.starts_with(namespace))
 }

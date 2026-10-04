@@ -193,6 +193,54 @@ impl KeymapFile {
         }
     }
 
+    /// 同 [`load_asset`]，但**容忍部分条目失败**：指向未注册 action 的绑定会被跳过
+    /// 并记 warn，只有当**全部**条目都失败时才返回 Err。
+    ///
+    /// 内置 keymap 逐字节取自 zed 基线，其中一部分绑定指向 aacode 有意未实现的功能
+    /// （`repl::*`、`tabular_data::*`、`onboarding::*` 等）。用 `load_asset` 时，
+    /// 这些未实现的 action 会让整份文件变成 `SomeFailedToLoad`，于是一个不存在的
+    /// action 就能把**所有**默认快捷键（backspace / ctrl-a / ctrl-s …）一起拖垮——
+    /// 症状是编辑器里按键毫无反应，且没有任何错误提示。
+    pub fn load_asset_partial(
+        asset_path: &str,
+        source: Option<KeybindSource>,
+        cx: &App,
+    ) -> anyhow::Result<Vec<KeyBinding>> {
+        let (mut key_bindings, skipped) =
+            match Self::load(asset_str::<SettingsAssets>(asset_path).as_ref(), cx) {
+                KeymapFileLoadResult::Success { key_bindings } => (key_bindings, None),
+                KeymapFileLoadResult::SomeFailedToLoad {
+                    key_bindings,
+                    error_message,
+                } => (key_bindings, Some(error_message.to_string())),
+                KeymapFileLoadResult::JsonParseFailure { error } => {
+                    anyhow::bail!("JSON parse error in built-in keymap \"{asset_path}\": {error}")
+                }
+            };
+
+        if key_bindings.is_empty() {
+            if let Some(error_message) = skipped {
+                anyhow::bail!(
+                    "Error loading built-in keymap \"{asset_path}\": {error_message}",
+                )
+            }
+        }
+        if let Some(error_message) = skipped {
+            // 绑定指向当前没有注册的 action（多为有意未实现的功能），跳过即可。
+            tracing::warn!(
+                "builtin keymap {asset_path}: {} binding(s) skipped for unknown actions:\n{error_message}",
+                error_message.matches("didn't find an action").count(),
+            );
+        }
+
+        if let Some(source) = source {
+            for key_binding in &mut key_bindings {
+                key_binding.set_meta(source.meta());
+            }
+        }
+        Ok(key_bindings)
+    }
+
     pub fn load_asset_allow_partial_failure(
         asset_path: &str,
         cx: &App,

@@ -9,6 +9,7 @@ description = "aacode 设置系统 (RustEmbed default.json → gpui Global Setti
 test-support = ["gpui/test-support", "fs/test-support"]
 
 [dependencies]
+tracing.workspace = true
 collections.workspace = true
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

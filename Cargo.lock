@@ -102,6 +102,7 @@ dependencies = [
  "image",
  "image_viewer",
  "itertools 0.14.0",
+ "keymap_editor",
  "language",
  "language_model",
  "language_selector",
@@ -147,6 +148,7 @@ dependencies = [
  "util",
  "uuid",
  "vim",
+ "vim_mode_setting",
  "wasm-bindgen",
  "watch",
  "which_key",
@@ -15787,6 +15789,7 @@ dependencies = [
  "smallvec",
  "strum 0.28.0",
  "tempfile",
+ "tracing",
  "unindent",
  "util",
 ]
