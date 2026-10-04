@@ -58,3 +58,17 @@ GPUI 桌面（`packages/app` + `packages/workspace` + `packages/ui`）是唯一�
 - 遇到函数修改/删除（有意 vs 遗漏）不确定时，**先暂停并提问**
 - project 等高复杂度 crate 优先用 hunk 级局部合并，不整文件替换
 - 区间同步以迁移 `bd747337..new` 对上游已有文件的改动为主；上游 old 不存在且区间无变更的文件视为 AACODE_LOCAL
+
+### project 特别说明（语义层面）
+
+除了结构性拆分外，`packages/project` 相对 `crates/project` 还存在以下语义层面的有意改动：
+- **函数签名调整**：部分函数参数、返回类型、可见性（pub/pub(crate)）在 aacode 中做了本地调整，以适配 aacode 的接口设计
+- **主动删除函数**：部分在 zed 中存在的函数在 aacode 中被主动移除（有意裁剪）
+- **可能漏实现**：在 port 过程中也可能存在本应保留但实际未实现的函数（需结合实际用法判断是否有意）
+- **接口/trait 实现差异**：部分 trait impl、内部 API 结构不同
+
+**rev→rev 同步要点**：
+- 对 `packages/project/src/project/*`（SPLIT）文件，不能简单整文件替换。区间内若 `crates/project/src/project.rs` 有改动，需先用 ast-grep/结构化分析提取受影响的符号（函数/struct/trait impl），再逐一核对 aacode 对应拆分文件中是否存在同名符号、签名是否一致、是否已实现。
+- 遇到符号在 aacode 中不存在但在上游区间改动中涉及时：**先暂停并提问**，判断是「主动删除」（有意）还是「漏实现」（需补充）。
+- 遇到签名不一致时：**先暂停并提问**，判断是否为有意调整。
+- 对 L2 文件（归一化后仍有差异）也要优先考虑语义变动而非行文差异。
