@@ -19,7 +19,7 @@ use super::layout::{
 };
 
 impl TerminalElement {
-    pub(super) fn layout_grid<T: TerminalLayoutCell>(
+    pub fn layout_grid<T: TerminalLayoutCell>(
         grid: impl Iterator<Item = T>,
         start_line_offset: i32,
         text_style: &TextStyle,

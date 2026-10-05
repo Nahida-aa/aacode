@@ -380,3 +380,26 @@ impl From<Hyperlink> for AlacHyperlink {
         }
     }
 }
+
+/// 上游 zed 的这个 impl 在 `crates/terminal/src/alacritty.rs`（此处对应
+/// `alacritty/conversions.rs`），aacode 移植 `terminal.rs` 时漏掉了它。
+///
+/// 它不是只给 repl 用的：`TerminalElement::layout_grid` 的入参是
+/// `impl Iterator<Item = T>`（zed 与 aacode 签名一致），而 `repl` 等调用方
+/// 直接把 `Terminal::with_renderable_cells(|cells| ...)` 给出的 `RenderableCells`
+/// 传进去。缺这个 impl 就编不过，且报错信息（`RenderableCells is not an iterator`）
+/// 指向调用点而不是缺失处，容易误判成调用方写错。
+impl Iterator for RenderableCells<'_> {
+    type Item = IndexedCell;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.cells.next().map(|cell| IndexedCell {
+            point: terminal_point_from_alacritty(cell.point),
+            cell: terminal_cell_from_alacritty(cell.cell),
+        })
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        self.cells.size_hint()
+    }
+}

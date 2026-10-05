@@ -90,12 +90,7 @@ fn main() {
         <dyn fs::Fs>::set_global(fs.clone(), cx);
 
         // repl::init 需要 Arc<dyn Fs>，故排在 fs 全局之后。对齐 Zed main.rs L725。
-        // TODO(端口遗留): repl 尚未适配 aacode 的 terminal_view API
-        //   (element::layout_grid 可见性 + RenderableCells 非 Iterator)，
-        //   且 async-tungstenite 与 remote 链路版本冲突，编译不通过。
-        //   在此之前 repl 不接入 [dependencies]，否则 repl::Run / RunInPlace
-        //   的内置 keymap 绑定无法生效（详见 .agents/zed-modifications.md）。
-        // repl::init(fs.clone(), cx);
+        repl::init(fs.clone(), cx);
 
         // —— HTTP client（对齐 Zed main.rs L508-L528）——
         // 先给 gpui 一个 ReqwestClient，Client::production 内部要用；

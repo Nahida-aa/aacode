@@ -139,9 +139,10 @@ lsp_command_selector.workspace = true
 # tabular_data_preview 必须进 [dependencies]（而非仅 dev-dependencies）：它的 action
 # （tabular_data::OpenPreview*）要靠 inventory 注册后，内置 keymap 才能解析出绑定。
 # 对齐 zed crates/zed/Cargo.toml L138。
-# repl 暂不接入：它按 zed 的 terminal_view API 写，与 aacode 现有 terminal_view
-# 不兼容（element::layout_grid 可见性、RenderableCells 非 Iterator）且
-# async-tungstenite 与 remote 链路版本冲突，编译不通过。
+# repl 与 tabular_data_preview 同理：action（repl::Run / RunInPlace /
+# tabular_data::OpenPreview*）要靠 inventory 注册后内置 keymap 才能解析出绑定。
+# 对齐 zed crates/zed/Cargo.toml L138 / L186。
+repl.workspace = true
 tabular_data_preview.workspace = true
 tab_switcher.workspace = true
 vim_mode_setting.workspace = true

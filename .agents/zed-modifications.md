@@ -137,28 +137,35 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
 > 从 `zed_actions` 改名的兼容措施（crate 改名不涉及用户配置），与 action 名的
 > namespace 是两件事，不要混淆。
 
-### terminal_view 拆分导致的 repl 移植障碍（未完成）
+### terminal_view / terminal 的移植缺口（已补，供后续 port 参考）
 
-`packages/repl` 已 fork 进仓（对齐 zed `crates/repl`），但**目前编译不通过**，因此
-**不在 `aa-app` 的 `[dependencies]` 里**，其 action `repl::Run` / `repl::RunInPlace`
-无法注册，内置 keymap 里对应绑定被跳过（启动时 WARN 列出）。
+`packages/repl` 接入时暴露出四处「repl 按 zed 的 API 写，但 aacode 的 terminal_view
+已经改过」的缺口，全部已修：
 
-三处障碍（都是「repl 按 zed 的 API 写，但 aacode 的 terminal_view 已经改过」）：
-
-1. **模块路径**：zed 是 `terminal_view::terminal_element::TerminalElement`（单文件），
+1. **模块路径**：zed 是 `terminal_view::terminal_element::TerminalElement`（单文件模块），
    aacode 把 `terminal_element.rs` 拆进了 `terminal_view/src/element/` 并从 crate 根
-   重导出 → 应写 `terminal_view::TerminalElement`（已改，见 `repl/src/outputs/plain.rs`）
-2. **`layout_grid` 可见性**：zed 是 `pub fn layout_grid`，aacode 的
-   `terminal_view/src/element/layout_grid.rs:22` 收窄成 `pub(super)`，
-   `repl/src/outputs/plain.rs:369` 要调用它 → 需要开放或加公开包装
-3. **`RenderableCells` 不是 Iterator**：aacode 的 `repl` 传入的 `RenderableCells<'_>`
-   不满足 `layout_grid` 的 `impl Iterator<Item = T>` 约束，需适配 aacode 的 API
-4. **依赖版本冲突**：`repl` 引入的 `async-tungstenite 0.35` 与 remote/livekit 链路的
-   版本不同，导致 `WebSocketStream` 类型不匹配（`repl/src/kernels/remote_kernels.rs:177`）
+   重导出 → 应写 `terminal_view::TerminalElement`
+2. **`layout_grid` 可见性**：zed 是 `pub fn`，aacode 曾收窄成 `pub(super)`
+   （`terminal_view/src/element/layout_grid.rs`）
+3. **`impl Iterator for RenderableCells<'_>` 缺失**：上游在 `crates/terminal/src/alacritty.rs`
+   有这个 impl，aacode 移植 `terminal.rs` 时漏了，已补到
+   `terminal/src/alacritty/conversions.rs`（转换函数已在那里，`IndexedCell` /
+   `RenderableCells` 也已在同文件的 `use crate::{...}` 中）。
+   **这个不只 repl 需要**：`TerminalElement::layout_grid` 的入参是
+   `impl Iterator<Item = T>`（zed 与 aacode 签名一致），任何把
+   `Terminal::with_renderable_cells(|cells| ...)` 的结果传进去的调用方都会踩到；
+   而报错信息（`RenderableCells is not an iterator`）指向**调用点**，极易误判成调用方写错。
+4. **`async-tungstenite` 版本分裂**：`repl` 直接用 workspace 的 `0.33`，而它的依赖
+   `jupyter-websocket-client 1.1.0` 声明 `async-tungstenite >= 0.29.1`（**无上界**），
+   cargo 选了最新的 `0.35`，两端 `WebSocketStream` 类型不通用
+   （`repl/src/kernels/remote_kernels.rs`）。上游 `Cargo.lock` 里只有一份 `0.33`。
+   修法：`cargo update -p async-tungstenite@0.35.0 --precise 0.33.0`
+   （锁到精确版本，勿用无 `-p` 的全量 `cargo update`）。
 
-**接线方式（等编译通过后照做，对齐 zed crates/zed/Cargo.toml L138/L186）**：
-- `workspace.dependencies` 已有 `repl`；需在 `aa-app` 的 `[dependencies]`（**非**
-  dev-dependencies）加 `repl.workspace = true`
-- 在 `main.rs` 的 fs 全局设置之后调 `repl::init(fs.clone(), cx)`
-  （`repl::init` 需要 `Arc<dyn Fs>`），对齐 zed main.rs L725
+**接线方式**（对齐 zed crates/zed/Cargo.toml L138/L186 + main.rs L725/L781）：
+- 这些 crate 的 action 要进 inventory 才会被内置 keymap 解析，因此必须进
+  `aa-app` 的 `[dependencies]`（**不是** `[dev-dependencies]`，否则不链接进二进制）
+- `repl::init(fs.clone(), cx)` 需要 `Arc<dyn Fs>`，排在 `set_global(fs.clone(), cx)` 之后
+- `tabular_data_preview::init(cx)` / `tab_switcher::init(cx)` /
+  `lsp_command_selector::init(cx)` 无参数，直接在 Panel init 段调用
 
