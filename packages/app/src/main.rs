@@ -82,9 +82,20 @@ fn main() {
         // 对齐 Zed main.rs L744 / L770，由顶层 app 依赖以避免与 workspace 循环。
         tab_switcher::init(cx);
         lsp_command_selector::init(cx);
+        // repl / tabular_data_preview 同理：action 要进 inventory 才能被内置 keymap
+        // 解析（repl::Run、tabular_data::OpenPreview*）。对齐 Zed main.rs L725 / L781。
+        tabular_data_preview::init(cx);
 
         // —— Fs 全局 ——
         <dyn fs::Fs>::set_global(fs.clone(), cx);
+
+        // repl::init 需要 Arc<dyn Fs>，故排在 fs 全局之后。对齐 Zed main.rs L725。
+        // TODO(端口遗留): repl 尚未适配 aacode 的 terminal_view API
+        //   (element::layout_grid 可见性 + RenderableCells 非 Iterator)，
+        //   且 async-tungstenite 与 remote 链路版本冲突，编译不通过。
+        //   在此之前 repl 不接入 [dependencies]，否则 repl::Run / RunInPlace
+        //   的内置 keymap 绑定无法生效（详见 .agents/zed-modifications.md）。
+        // repl::init(fs.clone(), cx);
 
         // —— HTTP client（对齐 Zed main.rs L508-L528）——
         // 先给 gpui 一个 ReqwestClient，Client::production 内部要用；

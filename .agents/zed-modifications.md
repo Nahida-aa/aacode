@@ -137,3 +137,28 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
 > 从 `zed_actions` 改名的兼容措施（crate 改名不涉及用户配置），与 action 名的
 > namespace 是两件事，不要混淆。
 
+### terminal_view 拆分导致的 repl 移植障碍（未完成）
+
+`packages/repl` 已 fork 进仓（对齐 zed `crates/repl`），但**目前编译不通过**，因此
+**不在 `aa-app` 的 `[dependencies]` 里**，其 action `repl::Run` / `repl::RunInPlace`
+无法注册，内置 keymap 里对应绑定被跳过（启动时 WARN 列出）。
+
+三处障碍（都是「repl 按 zed 的 API 写，但 aacode 的 terminal_view 已经改过」）：
+
+1. **模块路径**：zed 是 `terminal_view::terminal_element::TerminalElement`（单文件），
+   aacode 把 `terminal_element.rs` 拆进了 `terminal_view/src/element/` 并从 crate 根
+   重导出 → 应写 `terminal_view::TerminalElement`（已改，见 `repl/src/outputs/plain.rs`）
+2. **`layout_grid` 可见性**：zed 是 `pub fn layout_grid`，aacode 的
+   `terminal_view/src/element/layout_grid.rs:22` 收窄成 `pub(super)`，
+   `repl/src/outputs/plain.rs:369` 要调用它 → 需要开放或加公开包装
+3. **`RenderableCells` 不是 Iterator**：aacode 的 `repl` 传入的 `RenderableCells<'_>`
+   不满足 `layout_grid` 的 `impl Iterator<Item = T>` 约束，需适配 aacode 的 API
+4. **依赖版本冲突**：`repl` 引入的 `async-tungstenite 0.35` 与 remote/livekit 链路的
+   版本不同，导致 `WebSocketStream` 类型不匹配（`repl/src/kernels/remote_kernels.rs:177`）
+
+**接线方式（等编译通过后照做，对齐 zed crates/zed/Cargo.toml L138/L186）**：
+- `workspace.dependencies` 已有 `repl`；需在 `aa-app` 的 `[dependencies]`（**非**
+  dev-dependencies）加 `repl.workspace = true`
+- 在 `main.rs` 的 fs 全局设置之后调 `repl::init(fs.clone(), cx)`
+  （`repl::init` 需要 `Arc<dyn Fs>`），对齐 zed main.rs L725
+

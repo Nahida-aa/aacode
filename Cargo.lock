@@ -59,6 +59,7 @@ dependencies = [
  "assets",
  "audio",
  "auto_update",
+ "auto_update_ui",
  "breadcrumbs",
  "call",
  "channel",
@@ -116,6 +117,7 @@ dependencies = [
  "multi_buffer",
  "node_runtime",
  "notifications",
+ "onboarding",
  "outline_panel",
  "parking_lot",
  "paths",
@@ -142,6 +144,7 @@ dependencies = [
  "sidebar",
  "spin 0.10.1",
  "tab_switcher",
+ "tabular_data_preview",
  "tempfile",
  "terminal",
  "terminal_view",
@@ -17125,6 +17128,26 @@ dependencies = [
  "serde_json",
  "settings",
  "theme_settings",
+ "util",
+ "workspace",
+]
+
+[[package]]
+name = "tabular_data_preview"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_ui",
+ "anyhow",
+ "editor",
+ "fuzzy",
+ "gpui",
+ "indexmap 2.14.2",
+ "log",
+ "picker",
+ "project",
+ "proptest",
+ "serde_json",
+ "text",
  "util",
  "workspace",
 ]
