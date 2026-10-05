@@ -110,6 +110,7 @@ language = { path = "packages/language" }
 language_core = { path = "packages/language_core" }
 language_detection = { path = "packages/language_detection" }
 language_extension = { path = "packages/language_extension" }
+lsp_command_selector = { path = "packages/lsp_command_selector" }
 language_model = { path = "packages/language_model" }
 language_model_core = { path = "packages/language_model_core" }
 language_models = { path = "packages/language_models" }
@@ -174,6 +175,7 @@ streaming_diff = { path = "packages/streaming_diff" }
 svg_preview = { path = "packages/svg_preview" }
 system_specs = { path = "packages/system_specs" }
 task = { path = "packages/task" }
+tab_switcher = { path = "packages/tab_switcher" }
 tasks_ui = { path = "packages/tasks_ui" }
 text = { path = "packages/text" }
 telemetry = { path = "packages/telemetry" }
@@ -195,6 +197,14 @@ vim_mode_setting = { path = "packages/vim_mode_setting" }
 web_search = { path = "packages/web_search" }
 which_key = { path = "packages/which_key" }
 workspace = { path = "packages/workspace" }
+
+# 用户新增 crate（workspace member，但尚未全部被 app 直接依赖）。
+# 这里补齐 workspace.dependencies 条目，便于 app 按需引用。
+feedback = { path = "packages/feedback" }
+install_cli = { path = "packages/install_cli" }
+onboarding = { path = "packages/onboarding" }
+project_symbols = { path = "packages/project_symbols" }
+auto_update_ui = { path = "packages/auto_update_ui" }
 worktree = { path = "packages/worktree" }
 windows_resources = { path = "packages/windows_resources" }
 x_ai = { path = "packages/x_ai" }

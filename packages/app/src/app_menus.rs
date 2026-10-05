@@ -148,10 +148,8 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                 MenuItem::os_submenu("Services", gpui::SystemMenuType::Services),
                 MenuItem::separator(),
                 MenuItem::action("Extensions", aacode_actions::Extensions::default()),
-                // TODO(aacode): Zed 用 install_cli::InstallCliBinary；aacode 没有
-                // install_cli crate，先用占位，补 crate 后替换。
                 #[cfg(not(target_os = "windows"))]
-                MenuItem::action("Install CLI", NoAction),
+                MenuItem::action("Install CLI", install_cli::InstallCliBinary),
                 MenuItem::separator(),
                 #[cfg(target_os = "macos")]
                 MenuItem::action("Hide aacode", Hide),
@@ -287,8 +285,10 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                 ),
                 MenuItem::separator(),
                 MenuItem::action("Go to File...", workspace::ToggleFileFinder::default()),
-                // TODO(aacode): Zed 有 "Go to Symbol in Project"（project_symbols::Toggle），
-                // aacode 没有 project_symbols crate，补 crate 后启用。
+                MenuItem::action(
+                    "Go to Symbol in Project...",
+                    workspace::ToggleProjectSymbols,
+                ),
                 MenuItem::action(
                     "Go to Symbol in Editor...",
                     aacode_actions::outline::ToggleOutline,

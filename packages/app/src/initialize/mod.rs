@@ -138,6 +138,20 @@ pub fn init(cx: &mut App) {
     cx.on_action(|_: &aacode_actions::About, cx| {
         crate::core::open_about_window(cx);
     });
+
+    // 安装 CLI 工具到系统 PATH（对齐 Zed `zed.rs::init` 里的
+    // `cx.on_action(|_: &install_cli::InstallCliBinary, cx| install_cli_binary(cx))`）。
+    // `install_cli_binary` 需要 Window + Workspace 上下文，故走 `with_active_or_new_workspace`。
+    #[cfg(not(target_os = "windows"))]
+    cx.on_action(|_: &install_cli::InstallCliBinary, cx| {
+        with_active_or_new_workspace(cx, |_, window, cx| {
+            install_cli::install_cli_binary(window, cx);
+        });
+    });
+
+    // project_symbols 的 handler 通过 `observe_new(Workspace)` 注册，
+    // 需在 App 级 init 调用一次（对齐 Zed `zed.rs::init`）。
+    project_symbols::init(cx);
 }
 
 /// 对齐 Zed `crates/zed/src/zed.rs::quit`（L1753）。

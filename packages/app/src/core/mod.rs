@@ -6,7 +6,3 @@
 pub mod about;
 
 pub use about::open_about_window;
-
-pub fn init(_cx: &mut gpui::App) {
-    // 预留给独立 init 链，当前 main.rs 直接内联。
-}

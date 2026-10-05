@@ -76,6 +76,12 @@ fn main() {
         // Keymap 项、welcome 里的 Keymap 卡片都 dispatch 这个 action，没有它
         // 点击就毫无反应（面板类型已实现，缺的是这里的注册，见 zed main.rs L785）。
         keymap_editor::init(cx);
+        // tab_switcher / lsp_command_selector 的 crate 已 fork 进仓，但原先没有任何
+        // crate 依赖它们 → 未被链接进本二进制 → inventory 里没有它们的 action →
+        // 内置 keymap 中对应的绑定（ctrl-tab / tab / ...）解析时被跳过。
+        // 对齐 Zed main.rs L744 / L770，由顶层 app 依赖以避免与 workspace 循环。
+        tab_switcher::init(cx);
+        lsp_command_selector::init(cx);
 
         // —— Fs 全局 ——
         <dyn fs::Fs>::set_global(fs.clone(), cx);

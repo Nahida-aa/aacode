@@ -135,9 +135,13 @@ image_viewer.workspace = true
 language_tools.workspace = true
 line_ending_selector.workspace = true
 keymap_editor.workspace = true
+lsp_command_selector.workspace = true
+tab_switcher.workspace = true
 vim_mode_setting.workspace = true
 which_key.workspace = true
 ui_prompt.workspace = true
+install_cli.workspace = true
+project_symbols.workspace = true
 
 
 languages = { workspace = true, features = ["load-grammars"] }

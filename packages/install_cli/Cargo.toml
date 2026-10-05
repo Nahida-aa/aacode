@@ -1,0 +1,23 @@
+[package]
+name = "install_cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+test = false
+doctest = false
+
+[features]
+test-support = []
+
+[dependencies]
+anyhow.workspace = true
+client.workspace = true
+gpui.workspace = true
+log.workspace = true
+release_channel.workspace = true
+smol.workspace = true
+util.workspace = true
+workspace.workspace = true

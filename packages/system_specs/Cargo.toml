@@ -1,0 +1,25 @@
+[package]
+name = "system_specs"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+test = false
+doctest = false
+
+[features]
+default = []
+
+[dependencies]
+anyhow.workspace = true
+gpui.workspace = true
+human_bytes.workspace = true
+release_channel.workspace = true
+semver.workspace = true
+serde.workspace = true
+sysinfo.workspace = true
+
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
+pciid-parser.workspace = true

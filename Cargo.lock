@@ -101,6 +101,7 @@ dependencies = [
  "http_client",
  "image",
  "image_viewer",
+ "install_cli",
  "itertools 0.14.0",
  "keymap_editor",
  "language",
@@ -109,14 +110,19 @@ dependencies = [
  "language_tools",
  "languages",
  "line_ending_selector",
+ "lsp_command_selector",
+ "menu",
  "mimalloc",
+ "multi_buffer",
  "node_runtime",
  "notifications",
  "outline_panel",
  "parking_lot",
+ "paths",
  "pretty_assertions",
  "project",
  "project_panel",
+ "project_symbols",
  "prompt_store",
  "rayon",
  "recent_projects",
@@ -125,6 +131,7 @@ dependencies = [
  "remote_server",
  "repl",
  "reqwest_client",
+ "rope",
  "search",
  "semver",
  "serde",
@@ -134,6 +141,7 @@ dependencies = [
  "settings_ui",
  "sidebar",
  "spin 0.10.1",
+ "tab_switcher",
  "tempfile",
  "terminal",
  "terminal_view",
@@ -1834,6 +1842,31 @@ dependencies = [
  "tempfile",
  "util",
  "which",
+ "workspace",
+]
+
+[[package]]
+name = "auto_update_ui"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_ui",
+ "aacode_actions",
+ "agent_skills",
+ "anyhow",
+ "auto_update",
+ "client",
+ "db",
+ "editor",
+ "gpui",
+ "markdown_preview",
+ "prompt_store",
+ "release_channel 0.1.0",
+ "semver",
+ "serde",
+ "serde_json",
+ "smol",
+ "telemetry",
+ "util",
  "workspace",
 ]
 
@@ -4551,7 +4584,7 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
- "system_specs",
+ "system_specs 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
  "windows 0.62.2",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -6303,6 +6336,20 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "feedback"
+version = "0.1.0"
+dependencies = [
+ "aacode_actions",
+ "client",
+ "extension_host",
+ "gpui",
+ "system_specs 0.1.0",
+ "urlencoding",
+ "util",
+ "workspace",
 ]
 
 [[package]]
@@ -8525,6 +8572,20 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.6",
+]
+
+[[package]]
+name = "install_cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "client",
+ "gpui",
+ "log",
+ "release_channel 0.1.0",
+ "smol",
+ "util",
+ "workspace",
 ]
 
 [[package]]
@@ -11804,6 +11865,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "onboarding"
+version = "0.1.0"
+dependencies = [
+ "a_log",
+ "aa_gpui_kit_component",
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "aacode_actions",
+ "anyhow",
+ "client",
+ "cloud_api_types",
+ "collections",
+ "db",
+ "documented",
+ "fs",
+ "fuzzy",
+ "gpui",
+ "menu",
+ "notifications",
+ "picker",
+ "project",
+ "schemars 1.2.2",
+ "serde",
+ "settings",
+ "telemetry",
+ "theme_settings",
+ "util",
+ "vim_mode_setting",
+ "workspace",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.21.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13613,6 +13706,32 @@ dependencies = [
  "util",
  "workspace",
  "worktree",
+]
+
+[[package]]
+name = "project_symbols"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_fuzzy",
+ "aa_gpui_kit_theme",
+ "anyhow",
+ "editor",
+ "futures 0.3.34",
+ "fuzzy",
+ "gpui",
+ "language",
+ "lsp",
+ "ordered-float 5.5.0",
+ "picker",
+ "picker_preview",
+ "project",
+ "release_channel 0.1.0",
+ "semver",
+ "serde_json",
+ "settings",
+ "theme_settings",
+ "util",
+ "workspace",
 ]
 
 [[package]]
@@ -16960,6 +17079,20 @@ dependencies = [
 [[package]]
 name = "system_specs"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "gpui",
+ "human_bytes",
+ "pciid-parser",
+ "release_channel 0.1.0",
+ "semver",
+ "serde",
+ "sysinfo 0.39.6",
+]
+
+[[package]]
+name = "system_specs"
+version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "anyhow",
@@ -16970,6 +17103,30 @@ dependencies = [
  "semver",
  "serde",
  "sysinfo 0.39.6",
+]
+
+[[package]]
+name = "tab_switcher"
+version = "0.1.0"
+dependencies = [
+ "a_log",
+ "aa_gpui_fuzzy",
+ "aa_gpui_kit_theme",
+ "aa_gpui_kit_ui",
+ "collections",
+ "ctor",
+ "editor",
+ "gpui",
+ "menu",
+ "picker",
+ "project",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "settings",
+ "theme_settings",
+ "util",
+ "workspace",
 ]
 
 [[package]]
