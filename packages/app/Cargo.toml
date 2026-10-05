@@ -142,6 +142,8 @@ which_key.workspace = true
 ui_prompt.workspace = true
 install_cli.workspace = true
 project_symbols.workspace = true
+auto_update_ui.workspace = true
+onboarding.workspace = true
 
 
 languages = { workspace = true, features = ["load-grammars"] }

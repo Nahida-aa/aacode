@@ -202,6 +202,10 @@ fn main() {
         // 放在 open_window 之前因为 title_bar::init 已在上面 observe 了 Workspace。
         // 对齐 Zed main.rs L587 `zed::init(cx)`：注册 App 级 action handler。
         aa_app_lib::initialize::init(cx);
+        // 对齐 Zed main.rs：`auto_update_ui::init` 注册 Release Notes 本地查看 /
+        // 更新通知的 handler；`onboarding::init` 注册 ShowWelcome / OpenOnboarding 等。
+        auto_update_ui::init(cx);
+        onboarding::init(cx);
         // 对齐 Zed main.rs L856-L857：先取菜单再 set，避免 `&mut App` 借用冲突。
         let menus = aa_app_lib::app_menus::app_menus(cx);
         cx.set_menus(menus);

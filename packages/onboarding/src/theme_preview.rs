@@ -9,7 +9,7 @@ use ui::{
     IntoElement, RenderOnce, component_prelude::Documented, prelude::*, utils::inner_corner_radius,
 };
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub enum ThemePreviewStyle {
     Bordered,
     Borderless,

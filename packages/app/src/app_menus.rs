@@ -366,14 +366,13 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
             name: "Help".into(),
             disabled: false,
             items: vec![
-                // TODO(aacode): 品牌项待改。Zed 用 auto_update_ui::ViewReleaseNotesLocally，
-                // aacode 没有 auto_update_ui crate，先用占位。
-                MenuItem::action("View Release Notes Locally", NoAction),
+                MenuItem::action(
+                    "View Release Notes Locally",
+                    auto_update_ui::ViewReleaseNotesLocally,
+                ),
                 MenuItem::action("View Telemetry", aacode_actions::OpenTelemetryLog),
                 MenuItem::action("View Dependency Licenses", aacode_actions::OpenLicenses),
-                // TODO(aacode): Zed 用 onboarding::ShowWelcome；aacode 的 welcome
-                // 在 workspace crate 里，确认导出路径后替换下面的占位。
-                MenuItem::action("Show Welcome", NoAction),
+                MenuItem::action("Show Welcome", onboarding::ShowWelcome),
                 MenuItem::separator(),
                 MenuItem::action(
                     "File Bug Report...",
