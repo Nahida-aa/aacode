@@ -110,3 +110,30 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
 2. `inventory::iter::<gpui::MacroActionBuilder>` 取每个 builder 的 `fn` 指针地址，`same_code` 判断是「同一份代码被调用两次」还是「两处独立声明」
 3. `grep -c '^name = "<crate>"' Cargo.lock` 与 `cargo tree -d` 排除「同名 crate 两个来源」（`-d` 里出现 workspace member 或 gpui_learn 包才算异常；第三方 crate 多版本属正常）
 4. 若确认是同一 crate 两份编译实例，检查该 crate 的 `[dev-dependencies]` 有没有指向自己
+
+### action 的 namespace 必须是 zed，不能改名
+
+`actions!` 宏的**首参是用户可见的 action 名**，会出现在 keybindings.json、用户
+`keymap.json`、命令面板搜索与 keybindings schema 里——它是公开接口，不是内部命名。
+
+**保持上游的值，不要改成 `app` / `aacode` / 产品名。** 上游 zed 没有 `app`、
+`aacode` 这类 namespace；aacode 的做法是照搬上游（`aacode_actions` 里 9 处
+`actions!(zed, ...)`、`title_bar` 的 `actions!(app_menu, ...)` 都与上游一致）。
+
+唯一一次偏离是 `packages/app/src/app_menus.rs` 曾把 zed `crates/zed/src/zed.rs:121`
+那一块 app 级 action（`Hide` / `HideOthers` / `ShowAll` / `Minimize` / `Zoom` /
+`OpenDefaultSettings` / `ShowDefaultSemanticTokenRules` / `ToggleFullScreen`）搬进本文件时
+顺手把首参改成了 `app`。后果（已修）：
+
+- `assets/keymaps/default-linux.json` 的 `"zed::ToggleFullScreen"`（f11 全屏）解析失败
+- `default-macos.json` 的 `zed::Hide` / `HideOthers` / `Minimize` / `ToggleFullScreen` 同样失效
+- 从 zed 迁移过来的用户 keymap.json 也全部失效
+
+代价对比：改 20 个 keymap json + 破坏配置迁移，换的只是「换个更贴合产品名的命名」，
+不划算。Rust 侧引用不受影响（都是 `crate::app_menus::Minimize` 这类 crate 内类型路径）。
+
+> 注意 `aacode_actions` 里大量 action 带
+> `#[action(deprecated_aliases = ["aacode_actions::Xxx"])]` —— 那是 **Rust crate 名**
+> 从 `zed_actions` 改名的兼容措施（crate 改名不涉及用户配置），与 action 名的
+> namespace 是两件事，不要混淆。
+

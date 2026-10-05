@@ -16,8 +16,17 @@ use settings::Settings;
 // Zed 把这些 app 级 action 定义在 `crates/zed/src/zed.rs:121` 的 `actions!(zed, [...])`
 // 里；aacode 没有 zed.rs 等价文件，集中定义在此。
 // handler 注册见 `initialize::init`（对齐 Zed `zed.rs::init`）。
+//
+// namespace **必须是 `zed`**（即上游的值，zed 没有 `app` / `aacode` 这个 namespace）。
+// `actions!` 的首参是用户可见的 action 名，会出现在 keybindings.json、用户
+// keymap.json、命令面板与 keybindings schema 里；改它等于改公开接口：
+//   - `assets/keymaps/default-linux.json` 里的 `"zed::ToggleFullScreen"`（f11 全屏）
+//     `default-macos.json` 里的 `zed::Hide` / `HideOthers` / `Minimize` 绑定会解析失败
+//   - 从 zed 迁移过来的用户配置同样会失效
+// 代价是改 20 个 keymap json + 破坏配置迁移，而收益仅是「换个更贴合产品名的命名」，
+// 不划算。参见 `.agents/zed-modifications.md`。
 actions!(
-    app,
+    zed,
     [
         /// Hides the application window.
         Hide,
