@@ -125,24 +125,25 @@ pub async fn get_release_by_tag_name(
     Ok(release)
 }
 
-/// 反序列化 GitHub release asset 的 `digest` 字段，剥掉 `sha256:` 前缀。
+/// 剥掉 GitHub asset `digest` 字段的 `sha256:` 前缀。
+/// 逐字照抄 zed `afecd6d` 的 `crates/http_client/src/github.rs`。
 ///
-/// GitHub 的 `digest` 形如 `"sha256:<hex>"`。`1f370f5` 把原先「反序列化后遍历
-/// assets 剥离前缀」的写法改成 `deserialize_with`，但漏掉了这个函数体 ——
-/// 表现为 `cannot find function 'deserialize_sha256_digest' in this scope`，
-/// 且 `Deserializer` 被 import 了却无人使用。
-///
-/// 语义与该 commit 删除的旧逻辑逐字等价：
-/// `digest.strip_prefix("sha256:")` 命中则替换为裸 hex，否则原样保留。
+/// 注：本 crate 当前**零引用**（实际用的是 workspace 里 zed git 依赖的 `http_client`）。
+/// 保留本地 fork 是为将来去 zed 化做准备——代码里存在 zed 独有字符串。
+/// 改动请同步 zed 上游，避免与 `afecd6d` 产生无谓 diff。
 fn deserialize_sha256_digest<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let digest = Option::<String>::deserialize(deserializer)?;
-    Ok(digest.map(|digest| match digest.strip_prefix("sha256:") {
-        Some(stripped) => stripped.to_owned(),
-        None => digest,
-    }))
+    const PREFIX: &str = "sha256:";
+
+    let mut digest = Option::<String>::deserialize(deserializer)?;
+    if let Some(digest) = digest.as_mut()
+        && digest.starts_with(PREFIX)
+    {
+        digest.replace_range(..PREFIX.len(), "");
+    }
+    Ok(digest)
 }
 
 fn github_api_request(url: &str) -> Result<Request<AsyncBody>> {

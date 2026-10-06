@@ -199,3 +199,30 @@ E0308（`packages/repl/src/kernels/remote_kernels.rs`）。修法
 `cargo update -p async-tungstenite@0.35.0 --precise 0.33.0`，与上游 zed
 Cargo.lock 一致（上游只有一份 0.33）。
 
+
+## http_client：两套并存，本地 fork 当前零引用
+
+workspace 里有两个 http_client，**别搞混**：
+
+| Cargo 名字 | 来源 | 引用者 |
+|---|---|---|
+| `http_client` | zed git `rev = "afecd6d719aad92aecfa2860f49c4f2956708831"` | app / client / anthropic / dap / extension … 20+ crate，**这是实际运行的** |
+| `aa_http_client` | `path = "packages/http_client"` | **零个 crate** |
+
+**保留本地 fork 的原因**：将来可能不再用 zed 的 `http_client`——代码里存在
+zed 独有字符串。当前无妨，两者并存即可。
+
+**维护约定**：`packages/http_client/` 与 zed `afecd6d` 的 `crates/http_client/`
+实质代码**零差异**，只有两处无害偏差：
+
+1. **rustfmt**：aacode `.rustfmt.toml` 开了 `unstable_features = true` +
+   `fn_single_line = true`，故短函数压成一行。对 zed 做 diff 时这是噪声，忽略。
+2. **crate root 文件名**：zed 是 `[lib] path = "src/http_client.rs"`，fork 用
+   `src/lib.rs`（内容一致）。
+
+同步 fork 时改这两点即可；**不要**把 zed 的 `use` 语句改成 aacode 风格
+（见 `.agents/zed-port.md` #11：依赖用 Cargo 别名，不改搬来的源码）。
+
+目前代码里唯一的 zed 独有字符串是测试里的
+`packages/http_client/src/github.rs:199` ——
+`github_api_request("https://api.github.com/repos/zed-industries/zed/releases")`。

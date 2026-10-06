@@ -90,15 +90,22 @@ proc 宏展开时看不见 Cargo 别名，只认自己的真名。修法是在�
 
 本次补了 `open::local::open_paths`、`open::options::OpenResult`、`nav::MAX_RECENT_SELECTIONS`。
 
-### 坑：`http_client` 的 `deserialize_sha256_digest` 曾是悬空引用
+### 坑：零引用 crate 里的悬空引用，只有 `--workspace` 才暴露
 
-`github.rs:32` 写着 `#[serde(default, deserialize_with = "deserialize_sha256_digest")]`
-但函数体从未存在——`Deserializer` 被 import 却无人使用。根因是 `1f370f5` 把「反序列化后
-遍历 assets 剥离 `sha256:` 前缀」改成 `deserialize_with` 时漏加了函数。因为
-`http_client` 此前不在任何检查路径上，`cargo check --workspace` 才第一次暴露。
-语义可从该 commit 删除的旧代码逐字还原。
+`packages/http_client/src/github.rs:32` 写着
+`#[serde(default, deserialize_with = "deserialize_sha256_digest")]`，但函数体从未存在
+——`Deserializer` 被 import 却无人使用。根因是 `1f370f5` 把「反序列化后遍历 assets 剥离
+`sha256:` 前缀」改成 `deserialize_with` 时漏加了函数。
 
-> 教训：**检查范围要放到 `--workspace`**，只 check 主线包会漏掉这类问题。
+关键背景：该 crate 的 Cargo 名是 `aa_http_client`，**全仓库零引用**（实际跑的是 workspace
+里 zed git 依赖的 `http_client`）。也就是说这个 bug 在死代码里，不影响任何运行时行为，
+但它让 `cargo check --workspace` 失败。
+
+> 教训一：**检查范围要放到 `--workspace`**。只 check 主线包会漏掉这类问题。
+> 教训二：补函数体前先看 zed 上游有没有现成实现——这里 `afecd6d` 早就有，
+> 应该照抄而不是自己从被删代码反推（我第一次反推的版本比上游多了 `map` 闭包，
+> 虽等价但制造了无谓 diff）。
+> 详见 `.agents/zed-modifications.md` 的「http_client：两套并存」一节。
 
 ### 坑：不要凭 crate 名猜「需要什么依赖」
 
