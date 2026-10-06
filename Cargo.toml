@@ -441,8 +441,15 @@ quote = "1.0.9"
 rayon = "1.8"
 rand = "0.9"
 rsa = "0.9.6"
-rust-embed = { version = "=8.11", features = ["include-exclude", "compression"] }
-rust-embed-impl = "=8.11"
+# 版本与上游 zed 一致（zed Cargo.toml L825）：写 "8.11" 而非 "=8.11"。
+# 若用 "=" 把 rust-embed 锁死，cargo 仍会把 rust-embed-impl 解析成 8.12.0
+# （rust-embed 8.11.0 对 impl 的要求是 ^8.11），而 `compressed()` /
+# `EmbeddedCompressedFile` 是 impl 8.12 才有、trait 8.11 没有的 API，
+# derive 展开后直接报：
+#   E0407: method `compressed` is not a member of trait `rust_embed::RustEmbed`
+#   E0425/E0422: cannot find type/struct `EmbeddedCompressedFile`
+# 上游 Cargo.lock 里 rust-embed 与 rust-embed-impl 都是 8.11.0。
+rust-embed = { version = "8.11", features = ["include-exclude", "compression"] }
 rustix = { version = "1.1", features = ["fs"] }
 # WARNING: If you change this, you must also publish a new version of zed-scap to crates.io
 scap = { git = "https://github.com/zed-industries/scap", rev = "4afea48c3b002197176fb19cd0f9b180dd36eaac", default-features = false, package = "zed-scap", version = "0.0.8-zed" }
