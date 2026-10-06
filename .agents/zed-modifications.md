@@ -355,12 +355,24 @@ gpui_learn commit `957a9a3`。
    - per-item：`Stop Server` → `Remove Server`（逻辑一字未动）
    - 全局：`Stop All Servers` → `Remove All Servers`（与 `Restart All Servers` 平行）
 
-2. **新增真正的 `Stop Server`**（可恢复）
+2. **`Remove Server` 在「运行中」和「已停止」两种状态都提供**
+   - 上游只有一个动作，挂在 `if can_stop`（即 `BinaryStatus::None | Starting`）下就够了；
+     拆分后这个继承来的守卫**不完备** —— 已停止的 server 会被漏掉，
+     导致 Stop 之后**再也清不掉该条目**（只能靠 Restart All 顺带清）
+   - 实现：移出 `if can_stop`，handler 合并两步
+     1. `stop_language_servers_for_buffers(Vec::new(), {Id}, cx)` ——
+        运行中真正注销；已停止时该 id 已不在 `language_server_ids`，整条链路是
+        **静默 no-op**（`stopped_names` 为空、`stop_local_language_server` 取不到 name 直接返回），
+        不会 panic 也不会报错
+     2. `stopped_server_worktrees.remove(name)` —— 丢弃展示归属，条目消失
+   - 已停止时 `stopped_language_servers` 里的抑制**保留**，所以不会自己复活
+
+3. **新增真正的 `Stop Server`**（可恢复）
    - 停掉 server，但**条目保留**，可单独 `Start Server` 恢复
    - 实现：停止前先把该 server 的展示归属记入新字段（见下），再执行与上游
      完全相同的 `stop_language_servers_for_buffers(Vec::new(), {Id}, cx)`
 
-3. **新增 `Start Server`**（仅停止态显示）
+4. **新增 `Start Server`**（仅停止态显示）
    - **必须传全部 buffers**（`lsp_store.buffer_store().read(cx).buffers()`）。
      理由：现有 per-item `Restart Server`（497-581）用的是
      `servers_per_buffer_abs_path` 收集的 buffers，停止后该列表为空 →
@@ -369,7 +381,7 @@ gpui_learn commit `957a9a3`。
      （`lsp_store/mod.rs:3200-3204`），只有 `clear_stopped=true` 才会先移除该
      name（`lsp_store/mod.rs:13065-13072`），server 才能起来。
 
-4. **新增 `stopped_server_worktrees` 字段**（`lsp_button.rs` 的 `LanguageServers`）
+5. **新增 `stopped_server_worktrees` 字段**（`lsp_button.rs` 的 `LanguageServers`）
    ```rust
    stopped_server_worktrees: HashMap<LanguageServerName, (WeakEntity<Worktree>, LanguageServerId)>
    ```
@@ -383,10 +395,17 @@ gpui_learn commit `957a9a3`。
      `remove_server_does_not_touch_binary_statuses` 三个单测不受影响
    - Restart All / Remove All 两个全局分支都会 `clear()` 该字段
 
-5. **item 构造新增第三来源**
+6. **item 构造新增第三来源**
    - 位置紧跟 `binary_statuses` 循环之后，遍历 `stopped_server_worktrees`，
      用 `emitted_server_names` 去重，从 `binary_statuses` 取 `Stopped` 状态
    - 渲染结果：灰色 + `Stopped`（`lsp_button.rs:367-369` 已处理该状态的配色文案）
+
+### 状态矩阵（改动后）
+
+| server 状态 | 可用动作 |
+|---|---|
+| 运行中 / Starting | `Restart Server`、`Stop Server`、`Remove Server` |
+| 已停止（Stopped） | `Start Server`、`Remove Server` |
 
 ### 保留的两个细节（有意为之）
 

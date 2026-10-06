@@ -662,25 +662,42 @@ impl LanguageServerState {
                                     .ok();
                             });
 
-                            let lsp_store_for_remove = lsp_store.clone();
-                            let server_selector_for_remove = server_selector.clone();
-
-                            submenu = submenu.entry("Remove Server", None, move |_window, cx| {
-                                lsp_store_for_remove
-                                    .update(cx, |lsp_store, cx| {
-                                        lsp_store
-                                            .stop_language_servers_for_buffers(
-                                                Vec::new(),
-                                                HashSet::from_iter([
-                                                    server_selector_for_remove.clone()
-                                                ]),
-                                                cx,
-                                            )
-                                            .detach_and_log_err(cx);
-                                    })
-                                    .ok();
-                            });
                         }
+
+                        // "Remove Server"：彻底注销，条目消失，**两种状态都提供**。
+                        // - 运行中：走 lsp_store 的注销（清诊断、抑制自动启动），条目随之消失。
+                        // - 已停止：该 id 已不在 lsp_store 中，上面那步是 no-op；靠丢弃
+                        //   `stopped_server_worktrees` 里的展示归属让条目消失。
+                        //   若不提供，Stop 之后就再也没法把这个条目清掉了（只能 Restart All 顺带清）。
+                        let lsp_store_for_remove = lsp_store.clone();
+                        let server_selector_for_remove = server_selector.clone();
+                        let state_for_remove = state.clone();
+                        let server_name_for_remove = submenu_server_name.clone();
+
+                        submenu = submenu.entry("Remove Server", None, move |_window, cx| {
+                            state_for_remove
+                                .update(cx, |state, _| {
+                                    state
+                                        .language_servers
+                                        .stopped_server_worktrees
+                                        .remove(&server_name_for_remove);
+                                })
+                                .ok();
+
+                            lsp_store_for_remove
+                                .update(cx, |lsp_store, cx| {
+                                    lsp_store
+                                        .stop_language_servers_for_buffers(
+                                            Vec::new(),
+                                            HashSet::from_iter([
+                                                server_selector_for_remove.clone()
+                                            ]),
+                                            cx,
+                                        )
+                                        .detach_and_log_err(cx);
+                                })
+                                .ok();
+                        });
 
                         if can_start {
                             let lsp_store_for_start = lsp_store.clone();
