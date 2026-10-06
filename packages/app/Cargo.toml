@@ -205,6 +205,7 @@ theme_settings.workspace = true
 theme_selector.workspace = true
 ui.workspace = true
 project.workspace = true
+shellexpand.workspace = true
 project_panel.workspace = true
 outline_panel.workspace = true
 prompt_store.workspace = true

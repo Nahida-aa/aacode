@@ -14,9 +14,12 @@ use gpui::{
 };
 use gpui_platform::application;
 use git::GitHostingProviderRegistry;
+use settings::Settings as _;
+use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
 use theme::ActiveTheme;
+use util::ResultExt as _;
 
 /// 进程启动时刻，供 miniprofiler_ui 计算「启动到首次交互」的耗时。
 /// 对齐 Zed main.rs L199 / L202（在 main() 首行 get_or_init）。
@@ -192,9 +195,40 @@ fn main() {
         let languages = Arc::new(languages);
 
         // —— NodeRuntime ——
-        // Zed 从 SettingsStore 变化建 watch channel 传 node binary options；
-        // aacode 先传空 channel（None 作为 shell_env_loaded_rx，watch::channel(None) 作为 options）。
-        let (_node_options_tx, node_options_rx) = watch::channel(None);
+        // 对齐 Zed main.rs L533-L559。
+        //
+        // 关键：options 的 watch::Sender 必须被 observe_global 闭包**捕获**以保持存活。
+        // 之前这里写的是 `let (_node_options_tx, rx) = watch::channel(None);` —— 下划线
+        // 前缀让它立即 drop，且值恒为 None 永不填充。于是 NodeRuntime::instance()
+        // 第一次 borrow() 拿不到值 → options.changed().await → sender 已死 →
+        // Err(NoSenderError)("sender was dropped") → 返回 UnavailableNodeRuntime。
+        // 后果：prettier 安装必失败、所有依赖 node 的 LSP 起不来，且只有 ERROR 日志、
+        // 不崩溃。详见 .agents/zed-modifications.md。
+        let (mut node_options_tx, node_options_rx) = watch::channel(None);
+        cx.observe_global::<settings::SettingsStore>(move |cx| {
+            let settings = &project::ProjectSettings::get_global(cx).node;
+            let options = node_runtime::NodeBinaryOptions {
+                allow_path_lookup: !settings.ignore_system_version,
+                // TODO: Expose this setting（与 Zed 同）
+                allow_binary_download: true,
+                use_paths: settings.path.as_ref().map(|node_path| {
+                    let node_path = PathBuf::from(shellexpand::tilde(node_path).as_ref());
+                    let npm_path = settings
+                        .npm_path
+                        .as_ref()
+                        .map(|path| PathBuf::from(shellexpand::tilde(&path).as_ref()));
+                    (
+                        node_path.clone(),
+                        npm_path.unwrap_or_else(|| {
+                            let base_path = PathBuf::new();
+                            node_path.parent().unwrap_or(&base_path).join("npm")
+                        }),
+                    )
+                }),
+            };
+            node_options_tx.send(Some(options)).log_err();
+        })
+        .detach();
         let node_runtime =
             node_runtime::NodeRuntime::new(client.http_client(), None, node_options_rx);
 

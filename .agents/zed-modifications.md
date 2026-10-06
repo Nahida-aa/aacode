@@ -273,3 +273,51 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 
 如将来要与 zed 完全对齐，用 `cargo update -p <crate> --precise <zed 版本>` 逐个降级，
 不要裸跑不带 `-p` 的 `cargo update`（会重算全图，且可能让同名 crate 分裂成多份）。
+
+## NodeRuntime 的 options channel：sender 必须被 observer 捕获
+
+**现象**（编译通过、不崩溃、只有 ERROR 日志）：
+
+```
+ERROR project::prettier_store: Failed to install default prettier:
+      prettier & plugins install: fetching formatter packages: sender was dropped
+```
+
+**根因**：aacode 曾写
+
+```rust
+let (_node_options_tx, node_options_rx) = watch::channel(None);   // ← sender 立即 drop
+```
+
+`_` 前缀让 sender 创建后即销毁，且值恒为 `None` 永不填充。于是
+`node_runtime/src/lib.rs:86-99` 的 `instance()`：
+
+```rust
+if let Some(options) = state.options.borrow().as_ref() { break ... }  // None，走不到
+match state.options.changed().await {
+    Err(err) => return Box::new(UnavailableNodeRuntime {
+        error_message: err.to_string().into(),      // "sender was dropped"
+    }),
+}
+```
+
+`sender was dropped` 来自 zed 的 `watch` crate（`crates/watch/src/error.rs:21` 的
+`NoSenderError`），含义是 channel 发送端已销毁、永远等不到值。
+
+**影响面**：prettier 安装必失败、所有依赖 node 的 LSP 起不来、部分 agent 工具执行失效。
+全是静默的。
+
+**修法**：照抄 Zed `main.rs:533-556`，用 `observe_global::<SettingsStore>` 驱动 channel，
+sender 被闭包捕获因而存活，`settings.json` 的 `node` 配置（`ignore_system_version` /
+`path` / `npm_path`）也随之真正生效。注意 `get_global` 来自 `Settings` trait，
+需 `use settings::Settings as _;`；`log_err` 需 `use util::ResultExt as _;`。
+
+## 已知缺口：ui::on_new_scrollbars 未接（gpui_learn 侧漏导出）
+
+Zed `main.rs:557` 有一行 `ui::on_new_scrollbars::<SettingsStore>(cx);`（让每个新窗口的
+scrollbar 响应设置变化），aacode 未接。函数本身在 gpui_learn rev `21f4599` 里存在
+（`packages/ui/src/components/scrollbar.rs:627`），但 `packages/ui/src/components/mod.rs:117`
+的 `pub use scrollbar::{...}` 是**显式列举**（上游 zed 是 glob 导出），漏了该函数，
+导致 `ui::on_new_scrollbars` 在 crate 根不可寻。
+
+修法需改 gpui_learn 并推 rev，故不在 aacode 侧解决。与 node/prettier 无关，独立处理。
