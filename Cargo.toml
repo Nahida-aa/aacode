@@ -112,6 +112,7 @@ language_core = { path = "packages/language_core" }
 language_detection = { path = "packages/language_detection" }
 language_extension = { path = "packages/language_extension" }
 lsp_command_selector = { path = "packages/lsp_command_selector" }
+lsp_locations = { path = "packages/lsp_locations" }
 language_model = { path = "packages/language_model" }
 language_model_core = { path = "packages/language_model_core" }
 language_models = { path = "packages/language_models" }

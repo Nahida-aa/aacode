@@ -45,36 +45,74 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
    `RefreshLlmTokenListener::global(cx)` 读这个全局，少这行直接 panic
    （`no state of type client::llm_token::GlobalRefreshLlmTokenListener exists`，`gpui/src/app.rs`）。
 
-## 待查：可能仍缺失的 init
+## 已修：34 个 crate 已移植但 init 从未接线
 
-Zed `crates/zed/src/main.rs:696-706` 还有以下调用，aacode `main.rs` 中**没有**对应。
-它们不会导致启动 panic（它们反过来依赖已注册好的东西），但意味着对应功能是缺的：
+**症状**：无编译错误、无 panic，对应功能静默失效。例如 `diagnostics` / `encoding_selector` /
+`line_ending_selector` 的 action 已在 status_bar 菜单里点了没反应。
 
-| Zed 位置 | 调用 | aacode | 影响 |
-|---|---|---|---|
-| `main.rs:701` | `acp_tools::init(cx)` | ❌ 缺 | ACP 工具集 |
-| `main.rs:702` | `zed::telemetry_log::init(cx)` | ❌ 缺 | 遥测日志落盘 |
-| `main.rs:703` | `zed::remote_debug::init(cx)` | ❌ 缺 | 远程调试 |
-| `main.rs:704` | `edit_prediction_ui::init(cx)` | ❌ 缺 | 编辑预测 UI |
-| `main.rs:705` | `web_search::init(cx)` | ❌ 缺 | Web 搜索 |
-| `main.rs:706` | `web_search_providers::init(client, user_store, cx)` | ❌ 缺 | Web 搜索 provider |
-| `main.rs:707+` | `snippet_provider::init(cx)` | ❌ 缺 | 代码片段 |
+**根因**：这批 crate 全部 fork 进仓、`pub fn init` 也都写好了，但 `packages/app/src/main.rs`
+里一次都没调用。多数还**已经在 `[dependencies]` 里**——所以它们被链接了、action 进了 inventory，
+只是 handler 永远不注册。
 
-> 注：aacode 已移植了 `inspector_ui`（commit `462bab6`）并接上 `dev::ToggleInspector`，走的是自己的路径。
-> 上表**未逐个验证**实际影响，只是"上游有、aacode 没有 init 调用"的候选清单 —— 接入前需逐个确认依赖是否已就位。
+**修复**：按 Zed `main.rs` 的原始顺序补齐调用（无参数的一批插在 `ui_prompt::init` 之后；
+需要 `client` / `fs` / `app_state` 的插在对应变量就绪之后），并补 11 个缺失的 `[dependencies]`。
+
+已接线：`git_hosting_providers` `debugger_tools` `command_palette` `acp_tools`
+`edit_prediction_ui` `web_search` `snippet_provider` `recent_projects` `dev_container`
+`image_viewer` `diagnostics` `audio` `go_to_line` `outline` `tasks_ui` `search`
+`lsp_locations` `vim` `encoding_selector` `language_selector` `line_ending_selector`
+`toolchain_selector` `language_tools` `feedback` `markdown_preview` `svg_preview`
+`edit_prediction` `json_schema_store` `which_key` `client` `auto_update` `dap_adapters`
+`copilot_ui` `extension` `extension_host` `debug_adapter_extension` `language_extension`
+
+### 顺带发现：扩展子系统整块没接线
+
+补上述 init 时发现 aacode 里**根本没有 `extension_host_proxy` 这个变量**——
+`extension::init` + `ExtensionHostProxy::global(cx)`（Zed `main.rs:524-525`）两步都缺。
+照抄后 `debug_adapter_extension` / `language_extension` / `extension_host` 才拿得到 proxy。
+
+其中 `ExtensionHostProxy` 是从 **`extension`** crate 导入的（`use extension::ExtensionHostProxy`），
+不是 `extension_host`——后者只有私有 re-export。
+
+### 顺带发现：fork 拆模块时漏了 re-export
+
+`encoding_selector` 编译报 `cannot find function 'init' in crate 'encoding_selector'`。
+根因：Zed 的 crate root **就是** `src/encoding_selector.rs`（其 `Cargo.toml` 有
+`[lib] path = "src/encoding_selector.rs"`），所以上游 `pub fn init` 直接是 crate 根函数。
+本 fork 拆成 `lib.rs` + `mod encoding_selector;` 后只 re-export 了 `ActiveBufferEncoding`，
+漏了 `init`。**这类错误只在接线那一行才炸**，其余代码照常编译。
+
+## 仍缺（有意不接）
+
+| crate | 原因 |
+|---|---|
+| `copilot_chat` | 需 `CredentialsProvider` + `CopilotChatConfiguration`，aacode 无 Copilot 账号体系 |
+| `web_search_providers` / `edit_prediction_registry` / `miniprofiler_ui` / `file_finder` / `call_hierarchy` / `journal` / `extensions_ui` / `settings_profile_selector` / `etw_tracing` / `component_preview` | aacode 无对应 crate（整块未移植） |
 
 ## 怎么系统排查
 
-新增/移植功能时，把上游的 init 链 diff 一遍，别只补用到的那一个：
+新增/移植功能时，把上游的 init 链 diff 一遍，别只补用到的那一个。
+
+**必须扫整个 app crate，不能只扫 `main.rs`**——`packages/app/src/initialize/` 里还有
+36 处 `on_action` / `register_action`（含 `initialize::init`，对应上游 `zed::init`）。
+只 grep `main.rs` 会把这些全误判成「上游有、aacode 缺」。
 
 ```bash
-# 1. 列出上游 init 调用
+# 1. 上游 init 调用（90 项）
 grep -nE "^\s+[a-z_]+::(init|register)\(" <zed>/crates/zed/src/main.rs
 
-# 2. 逐条对照 aacode
-grep -nE "^\s+[a-z_]+::(init|register)\(" packages/app/src/main.rs
+# 2. aacode 侧：扫整个 app crate，且要匹配 init/register 两种形态
+grep -rhoE "\b[a-z_0-9]+::(init|register)\(" packages/app/src/ | sort -u
+
+# 3. 对差集逐项确认 crate 是否已移植 + 是否有 pub fn init
+#    → 「crate 在 + 有 init」= 真缺口
 ```
 
 重点关注 Zed 中**同一功能域内成组出现**的调用（如 provider 注册的
 `RefreshLlmTokenListener::register` + `language_models::init`）—— 它们通常有顺序依赖，
 漏一个的表现往往和漏另一个完全不同（一个是 panic，一个是静默空白）。
+
+另外注意 ` Zed::init` **不是**「统一 init 入口」，它只装 `crates/zed` 私有类型才能实现的
+action handler（`Hide` / `OpenLog` / `OpenSettingsFile` 等 12 个）。其余 init 必须住在各自 crate
+里（`crates/zed` 依赖几乎所有 crate，反向依赖会成环），「统一」的只是 `main.rs` 里的调用顺序。
+

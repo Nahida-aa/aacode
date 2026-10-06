@@ -137,6 +137,17 @@ line_ending_selector.workspace = true
 inspector_ui.workspace = true
 keymap_editor.workspace = true
 lsp_command_selector.workspace = true
+lsp_locations.workspace = true
+language_extension.workspace = true
+debugger_tools.workspace = true
+web_search.workspace = true
+snippet_provider.workspace = true
+outline.workspace = true
+tasks_ui.workspace = true
+feedback.workspace = true
+markdown_preview.workspace = true
+svg_preview.workspace = true
+json_schema_store.workspace = true
 # tabular_data_preview 必须进 [dependencies]（而非仅 dev-dependencies）：它的 action
 # （tabular_data::OpenPreview*）要靠 inventory 注册后，内置 keymap 才能解析出绑定。
 # 对齐 zed crates/zed/Cargo.toml L138。

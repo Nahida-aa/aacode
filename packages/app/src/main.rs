@@ -68,6 +68,49 @@ fn main() {
         // 弹窗（否则关闭未保存文件等 prompt 会是朴素白框样式）。
         ui_prompt::init(cx);
 
+        // —— 扩展子系统（对齐 Zed main.rs L524-L525 / L561 / L566）——
+        // extension::init 建 ExtensionHost 的全局 Entity；ExtensionHostProxy::global
+        // 取出它的 Arc 供后续各 extension crate 注册自己的 proxy。
+        // 整块此前完全没接线：debug_adapter_extension / language_extension /
+        // extension_host / theme_extension 都拿不到 proxy → 扩展机制静默失效。
+        extension::init(cx);
+        let extension_host_proxy = extension::ExtensionHostProxy::global(cx);
+
+        // —— 其余「只需 &mut App」的 crate init ——
+        // 这一批 crate 已全部 fork 进仓且有 pub fn init，但此前没有任何调用点：
+        // 它们不进 inventory → 内置 keymap 里的绑定被静默跳过 → action 触发无反应，
+        // 且全程无编译错误无 panic（见 .agents/memory/zed-init-chain-gaps.md）。
+        // 顺序对齐 Zed main.rs（括号内为 zed 的行号）。
+        git_hosting_providers::init(cx); // L520
+        debugger_tools::init(cx); // L592
+        command_palette::init(cx); // L677
+        acp_tools::init(cx); // L701
+        edit_prediction_ui::init(cx); // L704
+        web_search::init(cx); // L705
+        snippet_provider::init(cx); // L707
+        recent_projects::init(cx); // L726
+        dev_container::init(cx); // L727
+        image_viewer::init(cx); // L734
+        diagnostics::init(cx); // L736
+        audio::init(cx); // L738
+        go_to_line::init(cx); // L742
+        outline::init(cx); // L745
+        tasks_ui::init(cx); // L750
+        search::init(cx); // L753
+        lsp_locations::init(cx); // L754
+        vim::init(cx); // L764
+        encoding_selector::init(cx); // L767
+        language_selector::init(cx); // L768
+        line_ending_selector::init(cx); // L769
+        toolchain_selector::init(cx); // L771
+        language_tools::init(cx); // L774
+        feedback::init(cx); // L779
+        markdown_preview::init(cx); // L780
+        svg_preview::init(cx); // L782
+        edit_prediction::init(cx); // L787
+        json_schema_store::init(cx); // L789
+        which_key::init(cx); // L791
+
         // —— Panel init（对齐 Zed zed.rs L6174-6176）——
         git_ui::init(cx);
         project_panel::init(cx);
@@ -106,6 +149,12 @@ fn main() {
         // —— Client ——
         let client = client::Client::production(cx);
         cx.set_http_client(client.http_client());
+        // 注册 client 自身的 action（SignIn / SignOut 等）。对齐 Zed main.rs L593。
+        client::init(&client, cx);
+        // dap_adapters 注册 DAP adapter 相关 action。对齐 Zed main.rs L659。
+        dap_adapters::init(cx);
+        // auto_update 注册检查更新 / 安装更新的 handler。对齐 Zed main.rs L658。
+        auto_update::init(client.clone(), cx);
 
         // —— LanguageRegistry ——
         let languages = Arc::new(language::LanguageRegistry::new(
@@ -133,6 +182,37 @@ fn main() {
 
         // —— Client 全局 ——
         client::Client::set_global(client.clone(), cx);
+
+        // —— 扩展子系统续（对齐 Zed main.rs L561 / L566 / L662）——
+        // 三个 extension crate 各注册一种 proxy 到 extension_host_proxy；
+        // extension_host::init 建 ExtensionStore（装扩展、管理扩展进程）。
+        // 都必须排在 fs / client / node_runtime 就绪之后。
+        debug_adapter_extension::init(extension_host_proxy.clone(), cx);
+        language_extension::init(
+            language_extension::LspAccess::ViaWorkspaces({
+                let workspace_store = workspace_store.clone();
+                Arc::new(move |cx: &mut gpui::App| {
+                    workspace_store.update(cx, |workspace_store, cx| {
+                        Ok(workspace_store
+                            .workspaces()
+                            .filter_map(|weak| weak.upgrade())
+                            .map(|workspace: gpui::Entity<workspace::Workspace>| {
+                                workspace.read(cx).project().read(cx).lsp_store()
+                            })
+                            .collect())
+                    })
+                })
+            }),
+            extension_host_proxy.clone(),
+            languages.clone(),
+        );
+        extension_host::init(
+            extension_host_proxy.clone(),
+            fs.clone(),
+            client.clone(),
+            node_runtime.clone(),
+            cx,
+        );
 
         // —— Collab 初始化链（对齐 Zed zed.rs L6166-6168）——
         channel::init(&client, user_store.clone(), cx);
@@ -196,6 +276,10 @@ fn main() {
             app_state.client.clone(),
             cx,
         );
+        // copilot_ui 注册 Copilot 面板与相关 action。对齐 Zed main.rs L693。
+        // （copilot_chat::init 需要 CredentialsProvider + 配置对象，aacode 尚未
+        //   接 Copilot 账号体系，故暂不接线——见 zed-init-chain-gaps.md。）
+        copilot_ui::init(&app_state, cx);
         let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
         project::AgentRegistryStore::init_global(
             cx,
