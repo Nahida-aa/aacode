@@ -355,7 +355,7 @@ gpui_learn commit `957a9a3`。
 > 再重新注册，见 `lsp_store/mod.rs:13001` / `13063`）。
 > Stop 与 Remove 的差别**只在恢复粒度**：前者可 per-item 单独恢复，后者只能全局恢复。
 
-### 改动（6 项）
+### 改动（7 项）
 
 1. **改名**
    - per-item：`Stop Server` → `Remove Server`（逻辑一字未动）
@@ -406,12 +406,35 @@ gpui_learn commit `957a9a3`。
      用 `emitted_server_names` 去重，从 `binary_statuses` 取 `Stopped` 状态
    - 渲染结果：灰色 + `Stopped`（`lsp_button.rs:367-369` 已处理该状态的配色文案）
 
+7. **新增全局 `Stop All Servers`**
+   - 上游全局只有 `ToggleServersButton { restart: bool }` 二选一，aacode 改为
+     三选一枚举 `ToggleServersAction { StopAll, RemoveAll, RestartAll }`
+   - ⚠️ **`StopAll` 不能走 `stop_all_language_servers`**（`lsp_store/mod.rs:12963`）。
+     它会设 `all_language_servers_stopped = true` 这个**全局总闸**，在
+     `register_buffer_with_language_servers`（3126）和 `refresh_server_tree`（6355）
+     两处 early return 拦掉注册；而 `all_language_servers_stopped` 的写入点只有
+     `stop_all`（置 true）与 `restart_all`（置 false），中间的
+     `restart_language_servers_for_buffers` **不碰它** → 之后每个 per-item
+     `Start Server` 都会被拦成**静默 no-op**
+   - 正确实现：先把所有 server 的展示归属记入 `stopped_server_worktrees`，再
+     `stop_language_servers_for_buffers(Vec::new(), {所有 id}, cx)` 一次停掉，
+     **不设**那个总闸
+   - `RemoveAll` 仍走 `stop_all_language_servers`（设总闸、条目消失、靠 Restart All 恢复）
+
 ### 状态矩阵（改动后）
 
 | server 状态 | 可用动作 |
 |---|---|
 | 运行中 / Starting | `Restart Server`、`Stop Server`、`Remove Server` |
 | 已停止（Stopped） | `Start Server`、`Remove Server` |
+
+| 全局 | 说明 |
+|---|---|
+| `Stop All Servers` | 条目保留，可逐个单独 Start 恢复 |
+| `Remove All Servers` | 条目消失，只能 Restart All 恢复 |
+| `Restart All Servers` | 全部拉回 |
+
+（有 server 在运行时三者都显示；全部停止时只显示 `Restart All Servers`。）
 
 | 动作 | 条目 | 恢复粒度 |
 |---|---|---|

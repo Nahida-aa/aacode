@@ -302,32 +302,97 @@ impl LanguageServerState {
 
         let mut first_button_encountered = false;
         for item in &self.items {
-            if let LspMenuItem::ToggleServersButton { restart } = item {
-                let label = if *restart {
-                    "Restart All Servers"
-                } else {
-                    "Remove All Servers"
+            if let LspMenuItem::ToggleServersButton { action } = item {
+                let label = match action {
+                    ToggleServersAction::StopAll => "Stop All Servers",
+                    ToggleServersAction::RemoveAll => "Remove All Servers",
+                    ToggleServersAction::RestartAll => "Restart All Servers",
                 };
 
-                let restart = *restart;
+                let action = *action;
 
                 let button = ContextMenuEntry::new(label).handler({
                     let state = cx.entity();
                     move |_, cx| {
                         let lsp_store = state.read(cx).lsp_store.clone();
-                        // 全局动作结束后不该再保留单条展示归属。
-                        state.update(cx, |state, _| {
-                            state.language_servers.stopped_server_worktrees.clear();
-                        });
-                        lsp_store
-                            .update(cx, |lsp_store, cx| {
-                                if restart {
-                                    lsp_store.restart_all_language_servers(cx);
-                                } else {
-                                    lsp_store.stop_all_language_servers(cx);
+
+                        match action {
+                            ToggleServersAction::StopAll => {
+                                // 先把所有 server 的展示归属记下来，否则停止后条目全没了。
+                                // 必须绕开 `stop_all_language_servers`：它设的
+                                // `all_language_servers_stopped` 总闸会让之后每个
+                                // per-item Start 都被拦成 no-op。
+                                let entries = lsp_store
+                                    .update(cx, |lsp_store, cx| {
+                                        let worktree_store = lsp_store.worktree_store().clone();
+                                        lsp_store
+                                            .language_server_statuses()
+                                            .filter_map(|(server_id, status)| {
+                                                let worktree = status.worktree.and_then(
+                                                    |worktree_id| {
+                                                        worktree_store
+                                                            .read(cx)
+                                                            .worktree_for_id(worktree_id, cx)
+                                                    },
+                                                )?;
+                                                Some((
+                                                    status.name.clone(),
+                                                    (worktree.downgrade(), server_id),
+                                                ))
+                                            })
+                                            .collect::<Vec<_>>()
+                                    })
+                                    .unwrap_or_default();
+
+                                if !entries.is_empty() {
+                                    state.update(cx, |state, cx| {
+                                        state
+                                            .language_servers
+                                            .stopped_server_worktrees
+                                            .extend(entries);
+                                        cx.notify();
+                                    });
                                 }
-                            })
-                            .ok();
+
+                                lsp_store
+                                    .update(cx, |lsp_store, cx| {
+                                        let server_ids = lsp_store
+                                            .language_server_statuses()
+                                            .map(|(server_id, _)| server_id)
+                                            .collect::<HashSet<_>>();
+                                        if server_ids.is_empty() {
+                                            return;
+                                        }
+                                        lsp_store
+                                            .stop_language_servers_for_buffers(
+                                                Vec::new(),
+                                                HashSet::from_iter(
+                                                    server_ids.into_iter().map(
+                                                        LanguageServerSelector::Id,
+                                                    ),
+                                                ),
+                                                cx,
+                                            )
+                                            .detach_and_log_err(cx);
+                                    })
+                                    .ok();
+                            }
+                            _ => {
+                                // Remove All / Restart All 都是全局动作，
+                                // 结束后不该再保留单条展示归属。
+                                state.update(cx, |state, _| {
+                                    state.language_servers.stopped_server_worktrees.clear();
+                                });
+                                lsp_store
+                                    .update(cx, |lsp_store, cx| match action {
+                                        ToggleServersAction::RemoveAll => {
+                                            lsp_store.stop_all_language_servers(cx)
+                                        }
+                                        _ => lsp_store.restart_all_language_servers(cx),
+                                    })
+                                    .ok();
+                            }
+                        }
                     }
                 });
 
@@ -937,6 +1002,20 @@ enum ServerData<'a> {
     },
 }
 
+/// 全局动作按钮。上游用 `restart: bool` 二选一（Restart All / Stop All）；
+/// aacode 把「停止」与「移除」拆开后需要三选一。
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ToggleServersAction {
+    /// 全部停止：条目保留（记入 `stopped_server_worktrees`），可逐个单独 Start 恢复。
+    /// 注意不能走 `stop_all_language_servers`（它会设 `all_language_servers_stopped` 总闸，
+    /// 之后 per-item Start 会被该总闸拦成 no-op）。
+    StopAll,
+    /// 全部移除：条目消失，只能靠 Restart All 恢复。
+    RemoveAll,
+    /// 全部重启。
+    RestartAll,
+}
+
 #[derive(Debug)]
 enum LspMenuItem {
     WithHealthCheck {
@@ -950,7 +1029,7 @@ enum LspMenuItem {
         binary_status: LanguageServerBinaryStatus,
     },
     ToggleServersButton {
-        restart: bool,
+        action: ToggleServersAction,
     },
     Header {
         header: Option<SharedString>,
@@ -1397,10 +1476,19 @@ impl LspButton {
             }
             if !new_lsp_items.is_empty() {
                 if can_stop_all {
-                    new_lsp_items.push(LspMenuItem::ToggleServersButton { restart: true });
-                    new_lsp_items.push(LspMenuItem::ToggleServersButton { restart: false });
+                    new_lsp_items.push(LspMenuItem::ToggleServersButton {
+                        action: ToggleServersAction::StopAll,
+                    });
+                    new_lsp_items.push(LspMenuItem::ToggleServersButton {
+                        action: ToggleServersAction::RemoveAll,
+                    });
+                    new_lsp_items.push(LspMenuItem::ToggleServersButton {
+                        action: ToggleServersAction::RestartAll,
+                    });
                 } else if can_restart_all {
-                    new_lsp_items.push(LspMenuItem::ToggleServersButton { restart: true });
+                    new_lsp_items.push(LspMenuItem::ToggleServersButton {
+                        action: ToggleServersAction::RestartAll,
+                    });
                 }
             }
 
