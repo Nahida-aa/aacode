@@ -331,18 +331,3 @@ gpui_learn commit `957a9a3`。
 > 教训：把 glob 改成显式列举虽然更可控，但**迁移期必然漏**。搬 Zed 代码遇到
 > `cannot find function/xxx in crate ui` 时，先去被搬文件里确认符号是否存在 ——
 > 存在就是 re-export 漏了，而不是代码没写。
-
-## 决策：gpui_learn 保持本地 path patch（个人迭代阶段）
-
-根 `Cargo.toml` 的 `[patch."https://github.com/Nahida-aa/gpui_learn.git"]` 把 7 个包覆盖到
-`/home/aa/repos/ide_ls/gpui_learn/...` 的**绝对路径**，**保持不动**。
-
-**理由**（用户明确决策，勿再提议移除）：当前是个人迭代阶段，可复现性不是目标，
-迭代速度优先 —— 改完 gpui_learn 立即生效，不必先 push + 顶 rev。
-
-**代价与移除时机**：本段含绝对路径，别人 clone 会失败。等到需要协作或发布时再整段删除；
-届时 `[workspace.dependencies]` 里的 rev 已指向最新提交，删掉即可直接走 git 依赖。
-
-> 注意：`[patch]` 优先于 `[workspace.dependencies]` 的 rev 声明，所以后者当前**不起实际作用**。
-> 我曾把 rev 从 `21f4599` 更新到 `957a9a3`（gpui_learn 已推到该提交），这个更新保留着 ——
-> 它在 patch 移除后就是可用的 rev，也是「移除 patch 后能否直接构建」的凭据（已验证通过）。
