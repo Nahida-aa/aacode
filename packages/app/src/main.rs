@@ -229,6 +229,8 @@ fn main() {
             node_options_tx.send(Some(options)).log_err();
         })
         .detach();
+        // 让每个新窗口的 scrollbar 监听 SettingsStore 变化。对齐 Zed main.rs L557。
+        ui::on_new_scrollbars::<settings::SettingsStore>(cx);
         let node_runtime =
             node_runtime::NodeRuntime::new(client.http_client(), None, node_options_rx);
 

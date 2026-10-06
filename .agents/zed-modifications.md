@@ -312,12 +312,22 @@ sender 被闭包捕获因而存活，`settings.json` 的 `node` 配置（`ignore
 `path` / `npm_path`）也随之真正生效。注意 `get_global` 来自 `Settings` trait，
 需 `use settings::Settings as _;`；`log_err` 需 `use util::ResultExt as _;`。
 
-## 已知缺口：ui::on_new_scrollbars 未接（gpui_learn 侧漏导出）
+## ui::on_new_scrollbars：gpui_learn 显式列举导致的漏导出（已修）
 
 Zed `main.rs:557` 有一行 `ui::on_new_scrollbars::<SettingsStore>(cx);`（让每个新窗口的
-scrollbar 响应设置变化），aacode 未接。函数本身在 gpui_learn rev `21f4599` 里存在
-（`packages/ui/src/components/scrollbar.rs:627`），但 `packages/ui/src/components/mod.rs:117`
-的 `pub use scrollbar::{...}` 是**显式列举**（上游 zed 是 glob 导出），漏了该函数，
-导致 `ui::on_new_scrollbars` 在 crate 根不可寻。
+scrollbar 响应设置变化），aacode 补上了。
 
-修法需改 gpui_learn 并推 rev，故不在 aacode 侧解决。与 node/prettier 无关，独立处理。
+**卡点**：函数在 gpui_learn 的 `packages/ui/src/components/scrollbar.rs:627` 确实存在，
+但 `packages/ui/src/components/mod.rs` 的 `pub use scrollbar::{...}` 是**显式列举**
+（上游 zed 用 `pub use components::*` glob），漏了该函数 → 报
+`cannot find function 'on_new_scrollbars' in crate ui`。症状像"函数不存在"，
+实际是 re-export 缺失。
+
+**一并补齐的另外 2 项**（同样漏了导出，对比 scrollbar.rs 的 pub 项与导出列表得出）：
+`ScrollbarElement`、`ScrollbarPrepaintState`。补后可导出面与上游 glob 一致。
+
+gpui_learn commit `957a9a3`。
+
+> 教训：把 glob 改成显式列举虽然更可控，但**迁移期必然漏**。搬 Zed 代码遇到
+> `cannot find function/xxx in crate ui` 时，先去被搬文件里确认符号是否存在 ——
+> 存在就是 re-export 漏了，而不是代码没写。

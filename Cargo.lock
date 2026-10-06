@@ -156,6 +156,7 @@ dependencies = [
  "session",
  "settings",
  "settings_ui",
+ "shellexpand",
  "sidebar",
  "snippet_provider",
  "spin 0.10.1",
