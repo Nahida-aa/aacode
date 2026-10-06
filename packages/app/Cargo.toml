@@ -59,6 +59,7 @@ visual-tests = [
 [dependencies]
 acp_thread.workspace = true
 acp_tools.workspace = true
+ad_credentials_provider.workspace = true
 action_log = { workspace = true, optional = true }
 activity_indicator.workspace = true
 agent-client-protocol.workspace = true

@@ -63,7 +63,32 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
 `lsp_locations` `vim` `encoding_selector` `language_selector` `line_ending_selector`
 `toolchain_selector` `language_tools` `feedback` `markdown_preview` `svg_preview`
 `edit_prediction` `json_schema_store` `which_key` `client` `auto_update` `dap_adapters`
-`copilot_ui` `extension` `extension_host` `debug_adapter_extension` `language_extension`
+`copilot_chat` `copilot_ui` `extension` `extension_host` `debug_adapter_extension`
+`language_extension`
+
+至此事项清零：审计脚本已报不出任何「crate 在 + 有 `pub fn init` + app 未调用」的项。
+
+### 坑：不要凭 crate 名猜「需要什么依赖」
+
+`copilot_chat::init` 要 `CredentialsProvider` + `CopilotChatConfiguration`，我一度判定
+「aacode 无 Copilot 账号体系，故意不接」。实际两个依赖都齐：
+
+- `packages/ad_credentials_provider/src/lib.rs` **完整实现了** `CredentialsProvider`
+  （keychain + development 两种实现），并提供 `global(cx) -> Arc<dyn CredentialsProvider>`。
+  它就是 Zed 的 `zed_credentials_provider`，只是改了名。
+- `CopilotChatConfiguration` 就在 `copilot_chat/src/lib.rs:28`；其 `enterprise_uri` 的取值路径
+  `language::language_settings::all_language_settings(None, cx).edit_predictions.copilot.enterprise_uri`
+  在 `packages/language/src/language_settings/mod.rs:607`（`CopilotSettings`）完整存在。
+
+**教训**：判定「无法接线」前必须逐个 grep 验证依赖是否真的不存在。只看 crate 名容易得出
+「整块没移植」的错觉——那 10 个真正没移植的 crate（无 `packages/<name>` 目录）反而更容易识别。
+
+## 仍缺（aacode 整块未移植，非 init 缺口）
+
+`web_search_providers` `edit_prediction_registry` `miniprofiler_ui` `file_finder`
+`call_hierarchy` `journal` `extensions_ui` `settings_profile_selector` `etw_tracing`
+`component_preview` `theme_extension` —— aacode 无对应 crate 目录。
+要补属于新功能移植，不在 init 链范畴。
 
 ### 顺带发现：扩展子系统整块没接线
 
@@ -81,13 +106,6 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
 `[lib] path = "src/encoding_selector.rs"`），所以上游 `pub fn init` 直接是 crate 根函数。
 本 fork 拆成 `lib.rs` + `mod encoding_selector;` 后只 re-export 了 `ActiveBufferEncoding`，
 漏了 `init`。**这类错误只在接线那一行才炸**，其余代码照常编译。
-
-## 仍缺（有意不接）
-
-| crate | 原因 |
-|---|---|
-| `copilot_chat` | 需 `CredentialsProvider` + `CopilotChatConfiguration`，aacode 无 Copilot 账号体系 |
-| `web_search_providers` / `edit_prediction_registry` / `miniprofiler_ui` / `file_finder` / `call_hierarchy` / `journal` / `extensions_ui` / `settings_profile_selector` / `etw_tracing` / `component_preview` | aacode 无对应 crate（整块未移植） |
 
 ## 怎么系统排查
 

@@ -48,6 +48,7 @@ dependencies = [
  "acp_tools",
  "action_log",
  "activity_indicator",
+ "ad_credentials_provider",
  "agent",
  "agent-client-protocol",
  "agent_servers",

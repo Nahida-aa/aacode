@@ -277,8 +277,23 @@ fn main() {
             cx,
         );
         // copilot_ui 注册 Copilot 面板与相关 action。对齐 Zed main.rs L693。
-        // （copilot_chat::init 需要 CredentialsProvider + 配置对象，aacode 尚未
-        //   接 Copilot 账号体系，故暂不接线——见 zed-init-chain-gaps.md。）
+        // copilot_chat 必须排在 copilot_ui 之前：后者要读 GlobalCopilotChat 全局。
+        // 对齐 Zed main.rs L678-L691。credentials_provider 在 aacode 对应
+        // ad_credentials_provider（Zed 侧叫 zed_credentials_provider）。
+        let copilot_chat_configuration = copilot_chat::CopilotChatConfiguration {
+            enterprise_uri: language::language_settings::all_language_settings(None, cx)
+                .edit_predictions
+                .copilot
+                .enterprise_uri
+                .clone(),
+        };
+        let credentials_provider = ad_credentials_provider::global(cx);
+        copilot_chat::init(
+            app_state.client.http_client(),
+            credentials_provider,
+            copilot_chat_configuration,
+            cx,
+        );
         copilot_ui::init(&app_state, cx);
         let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
         project::AgentRegistryStore::init_global(
