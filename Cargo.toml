@@ -568,28 +568,28 @@ zeroize = "1.8"
 zstd = "0.11"
 
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
+clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
 # 别名为 zed 的新包 `fuzzy_nucleo`：我们对齐的就是它（Case / LengthPenalty /
 # match_strings_async / StringMatch.string: SharedString）。成员包二选一，
 # 不能同时写 aa_gpui_fuzzy 和 fuzzy_nucleo（同一 crate 两个名字 → Cargo 报错）。
-fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
+fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
 # zed 里这两个控件包就叫 `ui` / `ui_input`，同样用别名对齐，
 # 让照搬的 zed 代码（`ui::Button`、`ui_input::InputField`）零改动。
-ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
+ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
 # zed 里这个包叫 `theme`，别名让照搬的 zed 代码（`theme::SyntaxTheme` 等）原样可用。
 # 与 `aa_gpui_kit_theme` 指向同一个包；**每个包只能选其中一个名字声明**，
 # 否则会报 "depends on crate ... multiple times with different names"。
-theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
+theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
 # 图标枚举（gpui_learn packages/icons）在 zed 里叫 `icons`，同样用别名对齐。
-icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
-aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "21f45990a507cee26f56f5feaeadd6216787a9d6" }
+icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
+aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "957a9a33399446c5556ff9bcbb6a8a08ef159e09" }
 
 
 crashes = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
@@ -717,24 +717,14 @@ webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev 
 language_core = { path = "packages/language_core" }
 util = { path = "packages/util" }
 
-# gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
-# 别把任何一个改回 `git = ..., rev = ...` —— 那会让它停在旧提交，aacode 侧报
-# 「找不到刚加的符号」（如 `unresolved import theme::ClientDecorationsExt`），
-# 症状很像代码没写。同源要求见下面 ui_input 那条注释。
-[patch."https://github.com/Nahida-aa/gpui_learn.git"]
-aa_gpui_kit_assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }
-aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
-aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
-# icons 是刚加进 gpui_learn 的新包，还没进上面 git 依赖锁定的那个 rev，
-# 先用本地 path 顶上，等推上去并更新 rev 后可以移除这条。
-aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
-# clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样先走本地。
-aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
-# aa_gpui_fuzzy 的路径类型从 std::path::Path 换成了 zed 的 `path::RelPath`，
-# 与 zed crates/fuzzy_nucleo 对齐；project 因此不再需要手写 PathStyle 转换。
-aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" }
-# ui / ui_input / component 必须同源：ui 走本地 path 后，若 ui_input 还留在 c712ba1，
-# 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
-# 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
-aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
-aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
+# gpui_learn 走 git rev（见 [workspace.dependencies]，当前 957a9a3），**不加 [patch]**。
+#
+# 为什么不用 patch 覆盖成本地 path：
+#   patch 里要写绝对路径（/home/aa/repos/ide_ls/gpui_learn/...），提交后别人 clone
+#   会因路径不存在而无法构建。开发期想用本地版时，把下面这段临时加回
+#   [patch."https://github.com/Nahida-aa/gpui_learn.git"] 即可（改完 gpui_learn 立即
+#   生效，不必先 push + 顶 rev），但**不要提交**。
+#
+# 同源要求：ui / ui_input / component 必须来自同一个 rev。若它们分属不同 rev，
+# 会各拖一份 aa_gpui_kit_component，出现两个不同的 `Component` trait，报
+# `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
