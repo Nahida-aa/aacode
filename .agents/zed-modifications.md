@@ -331,3 +331,74 @@ gpui_learn commit `957a9a3`。
 > 教训：把 glob 改成显式列举虽然更可控，但**迁移期必然漏**。搬 Zed 代码遇到
 > `cannot find function/xxx in crate ui` 时，先去被搬文件里确认符号是否存在 ——
 > 存在就是 re-export 漏了，而不是代码没写。
+
+## LSP 面板：拆分「停止」与「移除」（aacode 有意改动）
+
+**文件**：`packages/language_tools/src/lsp_button.rs`（改动前与 Zed **零差异**，改动后
+`diff` 约 234 行）
+
+### 动机：上游命名与实际行为不符
+
+上游每个 server item 只有一个 `Stop Server`，但它**实际做的是注销/移除**：
+`stop_language_servers_for_buffers` → `stop_local_language_server`
+（`packages/project/src/lsp_store/mod.rs:12841`）会移除 `language_server_ids`、
+清空该 server 的全部诊断、优雅 shutdown、并把 name 写进 `stopped_language_servers`
+抑制自动启动；随后 `LspStoreEvent::LanguageServerRemoved` 触发
+`remove_server`（`lsp_button.rs:781-788`）清掉面板的 `servers_per_buffer_abs_path`
+→ **条目消失**，且**无法单独恢复**，只能走全局 `Restart All Servers`。
+
+即"停止"这个标签下藏着一个不可逆操作，连维护者都会误解。
+
+### 改动（4 项）
+
+1. **改名**
+   - per-item：`Stop Server` → `Remove Server`（逻辑一字未动）
+   - 全局：`Stop All Servers` → `Remove All Servers`（与 `Restart All Servers` 平行）
+
+2. **新增真正的 `Stop Server`**（可恢复）
+   - 停掉 server，但**条目保留**，可单独 `Start Server` 恢复
+   - 实现：停止前先把该 server 的展示归属记入新字段（见下），再执行与上游
+     完全相同的 `stop_language_servers_for_buffers(Vec::new(), {Id}, cx)`
+
+3. **新增 `Start Server`**（仅停止态显示）
+   - **必须传全部 buffers**（`lsp_store.buffer_store().read(cx).buffers()`）。
+     理由：现有 per-item `Restart Server`（497-581）用的是
+     `servers_per_buffer_abs_path` 收集的 buffers，停止后该列表为空 →
+     `if !buffers.is_empty()` 不成立 → **静默 no-op**。这是最容易踩的坑。
+   - `clear_stopped` 必须传 `true`：`stopped_language_servers` 会拦注册
+     （`lsp_store/mod.rs:3200-3204`），只有 `clear_stopped=true` 才会先移除该
+     name（`lsp_store/mod.rs:13065-13072`），server 才能起来。
+
+4. **新增 `stopped_server_worktrees` 字段**（`lsp_button.rs` 的 `LanguageServers`）
+   ```rust
+   stopped_server_worktrees: HashMap<LanguageServerName, (WeakEntity<Worktree>, LanguageServerId)>
+   ```
+   - **这是 aacode 新增的状态，上游没有**，rev→rev 同步时注意
+   - 用弱引用，与 `ServersForPath.worktree` 的 `Option<WeakEntity<Worktree>>` 风格一致
+   - **不要**改用"停止时不清理 `servers_per_buffer_abs_path`"来实现条目保留：
+     该 map 由更新事件重建，保留死 id 会在重启后产生**幽灵条目**。
+     独立记录可彻底回避，且 `remove_server` 无需改动 → 现有
+     `remove_server_drops_health_entry_for_id` /
+     `remove_server_evicts_id_from_per_buffer_entries_and_drops_empty_entries` /
+     `remove_server_does_not_touch_binary_statuses` 三个单测不受影响
+   - Restart All / Remove All 两个全局分支都会 `clear()` 该字段
+
+5. **item 构造新增第三来源**
+   - 位置紧跟 `binary_statuses` 循环之后，遍历 `stopped_server_worktrees`，
+     用 `emitted_server_names` 去重，从 `binary_statuses` 取 `Stopped` 状态
+   - 渲染结果：灰色 + `Stopped`（`lsp_button.rs:367-369` 已处理该状态的配色文案）
+
+### 保留的两个细节（有意为之）
+
+- `can_start` 用**双条件或**：`BinaryStatus::Stopped` **或** name 在
+  `stopped_server_worktrees` 中。前者不能省 —— `Stopped` 状态并不只由「移除」产生，
+  上游本来就存在该状态且有灰色标识（例如 Stop All 等路径也会置为该状态）。
+- 运行中的 server 会同时出现 `Restart Server` + `Stop Server` + `Remove Server` 三项，
+  `Stop` 与 `Remove` 的差异已在代码注释中说明（暂未做 tooltip）。
+
+### rev→rev 同步注意
+
+上游若改动以下任一项，需人工合并而非直接覆盖：
+`remove_server`（781-788）、item 构造（约 1210-1400）、per-item 子菜单（约 415-715）、
+全局按钮分支（约 303-340）。合并后请确认 `stopped_server_worktrees` 的三处引用
+（写入 / 移除 / 清空）仍然完整。
