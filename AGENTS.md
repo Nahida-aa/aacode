@@ -109,3 +109,11 @@ skill for more detailed guidance.
 zed 参照仓库在 `~/repos/ide_ls/learn_ls/zed`，单文件 crate 拆分后的可见性转发、
 `collections::` vs `std::collections::`、`RelPath` vs `std::path::Path`、
 模块遮蔽要用 `::rpc::` 绝对路径等坑都记在那儿，照搬时直接套用，别重新推演。
+
+## 排查经验（`.agents/memory/`）
+
+- **UI「内容不显示」类 bug**：先在数据源函数入口打一行 `len()` 确认数据非空，再碰渲染层。
+  指标全正常时立即停止、回头复核用户诉求。详见 `.agents/memory/debug-ui-empty.md`。
+- **Zed init 链缺口**：`init` 链缺失不报编译错、大多不 panic，只表现为功能静默失效
+  （如缺 provider 注册 → 某个设置子页全白且零报错）。移植新功能时 diff 一遍上游
+  `zed/src/main.rs` 的 init 链。已知缺口与排查法见 `.agents/memory/zed-init-chain-gaps.md`。
