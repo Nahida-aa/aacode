@@ -134,6 +134,7 @@ http_client.workspace = true
 image_viewer.workspace = true
 language_tools.workspace = true
 line_ending_selector.workspace = true
+inspector_ui.workspace = true
 keymap_editor.workspace = true
 lsp_command_selector.workspace = true
 # tabular_data_preview 必须进 [dependencies]（而非仅 dev-dependencies）：它的 action

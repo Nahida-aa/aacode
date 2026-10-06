@@ -168,6 +168,12 @@ fn main() {
         });
         workspace::AppState::set_global(app_state.clone(), cx);
 
+        // 注册 dev::ToggleInspector 的 handler（app menu「View → Toggle GPUI
+        // Inspector」与 ctrl-alt-i 走这个 action）。debug 构建下真的打开
+        // inspector；release 下只提示「仅 debug 构建可用」并从命令面板隐藏。
+        // 需要 AppState，故排在 set_global 之后。对齐 Zed main.rs L788。
+        inspector_ui::init(app_state.clone(), cx);
+
         // —— Agent init 链（对齐 Zed main.rs L694-L722，AppState 之后）——
         language_model::init(cx);
         let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
