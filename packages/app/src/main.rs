@@ -13,10 +13,16 @@ use gpui::{
     App, AppContext, SharedString, WindowDecorations, px, size,
 };
 use gpui_platform::application;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
+use std::time::Instant;
 use theme::ActiveTheme;
 
+/// 进程启动时刻，供 miniprofiler_ui 计算「启动到首次交互」的耗时。
+/// 对齐 Zed main.rs L199 / L202（在 main() 首行 get_or_init）。
+static STARTUP_TIME: OnceLock<Instant> = OnceLock::new();
+
 fn main() {
+    STARTUP_TIME.get_or_init(Instant::now);
     tracing_subscriber::fmt::init();
 
     // `aa-app --printenv` — shell env 捕获子进程（对齐 Zed main.rs L251-L255）。
@@ -87,6 +93,8 @@ fn main() {
         acp_tools::init(cx); // L701
         edit_prediction_ui::init(cx); // L704
         web_search::init(cx); // L705
+        // 需 client + user_store，故排在 app_state 之前的 client 创建之后插；
+        // 但 zed 用的是 app_state，故这里延后到 app_state 构造后（见下）。
         snippet_provider::init(cx); // L707
         recent_projects::init(cx); // L726
         dev_container::init(cx); // L727
@@ -94,7 +102,9 @@ fn main() {
         diagnostics::init(cx); // L736
         audio::init(cx); // L738
         go_to_line::init(cx); // L742
+        file_finder::init(cx); // L743
         outline::init(cx); // L745
+        call_hierarchy::init(cx); // L746
         tasks_ui::init(cx); // L750
         search::init(cx); // L753
         lsp_locations::init(cx); // L754
@@ -109,6 +119,7 @@ fn main() {
         svg_preview::init(cx); // L782
         edit_prediction::init(cx); // L787
         json_schema_store::init(cx); // L789
+        miniprofiler_ui::init(*STARTUP_TIME.get().unwrap(), cx); // L790
         which_key::init(cx); // L791
 
         // —— Panel init（对齐 Zed zed.rs L6174-6176）——
@@ -295,6 +306,11 @@ fn main() {
             cx,
         );
         copilot_ui::init(&app_state, cx);
+        // zed L706 web_search_providers / L766 journal / L786 extensions_ui
+        // 三者都需要 app_state（或其中的 client / user_store），故集中在此。
+        web_search_providers::init(app_state.client.clone(), app_state.user_store.clone(), cx);
+        journal::init(app_state.clone(), cx);
+        extensions_ui::init(cx);
         let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
         project::AgentRegistryStore::init_global(
             cx,

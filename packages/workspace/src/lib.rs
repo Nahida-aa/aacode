@@ -205,10 +205,11 @@ pub use crate::workspace::{
         lifecycle::reload
     },
     follow::{CollaboratorId, AutoWatch, state::ViewId},
+    nav::MAX_RECENT_SELECTIONS,
     notification::toast::Toast,
     open::{
-        local::{open_new, with_active_or_new_workspace},
-        options::{OpenOptions, OpenVisible, OpenMode,},
+        local::{open_new, open_paths, with_active_or_new_workspace},
+        options::{OpenOptions, OpenResult, OpenVisible, OpenMode,},
         remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db, open_remote_project_with_new_connection},
         matching::find_existing_workspace,
         file::create_and_open_local_file
@@ -234,7 +235,6 @@ use workspace::{
     follow::{FollowerState},
     open::local::{open_items, open_workspace_by_id},
     open::matching::{WorkspaceMatching, },
-    open::options::{ OpenResult},
     open::prompt::{PromptForNewPath, PromptForOpenPath},
     open::windows::workspace_windows_for_location,
     pane::ActivateInDirectionTarget,

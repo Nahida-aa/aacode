@@ -60,6 +60,12 @@ visual-tests = [
 acp_thread.workspace = true
 acp_tools.workspace = true
 ad_credentials_provider.workspace = true
+file_finder.workspace = true
+call_hierarchy.workspace = true
+journal.workspace = true
+extensions_ui.workspace = true
+web_search_providers.workspace = true
+miniprofiler_ui.workspace = true
 action_log = { workspace = true, optional = true }
 activity_indicator.workspace = true
 agent-client-protocol.workspace = true

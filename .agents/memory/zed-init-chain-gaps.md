@@ -64,9 +64,41 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
 `toolchain_selector` `language_tools` `feedback` `markdown_preview` `svg_preview`
 `edit_prediction` `json_schema_store` `which_key` `client` `auto_update` `dap_adapters`
 `copilot_chat` `copilot_ui` `extension` `extension_host` `debug_adapter_extension`
-`language_extension`
+`language_extension` `web_search_providers` `file_finder` `call_hierarchy` `journal`
+`extensions_ui` `miniprofiler_ui`
 
 至此事项清零：审计脚本已报不出任何「crate 在 + 有 `pub fn init` + app 未调用」的项。
+
+### 坑：移植 proc 宏 derive 时必须加 `#[register_component(crate = "...")]`
+
+`extensions_ui/src/components/extension_card.rs` 的 `#[derive(RegisterComponent)]` 报
+`cannot find module or crate 'aa_gpui_kit_component'`。这是 zed-port.md #12 的情形：
+proc 宏展开时看不见 Cargo 别名，只认自己的真名。修法是在消费方那一行加属性
+（aacode 已有 5 处既有用法，如 `agent_ui/src/ui/session_notice.rs:72`）：
+
+```rust
+#[derive(IntoElement, RegisterComponent)]
+#[register_component(crate = "component")]
+```
+
+### 坑：拆模块后 workspace 的公开 API 会「少几个符号」
+
+新 crate 照抄 zed 后常直接 `use workspace::{OpenResult, ...}`，但 aacode 把 workspace
+从单文件拆成了子模块，这些符号虽 `pub` 却没从 crate 根导出，报 `is private`。
+修法是在 `packages/workspace/src/lib.rs` 第 180 行那个 `pub use crate::workspace::{...}`
+块里补上（注意别和后面的私有 `use workspace::{...}` 块重复导入，否则 E0252）。
+
+本次补了 `open::local::open_paths`、`open::options::OpenResult`、`nav::MAX_RECENT_SELECTIONS`。
+
+### 坑：`http_client` 的 `deserialize_sha256_digest` 曾是悬空引用
+
+`github.rs:32` 写着 `#[serde(default, deserialize_with = "deserialize_sha256_digest")]`
+但函数体从未存在——`Deserializer` 被 import 却无人使用。根因是 `1f370f5` 把「反序列化后
+遍历 assets 剥离 `sha256:` 前缀」改成 `deserialize_with` 时漏加了函数。因为
+`http_client` 此前不在任何检查路径上，`cargo check --workspace` 才第一次暴露。
+语义可从该 commit 删除的旧代码逐字还原。
+
+> 教训：**检查范围要放到 `--workspace`**，只 check 主线包会漏掉这类问题。
 
 ### 坑：不要凭 crate 名猜「需要什么依赖」
 
@@ -83,12 +115,10 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
 **教训**：判定「无法接线」前必须逐个 grep 验证依赖是否真的不存在。只看 crate 名容易得出
 「整块没移植」的错觉——那 10 个真正没移植的 crate（无 `packages/<name>` 目录）反而更容易识别。
 
-## 仍缺（aacode 整块未移植，非 init 缺口）
+## 仍缺（有意不移植）
 
-`web_search_providers` `edit_prediction_registry` `miniprofiler_ui` `file_finder`
-`call_hierarchy` `journal` `extensions_ui` `settings_profile_selector` `etw_tracing`
-`component_preview` `theme_extension` —— aacode 无对应 crate 目录。
-要补属于新功能移植，不在 init 链范畴。
+- `etw_tracing` — Windows-only ETW 追踪，aacode 无此 crate
+- `component_preview` — Zed 官网组件预览工具，与产品功能无关
 
 ### 顺带发现：扩展子系统整块没接线
 
