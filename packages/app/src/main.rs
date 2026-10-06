@@ -183,9 +183,13 @@ fn main() {
         auto_update::init(client.clone(), cx);
 
         // —— LanguageRegistry ——
-        let languages = Arc::new(language::LanguageRegistry::new(
-            cx.background_executor().clone(),
-        ));
+        let mut languages = language::LanguageRegistry::new(cx.background_executor().clone());
+        // LSP server 的下载目录。扩展提供的 LSP（yaml-language-server、gopls 等）
+        // 要下载二进制到这里，没设就报
+        // `Failed to start language server "xxx": no language server download dir defined`。
+        // 对齐 Zed main.rs L530。
+        languages.set_language_server_download_dir(paths::languages_dir().clone());
+        let languages = Arc::new(languages);
 
         // —— NodeRuntime ——
         // Zed 从 SettingsStore 变化建 watch channel 传 node binary options；

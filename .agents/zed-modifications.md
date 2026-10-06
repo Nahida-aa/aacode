@@ -226,3 +226,50 @@ zed 独有字符串。当前无妨，两者并存即可。
 目前代码里唯一的 zed 独有字符串是测试里的
 `packages/http_client/src/github.rs:199` ——
 `github_api_request("https://api.github.com/repos/zed-industries/zed/releases")`。
+
+## 高危依赖：slotmap（版本必须与 zed 一致）
+
+**现象**（编译通过、不 panic、只在启动时刷 ERROR）：
+
+```
+ERROR: Unable to deserialize editor: No entry in database for item_id:
+       4294967690 and workspace_id WorkspaceId(2)
+ERROR: No keybinding editor to deserialize
+```
+
+**根因**：`gpui::EntityId` 是 `slotmap::new_key_type!` 生成的 Key（idx+version 打包位域），
+而 workspace 持久化把它的原始 u64 直接当主键写进 `editors` 表：
+
+```
+workspace/serialize/pane.rs:36   item_id: handle.item_id().as_u64()
+        ↓ 写入
+editors 表 (item_id, workspace_id) ← 主键
+        ↓ 读取
+editor/items.rs:1290  EditorDb::get_serialized_editor(item_id, workspace_id)
+        ↓ 查不到行
+"Unable to deserialize editor: No entry in database"
+```
+
+声明是 `slotmap = "1.0.6"`（caret 语义），lock 却漂到 `1.1.1`（zed 是 `1.0.7`）。
+位域布局一变，旧行解码即错。识别特征：日志里出现 `4294967295`（= `0xFFFFFFFF`）——
+那正是 `slotmap::KeyData::null()` 的 `idx == u32::MAX` 特征，正常数据不该有。
+
+**修法**：`cargo update -p slotmap --precise 1.0.7`（checksum 应与 zed lock 一致）。
+
+**已排查确认其余无同类风险**：
+- `proto` 是 aacode 本地 fork，主线同进程不与 zed 通信 → 无 wire 兼容问题
+- `inventory` 0.3.21→0.3.24 是 patch 版本，且 keymap 存的是 action 名字符串 → 无害
+- 其余持久化类型（`SerializedEditor` 等）字段全是 `String`/`PathBuf`/`i64`，
+  不含第三方紧凑编码；`debugger_ui` 的 `HashMap<EntityId, _>` 是运行时结构，不落库
+
+**防线**：`script/check-lock-drift.sh` 第二重检查会比对高危包与 zed lock 的版本，
+不一致直接 `exit 1`。用法 `ZED_LOCK=<path> bash script/check-lock-drift.sh`。
+
+## 全量对照现状（非阻塞，仅记录）
+
+aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多数是小版本升级，
+如 `cc 1.4.3→1.6.0`、`regex 1.12.3→1.13.1`），不影响正确性。成因同
+「无上界依赖陷阱」——任何写 lock 的 cargo 操作都可能重算。
+
+如将来要与 zed 完全对齐，用 `cargo update -p <crate> --precise <zed 版本>` 逐个降级，
+不要裸跑不带 `-p` 的 `cargo update`（会重算全图，且可能让同名 crate 分裂成多份）。
