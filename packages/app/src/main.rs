@@ -176,6 +176,26 @@ fn main() {
 
         // —— Agent init 链（对齐 Zed main.rs L694-L722，AppState 之后）——
         language_model::init(cx);
+        // 对齐 Zed main.rs L695：必须在 language_models::init 之前注册 LLM token
+        // 全局监听器。language_models/src/provider/cloud.rs:120 会调
+        // RefreshLlmTokenListener::global(cx) 读这个全局，少这步启动即 panic
+        // （gpui app.rs: "no state of type client::llm_token::GlobalRefreshLlmTokenListener exists"）。
+        client::RefreshLlmTokenListener::register(
+            app_state.client.clone(),
+            app_state.user_store.clone(),
+            cx,
+        );
+        // 补齐 Zed main.rs L700 的 provider 注册：language_model::init 只建
+        // LanguageModelRegistry 这个 trait/类型容器，不注册任何 provider。缺了
+        // 这行，registry.visible_providers() 恒为空 → Settings → LLM Providers
+        // 整页空白（settings_ui/src/pages/llm_providers_page.rs:31），且不报错。
+        // 依赖 app_state 已构造完成：user_store / client 都取自 app_state，与 Zed
+        // 的 `app_state.user_store.clone()` / `app_state.client.clone()` 一致。
+        language_models::init(
+            app_state.user_store.clone(),
+            app_state.client.clone(),
+            cx,
+        );
         let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
         project::AgentRegistryStore::init_global(
             cx,

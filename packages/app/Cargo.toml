@@ -157,6 +157,7 @@ onboarding.workspace = true
 
 languages = { workspace = true, features = ["load-grammars"] }
 language_model.workspace = true
+language_models.workspace = true
 language_selector.workspace = true
 
 mimalloc = { version = "0.1", optional = true }
