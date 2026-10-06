@@ -169,3 +169,33 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
 - `tabular_data_preview::init(cx)` / `tab_switcher::init(cx)` /
   `lsp_command_selector::init(cx)` 无参数，直接在 Panel init 段调用
 
+### 无上界依赖约束会因 lock 重算而分裂成多版本
+
+**症状**：`multiple different versions of crate X in the dependency graph` 之类的
+编译错误，实际是同一 crate 在图里存在两份，`WebSocketStream` 之类类型不相通。
+
+**机制**：crates.io 上有些包对依赖声明的是**无上界**约束，例如
+`jupyter-websocket-client 1.1.0` 对 `async-tungstenite` 声明 `>= 0.29.1`。
+cargo 对 `0.x` 版本的 caret 是限定的（`"0.33"` = `>=0.33.0, <0.34.0`），所以我们自己的
+声明限死在 0.33；但 `>= 0.29.1` 没有上界，**一旦 lock 被重算，求解器就会给它挑当时
+最新的版本**，于是图里同时出现 0.33 与 0.35 两份。
+
+**什么操作会重算 lock**（都会静默改写 Cargo.lock）：
+- 裸跑 `cargo metadata`（不带 `--locked`）
+- 不带 `-p` 的 `cargo update`
+- 新增/删除依赖、改 feature、`[patch]` 变更
+
+**规避**：
+- 平时用 `cargo check --locked` / `cargo build --locked`；确实需要重算时用
+  `cargo update -p <crate> --precise <version>` 精确到单个包
+- 定期跑 `script/check-lock-drift.sh`（等价于上游 zed CI 的
+  `cargo update --locked --workspace`，见 .github/workflows/run_tests.yml）
+  在提交前确认 lock 没有可更新的漂移
+- 上游 zed 从不做会写 lock 的操作，CI 全程 `--locked`；aacode 没有 CI，
+  故用该脚本替代
+
+**已发生实例**：`async-tungstenite` 被重算为 0.33 + 0.35 两份，导致 `repl` 报
+E0308（`packages/repl/src/kernels/remote_kernels.rs`）。修法
+`cargo update -p async-tungstenite@0.35.0 --precise 0.33.0`，与上游 zed
+Cargo.lock 一致（上游只有一份 0.33）。
+
