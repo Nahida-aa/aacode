@@ -13,6 +13,7 @@ use gpui::{
     App, AppContext, SharedString, WindowDecorations, px, size,
 };
 use gpui_platform::application;
+use git::GitHostingProviderRegistry;
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
 use theme::ActiveTheme;
@@ -32,6 +33,11 @@ fn main() {
         util::shell_env::print_env();
         return;
     }
+
+    // git_hosting_providers::init 会读 GlobalGitHostingProviderRegistry 全局，
+    // 必须在 app.run 之前把 registry 造好。对齐 Zed main.rs L423。
+    let git_hosting_provider_registry =
+        Arc::new(GitHostingProviderRegistry::new());
 
     // —— app.run 外层：db / fs / session（不依赖 gpui App）——
     let app = application().with_assets(aa_gpui_kit_assets::Assets);
@@ -54,6 +60,12 @@ fn main() {
         // 顺序对齐 Zed: settings::init 必须在 theme_settings::init 之前
         // （theme_settings::init 需要 SettingsStore 存在才能读 ThemeSettings）
         gpui_tokio::init(cx);
+
+        // Release channel 必须早于任何读 GlobalReleaseChannel 的 init —— 例如
+        // ad_credentials_provider::global 会按 Dev/Release 决定用系统 keychain 还是
+        // development 文件。原先放在 app_state 之后（第 339 行），导致
+        // git_hosting_providers::init 读不到该全局而 panic。对齐 Zed main.rs L492。
+        release_channel::init(semver::Version::new(0, 1, 0), cx);
         settings::init(cx);
         // 绑定内置默认快捷键（default-<os>.json + base_keymap + vim）。
         // 必须在 settings::init 之后——它要读 BaseKeymap 全局。
@@ -87,6 +99,9 @@ fn main() {
         // 它们不进 inventory → 内置 keymap 里的绑定被静默跳过 → action 触发无反应，
         // 且全程无编译错误无 panic（见 .agents/memory/zed-init-chain-gaps.md）。
         // 顺序对齐 Zed main.rs（括号内为 zed 的行号）。
+        // git_hosting_providers::init 读 GlobalGitHostingProviderRegistry 全局，
+        // 必须先 set_global —— 对齐 Zed main.rs L519。
+        GitHostingProviderRegistry::set_global(git_hosting_provider_registry, cx);
         git_hosting_providers::init(cx); // L520
         debugger_tools::init(cx); // L592
         command_palette::init(cx); // L677
@@ -325,9 +340,6 @@ fn main() {
             false, // is_eval
             cx,
         );
-
-        // —— Release channel（对齐 Zed main.rs L492）——
-        release_channel::init(semver::Version::new(0, 1, 0), cx);
 
         // —— Workspace 全局 action ——
         workspace::init(app_state.clone(), cx);

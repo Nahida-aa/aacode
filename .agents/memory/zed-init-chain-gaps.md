@@ -171,3 +171,52 @@ grep -rhoE "\b[a-z_0-9]+::(init|register)\(" packages/app/src/ | sort -u
 action handler（`Hide` / `OpenLog` / `OpenSettingsFile` 等 12 个）。其余 init 必须住在各自 crate
 里（`crates/zed` 依赖几乎所有 crate，反向依赖会成环），「统一」的只是 `main.rs` 里的调用顺序。
 
+
+## 必须实跑验证：init 顺序错误编译期查不出来
+
+补完 init 链后**一定要 `./target/debug/aa-app` 实跑**。编译通过 ≠ 能启动。
+
+本轮实跑抓到 2 个 panic，都是「init 缺前置 set_global」或「init 被插队到依赖方之前」：
+
+### 1. 漏抄 set_global（照抄时只抄了 init 那行）
+
+`git_hosting_providers::init(cx)` 内部读 `GlobalGitHostingProviderRegistry`，但 Zed 里
+它前面还有两行必须一起抄：
+
+```rust
+// app.run 之前（zed main.rs L423）
+let git_hosting_provider_registry = Arc::new(GitHostingProviderRegistry::new());
+// init 之前（zed main.rs L519）
+GitHostingProviderRegistry::set_global(git_hosting_provider_registry, cx);  // 注意是 move，不是 clone
+```
+
+> 用 `.clone()` 会触发 E0373「closure may outlive the current function」——
+> Zed 是把 Arc **move** 进 `app.run` 闭包的。
+
+### 2. 旧 init 位置太晚，被新 init 提前触发
+
+`release_channel::init` 原先在第 339 行（app_state 之后），而 Zed 在 L492 极早期。
+本来没人读它所以不炸；一旦有 init 在它之前读 `GlobalReleaseChannel` 就 panic。
+实际触发者：`ad_credentials_provider::global`（按 Dev/Release 决定系统 keychain vs
+development 文件）与 `git_hosting_providers`。
+
+> 教训：把新 init 插到链子前部时，要顺带检查**被它插队的前置全局**是否已就绪。
+
+### 判定某全局是否安全就绪的快捷方法
+
+```bash
+# 谁 set_global 它
+grep -rn "X::set_global\|set_global(X" packages/*/src/
+# 谁读它（读的地方必须在 set_global 之后被调用）
+grep -rn "X::global\|global::<X>" packages/*/src/
+```
+
+然后确认 app 的调用顺序里 set_global 的位置早于所有读者。
+
+## 环境噪声（不是 init 问题）
+
+实跑日志里的这些 ERROR 可忽略，与 init 链无关：
+
+- `sender was dropped` — oxfmt / prettier 后台任务随进程被杀中断
+- `no language server download dir defined` — 未设 LSP 下载目录
+- `status error 403 ... API rate limit exceeded` — GitHub 匿名 API 限流（本机出口 IP）
