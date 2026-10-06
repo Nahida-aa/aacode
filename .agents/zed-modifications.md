@@ -347,9 +347,15 @@ gpui_learn commit `957a9a3`。
 `remove_server`（`lsp_button.rs:781-788`）清掉面板的 `servers_per_buffer_abs_path`
 → **条目消失**，且**无法单独恢复**，只能走全局 `Restart All Servers`。
 
-即"停止"这个标签下藏着一个不可逆操作，连维护者都会误解。
+即"停止"这个标签下藏着一个**无法单独恢复**的操作（仍可走全局 `Restart All Servers`
+恢复，但那会顺带重启所有 server），连维护者都会误解。
 
-### 改动（4 项）
+> 注意区分：**两者都可通过 `Restart All Servers` 恢复**（`restart_all_language_servers`
+> 传空 selector + `clear_stopped=true`，会 `stopped_language_servers.clear()` 清空全部抑制
+> 再重新注册，见 `lsp_store/mod.rs:13001` / `13063`）。
+> Stop 与 Remove 的差别**只在恢复粒度**：前者可 per-item 单独恢复，后者只能全局恢复。
+
+### 改动（6 项）
 
 1. **改名**
    - per-item：`Stop Server` → `Remove Server`（逻辑一字未动）
@@ -406,6 +412,11 @@ gpui_learn commit `957a9a3`。
 |---|---|
 | 运行中 / Starting | `Restart Server`、`Stop Server`、`Remove Server` |
 | 已停止（Stopped） | `Start Server`、`Remove Server` |
+
+| 动作 | 条目 | 恢复粒度 |
+|---|---|---|
+| `Stop Server` | 保留（灰色 Stopped） | **单独**恢复：per-item `Start Server` |
+| `Remove Server` | 消失 | **只能全局**恢复：`Restart All Servers`（会顺带重启所有 server） |
 
 ### 保留的两个细节（有意为之）
 
