@@ -717,14 +717,27 @@ webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev 
 language_core = { path = "packages/language_core" }
 util = { path = "packages/util" }
 
-# gpui_learn 走 git rev（见 [workspace.dependencies]，当前 957a9a3），**不加 [patch]**。
+# gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
 #
-# 为什么不用 patch 覆盖成本地 path：
-#   patch 里要写绝对路径（/home/aa/repos/ide_ls/gpui_learn/...），提交后别人 clone
-#   会因路径不存在而无法构建。开发期想用本地版时，把下面这段临时加回
-#   [patch."https://github.com/Nahida-aa/gpui_learn.git"] 即可（改完 gpui_learn 立即
-#   生效，不必先 push + 顶 rev），但**不要提交**。
+# 当前是个人迭代阶段，构建可复现性不是目标，迭代速度优先。代价是本段含绝对路径，
+# 别人 clone 会失败 —— 等到需要协作/发布时再移除（届时 rev 已在
+# [workspace.dependencies] 里指向最新提交，移除即可直接用 git 依赖）。
 #
-# 同源要求：ui / ui_input / component 必须来自同一个 rev。若它们分属不同 rev，
-# 会各拖一份 aa_gpui_kit_component，出现两个不同的 `Component` trait，报
-# `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
+# 别把任何一个改回 `git = ..., rev = ...` —— 那会让它停在旧提交，aacode 侧报
+# 「找不到刚加的符号」（如 `unresolved import theme::ClientDecorationsExt`），
+# 症状很像代码没写。同源要求见下面 ui_input 那条注释。
+[patch."https://github.com/Nahida-aa/gpui_learn.git"]
+aa_gpui_kit_assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }
+aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
+aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
+aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
+# clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样走本地。
+aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
+# aa_gpui_fuzzy 的路径类型从 std::path::Path 换成了 zed 的 `path::RelPath`，
+# 与 zed crates/fuzzy_nucleo 对齐；project 因此不再需要手写 PathStyle 转换。
+aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" }
+# ui / ui_input / component 必须同源：若 ui_input 与 ui 停在不同 rev，
+# 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
+# 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
+aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
+aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
