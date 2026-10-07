@@ -226,6 +226,20 @@ watch.workspace = true
 a_log.workspace = true
 a_tracing.workspace = true
 
+# core/open_listener.rs 直接用到这三者（zed 的 crates/zed/Cargo.toml L160/L220/L221
+# 同样把它们放在 [dependencies] 而非 dev-dependencies）。
+# log     —— 解析失败分支的 log::error!
+# url     —— 解析 ssh:// / git 链接的 query 与 Host（parse_ssh_url / parse_git_url）
+# urlencoding —— ssh userinfo 里的 percent-decode / re-encode
+log.workspace = true
+url.workspace = true
+urlencoding.workspace = true
+
+# core/open_listener.rs 用到 remote::{RemoteConnectionOptions, WslConnectionOptions}。
+# 此前只在 [dev-dependencies]（L254），主二进制链接不到 —— open_listener 移进来后才暴露。
+# zed 同样两处都声明（crates/zed/Cargo.toml L184 主依赖 + L269 dev 加 test-support）。
+remote.workspace = true
+
 # AppState::test / Project::local 需要的间接依赖（通过 workspace crate re-export 不够，
 # main.rs 直接用了这些类型）—— 但 workspace crate 已经声明了它们，这里只需要保证可访问。
 # 实际上 main.rs 里 workspace::AppState::test() 内部已经处理了一切，main.rs 只需要 project。

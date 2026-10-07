@@ -176,7 +176,17 @@ use crate::{
 
 // ========= workspace 嵌套模块的关键类型（crate 内部可见，顶级模块通过 crate::XXX 访问） =========
 // Zed 单文件时这些类型直接定义在 workspace.rs 里，天然 crate 根可见。我们拆分到子模块后
-// 需要这里 use 过来让 crate 根能看到。普通 use 足够了，不需要 pub use。
+// 需要这里 use 过来让 crate 根能看到。
+//
+// 例外：open::matching::WorkspaceMatching 与 open::windows::workspace_windows_for_location
+// 必须是 pub use —— aacode 的 core/open_listener.rs 要用它们把 cli::OpenBehavior 映射成
+// OpenOptions{workspace_matching, requesting_window}（open_listener.rs L803/L812）。
+// Zed 侧这两个定义在 workspace.rs 顶层故天然可达，拆分后不给 pub 就编译不过。
+// （open::local / open::prompt 那几个仍只需 crate 内可见，故留在下方 use 块里。）
+// 供 aacode 的 core/open_listener.rs 使用（见上方注释）。
+pub use workspace::open::matching::WorkspaceMatching;
+pub use workspace::open::windows::workspace_windows_for_location;
+
 pub use crate::workspace::{
     actions::{
         ActivatePaneDown, ActivatePaneLeft, ActivatePaneRight, ActivatePaneUp, NewCenterTerminal,
@@ -212,6 +222,7 @@ pub use crate::workspace::{
         options::{OpenOptions, OpenResult, OpenVisible, OpenMode,},
         remote::{open_remote_project_with_existing_connection, remote_workspace_position_from_db, open_remote_project_with_new_connection},
         matching::find_existing_workspace,
+        restore::{last_opened_workspace_location, last_session_workspace_locations, restore_multiworkspace},
         file::create_and_open_local_file
     },
 
@@ -234,9 +245,7 @@ use workspace::{
     follow::leader_border_for_pane,
     follow::{FollowerState},
     open::local::{open_items, open_workspace_by_id},
-    open::matching::{WorkspaceMatching, },
     open::prompt::{PromptForNewPath, PromptForOpenPath},
-    open::windows::workspace_windows_for_location,
     pane::ActivateInDirectionTarget,
     registries::{ProjectItemRegistry, SerializableItemRegistry},
     serialize::WorkspaceLocation,
