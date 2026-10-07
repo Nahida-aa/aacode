@@ -29,7 +29,8 @@ fn main() {
     STARTUP_TIME.get_or_init(Instant::now);
     tracing_subscriber::fmt::init();
 
-    // `aa-app --printenv` — shell env 捕获子进程（对齐 Zed main.rs L251-L255）。
+    // `aacode --printenv` — shell env 捕获子进程（对齐 Zed main.rs L251-L255）。
+    // 二进制产物名是 aacode；project/src/environment.rs 用当前 exe 路径调起本进程。
     // project/src/environment.rs 的 capture_unix 会 shell exec `<exe> --printenv`
     // 来拿到 JSON env vars。没这个分支 shell env 就全是空的。
     if std::env::args().any(|a| a == "--printenv") {
