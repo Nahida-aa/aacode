@@ -70,8 +70,17 @@ trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d88
 [package.metadata.cargo-shear]
 ignored = ["async-std"]
 
-# 对齐 zed `crates/fs`：`fake_fs` / `fake_git_repo` 要用
-# `BackgroundExecutor::simulate_random_delay`（gpui）、`Oid::random`（git，靠 rand）、
-# 以及 util 的测试辅助，所以三个子 feature 都得开。
+# 对齐 zed `crates/fs` L64-L71。三行缺一不可：
+#   - `cargo test` 不会自动开启 `cfg(feature = "test-support")`（`cfg(test)` 是另一回事），
+#     所以测试构建要在这里显式把 feature 打开，否则 `gpui::TestAppContext` /
+#     `run_test` / `ForegroundExecutor::block_test` 全都不存在（fs_watcher 的测试用到）。
+#   - `fs = { features = ["test-support"] }` 是**自引用**，让本 crate 在测试构建下
+#     以 test-support 形态编译（fake_fs / fake_git_repo 里的 #[cfg(feature = ...)] 代码
+#     才会参与编译）。zed 原版同样是自引用，见 crates/fs/Cargo.toml L64-L67。
+[dev-dependencies]
+fs = { workspace = true, features = ["test-support"] }
+gpui = { workspace = true, features = ["test-support"] }
+git = { workspace = true, features = ["test-support"] }
+
 [features]
 test-support = ["gpui/test-support", "git/test-support", "util/test-support"]
