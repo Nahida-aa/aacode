@@ -8,7 +8,12 @@
 //!
 //! 挂载点对齐 Zed：`observe_new::<Workspace>` 里对 `active_pane` 执行一次，
 //! 再订阅 `Event::PaneAdded` 给后续新增的 pane 补上（分屏/新窗口用）。
-
+//!
+//! 注意与同目录 `panels.rs` 的 `initialize_panels`（**复数**）区分：那是 Zed
+//! `zed.rs:777` 的左侧 Dock Panel（project / git / agent 面板），本文件对应的是
+//! `zed.rs:1457` 的 `initialize_pane`（**单数**），负责 tab 下方那栏 toolbar item。
+//! Zed 两者只差一个 s，本 fork 拆成文件后特意把本文件命名为 `pane_toolbar`
+//! 以免与 `panels.rs` 混淆。
 
 use breadcrumbs::Breadcrumbs;
 use diagnostics::ToolbarControls as DiagnosticEditorControls;
