@@ -1,5 +1,5 @@
 run-app:
-    cargo run -p aa-app
+    cargo run -p aacode
 
 # 清理
 clean:
@@ -29,22 +29,22 @@ icons:
 install prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
-    cargo build --release -p aa-app
-    install -Dm755 target/release/aa-app "{{prefix}}/bin/aa-app"
+    cargo build --release -p aacode
+    install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"
     cp -r resources/icons/hicolor/. "{{prefix}}/share/icons/hicolor/"
-    sed "s|Exec=aa-app|Exec={{prefix}}/bin/aa-app|; s|TryExec=aa-app|TryExec={{prefix}}/bin/aa-app|" \
+    sed "s|Exec=aacode|Exec={{prefix}}/bin/aacode|; s|TryExec=aacode|TryExec={{prefix}}/bin/aacode|" \
         resources/aacode.desktop > "{{prefix}}/share/applications/aacode.desktop"
     # 这三个是"有则刷新、无则跳过"——缺了不影响安装，只是桌面数据库/图标缓存不更新。
     -update-desktop-database "{{prefix}}/share/applications"
     -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
     -kbuildsycoca6
-    echo "已安装到 {{prefix}}（二进制：{{prefix}}/bin/aa-app）"
+    echo "已安装到 {{prefix}}（二进制：{{prefix}}/bin/aacode）"
 
 # 卸载本地安装（数据目录 ~/.local/share/zed 保留，见 paths::APP_NAME）
 uninstall prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
-    rm -f "{{prefix}}/bin/aa-app" "{{prefix}}/share/applications/aacode.desktop"
+    rm -f "{{prefix}}/bin/aacode" "{{prefix}}/share/applications/aacode.desktop"
     find "{{prefix}}/share/icons/hicolor" -name 'aacode.png' -delete 2>/dev/null || true
     -update-desktop-database "{{prefix}}/share/applications"
     -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"

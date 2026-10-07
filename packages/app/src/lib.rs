@@ -1,4 +1,4 @@
-//! aacode desktop (`aa-app`) library entry.
+//! aacode desktop library entry（package / 二进制名均为 `aacode`）。
 //!
 //! 模块划分对齐 Zed `crates/zed/src/`:
 //! - `core` — 全局 init 链（gpui_tokio / theme / settings / editor / terminal / title_bar / workspace::init / AppState 构建）

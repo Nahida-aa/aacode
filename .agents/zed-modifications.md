@@ -46,7 +46,7 @@ GPUI 桌面（`packages/app` + `packages/workspace` + `packages/ui`）是唯一�
 - `packages/ui-solid/`（Kobalte UI）
 - `packages/shared/`、`packages/sdk-ts/`
 
-同步验收门槛：`cargo check -p aa-app -p workspace -p aa_gpui_kit_ui` 必须通过（warnings 可接受）。
+同步验收门槛：`cargo check -p aacode -p workspace -p aa_gpui_kit_ui` 必须通过（warnings 可接受）。
 
 ## 6. 同步原则（rev→rev）
 
@@ -164,7 +164,7 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
 
 **接线方式**（对齐 zed crates/zed/Cargo.toml L138/L186 + main.rs L725/L781）：
 - 这些 crate 的 action 要进 inventory 才会被内置 keymap 解析，因此必须进
-  `aa-app` 的 `[dependencies]`（**不是** `[dev-dependencies]`，否则不链接进二进制）
+  `aacode` 的 `[dependencies]`（**不是** `[dev-dependencies]`，否则不链接进二进制）
 - `repl::init(fs.clone(), cx)` 需要 `Arc<dyn Fs>`，排在 `set_global(fs.clone(), cx)` 之后
 - `tabular_data_preview::init(cx)` / `tab_switcher::init(cx)` /
   `lsp_command_selector::init(cx)` 无参数，直接在 Panel init 段调用
