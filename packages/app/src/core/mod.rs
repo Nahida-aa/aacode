@@ -144,12 +144,55 @@ pub fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &
     }
 }
 
-/// 开窗口失败时的用户提示。对齐 Zed `crates/zed/src/main.rs:153`。
+/// 开窗口失败时的用户提示。对齐 Zed `crates/zed/src/main.rs:153-190`。
 ///
-/// 与 Zed 的差异：Zed 在非 Linux 平台会 `process::exit(1)`，Linux 下走 ashpd 桌面通知。
-/// aacode 尚未依赖 ashpd，故统一只打印 stderr —— 避免为一个错误提示引入新依赖。
+/// Linux/freebsd 走 ashpd 桌面通知（XDG 桌面门户），其余平台直接退出 —— 开不出窗口时
+/// 继续跑一个没有窗口的进程没有意义，故两条路最终都 `process::exit(1)`。
 fn fail_to_open_window_async(e: anyhow::Error, cx: &mut AsyncApp) {
-    eprintln!("aacode failed to open a window: {e:?}");
+    cx.update(|cx| fail_to_open_window(e, cx));
+}
+
+fn fail_to_open_window(e: anyhow::Error, _cx: &mut App) {
+    eprintln!(
+        "aacode failed to open a window: {e:?}. See https://aacode.dev/docs/linux for troubleshooting steps."
+    );
+    #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
+    {
+        std::process::exit(1);
+    }
+
+    // Maybe unify this with gpui::platform::linux::platform::ResultExt::notify_err(..)?
+    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+    {
+        use ashpd::desktop::notification::{Notification, NotificationProxy, Priority};
+        _cx.spawn(async move |_cx| {
+            let Ok(proxy) = NotificationProxy::new().await else {
+                std::process::exit(1);
+            };
+
+            proxy
+                .add_notification(
+                    // 与 Zed 的 "dev.zed.Oops" 同理：用固定 id 避免同一失败刷多条通知。
+                    "dev.aacode.Oops",
+                    Notification::new("aacode failed to launch")
+                        .body(Some(
+                            format!(
+                                "{e:?}. See https://aacode.dev/docs/linux for troubleshooting steps."
+                            )
+                            .as_str(),
+                        ))
+                        .priority(Priority::High)
+                        .icon(ashpd::desktop::Icon::with_names(&[
+                            "dialog-question-symbolic",
+                        ])),
+                )
+                .await
+                .ok();
+
+            std::process::exit(1);
+        })
+        .detach();
+    }
 }
 
 /// 启动时的窗口恢复：优先按用户的 `restore_on_startup` 设置恢复上次窗口，

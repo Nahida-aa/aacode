@@ -62,9 +62,14 @@ install prefix="$HOME/.local":
     chmod +x "{{prefix}}/share/applications/{{_app_id}}.desktop"
 
     # 这三个是"有则刷新、无则跳过"——缺了不影响安装，只是桌面数据库/图标缓存不更新。
-    -update-desktop-database "{{prefix}}/share/applications"
-    -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
-    -kbuildsycoca6
+    # 注意不能用 just 的 `-` 行前缀来容错：那只对非 shebang recipe 有效，而本 recipe
+    # 是 `#!/usr/bin/env bash` 块，整块按一个脚本执行，`-foo` 会被 shell 当成命令名
+    # （"未找到命令"）。故显式 `|| true`。
+    command -v update-desktop-database >/dev/null \
+      && update-desktop-database "{{prefix}}/share/applications" || true
+    command -v gtk-update-icon-cache >/dev/null \
+      && gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor" || true
+    command -v kbuildsycoca6 >/dev/null && kbuildsycoca6 || true
     echo "已安装到 {{prefix}}（二进制：{{prefix}}/bin/aacode，desktop：{{_app_id}}.desktop）"
 
 # 卸载本地安装（数据目录 ~/.local/share/zed 保留，见 paths::APP_NAME）
@@ -73,8 +78,10 @@ uninstall prefix="$HOME/.local":
     set -euo pipefail
     rm -f "{{prefix}}/bin/aacode" "{{prefix}}/share/applications/{{_app_id}}.desktop"
     find "{{prefix}}/share/icons/hicolor" -name "{{_app_icon}}.png" -delete 2>/dev/null || true
-    -update-desktop-database "{{prefix}}/share/applications"
-    -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
+    command -v update-desktop-database >/dev/null \
+      && update-desktop-database "{{prefix}}/share/applications" || true
+    command -v gtk-update-icon-cache >/dev/null \
+      && gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor" || true
     echo "已从 {{prefix}} 卸载"
 
 # cargo tree -e no-dev -i -p terminal_view    # 谁依赖 terminal_view（反向）

@@ -124,12 +124,7 @@ git_ui = { workspace = true, features = ["call"] }
 git_ui_core.workspace = true
 go_to_line.workspace = true
 gpui = { workspace = true, features = ["profiler", "stacker"] }
-gpui_platform = { workspace = true, features = [
-    "screen-capture",
-    "font-kit",
-    "wayland",
-    "x11",
-] }
+
 gpui_tokio.workspace = true
 image = { workspace = true, optional = true }
 spin = "0.10.0"
@@ -235,6 +230,12 @@ log.workspace = true
 url.workspace = true
 urlencoding.workspace = true
 
+# ashpd —— core/mod.rs 的 fail_to_open_window 用 ashpd::desktop::notification
+# 在开窗口失败时弹 XDG 桌面通知（对齐 Zed crates/zed/src/main.rs:153-190）。
+# 仅 Linux/freebsd 有效，其余平台走 process::exit，与 Zed 一致。
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
+ashpd.workspace = true
+
 # core/open_listener.rs 用到 remote::{RemoteConnectionOptions, WslConnectionOptions}。
 # 此前只在 [dev-dependencies]（L254），主二进制链接不到 —— open_listener 移进来后才暴露。
 # zed 同样两处都声明（crates/zed/Cargo.toml L184 主依赖 + L269 dev 加 test-support）。
@@ -244,14 +245,13 @@ remote.workspace = true
 # main.rs 直接用了这些类型）—— 但 workspace crate 已经声明了它们，这里只需要保证可访问。
 # 实际上 main.rs 里 workspace::AppState::test() 内部已经处理了一切，main.rs 只需要 project。
 
-[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
-gpui_platform = { workspace = true, features = ["font-kit", "wayland", "x11"] }
+gpui_platform = { workspace = true, features = [
+    "screen-capture",
+    "font-kit",
+    "wayland",
+    "x11",
+] }
 
-[target.'cfg(not(any(target_os = "linux", target_os = "freebsd", target_family = "wasm")))'.dependencies]
-gpui_platform = { workspace = true }
-
-[target.'cfg(target_family = "wasm")'.dependencies]
-gpui_platform = { workspace = true }
 wasm-bindgen = "0.2.120"
 
 [dev-dependencies]
