@@ -81,7 +81,75 @@ pub fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &
             }
             _ => {}
         }
+        // Zed main.rs L1258：kind 有值时走完上面的定向动作就结束，不再落到下面的
+        // 打开路径逻辑。少了这个 return 会与上面各臂的 `app_state` move 冲突，
+        // 且语义也不对（kind 与路径打开是互斥的两条路）。
+        return;
     }
+
+    // —— 以下对齐 Zed crates/zed/src/main.rs L1277-1310 ——
+    //
+    // 只有 kind 为 None 时才会到这里，即"没有定向动作、只打开路径"。file:// /
+    // zed://file 这类 url 由 OpenRequest::parse 填进 open_paths 而不动 kind
+    // （open_listener.rs:163），所以 `aacode --new <file>` 正是走这条路径。
+    //
+    // 最初移植时漏了整个 L1277-1372 的函数尾部，导致
+    // test_e2e_explicit_new_flag_with_file_url_opens_new_window 失败：
+    // `aacode --new <file>` 收到后 open_paths 被丢弃，窗口数停在 1。
+    let mut task = None;
+    let dev_container = request.dev_container;
+    if !request.open_paths.is_empty() || !request.diff_paths.is_empty() {
+        let app_state = app_state.clone();
+        let base_open_options = open_listener::open_options_for_request(
+            request.open_behavior,
+            &workspace::SerializedWorkspaceLocation::Local,
+            cx,
+        );
+        task = Some(cx.spawn(async move |cx| {
+            let paths_with_position = open_listener::derive_paths_with_position(
+                app_state.fs.as_ref(),
+                request.open_paths,
+            )
+            .await;
+            let (_window, results) = open_listener::open_paths_with_positions(
+                &paths_with_position,
+                &request.diff_paths,
+                request.diff_all,
+                app_state,
+                workspace::OpenOptions {
+                    open_in_dev_container: dev_container,
+                    ..base_open_options
+                },
+                cx,
+            )
+            .await?;
+            for result in results.into_iter().flatten() {
+                if let Err(err) = result {
+                    log::error!("Error opening path: {err:#}");
+                }
+            }
+            anyhow::Ok(())
+        }));
+    }
+
+    // Zed 同处还有 open_channel_notes / join_channel 分支（main.rs L1308-1360），
+    // aacode 的 open_listener 未移植该功能，故此处省略而非留空实现。
+    if let Some(task) = task {
+        cx.spawn(async move |cx| {
+            if let Err(err) = task.await {
+                fail_to_open_window_async(err, cx);
+            }
+        })
+        .detach();
+    }
+}
+
+/// 开窗口失败时的用户提示。对齐 Zed `crates/zed/src/main.rs:153`。
+///
+/// 与 Zed 的差异：Zed 在非 Linux 平台会 `process::exit(1)`，Linux 下走 ashpd 桌面通知。
+/// aacode 尚未依赖 ashpd，故统一只打印 stderr —— 避免为一个错误提示引入新依赖。
+fn fail_to_open_window_async(e: anyhow::Error, cx: &mut AsyncApp) {
+    eprintln!("aacode failed to open a window: {e:?}");
 }
 
 /// 启动时的窗口恢复：优先按用户的 `restore_on_startup` 设置恢复上次窗口，
