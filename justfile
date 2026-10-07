@@ -9,108 +9,73 @@ stats:
     scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf
 
 # —— 本地安装 ——
-# 参考 aa-player 的 just install（同为 GPUI 应用，踩过的坑一致）。
-# 生成应用图标（hicolor 多尺寸，产物随仓库提交）。
-# 依赖 resvg；改了 assets/images/aacode.svg 后重跑即可。
+# 布局与 zed 的 crates/zed/resources + script/bundle-linux 对齐：
+#   packages/app/resources/aacode.desktop.in   .desktop 模板（envsubst 填充）
+#   packages/app/resources/app-icon.png        512x512
+#   packages/app/resources/app-icon@2x.png     1024x1024（HiDPI）
+# APP_ID 用 reverse-dns 同 zed（dev.zed.Zed），使各 channel 的 desktop 可并存。
+_app_name    := env_var_or_default("APP_NAME", "AACode")
+_app_id      := env_var_or_default("APP_ID", "dev.aacode.AACode")
+_app_icon    := env_var_or_default("APP_ICON", "aacode")
+_app_args    := env_var_or_default("APP_ARGS", "%F")
+
+# 生成应用图标（512 + 1024，产物随仓库提交）。依赖 resvg。
+# 改了 assets/images/aacode.svg 后重跑。
 icons:
     #!/usr/bin/env bash
     set -euo pipefail
-    for s in 32 48 64 128 256 512; do
-      d="resources/icons/hicolor/${s}x${s}/apps"
-      mkdir -p "$d"
-      resvg -w "$s" -h "$s" assets/images/aacode.svg "$d/aacode.png"
-    done
-    echo "生成完成：resources/icons/hicolor/"
+    resvg -w 512  -h 512  assets/images/aacode.svg packages/app/resources/app-icon.png
+    resvg -w 1024 -h 1024 assets/images/aacode.svg packages/app/resources/app-icon@2x.png
+    echo "生成完成：packages/app/resources/app-icon{,\\@2x}.png"
+
+# 渲染 .desktop 模板到标准输出（调试用，不安装）。
+# channel 变体：APP_NAME=AACode\ Nightly APP_ID=dev.aacode.AACode-Nightly just desktop
+desktop:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export DO_STARTUP_NOTIFY="true" APP_CLI="aacode" APP_ICON="{{_app_icon}}" APP_ARGS="{{_app_args}}"
+    export APP_NAME="{{_app_name}}" APP_ID="{{_app_id}}"
+    envsubst < packages/app/resources/aacode.desktop.in
 
 # 本地真实安装（默认用户级 ~/.local，无需 root；可传 PREFIX 覆盖，如 `just install /usr`）。
-# 布局：bin + share/icons/hicolor + share/applications。
-# 安装副本里 Exec/TryExec 改写为绝对路径——用户级安装时 ~/.local/bin 往往不在
-# GUI 会话 PATH 里，TryExec 解析失败会导致启动器直接隐藏该应用。
+#
+# Exec/TryExec 用绝对路径：用户级安装时 ~/.local/bin 往往不在 GUI 会话 PATH 里，
+# TryExec 解析失败会让启动器直接隐藏该应用。zed 的 tarball 面向解压即用故用裸名，
+# 这里 install 到 PREFIX 必须绝对化 —— 与 aa-player 的做法一致。
 install prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
     cargo build --release -p aacode
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"
-    cp -r resources/icons/hicolor/. "{{prefix}}/share/icons/hicolor/"
-    sed "s|Exec=aacode|Exec={{prefix}}/bin/aacode|; s|TryExec=aacode|TryExec={{prefix}}/bin/aacode|" \
-        resources/aacode.desktop > "{{prefix}}/share/applications/aacode.desktop"
+
+    # 512 + 1024 两个尺寸，对齐 zed bundle-linux L174-177。
+    install -Dm644 packages/app/resources/app-icon.png       "{{prefix}}/share/icons/hicolor/512x512/apps/{{_app_icon}}.png"
+    install -Dm644 packages/app/resources/app-icon@2x.png       "{{prefix}}/share/icons/hicolor/1024x1024/apps/{{_app_icon}}.png"
+
+    # .desktop 由模板 envsubst 生成，再把 APP_CLI 绝对化。
+    export DO_STARTUP_NOTIFY="true" APP_ICON="{{_app_icon}}" APP_ARGS="{{_app_args}}"
+    export APP_NAME="{{_app_name}}" APP_ID="{{_app_id}}"
+    export APP_CLI="{{prefix}}/bin/aacode"
+    mkdir -p "{{prefix}}/share/applications"
+    envsubst < packages/app/resources/aacode.desktop.in \
+      > "{{prefix}}/share/applications/{{_app_id}}.desktop"
+    chmod +x "{{prefix}}/share/applications/{{_app_id}}.desktop"
+
     # 这三个是"有则刷新、无则跳过"——缺了不影响安装，只是桌面数据库/图标缓存不更新。
     -update-desktop-database "{{prefix}}/share/applications"
     -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
     -kbuildsycoca6
-    echo "已安装到 {{prefix}}（二进制：{{prefix}}/bin/aacode）"
+    echo "已安装到 {{prefix}}（二进制：{{prefix}}/bin/aacode，desktop：{{_app_id}}.desktop）"
 
 # 卸载本地安装（数据目录 ~/.local/share/zed 保留，见 paths::APP_NAME）
 uninstall prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
-    rm -f "{{prefix}}/bin/aacode" "{{prefix}}/share/applications/aacode.desktop"
-    find "{{prefix}}/share/icons/hicolor" -name 'aacode.png' -delete 2>/dev/null || true
+    rm -f "{{prefix}}/bin/aacode" "{{prefix}}/share/applications/{{_app_id}}.desktop"
+    find "{{prefix}}/share/icons/hicolor" -name "{{_app_icon}}.png" -delete 2>/dev/null || true
     -update-desktop-database "{{prefix}}/share/applications"
     -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
     echo "已从 {{prefix}} 卸载"
-
-# tools
-## outline —— 打印源文件的符号大纲（zed 的 tree-sitter outline.scm）
-## 用法：just outline <文件...> [fields=...]
-##   fields 留空 = 最少内容(text,line)；all = 全部；也可指定：text,line,relations
-##   注意必须 --release 构建（grammars 的查询文件只在 release 下内嵌）
-outline file='tools/outline/src/main.rs' fields='text,line':
-    cargo run --release -p outline -- {{file}} --fields {{fields}}
-
-## outline-json —— JSON 输出（嵌套 children 结构）
-outline-json file='tools/outline/src/main.rs' fields='all':
-    cargo run --release -p outline -- -f json --fields {{fields}} {{file}}
-
-## outline-page —— 大文件翻页看（text 保持人读格式）
-outline-page file='tools/outline/src/main.rs' offset='0' limit='30':
-    cargo run --release -p outline -- -f text --fields text,line --offset {{offset}} --limit {{limit}} {{file}}
-
-## gh-releases —— 查 GitHub release 列表 + 每个 tag 对应的 commit sha（单次 GraphQL 请求）
-## 用法：just gh-releases <repo> [limit] [offset] [latest] [json]
-##   repo    例：zed-industries/zed
-##   limit   最多几条（默认 15）      offset 跳过前几条（默认 0）
-##   latest  true 时只输出最新稳定版那一行   json  true 时输出原始 JSON
-##   注意：just 的 recipe 参数只按位置传，不支持 name=value（--set 仅对变量生效）
-##   例：just gh-releases zed-industries/zed 5
-##      just gh-releases zed-industries/zed 1 0 true | cut -f2   # 只要最新稳定版的 sha
-gh-releases repo limit='15' offset='0' latest='false' json='false':
-    bun tools/gh-releases.ts {{repo}} --limit {{limit}} --offset {{offset}} {{ if latest == 'true' { '--latest' } else { '' } }} {{ if json == 'true' { '--json' } else { '' } }}
-
-## zed-fork-scan —— 扫 rev 区间内 zed 上游改动，筛出命中我们本地 fork 的部分
-## 用来驱动「fork 同步」（把上游改动 port 进 packages/*），区别于「rev 同步」（换 git rev）
-##
-## 四个 recipe 对应脚本的四种模式（just 的 --set 只能覆盖全局变量，改不了 recipe 参数，
-## 所以这里用独立 recipe 而不是 --set mode=xxx）：
-##   zed-fork-scan     概览表：命中了哪些 fork crate，各改了几个文件（降序）
-##   zed-fork-commits 只列触及 fork 的提交，按时间倒序，用来逐条分诊
-##   zed-fork-files    每个命中 crate 具体改了哪些文件
-##   zed-fork-all      上游 crates/ 下全部有改动的目录，★ 标出我们 fork 了哪些
-##
-## 都接 [old] [new] 两个可选位置参数：old 省略时自动取根 Cargo.toml 里当前 pin 的那个，
-## new 默认 origin/main，想跟 stable 就显式写 v1.22.0
-_fork-scan mode old='' new='':
-    tools/zed-fork-scan.sh {{ if old != '' { '--old ' + old + ' ' } else { '' } }}{{ if new != '' { '--new ' + new + ' ' } else { '' } }}{{ if mode != 'table' { '--' + mode } else { '' } }}
-
-## 例：just zed-fork-scan                            # 当前 pin → origin/main
-##     just zed-fork-commits                         # 逐条分诊
-##     just zed-fork-scan bd747337 v1.22.0           # 显式区间
-## 直接调脚本：tools/zed-fork-scan.sh --commits
-## fork-sync —— rev→rev 同步计划的脚手架（详见 .agents/fork-sync/README.md）
-## new   生成 .agents/fork-sync/<old7>_<new7>.md，区间数据/命中 crate/逐条 port/
-##       ⚠双方都改过的文件清单 都自动填好；已存在则拒绝覆盖
-## list  列出所有同步文件与状态
-## 例：just fork-sync new
-##     just fork-sync new bd747337 afecd6d719
-##     just fork-sync new --batch "批次 A" --note "先跑通流程"
-##     just fork-sync list
-fork-sync mode='new' old='' new='' batch='' note='':
-    tools/fork-sync-new.sh {{ if mode == 'list' { '--list' } else { '' } }} {{ if old != '' { '--old ' + old + ' ' } else { '' } }}{{ if new != '' { '--new ' + new + ' ' } else { '' } }}{{ if batch != '' { '--batch "' + batch + '" ' } else { '' } }}{{ if note != '' { '--note "' + note + '" ' } else { '' } }}
-
-zed-fork-scan old='' new='': (_fork-scan 'table' old new)
-zed-fork-commits old='' new='': (_fork-scan 'commits' old new)
-zed-fork-files old='' new='': (_fork-scan 'files' old new)
-zed-fork-all old='' new='': (_fork-scan 'all' old new)
 
 # cargo tree -e no-dev -i -p terminal_view    # 谁依赖 terminal_view（反向）
 # cargo tree -e no-dev -p terminal_view       # terminal_view 依赖谁（正向）
