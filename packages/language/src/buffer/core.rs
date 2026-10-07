@@ -47,7 +47,11 @@ use text::{
 /// An in-memory representation of a source code file, including its text,
 /// syntax trees, git status, and diagnostics.
 pub struct Buffer {
-    text: TextBuffer,
+    // zed 单文件 crates/language/src/buffer.rs 里该字段同为私有，但 test-support 的
+    // `impl Buffer` 与 struct 定义**同模块**故可直接访问；本 fork 把它拆进
+    // buffer/core.rs 后 test_support.rs 成为兄弟模块，必须放宽才能编译。
+    // 用 pub(super) 而非 pub(crate)：只放宽到 buffer 模块，不进 crate 根。
+    pub(super) text: TextBuffer,
     branch_state: Option<BufferBranchState>,
     /// Filesystem state, `None` when there is no path.
     file: Option<Arc<dyn File>>,
@@ -2159,7 +2163,8 @@ impl Buffer {
         Some(edit_id)
     }
 
-    fn did_edit(
+    // 见上方 `text` 字段的说明：拆模块后需放宽可见性给 buffer::test_support。
+    pub(super) fn did_edit(
         &mut self,
         old_version: &clock::Global,
         was_dirty: bool,
@@ -2429,7 +2434,13 @@ impl Buffer {
         }
     }
 
-    fn send_operation(&mut self, operation: Operation, is_local: bool, cx: &mut Context<Self>) {
+    // 见上方 `text` 字段的说明：拆模块后需放宽可见性给 buffer::test_support。
+    pub(super) fn send_operation(
+        &mut self,
+        operation: Operation,
+        is_local: bool,
+        cx: &mut Context<Self>,
+    ) {
         self.was_changed();
         cx.emit(BufferEvent::Operation {
             operation,

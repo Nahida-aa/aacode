@@ -201,7 +201,7 @@ pub use crate::workspace::{
             *,
         },
         event::Event,
-        workspace::Workspace,
+        workspace::{Workspace, WorkspaceHandle},
         lifecycle::reload
     },
     follow::{CollaboratorId, AutoWatch, state::ViewId},

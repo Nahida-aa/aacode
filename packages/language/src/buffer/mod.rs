@@ -21,6 +21,13 @@ pub use bracket_ranges::BracketMatch;
 pub use char_classifier::{CharClassifier, CharKind, CharScopeContext};
 pub use chunks::{BufferChunks, Chunk, HighlightRun, LanguageAwareStyling};
 pub use core::Buffer;
+
+// 对齐 zed crates/language/src/buffer.rs:77 —— 那行 `pub use` 就挂在
+// test-support 块旁，同样带 cfg 门控。外部（如 language_tools 的测试）靠
+// `language::tree_sitter_rust` 拿到 grammar 的 LANGUAGE 常量。
+// 少了这条报 `no tree_sitter_rust in the root`。
+#[cfg(any(test, feature = "test-support"))]
+pub use {tree_sitter_python, tree_sitter_rust, tree_sitter_typescript};
 pub use edit::{AutoIndentExclusion, AutoindentMode};
 pub use edit_preview::EditPreview;
 pub use event::{BufferEditSource, BufferEvent, Operation, ParseStatus};
