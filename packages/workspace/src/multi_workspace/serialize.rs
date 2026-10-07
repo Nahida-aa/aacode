@@ -63,15 +63,22 @@ impl MultiWorkspace {
         tasks
     }
 
-    /// Flush every workspace's serialization **and** bind them to the current
-    /// session/window, returning the pending tasks.
+    /// Assigns random database IDs to all retained workspaces, flushes
+    /// workspace serialization (SQLite) and multi-workspace state (KVP),
+    /// and writes session bindings so the serialized data can be read
+    /// back by `last_session_workspace_locations` +
+    /// `read_serialized_multi_workspaces`.
     ///
-    /// 对齐 Zed `crates/workspace/src/multi_workspace.rs:1697`。区别是 aacode 的
-    /// `flush_pending_serialization` 不做 session binding，故单列一个方法而不是
-    /// 改它 —— 后者已有调用方（quit handler），改语义会牵连别处。
+    /// 对齐 Zed `crates/workspace/src/multi_workspace.rs:1696-1697`。Zed 侧同样带
+    /// `#[cfg(any(test, feature = "test-support"))]`：它依赖同样被门控的
+    /// `Workspace::set_random_database_id`（workspace.rs:8455），且 zed 全部调用点
+    /// （persistence.rs:6139 在 mod tests、markdown_preview_view.rs:3315/3462、
+    /// open_listener.rs:2742）都在测试代码里，生产路径无调用方。故此处照搬该 gate ——
+    /// 去掉会因 set_random_database_id 不存在而编译失败（E0599）。
     ///
     /// core/open_listener.rs 的测试用它来在删窗口前把 workspace 落库，
-    /// 否则 `db.last_workspace()` 读不到数据（该方法此前未移植，测试编译不过）。
+    /// 否则 `db.last_workspace()` 读不到数据。
+    #[cfg(any(test, feature = "test-support"))]
     pub fn flush_all_serialization(
         &mut self,
         window: &mut Window,
