@@ -8,6 +8,48 @@ clean:
 stats:
     scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf
 
+# —— 本地安装 ——
+# 参考 aa-player 的 just install（同为 GPUI 应用，踩过的坑一致）。
+# 生成应用图标（hicolor 多尺寸，产物随仓库提交）。
+# 依赖 resvg；改了 assets/images/aacode.svg 后重跑即可。
+icons:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for s in 32 48 64 128 256 512; do
+      d="resources/icons/hicolor/${s}x${s}/apps"
+      mkdir -p "$d"
+      resvg -w "$s" -h "$s" assets/images/aacode.svg "$d/aacode.png"
+    done
+    echo "生成完成：resources/icons/hicolor/"
+
+# 本地真实安装（默认用户级 ~/.local，无需 root；可传 PREFIX 覆盖，如 `just install /usr`）。
+# 布局：bin + share/icons/hicolor + share/applications。
+# 安装副本里 Exec/TryExec 改写为绝对路径——用户级安装时 ~/.local/bin 往往不在
+# GUI 会话 PATH 里，TryExec 解析失败会导致启动器直接隐藏该应用。
+install prefix="$HOME/.local":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cargo build --release -p aa-app
+    install -Dm755 target/release/aa-app "{{prefix}}/bin/aa-app"
+    cp -r resources/icons/hicolor/. "{{prefix}}/share/icons/hicolor/"
+    sed "s|Exec=aa-app|Exec={{prefix}}/bin/aa-app|; s|TryExec=aa-app|TryExec={{prefix}}/bin/aa-app|" \
+        resources/aacode.desktop > "{{prefix}}/share/applications/aacode.desktop"
+    # 这三个是"有则刷新、无则跳过"——缺了不影响安装，只是桌面数据库/图标缓存不更新。
+    -update-desktop-database "{{prefix}}/share/applications"
+    -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
+    -kbuildsycoca6
+    echo "已安装到 {{prefix}}（二进制：{{prefix}}/bin/aa-app）"
+
+# 卸载本地安装（数据目录 ~/.local/share/zed 保留，见 paths::APP_NAME）
+uninstall prefix="$HOME/.local":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    rm -f "{{prefix}}/bin/aa-app" "{{prefix}}/share/applications/aacode.desktop"
+    find "{{prefix}}/share/icons/hicolor" -name 'aacode.png' -delete 2>/dev/null || true
+    -update-desktop-database "{{prefix}}/share/applications"
+    -gtk-update-icon-cache -q -t -f "{{prefix}}/share/icons/hicolor"
+    echo "已从 {{prefix}} 卸载"
+
 # tools
 ## outline —— 打印源文件的符号大纲（zed 的 tree-sitter outline.scm）
 ## 用法：just outline <文件...> [fields=...]
