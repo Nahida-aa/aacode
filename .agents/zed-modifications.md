@@ -227,43 +227,6 @@ zed 独有字符串。当前无妨，两者并存即可。
 `packages/http_client/src/github.rs:199` ——
 `github_api_request("https://api.github.com/repos/zed-industries/zed/releases")`。
 
-## 高危依赖：slotmap（版本必须与 zed 一致）
-
-**现象**（编译通过、不 panic、只在启动时刷 ERROR）：
-
-```
-ERROR: Unable to deserialize editor: No entry in database for item_id:
-       4294967690 and workspace_id WorkspaceId(2)
-ERROR: No keybinding editor to deserialize
-```
-
-**根因**：`gpui::EntityId` 是 `slotmap::new_key_type!` 生成的 Key（idx+version 打包位域），
-而 workspace 持久化把它的原始 u64 直接当主键写进 `editors` 表：
-
-```
-workspace/serialize/pane.rs:36   item_id: handle.item_id().as_u64()
-        ↓ 写入
-editors 表 (item_id, workspace_id) ← 主键
-        ↓ 读取
-editor/items.rs:1290  EditorDb::get_serialized_editor(item_id, workspace_id)
-        ↓ 查不到行
-"Unable to deserialize editor: No entry in database"
-```
-
-声明是 `slotmap = "1.0.6"`（caret 语义），lock 却漂到 `1.1.1`（zed 是 `1.0.7`）。
-位域布局一变，旧行解码即错。识别特征：日志里出现 `4294967295`（= `0xFFFFFFFF`）——
-那正是 `slotmap::KeyData::null()` 的 `idx == u32::MAX` 特征，正常数据不该有。
-
-**修法**：`cargo update -p slotmap --precise 1.0.7`（checksum 应与 zed lock 一致）。
-
-**已排查确认其余无同类风险**：
-- `proto` 是 aacode 本地 fork，主线同进程不与 zed 通信 → 无 wire 兼容问题
-- `inventory` 0.3.21→0.3.24 是 patch 版本，且 keymap 存的是 action 名字符串 → 无害
-- 其余持久化类型（`SerializedEditor` 等）字段全是 `String`/`PathBuf`/`i64`，
-  不含第三方紧凑编码；`debugger_ui` 的 `HashMap<EntityId, _>` 是运行时结构，不落库
-
-**防线**：`script/check-lock-drift.sh` 第二重检查会比对高危包与 zed lock 的版本，
-不一致直接 `exit 1`。用法 `ZED_LOCK=<path> bash script/check-lock-drift.sh`。
 
 ## 全量对照现状（非阻塞，仅记录）
 
@@ -274,63 +237,7 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 如将来要与 zed 完全对齐，用 `cargo update -p <crate> --precise <zed 版本>` 逐个降级，
 不要裸跑不带 `-p` 的 `cargo update`（会重算全图，且可能让同名 crate 分裂成多份）。
 
-## NodeRuntime 的 options channel：sender 必须被 observer 捕获
 
-**现象**（编译通过、不崩溃、只有 ERROR 日志）：
-
-```
-ERROR project::prettier_store: Failed to install default prettier:
-      prettier & plugins install: fetching formatter packages: sender was dropped
-```
-
-**根因**：aacode 曾写
-
-```rust
-let (_node_options_tx, node_options_rx) = watch::channel(None);   // ← sender 立即 drop
-```
-
-`_` 前缀让 sender 创建后即销毁，且值恒为 `None` 永不填充。于是
-`node_runtime/src/lib.rs:86-99` 的 `instance()`：
-
-```rust
-if let Some(options) = state.options.borrow().as_ref() { break ... }  // None，走不到
-match state.options.changed().await {
-    Err(err) => return Box::new(UnavailableNodeRuntime {
-        error_message: err.to_string().into(),      // "sender was dropped"
-    }),
-}
-```
-
-`sender was dropped` 来自 zed 的 `watch` crate（`crates/watch/src/error.rs:21` 的
-`NoSenderError`），含义是 channel 发送端已销毁、永远等不到值。
-
-**影响面**：prettier 安装必失败、所有依赖 node 的 LSP 起不来、部分 agent 工具执行失效。
-全是静默的。
-
-**修法**：照抄 Zed `main.rs:533-556`，用 `observe_global::<SettingsStore>` 驱动 channel，
-sender 被闭包捕获因而存活，`settings.json` 的 `node` 配置（`ignore_system_version` /
-`path` / `npm_path`）也随之真正生效。注意 `get_global` 来自 `Settings` trait，
-需 `use settings::Settings as _;`；`log_err` 需 `use util::ResultExt as _;`。
-
-## ui::on_new_scrollbars：gpui_learn 显式列举导致的漏导出（已修）
-
-Zed `main.rs:557` 有一行 `ui::on_new_scrollbars::<SettingsStore>(cx);`（让每个新窗口的
-scrollbar 响应设置变化），aacode 补上了。
-
-**卡点**：函数在 gpui_learn 的 `packages/ui/src/components/scrollbar.rs:627` 确实存在，
-但 `packages/ui/src/components/mod.rs` 的 `pub use scrollbar::{...}` 是**显式列举**
-（上游 zed 用 `pub use components::*` glob），漏了该函数 → 报
-`cannot find function 'on_new_scrollbars' in crate ui`。症状像"函数不存在"，
-实际是 re-export 缺失。
-
-**一并补齐的另外 2 项**（同样漏了导出，对比 scrollbar.rs 的 pub 项与导出列表得出）：
-`ScrollbarElement`、`ScrollbarPrepaintState`。补后可导出面与上游 glob 一致。
-
-gpui_learn commit `957a9a3`。
-
-> 教训：把 glob 改成显式列举虽然更可控，但**迁移期必然漏**。搬 Zed 代码遇到
-> `cannot find function/xxx in crate ui` 时，先去被搬文件里确认符号是否存在 ——
-> 存在就是 re-export 漏了，而不是代码没写。
 
 ## LSP 面板：拆分「停止」与「移除」（aacode 有意改动）
 
@@ -489,29 +396,27 @@ SettingsPageItem::ActionLink(ActionLink {
 注意 `ai_page` 的 `general_section()` 返回类型写死 `[SettingsPageItem; 8]`，
 加项要同步改成 9 —— 该签名是 aacode 自己的简化（zed 是 `Vec`），非移植差异。
 
-## Pane toolbar：补齐 Zed `initialize_pane`（移植缺失，已修）
 
-上游 `crates/zed/src/zed.rs:1457` 的 `initialize_pane` 逐个
-`toolbar.add_item(...)` 把 tab 下方那整栏挂到**每个 pane** 上，共 26 个 item。
-aacode 此前完全没有这段，导致该栏全空 —— 用户报「zed 有路径和按钮，aacode 没有」。
+## Pane toolbar：4 个 item 未移植（`initialize_pane` 其余 22 个已接）
 
-**不是设置问题**：相关 crate 都在仓里，`editor/src/lib.rs:362` 也已设好
-`RenderBreadcrumbText` 全局（与 zed **同号**），只缺「挂到 pane 上」这一步。
-不报编译错、不 panic，纯静默缺失。
+Zed `crates/zed/src/zed.rs:1457` 的 `initialize_pane` 往每个 pane 挂 26 个
+toolbar item。aacode 已接 22 个，**以下 4 个无对应实现，rev→rev 时不必同步**：
 
-已补 22 个，跳过 4 个 aacode 无实现的：
-`QuickActionBar`（957 行 zed 内部组件，只包装 `BufferSearchBar`，后者不依赖它）、
-`TelemetryLogToolbarItemView`、`MigrationBanner`、`BasedPyrightBanner`。
+| item | 原因 |
+|---|---|
+| `QuickActionBar` | zed crate 内部组件（`crates/zed/src/zed/quick_action_bar.rs`，连同 `preview.rs` 共 957 行）。它只是包装 `BufferSearchBar`，后者不依赖它（zed 把 Entity 传进去做外层），故 aacode 直接加裸的 `BufferSearchBar`。 |
+| `TelemetryLogToolbarItemView` | zed crate 内部模块，打开遥测日志窗口的入口。 |
+| `MigrationBanner` | 数据库迁移期间的提示横幅。 |
+| `BasedPyrightBanner` | Python LSP 提示横幅。 |
 
-**移植细节**：
-- `gpui::AppContext as _` 必引 —— `cx.new()` 是它的方法，漏掉报
-  「no method named new found for Context<Toolbar>」（对齐 zed.rs:43）
+移植时的两个 import 细节（照抄时会踩）：
+
+- `gpui::AppContext as _` 必引 —— `cx.new()` 是该 trait 的方法，漏掉会报
+  「no method named new found for Context<Toolbar>」（对应 zed.rs:43）
 - `LspLogToolbarItemView` 走模块路径 `language_tools::lsp_log_view::`，
-  因 crate 根只 re-export 了 `LspLogView`（对齐 zed.rs:53）
-- 挂载点对齐 zed L550：`observe_new::<Workspace>` 对 `active_pane` 执行一次 +
-  订阅 `Event::PaneAdded`
+  因 crate 根只 re-export 了 `LspLogView`（对应 zed.rs:53）
 
-**命名**：模块名 `panes` 是 aacode 拆出来的（zed 是 zed.rs 内联），属可改；
-函数名一律保留 zed 原名 —— `initialize_pane` 逐字照搬，
-新增的外层包装叫 `initialize_pane_toolbars`（zed 那边内联在 observe_new 里，
-无独立函数，故不是照抄而是新名，已在代码注释说明）。
+挂载点在 `app/src/initialize/pane_toolbar.rs`，对齐 zed L550 的
+`observe_new::<Workspace>` + `Event::PaneAdded` 订阅。模块名 `pane_toolbar`
+是 aacode 拆出来的（zed 内联在 zed.rs），与 `panels.rs` 的
+`initialize_panels`（左侧 Dock Panel）刻意区分 —— 两者在 Zed 里只差复数。
