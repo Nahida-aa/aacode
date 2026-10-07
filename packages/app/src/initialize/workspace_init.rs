@@ -6,10 +6,15 @@ use ui::{ContextMenu, PopoverMenuHandle};
 use settings::Settings as _;
 use vim_mode_setting::HelixModeSetting;
 
-/// 注册两个 observe_new：
+/// 注册三个 observe_new：
 /// - **MultiWorkspace** → `cx.defer` 里创建 Sidebar + register_sidebar
 /// - **Workspace** → 创建 Dock Panel（agent/project/git 等）+ 注册 StatusBar 按钮
+/// - **Pane** → 挂 tab 下方那栏 toolbar item（路径栏/搜索框/诊断日志入口等，见 panes.rs）
 pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
+    // 对齐 Zed crates/zed/src/zed.rs L550 的 observe_new（含 PaneAdded 订阅）。
+    // 必须在任何 pane 被创建之前注册，否则先建出来的 pane 拿不到 toolbar item。
+    super::panes::init(cx);
+
     // —— MultiWorkspace observe_new → Sidebar ——
     cx.observe_new(|multi_workspace: &mut workspace::MultiWorkspace, window, cx| {
         let Some(window) = window else {

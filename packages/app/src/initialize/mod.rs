@@ -20,6 +20,7 @@ use vim_mode_setting::HelixModeSetting;
 use workspace::{MultiWorkspace, Workspace};
 
 pub mod panels;
+pub mod panes;
 pub mod workspace_init;
 
 pub use workspace_init::initialize_workspace;
