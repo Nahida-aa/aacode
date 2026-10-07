@@ -1476,14 +1476,15 @@ impl LspButton {
             }
             if !new_lsp_items.is_empty() {
                 if can_stop_all {
+                    // 顺序对齐上游：Restart All 在最上面，其后才是停止/移除类。
+                    new_lsp_items.push(LspMenuItem::ToggleServersButton {
+                        action: ToggleServersAction::RestartAll,
+                    });
                     new_lsp_items.push(LspMenuItem::ToggleServersButton {
                         action: ToggleServersAction::StopAll,
                     });
                     new_lsp_items.push(LspMenuItem::ToggleServersButton {
                         action: ToggleServersAction::RemoveAll,
-                    });
-                    new_lsp_items.push(LspMenuItem::ToggleServersButton {
-                        action: ToggleServersAction::RestartAll,
                     });
                 } else if can_restart_all {
                     new_lsp_items.push(LspMenuItem::ToggleServersButton {

@@ -428,13 +428,16 @@ gpui_learn commit `957a9a3`。
 | 运行中 / Starting | `Restart Server`、`Stop Server`、`Remove Server` |
 | 已停止（Stopped） | `Start Server`、`Remove Server` |
 
-| 全局 | 说明 |
+| 全局（按面板自上而下顺序） | 说明 |
 |---|---|
+| `Restart All Servers` | 全部拉回（**对齐上游，始终排最上面**） |
 | `Stop All Servers` | 条目保留，可逐个单独 Start 恢复 |
 | `Remove All Servers` | 条目消失，只能 Restart All 恢复 |
-| `Restart All Servers` | 全部拉回 |
 
-（有 server 在运行时三者都显示；全部停止时只显示 `Restart All Servers`。）
+（有 server 在运行时三者都显示，顺序如上；全部停止时只显示 `Restart All Servers`。）
+
+> 顺序对齐上游：上游 `if can_stop_all` 先 push `restart: true`（Restart All）再 push
+> `restart: false`（Stop All）。新增 `StopAll` 时不要把它排到 Restart 前面。
 
 | 动作 | 条目 | 恢复粒度 |
 |---|---|---|
