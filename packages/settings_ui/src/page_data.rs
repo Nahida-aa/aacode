@@ -8920,6 +8920,19 @@ fn ai_page(cx: &App) -> SettingsPage {
                 metadata: None,
                 files: USER,
             }),
+            // 「试听」：立刻播一次 AgentDone 提示音，用来确认当前输出设备能否出声。
+            // 上游 zed 没有这一项（只有 Collaboration 页的 Test Audio，走完整回环测试：
+            // 同时开麦与扬声器）。这里只播提示音，不碰麦克风，且放在 Agent 页紧邻
+            // Play Sound When Agent Done —— 改完开关立刻能听到效果。
+            SettingsPageItem::ActionLink(ActionLink {
+                title: "Test Agent Done Sound".into(),
+                description: Some("Play the agent-done notification sound once.".into()),
+                button_text: "Play".into(),
+                on_click: Arc::new(|_settings_window, _window, cx| {
+                    audio::Audio::play_sound(audio::Sound::AgentDone, cx);
+                }),
+                files: USER,
+            }),
             SettingsPageItem::SettingItem(SettingItem {
                 title: "Prevent Idle Sleep",
                 description: "Whether to keep the system awake while agent threads are running.",
