@@ -458,3 +458,60 @@ gpui_learn commit `957a9a3`。
 `remove_server`（781-788）、item 构造（约 1210-1400）、per-item 子菜单（约 415-715）、
 全局按钮分支（约 303-340）。合并后请确认 `stopped_server_worktrees` 的三处引用
 （写入 / 移除 / 清空）仍然完整。
+
+## Settings → AI：新增「试听」按钮（aacode 独有，非移植）
+
+`settings_ui/src/page_data.rs` 的 `ai_page()` 里，在 `Play Sound When Agent Done`
+之后插入一个 `SettingsPageItem::ActionLink`：
+
+```rust
+SettingsPageItem::ActionLink(ActionLink {
+    title: "Test Agent Done Sound".into(),
+    button_text: "Play".into(),
+    on_click: Arc::new(|_settings_window, _window, cx| {
+        audio::Audio::play_sound(audio::Sound::AgentDone, cx);
+    }),
+    files: USER,
+}),
+```
+
+**上游 zed 没有这一项。** zed 只有 Collaboration 页的 Test Audio
+（`page_data.rs:8555`），那走完整回环测试（`audio_test_window.rs` 同时
+`open_input_stream` + `open_test_output`）。
+
+差异点：
+- 只播提示音，**不碰麦克风**
+- 放在 Agent 页而非 Collaboration 页，紧邻对应开关，改完立刻能听到效果
+- 用途：排查本机 audio 输出设备是否可用（本机 `alsa::poll()` POLLERR 的排查工具）
+
+`settings_ui` 本就依赖 `audio`（`Cargo.toml:16`），无需新增依赖。
+
+注意 `ai_page` 的 `general_section()` 返回类型写死 `[SettingsPageItem; 8]`，
+加项要同步改成 9 —— 该签名是 aacode 自己的简化（zed 是 `Vec`），非移植差异。
+
+## Pane toolbar：补齐 Zed `initialize_pane`（移植缺失，已修）
+
+上游 `crates/zed/src/zed.rs:1457` 的 `initialize_pane` 逐个
+`toolbar.add_item(...)` 把 tab 下方那整栏挂到**每个 pane** 上，共 26 个 item。
+aacode 此前完全没有这段，导致该栏全空 —— 用户报「zed 有路径和按钮，aacode 没有」。
+
+**不是设置问题**：相关 crate 都在仓里，`editor/src/lib.rs:362` 也已设好
+`RenderBreadcrumbText` 全局（与 zed **同号**），只缺「挂到 pane 上」这一步。
+不报编译错、不 panic，纯静默缺失。
+
+已补 22 个，跳过 4 个 aacode 无实现的：
+`QuickActionBar`（957 行 zed 内部组件，只包装 `BufferSearchBar`，后者不依赖它）、
+`TelemetryLogToolbarItemView`、`MigrationBanner`、`BasedPyrightBanner`。
+
+**移植细节**：
+- `gpui::AppContext as _` 必引 —— `cx.new()` 是它的方法，漏掉报
+  「no method named new found for Context<Toolbar>」（对齐 zed.rs:43）
+- `LspLogToolbarItemView` 走模块路径 `language_tools::lsp_log_view::`，
+  因 crate 根只 re-export 了 `LspLogView`（对齐 zed.rs:53）
+- 挂载点对齐 zed L550：`observe_new::<Workspace>` 对 `active_pane` 执行一次 +
+  订阅 `Event::PaneAdded`
+
+**命名**：模块名 `panes` 是 aacode 拆出来的（zed 是 zed.rs 内联），属可改；
+函数名一律保留 zed 原名 —— `initialize_pane` 逐字照搬，
+新增的外层包装叫 `initialize_pane_toolbars`（zed 那边内联在 observe_new 里，
+无独立函数，故不是照抄而是新名，已在代码注释说明）。

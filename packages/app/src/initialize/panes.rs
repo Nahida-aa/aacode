@@ -23,11 +23,13 @@ use onboarding::multibuffer_hint::MultibufferHint;
 use search::{BufferSearchBar, project_search::ProjectSearchBar};
 use workspace::{Event, Pane, Workspace};
 
-/// 把 Zed `initialize_pane` 的调用点移植过来。
+/// 注册「每个 pane 都挂上 toolbar item」的 observe_new。
 ///
-/// 对齐 Zed `crates/zed/src/zed.rs:550-563`：新 workspace 打开时对 active pane
-/// 注册一次，之后每收到 `PaneAdded` 事件再对新 pane 注册。
-pub fn init(cx: &mut App) {
+/// 对齐 Zed `crates/zed/src/zed.rs:550-563`。Zed 那边这段是内联在
+/// `observe_new::<Workspace>` 里的，没有独立包装函数；本 fork 拆到独立模块，
+/// 故起名 `initialize_pane_toolbars`（区别于同模块的 `initialize_pane`，后者是
+/// Zed 原名、逐字保留）。
+pub fn initialize_pane_toolbars(cx: &mut App) {
     cx.observe_new(|workspace: &mut Workspace, window, cx| {
         let Some(window) = window else {
             return;
