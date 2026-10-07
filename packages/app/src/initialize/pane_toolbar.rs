@@ -16,6 +16,7 @@
 //! 以免与 `panels.rs` 混淆。
 
 use breadcrumbs::Breadcrumbs;
+use crate::core::MigrationBanner;
 use diagnostics::ToolbarControls as DiagnosticEditorControls;
 // `AppContext` 必须引入：`cx.new()` 是它的方法，漏掉会报
 // 「no method named `new` found for Context<Toolbar>」—— 与 zed.rs:43 的 import 对齐。
@@ -28,13 +29,14 @@ use onboarding::multibuffer_hint::MultibufferHint;
 use search::{BufferSearchBar, project_search::ProjectSearchBar};
 use workspace::{Event, Pane, Workspace};
 
-/// 注册「每个 pane 都挂上 toolbar item」的 observe_new。
+/// 对齐 Zed `crates/zed/src/zed.rs:550-563` 里挂在 `observe_new::<Workspace>`
+/// 上的那段订阅。
 ///
-/// 对齐 Zed `crates/zed/src/zed.rs:550-563`。Zed 那边这段是内联在
-/// `observe_new::<Workspace>` 里的，没有独立包装函数；本 fork 拆到独立模块，
-/// 故起名 `initialize_pane_toolbars`（区别于同模块的 `initialize_pane`，后者是
-/// Zed 原名、逐字保留）。
-pub fn initialize_pane_toolbars(cx: &mut App) {
+/// Zed 那段是**内联**在 `zed.rs` 的 `observe_new` 里（与 `OpenBundledFile` 等分支
+/// 共用同一个 match），没有独立包装函数。本 fork 拆成独立模块后保留一层薄壳，
+/// 但**不新增 Zed 之外的名字**：对外只暴露 Zed 原名 `initialize_pane`，由
+/// `workspace_init.rs` 里已有的 `observe_new` 调用。
+pub(super) fn subscribe_pane_toolbars(cx: &mut App) {
     cx.observe_new(|workspace: &mut Workspace, window, cx| {
         let Some(window) = window else {
             return;
@@ -58,13 +60,15 @@ pub fn initialize_pane_toolbars(cx: &mut App) {
 
 /// 对齐 Zed `crates/zed/src/zed.rs:1457` 的 `initialize_pane`。
 ///
-/// 与上游的差异：跳过 4 个 aacode 没有实现的 item，各自的缺失原因见下方注释。
+/// 与上游的差异：跳过 2 个 aacode 没有实现的 item，各自的缺失原因见下方注释。
 fn initialize_pane(
     workspace: &Workspace,
     pane: &Entity<Pane>,
     window: &mut Window,
     cx: &mut Context<Workspace>,
 ) {
+    // 对齐 Zed zed.rs:1463 —— MigrationBanner::new 需要 WeakEntity<Workspace>。
+    let workspace_handle = cx.weak_entity();
     pane.update(cx, |pane, cx| {
         pane.toolbar().update(cx, |toolbar, cx| {
             let multibuffer_hint = cx.new(|_| MultibufferHint::new());
@@ -87,12 +91,10 @@ fn initialize_pane(
                     cx,
                 )
             });
-            toolbar.add_item(buffer_search_bar, window, cx);
-            // 上游紧接着是
-            //   let quick_action_bar = cx.new(|cx| QuickActionBar::new(buffer_search_bar, workspace, cx));
-            // 但 QuickActionBar 是 zed crate 内的组件（crates/zed/src/zed/quick_action_bar.rs，
-            // 连同 preview.rs 共 957 行），aacode 无对应 crate。BufferSearchBar 本身不依赖它
-            // （zed 只是把 Entity 传进去做包装），故此处只加裸的 BufferSearchBar。
+            toolbar.add_item(buffer_search_bar.clone(), window, cx);
+            let quick_action_bar =
+                cx.new(|cx| crate::core::QuickActionBar::new(buffer_search_bar, workspace, cx));
+            toolbar.add_item(quick_action_bar, window, cx);
             let diagnostic_editor_controls = cx.new(|_| DiagnosticEditorControls::new());
             toolbar.add_item(diagnostic_editor_controls, window, cx);
             let project_search_bar = cx.new(|_| ProjectSearchBar::new());
@@ -107,7 +109,11 @@ fn initialize_pane(
             // （打开遥测日志窗口的入口），aacode 无对应物，跳过。
             let syntax_tree_item = cx.new(|_| SyntaxTreeToolbarItemView::new());
             toolbar.add_item(syntax_tree_item, window, cx);
-            // 上游此处有 `MigrationBanner` —— 数据库迁移期间的提示横幅，aacode 跳过。
+            // 对齐 Zed zed.rs:1500 —— workspace_handle 在 initialize_pane 开头取出，
+            // MigrationBanner::new 需要 WeakEntity<Workspace>。
+            let migration_banner =
+                cx.new(|inner_cx| MigrationBanner::new(workspace_handle.clone(), inner_cx));
+            toolbar.add_item(migration_banner, window, cx);
             let highlights_tree_item = cx.new(|_| HighlightsTreeToolbarItemView::new());
             toolbar.add_item(highlights_tree_item, window, cx);
             let project_diff_toolbar = cx.new(|cx| git_ui::project_diff::ProjectDiffToolbar::new(workspace, cx));

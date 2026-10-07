@@ -397,17 +397,15 @@ SettingsPageItem::ActionLink(ActionLink {
 加项要同步改成 9 —— 该签名是 aacode 自己的简化（zed 是 `Vec`），非移植差异。
 
 
-## Pane toolbar：4 个 item 未移植（`initialize_pane` 其余 22 个已接）
+## Pane toolbar：2 个 item 未移植（其余 24 个已接）
 
 Zed `crates/zed/src/zed.rs:1457` 的 `initialize_pane` 往每个 pane 挂 26 个
-toolbar item。aacode 已接 22 个，**以下 4 个无对应实现，rev→rev 时不必同步**：
+toolbar item。aacode 已接 24 个，**以下 2 个无对应实现，rev→rev 时不必同步**：
 
 | item | 原因 |
 |---|---|
-| `QuickActionBar` | zed crate 内部组件（`crates/zed/src/zed/quick_action_bar.rs`，连同 `preview.rs` 共 957 行）。它只是包装 `BufferSearchBar`，后者不依赖它（zed 把 Entity 传进去做外层），故 aacode 直接加裸的 `BufferSearchBar`。 |
-| `TelemetryLogToolbarItemView` | zed crate 内部模块，打开遥测日志窗口的入口。 |
-| `MigrationBanner` | 数据库迁移期间的提示横幅。 |
-| `BasedPyrightBanner` | Python LSP 提示横幅。 |
+| `TelemetryLogToolbarItemView` | zed crate 内部模块（打开遥测日志窗口的入口）。 |
+| `BasedPyrightBanner` | 所属 crate `language_onboarding` **整个未移植**（aacode 有 `packages/languages` 里的 `BasedPyrightLspAdapter`，即 LSP 本身是有的，只缺首次安装引导横幅）。 |
 
 移植时的两个 import 细节（照抄时会踩）：
 
@@ -420,3 +418,19 @@ toolbar item。aacode 已接 22 个，**以下 4 个无对应实现，rev→rev 
 `observe_new::<Workspace>` + `Event::PaneAdded` 订阅。模块名 `pane_toolbar`
 是 aacode 拆出来的（zed 内联在 zed.rs），与 `panels.rs` 的
 `initialize_panels`（左侧 Dock Panel）刻意区分 —— 两者在 Zed 里只差复数。
+
+### 已搬入 app crate 的两个 zed 内部组件
+
+原属 zed crate、无独立 crate 的组件，移植到 `app/src/core/` 下（模块名可改，
+函数名保留原样）：
+
+| 组件 | aacode 位置 | 上游位置 |
+|---|---|---|
+| `QuickActionBar` | `core/quick_action_bar.rs` + `quick_action_bar/{preview,repl_menu}.rs`（共 1460 行） | `crates/zed/src/zed/quick_action_bar*.rs` |
+| `MigrationBanner` | `core/migrate/mod.rs`（326 行） | `crates/zed/src/zed/migrate.rs` |
+
+两者照抄所需的 workspace 依赖：`picker` / `markdown` / `migrator`
+（`MigrationBanner` 用 `migrator::{migrate_keymap, migrate_settings}`；
+aacode 的 `packages/migrator` 已含这两个函数）。
+`MigrationBanner` 还需在 `initialize_pane` 开头取 `cx.weak_entity()`
+（对齐 zed.rs:1463）。

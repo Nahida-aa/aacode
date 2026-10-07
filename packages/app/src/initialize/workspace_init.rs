@@ -13,7 +13,7 @@ use vim_mode_setting::HelixModeSetting;
 pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
     // 对齐 Zed crates/zed/src/zed.rs L550 的 observe_new（含 PaneAdded 订阅）。
     // 必须在任何 pane 被创建之前注册，否则先建出来的 pane 拿不到 toolbar item。
-    super::pane_toolbar::initialize_pane_toolbars(cx);
+    super::pane_toolbar::subscribe_pane_toolbars(cx);
 
     // —— MultiWorkspace observe_new → Sidebar ——
     cx.observe_new(|multi_workspace: &mut workspace::MultiWorkspace, window, cx| {
