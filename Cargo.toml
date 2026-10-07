@@ -568,28 +568,28 @@ zeroize = "1.8"
 zstd = "0.11"
 
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
+clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 # 别名为 zed 的新包 `fuzzy_nucleo`：我们对齐的就是它（Case / LengthPenalty /
 # match_strings_async / StringMatch.string: SharedString）。成员包二选一，
 # 不能同时写 aa_gpui_fuzzy 和 fuzzy_nucleo（同一 crate 两个名字 → Cargo 报错）。
-fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
+fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 # zed 里这两个控件包就叫 `ui` / `ui_input`，同样用别名对齐，
 # 让照搬的 zed 代码（`ui::Button`、`ui_input::InputField`）零改动。
-ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
+ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 # zed 里这个包叫 `theme`，别名让照搬的 zed 代码（`theme::SyntaxTheme` 等）原样可用。
 # 与 `aa_gpui_kit_theme` 指向同一个包；**每个包只能选其中一个名字声明**，
 # 否则会报 "depends on crate ... multiple times with different names"。
-theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
+theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 # 图标枚举（gpui_learn packages/icons）在 zed 里叫 `icons`，同样用别名对齐。
-icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
-aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "a44926abf9d07d9b919399334fe77b5fbac21d68" }
+icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 
 
 crashes = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
