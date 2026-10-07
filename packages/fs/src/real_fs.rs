@@ -481,12 +481,26 @@ impl Fs for RealFs {
         // its target and leave the link behind.
         let path = std::path::absolute(path).context("Could not make the path absolute")?;
 
-        let entry = smol::unblock(move || trash::delete_with_info(path))
-            .await
-            .context("Could not trash file or dir")?
-            .into();
+        // trash-rs 无 android 后端（见 Cargo.toml 里该依赖的注释）。android 上
+        // 「移到回收站」退化为返回不支持，其余删除语义不变。
+        // —— 权宜之计，替换 trash-rs 后移除本分支。——
+        //
+        // 用 #[cfg] 而非 cfg!()：后者是运行时分支，`trash::delete_with_info`
+        // 仍会被编译，android 上依旧找不到 trash crate。
+        #[cfg(target_os = "android")]
+        {
+            anyhow::bail!("Moving to the system trash is not supported on Android (yet)");
+        }
 
-        Ok(self.trash.lock().insert(entry))
+        #[cfg(not(target_os = "android"))]
+        {
+            let entry = smol::unblock(move || trash::delete_with_info(path))
+                .await
+                .context("Could not trash file or dir")?
+                .into();
+
+            Ok(self.trash.lock().insert(entry))
+        }
     }
 
     async fn open_sync(&self, path: &Path) -> Result<Box<dyn io::Read + Send + Sync>> {
@@ -963,18 +977,31 @@ impl Fs for RealFs {
 
         let restored_item_path = trashed_entry.original_parent.join(&trashed_entry.name);
 
-        let (tx, rx) = futures::channel::oneshot::channel();
-        std::thread::Builder::new()
-            .name("restore trashed item".to_string())
-            .spawn(move || {
-                let res = trash::restore_all([trashed_entry.into_trash_item()]);
-                tx.send(res)
-            })
-            .expect("The OS can spawn a threads");
+        // 同 trash()：trash-rs 无 android 后端，android 上恢复退化为返回不支持。
+        // —— 权宜之计，替换 trash-rs 后移除本分支。——
+        #[cfg(target_os = "android")]
+        {
+            return Err(TrashRestoreError::Unknown {
+                description: "Restoring from the system trash is not supported on Android (yet)"
+                    .into(),
+            });
+        }
 
-        rx.await.expect("Restore all never panics")?;
-        self.trash.lock().remove(trash_id);
-        Ok(restored_item_path)
+        #[cfg(not(target_os = "android"))]
+        {
+            let (tx, rx) = futures::channel::oneshot::channel();
+            std::thread::Builder::new()
+                .name("restore trashed item".to_string())
+                .spawn(move || {
+                    let res = trash::restore_all([trashed_entry.into_trash_item()]);
+                    tx.send(res)
+                })
+                .expect("The OS can spawn a threads");
+
+            rx.await.expect("Restore all never panics")?;
+            self.trash.lock().remove(trash_id);
+            Ok(restored_item_path)
+        }
     }
 }
 

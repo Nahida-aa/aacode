@@ -35,7 +35,6 @@ util.workspace = true
 path.workspace = true
 is_executable = "1.0.5"
 notify = "9.0.0-rc.4"
-trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d884a89351f3b8856d12894cccee261d" }
 
 [target.'cfg(unix)'.dependencies]
 rustix.workspace = true
@@ -47,6 +46,26 @@ async-std.workspace = true
 
 [target.'cfg(target_os = "macos")'.dependencies]
 unicode-normalization = "0.1"
+
+# trash-rs 只实现了 windows / macos / freedesktop-linux 三套，其 lib.rs 用
+# `all(unix, not(macos), not(ios), not(android))` 显式排除 ios 与 android ——
+# 没有 android 后端可用。
+#
+# 而它此前是**无条件**依赖：依赖它的 real_fs.rs 有两处调用
+# （`trash::delete_with_info` / `trash::restore_all`），于是 fs crate 在
+# target_os = "android" 下直接编不过（E0433: cannot find module `platform`）。
+#
+# 故条件化到「trash-rs 真正支持的平台」。Android 上 fs crate 其余部分
+# （文件读写、watch、metadata…）照常参与编译，只是回收站两个动作退化为返回
+# `Unsupported`。
+#
+# —— 权宜之计，非终态。——
+# 待 android 端有回收站实现后（可行方向：应用私有目录下的 freedesktop 风格
+# `.Trash`，与 XDG 规范同构；Android scoped storage 下应用私有目录无需额外权限），
+# 把 trash-rs 整体换掉并恢复为无条件依赖即可 —— real_fs.rs 那两处调用点与
+# trash.rs 的三个转换 impl 都是照抄 Zed，届时只需改这一层。
+[target.'cfg(not(target_os = "android"))'.dependencies]
+trash = { git = "https://github.com/zed-industries/trash-rs", rev = "41c6c800d884a89351f3b8856d12894cccee261d" }
 
 [package.metadata.cargo-shear]
 ignored = ["async-std"]

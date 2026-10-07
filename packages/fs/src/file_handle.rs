@@ -30,7 +30,10 @@ impl FileHandle for std::fs::File {
         Ok(path)
     }
 
-    #[cfg(target_os = "linux")]
+    // Android 复用 linux 实现：Android 同为 Linux 内核，`/proc/self/fd/` 与
+    // " (deleted)" 后缀判定都成立。这里**不是**权宜之计 —— 与 linux 同源，
+    // 不是「暂时没适配」。
+    #[cfg(any(target_os = "linux", target_os = "android"))]
     fn current_path(&self, _: &Arc<dyn Fs>) -> Result<PathBuf> {
         use std::os::fd::{AsFd, AsRawFd};
 
