@@ -1,8 +1,7 @@
 //! Toolbar — 编辑器/面板顶部的工具条容器。
 //!
 //! 对齐 Zed `crates/workspace/src/toolbar.rs`。
-//! 简化版：去掉 `PaneSearchBarCallbacks`（Zed workspace 全局回调，需 language registry）、
-//! 去掉 `can_navigate`，用 `px(...)` 代替 Zed 的 `DynamicSpacing`。
+//! 简化版：去掉 `PaneSearchBarCallbacks`（Zed workspace 全局回调，需 language registry）。
 
 use crate::ItemHandle;
 use gpui::{
@@ -251,7 +250,7 @@ impl<T: ToolbarItemView> ToolbarItemViewHandle for Entity<T> {
 
 impl Render for Toolbar {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        if self.hidden || !self.has_any_visible_items() {
+        if !self.has_any_visible_items() {
             return div();
         }
 
@@ -261,21 +260,26 @@ impl Render for Toolbar {
         let has_right_items = self.right_items().count() > 0;
 
         v_flex()
+            .group("toolbar")
             .relative()
-            .py(px(4.))
-            .px(px(8.))
-            .when(has_left_items || has_right_items, |this| this.gap(px(4.)))
+            .py(DynamicSpacing::Base06.rems(cx))
+            .px(DynamicSpacing::Base08.rems(cx))
+            .when(has_left_items || has_right_items, |this| {
+                this.gap(DynamicSpacing::Base06.rems(cx))
+            })
             .border_b_1()
+            .border_color(cx.theme().colors().border_variant)
+            .bg(cx.theme().colors().toolbar_background)
             .child(
                 h_flex()
                     .items_start()
                     .justify_between()
-                    .gap(px(8.))
+                    .gap(DynamicSpacing::Base08.rems(cx))
                     .when(has_left_items, |this| {
                         this.child(
                             h_flex()
-                                .min_h(px(32.))
-                                .flex_1()
+                                .min_h_8()
+                                .flex_auto()
                                 .justify_start()
                                 .overflow_x_hidden()
                                 .children(self.left_items().map(|item| item.to_any())),
@@ -284,7 +288,7 @@ impl Render for Toolbar {
                     .when(has_right_items, |this| {
                         this.child(
                             h_flex()
-                                .h(px(32.))
+                                .h_8()
                                 .flex_row_reverse()
                                 .when(has_left_items, |this| this.flex_none())
                                 .justify_end()
