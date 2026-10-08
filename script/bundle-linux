@@ -12,10 +12,14 @@
 #    release_channel crate 用 include_str!("../../app/RELEASE_CHANNEL") 读同一个文件），
 #    crates/zed/resources/ → packages/app/resources/。
 #
-# 2. 图标不分 channel
-#    Zed 按 $suffix 取 app-icon{-dev,-nightly,-preview}.png；aacode 只有
-#    packages/app/resources/app-icon.png（由 `just icons` 从 assets/images/aacode.svg
-#    生成），故去掉 $suffix。若将来要分 channel，在此加 if 分支。
+# 2. 图标分 channel（与 Zed 一致）
+#    按 $suffix 取 app-icon$suffix.png —— stable 无后缀，其余带 -<channel>。
+#    $suffix 由上方的 channel 变量算出，与 Zed `crates/zed/build.rs` 的 icon_path()
+#    （L221-240）同一套规则；`just icons` 从 assets/images/aacode{,-dev,-nightly,
+#    -preview}.svg 生成这 8 个文件（4 channel × 512/1024）。
+#    差异：Zed 用 `option_env!("RELEASE_CHANNEL")` 决定后缀（build.rs 编译期读 env），
+#    这里用运行时读到的 $channel 变量 —— 两者取值同源（都源于
+#    packages/app/RELEASE_CHANNEL），只是 zed 在 build.rs 里做、这里在脚本里做。
 #
 # 3. libexec 里的名字
 #    Zed: release/zed → libexec/zed-editor、release/cli → bin/zed。
@@ -220,9 +224,9 @@ cp $(find_libs) "${zed_dir}/lib"
 
 # Icons
 mkdir -p "${zed_dir}/share/icons/hicolor/512x512/apps"
-cp "packages/app/resources/app-icon.png" "${zed_dir}/share/icons/hicolor/512x512/apps/aacode.png"
+cp "packages/app/resources/app-icon$suffix.png" "${zed_dir}/share/icons/hicolor/512x512/apps/aacode.png"
 mkdir -p "${zed_dir}/share/icons/hicolor/1024x1024/apps"
-cp "packages/app/resources/app-icon@2x.png" "${zed_dir}/share/icons/hicolor/1024x1024/apps/aacode.png"
+cp "packages/app/resources/app-icon$suffix@2x.png" "${zed_dir}/share/icons/hicolor/1024x1024/apps/aacode.png"
 
 # .desktop
 export DO_STARTUP_NOTIFY="true"

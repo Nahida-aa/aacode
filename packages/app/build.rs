@@ -8,8 +8,9 @@
 //! 没有这一步，Linux 下窗口没有应用图标，任务栏/Alt-Tab 显示 gpui 的兜底图标。
 //!
 //! 与 Zed 的差异：
-//! - 图标源用 aacode 自己的 `packages/app/resources/app-icon.png`，不按 channel
-//!   区分 dev/nightly（aacode 的 `just icons` 只生成这一份）。
+//! - 图标按 channel 区分（app-icon{,-dev,-nightly,-preview}.png），规则与 Zed
+//!   icon_path() 相同；取值来源改成运行时：先 `ZED_RELEASE_CHANNEL` env（`just install`
+//!   注入），否则回退读 `packages/app/RELEASE_CHANNEL`，都没有则 dev。
 //! - zed 用 `option_env!("RELEASE_CHANNEL")` 决定图标文件名后缀；aacode 的
 //!   release_channel 是运行时读 `<repo>/zed/RELEASE_CHANNEL`，build.rs 里拿不到，
 //!   且只有一个图标，故省略这段。
@@ -27,11 +28,32 @@ fn prepare_app_icon_x11() {
 
     // cargo 把 build script 的 cwd 设为包根（packages/app/），图标与
     // aacode.desktop.in 同级。
-    let icon = Path::new("resources/app-icon.png");
+    //
+    // 按 channel 选图标，后缀规则与 Zed `crates/zed/build.rs` 的 icon_path()
+    // （L221-240）一致：stable 无后缀，preview/nightly 带对应后缀，未知一律 -dev。
+    // Zed 用 `option_env!("RELEASE_CHANNEL")` 读编译期 env；这里用运行时
+    // `ZED_RELEASE_CHANNEL`（`just install` 注入）或回退读 packages/app/RELEASE_CHANNEL。
+    let channel = env::var("ZED_RELEASE_CHANNEL")
+        .ok()
+        .or_else(|| {
+            std::fs::read_to_string("RELEASE_CHANNEL")
+                .ok()
+                .map(|s| s.trim().to_string())
+        })
+        .unwrap_or_else(|| "dev".to_string());
+    let suffix = match channel.as_str() {
+        "stable" => "",
+        "preview" => "-preview",
+        "nightly" => "-nightly",
+        _ => "-dev",
+    };
+
+    let icon = Path::new(&format!("resources/app-icon{suffix}.png"));
     assert!(
         icon.exists(),
-        "missing {} —— run `just icons` to generate it from assets/images/aacode.svg",
-        icon.display()
+        "missing {} —— run `just icons` to generate it from assets/images/aacode{}.svg",
+        icon.display(),
+        suffix
     );
 
     let resized_image = ImageReader::open(icon)
@@ -45,6 +67,9 @@ fn prepare_app_icon_x11() {
     resized_image.save(&icon_out_path).expect("saving app icon");
 
     println!("cargo:rerun-if-changed={}", icon.to_string_lossy());
+    // channel 变了要重新选图标，故监听这两个来源。
+    println!("cargo:rerun-if-env-changed=ZED_RELEASE_CHANNEL");
+    println!("cargo:rerun-if-changed=RELEASE_CHANNEL");
 }
 
 fn main() {

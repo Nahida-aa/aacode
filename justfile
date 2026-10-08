@@ -10,9 +10,9 @@ stats:
 
 # —— 本地安装 ——
 # 布局与 zed 的 crates/zed/resources + script/bundle-linux 对齐：
-#   packages/app/resources/aacode.desktop.in   .desktop 模板（envsubst 填充）
-#   packages/app/resources/app-icon.png        512x512
-#   packages/app/resources/app-icon@2x.png     1024x1024（HiDPI）
+#   packages/app/resources/aacode.desktop.in       .desktop 模板（envsubst 填充）
+#   packages/app/resources/app-icon<suffix>.png     512x512，按 channel 取（stable 无后缀）
+#   packages/app/resources/app-icon<suffix>@2x.png  1024x1024（HiDPI）
 # 全部走 zed 的注入方式，值在本 recipe 执行时由环境变量决定，不写进源码：
 #   RELEASE_CHANNEL  同 zed 的 ZED_RELEASE_CHANNEL —— release_channel crate 在
 #                    **构建期**读它（build.rs 检测到该 env 就置
@@ -34,14 +34,35 @@ _app_id      := env_var_or_default("APP_ID", "dev.aacode.AACode")
 _app_icon    := env_var_or_default("APP_ICON", "aacode")
 _app_args    := env_var_or_default("APP_ARGS", "%F")
 
-# 生成应用图标（512 + 1024，产物随仓库提交）。依赖 resvg。
-# 改了 assets/images/aacode.svg 后重跑。
+# 图标文件名后缀：stable 无后缀，其余带 -<channel>，未知 channel 一律 -dev。
+# 规则同 Zed `crates/zed/build.rs` 的 icon_path()（L221-240）。
+# 这里用 just 的 if/else 表达式（而非 shell），因为 bundle-linux 里已有等价的 $suffix 变量，
+# 两边规则必须一致，改一处记得改另一处。
+_icon_suffix := if _channel == "stable" { "" } else if _channel == "preview" { "-preview" } else if _channel == "nightly" { "-nightly" } else { "-dev" }
+
+# 生成应用图标，512 + 1024 两个尺寸 × 4 个 channel，产物随仓库提交。依赖 resvg。
+#
+# 命名规则照 Zed `crates/zed/build.rs` 的 icon_path()（L221-240）：stable 无后缀，
+# 其余带 -<channel>，未知 channel 一律当 -dev。
+#   aacode.svg         → app-icon.png        （stable）
+#   aacode-dev.svg     → app-icon-dev.png
+#   aacode-nightly.svg → app-icon-nightly.png
+#   aacode-preview.svg → app-icon-preview.png
+# 改了任一 assets/images/*.svg 后重跑。
 icons:
     #!/usr/bin/env bash
     set -euo pipefail
-    resvg -w 512  -h 512  assets/images/aacode.svg packages/app/resources/app-icon.png
-    resvg -w 1024 -h 1024 assets/images/aacode.svg packages/app/resources/app-icon@2x.png
-    echo "生成完成：packages/app/resources/app-icon{,\\@2x}.png"
+    # 用 cut 而不是 shell 的 ${var%%:*} —— 后者的 %{ 会被 just 的插值语法吃掉。
+    for pair in "stable:aacode" "dev:aacode-dev" "nightly:aacode-nightly" "preview:aacode-preview"; do
+      # stable 的源文件是 aacode.svg（无后缀），其余带 -<channel>。
+      suffix=$(echo "$pair" | cut -d: -f1)
+      src="assets/images/$(echo "$pair" | cut -d: -f2).svg"
+      base="packages/app/resources/app-icon"
+      if [ "$suffix" != "stable" ]; then base="$base-$suffix"; fi
+      resvg -w 512  -h 512  "$src" "$base.png"
+      resvg -w 1024 -h 1024 "$src" "$base@2x.png"
+    done
+    echo "生成完成：packages/app/resources/app-icon{,-dev,-nightly,-preview}{,@2x}.png"
 
 # 渲染 .desktop 模板到标准输出（调试用，不安装）。
 # channel 变体：APP_NAME=AACode\ Nightly APP_ID=dev.aacode.AACode-Nightly just desktop
@@ -88,8 +109,10 @@ install prefix="$HOME/.local":
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"
 
     # 512 + 1024 两个尺寸，对齐 zed bundle-linux L174-177。
-    install -Dm644 packages/app/resources/app-icon.png       "{{prefix}}/share/icons/hicolor/512x512/apps/{{_app_icon}}.png"
-    install -Dm644 packages/app/resources/app-icon@2x.png       "{{prefix}}/share/icons/hicolor/1024x1024/apps/{{_app_icon}}.png"
+    install -Dm644 "packages/app/resources/app-icon{{_icon_suffix}}.png" \
+      "{{prefix}}/share/icons/hicolor/512x512/apps/{{_app_icon}}.png"
+    install -Dm644 "packages/app/resources/app-icon{{_icon_suffix}}@2x.png" \
+      "{{prefix}}/share/icons/hicolor/1024x1024/apps/{{_app_icon}}.png"
 
     # .desktop 由模板 envsubst 生成，再把 APP_CLI 绝对化。
     export DO_STARTUP_NOTIFY="true" APP_ICON="{{_app_icon}}" APP_ARGS="{{_app_args}}"
