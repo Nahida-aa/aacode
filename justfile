@@ -37,6 +37,26 @@ desktop:
     export APP_NAME="{{_app_name}}" APP_ID="{{_app_id}}"
     envsubst < packages/app/resources/aacode.desktop.in
 
+# 把调试符号拆到 .dbg，再 strip 掉本体里的 debug info 与局部符号。
+# 对齐 Zed `script/bundle-linux` L119-129（含其注释里的 objcopy 选型理由）。
+#
+# 实测效果：521 MB → 366 MB（省 155 MB）。省的是**符号表**不是 debuginfo ——
+# aacode 没有 [profile.release] 段，用 cargo 默认 debug = false，二进制里本来
+# 就没有 .debug_* section；真正的体积在 .symtab + .strtab（约 303 MB），
+# `--discard-all` 把局部符号也丢掉了，符号表于是几乎归零。
+# 注意 llvm-size -A 不显示 .symtab/.strtab，只看它会误判"没有可 strip 的东西"。
+#
+# .dbg 留在 target/release/ 不安装 —— 与 zed 一致（它的 .dbg 也不进 tarball）。
+strip:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    bin="target/release/aacode"
+    # 用 llvm-objcopy 而非 objcopy：老发行版（如 Ubuntu 20.04）的 GNU objcopy
+    # 不认新版 LLVM 产生的 CREL section。此段理由抄自 zed bundle-linux L123-124。
+    llvm-objcopy --only-keep-debug "$bin" "$bin.dbg"
+    llvm-objcopy --strip-debug --discard-all "$bin"
+    ls -la "$bin" "$bin.dbg"
+
 # 本地真实安装（默认用户级 ~/.local，无需 root；可传 PREFIX 覆盖，如 `just install /usr`）。
 #
 # Exec/TryExec 用绝对路径：用户级安装时 ~/.local/bin 往往不在 GUI 会话 PATH 里，
@@ -46,6 +66,8 @@ install prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
     cargo build --release -p aacode
+    # 与 zed bundle-linux 同样的顺序：先 strip 产物，再把瘦身后的本体装进 PREFIX。
+    just strip
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"
 
     # 512 + 1024 两个尺寸，对齐 zed bundle-linux L174-177。
