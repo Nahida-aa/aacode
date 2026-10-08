@@ -24,17 +24,13 @@ pub static RELEASE_CHANNEL_NAME: LazyLock<String> = LazyLock::new(|| {
 ///
 /// The build script checks for `$ZED_RELEASE_CHANNEL` and emits the `cfg`
 #[cfg(__do_not_set_zed_release_channel)]
-fn compile_time_release_channel_name() -> String { env!("ZED_RELEASE_CHANNEL").trim().to_string() }
+fn compile_time_release_channel_name() -> String {
+    env!("ZED_RELEASE_CHANNEL").trim().to_string()
+}
 
 #[cfg(not(__do_not_set_zed_release_channel))]
 fn compile_time_release_channel_name() -> String {
-    let manifest_dir = std::env!("CARGO_MANIFEST_DIR");
-    let workspace_root = std::path::Path::new(manifest_dir).join("..").join("..");
-    let release_channel_file = workspace_root.join("zed").join("RELEASE_CHANNEL");
-    match std::fs::read_to_string(&release_channel_file) {
-        Ok(content) => content.trim().to_string(),
-        Err(_) => "dev".to_string(),
-    }
+    include_str!("../../app/RELEASE_CHANNEL").trim().to_string()
 }
 
 #[doc(hidden)]
