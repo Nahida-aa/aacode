@@ -1,0 +1,262 @@
+#!/usr/bin/env bash
+#
+# 构建 Linux 发布 tarball。对齐 Zed `script/bundle-linux`，逐段保持同构：
+#   读 channel / 版本 → 交叉编译（gnu + musl）→ sentry 上传（可选）
+#   → objcopy 拆 .dbg 并 strip → 收集动态库到 lib/ → 图标 + .desktop → tar.gz
+#
+# 与 Zed 的差异（均为有意为之，改动前先读这里）：
+#
+# 1. crate / 路径改名
+#    zed → aacode，crates/zed/RELEASE_CHANNEL → packages/app/RELEASE_CHANNEL
+#    （两者都放在**主二进制 crate** 目录下：zed 是 crates/zed、aacode 是 packages/app；
+#    release_channel crate 用 include_str!("../../app/RELEASE_CHANNEL") 读同一个文件），
+#    crates/zed/resources/ → packages/app/resources/。
+#
+# 2. 图标不分 channel
+#    Zed 按 $suffix 取 app-icon{-dev,-nightly,-preview}.png；aacode 只有
+#    packages/app/resources/app-icon.png（由 `just icons` 从 assets/images/aacode.svg
+#    生成），故去掉 $suffix。若将来要分 channel，在此加 if 分支。
+#
+# 3. libexec 里的名字
+#    Zed: release/zed → libexec/zed-editor、release/cli → bin/zed。
+#    aacode: release/aacode → libexec/aacode、release/cli → bin/aacode。
+#    注意 bin/ 放的是 **cli 二进制**（与 Zed 一致）—— install.sh / 用户 PATH 里的
+#    `aacode` 命中的是它，而 desktop 的 Exec 也走它，这正是 [Desktop Action
+#    NewWorkspace] 里 `aacode --new` 能工作的原因。主应用在 libexec/ 里，
+#    zed 的 install.sh（main.rs 的 open_listener::listen_for_cli_connections）经
+#    zed-cli:// socket 把请求转给它。
+#
+# 4. sentry
+#    换成 -p aacode / -o aacode-dev；未设 SENTRY_AUTH_TOKEN 时整段自动跳过
+#    （与 Zed 同逻辑，Zed 那段 L92-113）。
+#
+# 5. blob-store
+#    仍然 source script/lib/blob-store.sh（原样取自 Zed），但本脚本不调用上传函数 ——
+#    上传由发布流程单独触发，与 Zed 的分工相同。
+#
+# 依赖的辅助文件（本次一并从 Zed 移植/适配）：
+#   script/get-crate-version          原样
+#   script/lib/blob-store.sh          原样
+#   script/generate-licenses          适配：icons 的 LICENSES 读 gpui_learn 那边
+#                                     （aacode 的图标是 aa_icons crate），
+#                                     配置改名 aacode-licenses.toml
+#   script/licenses/template.md.hbs   原样
+#   script/licenses/aacode-licenses.toml  从 zed-licenses.toml 改注释措辞
+#   .cargo/bundle-config.toml         原样（rpath=$ORIGIN/../lib 供 lib/ 收集的动态库）
+#
+# 产物：target/release/aacode-linux-<arch>.tar.gz
+#       内含 aacode[.<channel>].app/{bin,libexec,lib,share}/
+#       target/release/aacode-remote-server-linux-<arch>.gz（单独文件）
+
+set -euxo pipefail
+source script/lib/blob-store.sh
+
+# Function for displaying help info
+help_info() {
+  echo "
+Usage: ${0##*/} [options]
+Build a release .tar.gz for Linux.
+
+Options:
+  -h, --help     Display this help and exit.
+  --flatpak      Set ZED_BUNDLE_TYPE=flatpak so that this can be included in system info
+  "
+}
+
+# Parse all arguments manually
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            help_info
+            exit 0
+            ;;
+        --flatpak)
+            export ZED_BUNDLE_TYPE=flatpak
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            help_info
+            exit 1
+            ;;
+        *)
+            echo "Error: Unexpected argument: $1" >&2
+            help_info
+            exit 1
+            ;;
+    esac
+done
+
+if [[ -n "${RUSTFLAGS+x}" || -n "${CARGO_ENCODED_RUSTFLAGS+x}" ]]; then
+    echo "Unset RUSTFLAGS and CARGO_ENCODED_RUSTFLAGS; put extra flags in target rustflags in .cargo/config.toml so bundle flags are preserved." >&2
+    exit 1
+fi
+
+export ZED_BUNDLE=true
+
+channel=$(<packages/app/RELEASE_CHANNEL)
+target_dir="${CARGO_TARGET_DIR:-target}"
+
+version="$(script/get-crate-version aacode)"
+# Set RELEASE_VERSION so it's compiled into GPUI and it knows about the version.
+export RELEASE_VERSION="${version}"
+
+commit=$(git rev-parse HEAD | cut -c 1-7)
+
+version_info=$(rustc --version --verbose)
+host_line=$(echo "$version_info" | grep host)
+target_triple=${host_line#*: }
+musl_triple=${target_triple%-gnu}-musl
+remote_server_triple=${REMOTE_SERVER_TARGET:-"${musl_triple}"}
+rustup_installed=false
+if command -v rustup >/dev/null 2>&1; then
+    rustup_installed=true
+fi
+
+# Generate the licenses first, so they can be baked into the binaries
+script/generate-licenses
+
+if "$rustup_installed"; then
+    rustup target add "$remote_server_triple"
+fi
+
+export CC=${CC:-$(which clang)}
+
+# Build binary in release mode
+cargo --config .cargo/bundle-config.toml build --release --target "${target_triple}" --package aacode --package cli
+# Build remote_server in separate invocation to prevent feature unification from other crates
+# from influencing dynamic libraries required by it.
+if [[ "$remote_server_triple" == "$musl_triple" ]]; then
+    musl_cc_var="CC_$(echo "$remote_server_triple" | tr '-' '_')"
+    export "$musl_cc_var"=musl-gcc
+fi
+cargo --config .cargo/bundle-config.toml build --release --target "${remote_server_triple}" --package remote_server
+
+# Upload debug info to sentry.io
+if ! command -v sentry-cli >/dev/null 2>&1; then
+    echo "sentry-cli not found. skipping sentry upload."
+    echo "install with: 'curl -sL https://sentry.io/get-cli | bash'"
+else
+    if [[ -n "${SENTRY_AUTH_TOKEN:-}" ]]; then
+        echo "Uploading aacode debug symbols to sentry..."
+        # note: this uploads the unstripped binary which is needed because it contains
+        # .eh_frame data for stack unwinding. see https://github.com/getsentry/symbolic/issues/783
+        for attempt in 1 2 3; do
+            echo "Attempting sentry upload (attempt $attempt/3)..."
+            if sentry-cli debug-files upload --include-sources --wait -p aacode -o aacode-dev \
+                "${target_dir}/${target_triple}"/release/aacode \
+                "${target_dir}/${remote_server_triple}"/release/remote_server; then
+                echo "Sentry upload successful on attempt $attempt"
+                break
+            else
+                echo "Sentry upload failed on attempt $attempt"
+                if [ $attempt -eq 3 ]; then
+                    echo "All sentry upload attempts failed"
+                fi
+            fi
+        done
+    else
+        echo "missing SENTRY_AUTH_TOKEN. skipping sentry upload."
+    fi
+fi
+
+# Split debug symbols into local .dbg files, then strip debug info and local
+# symbols from the shipped binaries. Sentry receives the full unstripped
+# binaries above; the .dbg files keep symbols recoverable when that upload
+# is skipped.
+# We use llvm-objcopy because GNU objcopy on older distros (e.g. Ubuntu 20.04)
+# doesn't understand CREL sections produced by newer LLVM.
+llvm-objcopy --only-keep-debug "${target_dir}/${target_triple}/release/aacode" "${target_dir}/${target_triple}/release/aacode.dbg"
+llvm-objcopy --only-keep-debug "${target_dir}/${remote_server_triple}/release/remote_server" "${target_dir}/${remote_server_triple}/release/remote_server.dbg"
+llvm-objcopy --strip-debug --discard-all "${target_dir}/${target_triple}/release/aacode"
+llvm-objcopy --strip-debug --discard-all "${target_dir}/${target_triple}/release/cli"
+llvm-objcopy --strip-debug --discard-all "${target_dir}/${remote_server_triple}/release/remote_server"
+
+# Ensure that remote_server does not depend on libssl nor libcrypto, as we got rid of these deps.
+if ldd "${target_dir}/${remote_server_triple}/release/remote_server" | grep -q 'libcrypto\|libssl'; then
+    if [[ "$remote_server_triple" == *-musl ]]; then
+        echo "Error: remote_server still depends on libssl or libcrypto" && exit 1
+    else
+        echo "Info: Using non-musl remote-server build."
+    fi
+fi
+
+suffix=""
+if [ "$channel" != "stable" ]; then
+  suffix="-$channel"
+fi
+
+# Move everything that should end up in the final package
+# into a temp directory.
+temp_dir=$(mktemp -d)
+zed_dir="${temp_dir}/aacode$suffix.app"
+
+# Binary
+mkdir -p "${zed_dir}/bin" "${zed_dir}/libexec"
+cp "${target_dir}/${target_triple}/release/aacode" "${zed_dir}/libexec/aacode"
+cp "${target_dir}/${target_triple}/release/cli" "${zed_dir}/bin/aacode"
+
+# Libs
+# Bundle libstdc++ so older supported systems can run binaries built with our
+# toolchain even when their system libstdc++.so.6 lacks required GLIBCXX symbols.
+#
+# Never bundle the GLib family or its private dependencies: host libraries that
+# get dlopen'd are built against the system GLib, and resolving them against an
+# older bundled copy fails with missing symbols.
+find_libs() {
+    ldd ${target_dir}/${target_triple}/release/aacode |\
+        cut -d' ' -f3 |\
+        grep -v '\<\(libc.so\|libgcc_s.so\|libm.so\|libpthread.so\|libdl.so\|libasound.so\)' |\
+        grep -v '\<\(libglib-2.0.so\|libgobject-2.0.so\|libgio-2.0.so\|libgmodule-2.0.so\|libpcre.so\|libpcre2-8.so\|libmount.so\|libblkid.so\|libselinux.so\|libffi.so\|libresolv.so\|libz.so\)'
+}
+
+mkdir -p "${zed_dir}/lib"
+rm -rf "${zed_dir}/lib/*"
+cp $(find_libs) "${zed_dir}/lib"
+
+# Icons
+mkdir -p "${zed_dir}/share/icons/hicolor/512x512/apps"
+cp "packages/app/resources/app-icon.png" "${zed_dir}/share/icons/hicolor/512x512/apps/aacode.png"
+mkdir -p "${zed_dir}/share/icons/hicolor/1024x1024/apps"
+cp "packages/app/resources/app-icon@2x.png" "${zed_dir}/share/icons/hicolor/1024x1024/apps/aacode.png"
+
+# .desktop
+export DO_STARTUP_NOTIFY="true"
+export APP_CLI="aacode"
+export APP_ICON="aacode"
+export APP_ARGS="%U"
+if [[ "$channel" == "preview" ]]; then
+  export APP_NAME="AACode Preview"
+  APP_ID="dev.aacode.AACode-Preview"
+elif [[ "$channel" == "nightly" ]]; then
+  export APP_NAME="AACode Nightly"
+  APP_ID="dev.aacode.AACode-Nightly"
+elif [[ "$channel" == "dev" ]]; then
+  export APP_NAME="AACode Dev"
+  APP_ID="dev.aacode.AACode-Dev"
+else
+  export APP_NAME="AACode"
+  APP_ID="dev.aacode.AACode"
+fi
+
+mkdir -p "${zed_dir}/share/applications"
+envsubst < "packages/app/resources/aacode.desktop.in" > "${zed_dir}/share/applications/$APP_ID.desktop"
+chmod +x "${zed_dir}/share/applications/$APP_ID.desktop"
+
+# Copy generated licenses so they'll end up in archive too
+cp "assets/licenses.md" "${zed_dir}/licenses.md"
+
+# Create archive out of everything that's in the temp directory
+arch=$(uname -m)
+archive="aacode-linux-${arch}.tar.gz"
+
+rm -rf "${archive}"
+remove_match="aacode(-[a-zA-Z0-9]+)?-linux-$(uname -m)\.tar\.gz"
+ls "${target_dir}/release" | grep -E ${remove_match} | xargs -d "\n" -I {} rm -f "${target_dir}/release/{}" || true
+tar -czvf "${target_dir}/release/$archive" -C ${temp_dir} "aacode$suffix.app"
+
+gzip -f --stdout --best "${target_dir}/${remote_server_triple}/release/remote_server" > "${target_dir}/aacode-remote-server-linux-${arch}.gz"

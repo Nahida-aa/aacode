@@ -13,7 +13,22 @@ stats:
 #   packages/app/resources/aacode.desktop.in   .desktop 模板（envsubst 填充）
 #   packages/app/resources/app-icon.png        512x512
 #   packages/app/resources/app-icon@2x.png     1024x1024（HiDPI）
-# APP_ID 用 reverse-dns 同 zed（dev.zed.Zed），使各 channel 的 desktop 可并存。
+# 全部走 zed 的注入方式，值在本 recipe 执行时由环境变量决定，不写进源码：
+#   RELEASE_CHANNEL  同 zed 的 ZED_RELEASE_CHANNEL —— release_channel crate 在
+#                    **构建期**读它（build.rs 检测到该 env 就置
+#                    __do_not_set_zed_release_channel cfg，lib.rs 走 env! 分支）。
+#                    它决定 db 目录（0-<channel>）与 cli 的 socket 名
+#                    （zed-<channel>.sock）。改它必须重新构建。
+#   APP_NAME/APP_ID/APP_ICON/APP_ARGS  zed 的 script/bundle-linux L180-199 同样是
+#                    export 一组变量再 envsubst 渲染 .desktop.in，这里照搬。
+#
+# 例（各 channel 并存，desktop 文件名不同故互不覆盖）：
+#   just install
+#   RELEASE_CHANNEL=nightly APP_NAME="AACode Nightly" APP_ID=dev.aacode.AACode-Nightly just install
+#
+# 注意 RELEASE_CHANNEL 只影响 aacode 自己；它与 paths::APP_NAME（决定数据目录
+# ~/.local/share/<name>）是两件事，见 .agents/zed-modifications.md。
+_channel      := env_var_or_default("RELEASE_CHANNEL", "dev")
 _app_name    := env_var_or_default("APP_NAME", "AACode")
 _app_id      := env_var_or_default("APP_ID", "dev.aacode.AACode")
 _app_icon    := env_var_or_default("APP_ICON", "aacode")
@@ -65,7 +80,9 @@ strip:
 install prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
-    cargo build --release -p aacode
+    # RELEASE_CHANNEL 在这里注入 —— 必须在 cargo build 之前，release_channel 的
+    # build.rs 是构建期读 env 的（对齐 zed：CI 在编译时注入 ZED_RELEASE_CHANNEL）。
+    ZED_RELEASE_CHANNEL="{{_channel}}" cargo build --release -p aacode
     # 与 zed bundle-linux 同样的顺序：先 strip 产物，再把瘦身后的本体装进 PREFIX。
     just strip
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"

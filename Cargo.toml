@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/language_model_core", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/language_core", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/a_util", "packages/grammars", "packages/etw_tracing",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/a_util", "packages/etw_tracing",
 ]
 
 [workspace.package]
@@ -116,7 +116,7 @@ inspector_ui = { path = "packages/inspector_ui" }
 json_schema_store = { path = "packages/json_schema_store" }
 keymap_editor = { path = "packages/keymap_editor" }
 language = { path = "packages/language" }
-language_core = { path = "packages/language_core" }
+language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/language_core" }
 language_detection = { path = "packages/language_detection" }
 language_extension = { path = "packages/language_extension" }
 lsp_command_selector = { path = "packages/lsp_command_selector" }
@@ -611,20 +611,25 @@ fuzzy = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92a
 credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 eval_utils = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
-# grammars fork 进仓（2026-10-08）。原因：作为 zed git 依赖时它内部的 `util::`
-# 解析到 zed 自己的 util crate，而那个 crate 的 debug-embed 是 opt-in、无 default，
-# 于是 fs_embed! 在 debug 构建下走 __fs_embed_get，运行时从
-# `dev_repo_root() + root_relative`（"crates/grammars/src"）读文件。对 zed 仓库成立，
-# 对 aacode 不成立 —— 仓库里没有 crates/ 目录，于是 get_file() 恒返回 None，
-# languages::init() 构建内置语言表时 panic：
+# grammars 指向 gpui_learn（crate 名 aa_gpui_kit_grammars），用 package= 改名，
+# 使全仓 `grammars::` 的调用点无需改动。
+#
+# 为什么不能继续用 zed git 版的 grammars：它内部的 `util::` 解析到 zed 自己的 util
+# crate，那个 crate 的 debug-embed 是 opt-in、无 default，于是 fs_embed! 在 debug
+# 构建下走 __fs_embed_get，运行时从 `dev_repo_root() + root_relative`
+# （"crates/grammars/src"）读文件。对 zed 仓库成立，对 aacode 不成立 ——
+# aacode 仓库里既没有 crates/ 目录，grammars 也在 cargo 的 git checkout 里而不在
+# aacode 仓库内，于是 get_file() 恒返回 None，languages::init() 构建内置语言表时
+# panic：
 #   thread 'main' panicked at packages/languages/src/cpp.rs:5:10:
 #   missing cpp/semantic_token_rules.json
-# 同样的还有 go / python / rust 三个。只影响 debug 构建（release 编译期内嵌故正常）。
+# 同类的还有 go / python / rust 三个 semantic_token_rules.json。只影响 debug 构建，
+# release 走 rust_embed 编译期内嵌故正常。
 #
-# 放进 packages/ 后 grammars 的 `util.workspace = true` 解析到 aacode 的
-# aa_gpui_kit_util，其 features 段有 `default = ["debug-embed"]`，
-# 与仓库布局无关。同时也去掉了图里 zed 的 util（原先只被 grammars 拉）。
-grammars  = { path = "packages/grammars" }
+# gpui_learn 版的 grammars 里 `util.workspace = true` 解析到 aa_gpui_kit_util，
+# 其 features 段有 `default = ["debug-embed"]`，与仓库布局无关；4 个 json 文件
+# （cpp/go/python/rust）都在 packages/grammars/src/ 下。
+grammars  = { package = "aa_gpui_kit_grammars", path = "/home/aa/repos/ide_ls/gpui_learn/packages/grammars" }
 html_to_markdown = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 http_client = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 http_client_tls = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
@@ -728,14 +733,13 @@ notify-types = { git = "https://github.com/zed-industries/notify", rev = "d842f1
 webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev = "0a1c519cfce9b365229026b55de9b9dbdb6fed3c" }
 
 
-# 本地开发覆盖（仅开发期用）：zed 的 crate 用本地 `packages/language_core` 顶上。
 # 等我们不再依赖 zed git 源后即可整段删除。
 # zed git 源里的 crate 也会拖 zed 自己的 `language_core`，与我们的
-# `packages/language_core` 形成两份 —— 于是 `LanguageConfig` / `LanguageQueries` /
+# 那份 language_core 形成两份 —— 于是 `LanguageConfig` / `LanguageQueries` /
 # `LanguageName` 全都"类型不同"（E0308 + 「multiple different versions」）。
 # 统一指到本地这份。
 [patch."https://github.com/zed-industries/zed"]
-language_core = { path = "packages/language_core" }
+language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/language_core" }
 
 
 # gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
@@ -762,3 +766,33 @@ aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" 
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
 aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
 aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
+# util / util_macros 同样必须走本地，否则图里会同时存在两份：
+#   · aacode 自己的 workspace 声明的是 git rev（workspace.dependencies L203-204）
+#   · 而 gpui_learn 的 grammars / language_core 里的 `util.workspace = true`
+#     是按 **gpui_learn 自己的 workspace** 解析的，落到它的 packages/util（path）
+# 两者 source 不同 ⇒ 编译出两个 crate。util 导出 Range / Cow / HashMap 等类型，
+# 一旦跨 crate 混用就是 E0308「multiple different versions」。
+# 与上面 ui / ui_input / component 同理：凡是从 gpui_learn 侧被间接拉进来的 crate，
+# 都要在此声明 path patch 才能与其 workspace 解析结果一致。
+aa_gpui_kit_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util" }
+aa_gpui_kit_util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util_macros" }
+
+
+# —— release profile ——
+# 对齐 Zed Cargo.toml L1117-1123。原先本文件**没有任何 [profile] 段**，用的是 cargo
+# 默认值（opt-level=3 / debug=false / lto=false / codegen-units=16），即"优化过但没有
+# 跨 crate 优化"，比 zed 慢也略胖。
+#
+# - debug = "limited"   保留行号表（panic 仍能指到源码行），但不像 "full" 那样为每个
+#                      类型/泛型实例生成完整 debuginfo。注意用户的 .cargo/config.toml
+#                      已把 [profile.dev] 改成 debug = "line-tables-only"，与此呼应。
+# - lto = "thin"        跨 crate 优化。体积与性能都优于默认。
+# - codegen-units = 1   单编译单元，利于优化；代价是构建显著变慢。
+#
+# [profile.release.package] 那段例外（zed 给自己的主二进制放宽到 16）**未搬**：
+# 目的相反 —— zed 是为了缩短自己主二进制的构建时间，aacode 的主二进制只有
+# packages/app 一个，用不着。
+[profile.release]
+debug = "limited"
+lto = "thin"
+codegen-units = 1

@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# 生成 assets/licenses.md（被编译进二进制，bundle-linux 会拷进 tarball）。
+# 对齐 Zed `script/generate-licenses`。
+#
+# 与 Zed 的差异：
+# - 图标来自 gpui_learn（aacode 的 icons 是 aa_icons crate），故读那边的
+#   assets/icons/LICENSES 而不是本仓库的 assets/icons/。路径可用 ICONS_LICENSES 覆盖。
+
+set -euo pipefail
+
+CARGO_ABOUT_VERSION="0.8.2"
+OUTPUT_FILE="${1:-$(pwd)/assets/licenses.md}"
+TEMPLATE_FILE="script/licenses/template.md.hbs"
+THEMES_LICENSES="${THEMES_LICENSES:-assets/themes/LICENSES}"
+ICONS_LICENSES="${ICONS_LICENSES:-/home/aa/repos/ide_ls/gpui_learn/assets/icons/LICENSES}"
+ABOUT_CONFIG="script/licenses/aacode-licenses.toml"
+
+fail_on_stderr() {
+    local tmpfile=$(mktemp)
+    "$@" 2> >(tee "$tmpfile" >&2)
+    local rc=$?
+    [ -s "$tmpfile" ] && rc=1
+    rm "$tmpfile"
+    return $rc
+}
+
+for f in "$THEMES_LICENSES" "$ICONS_LICENSES" "$TEMPLATE_FILE" "$ABOUT_CONFIG"; do
+    if [[ ! -f "$f" ]]; then
+        echo "generate-licenses: missing $f" >&2
+        exit 1
+    fi
+done
+
+echo -n "" >"$OUTPUT_FILE"
+
+{
+    echo -e "# ###### THEME LICENSES ######\n"
+    cat "$THEMES_LICENSES"
+
+    echo -e "\n# ###### ICON LICENSES ######\n"
+    cat "$ICONS_LICENSES"
+
+    echo -e "\n# ###### CODE LICENSES ######\n"
+} >>"$OUTPUT_FILE"
+
+if ! cargo about --version | grep "cargo-about $CARGO_ABOUT_VERSION" &>/dev/null; then
+    echo "Installing cargo-about@$CARGO_ABOUT_VERSION..."
+    cargo install "cargo-about@$CARGO_ABOUT_VERSION"
+else
+    echo "cargo-about@$CARGO_ABOUT_VERSION is already installed."
+fi
+
+echo "Generating cargo licenses"
+if [ -z "${ALLOW_MISSING_LICENSES-}" ]; then FAIL_FLAG=--fail; else FAIL_FLAG=""; fi
+if [ -z "${ALLOW_MISSING_LICENSES-}" ]; then WRAPPER=fail_on_stderr; else WRAPPER=""; fi
+set -x
+$WRAPPER cargo about generate \
+    $FAIL_FLAG \
+    -c "$ABOUT_CONFIG" \
+    "$TEMPLATE_FILE" >>"$OUTPUT_FILE"
+set +x
+
+sed -i.bak 's/&quot;/"/g' "$OUTPUT_FILE"
+sed -i.bak 's/&#x27;/'\''/g' "$OUTPUT_FILE" # The ` '\'' ` thing ends the string, appends a single quote, and re-opens the string
+sed -i.bak 's/&#x3D;/=/g' "$OUTPUT_FILE"
+sed -i.bak 's/&#x60;/`/g' "$OUTPUT_FILE"
+sed -i.bak 's/&lt;/</g' "$OUTPUT_FILE"
+sed -i.bak 's/&gt;/>/g' "$OUTPUT_FILE"
+
+rm -rf "${OUTPUT_FILE}.bak"
+
+echo "generate-licenses completed. See $OUTPUT_FILE"

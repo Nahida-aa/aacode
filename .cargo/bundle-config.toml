@@ -1,0 +1,18 @@
+# 打包（bundle）专用 cargo 配置。对齐 Zed `.cargo/bundle-config.toml`。
+#
+# 单独一个文件而不是并进 .cargo/config.toml：Zed 这么分是因为 bundle-linux 每次调用
+# 都用 `cargo --config .cargo/bundle-config.toml` 显式带上，而 .cargo/config.toml 是
+# 开发者本地的常规配置（aacode 的那份带 Android NDK linker 等临时配置，未跟踪）。
+#
+# rpath=$ORIGIN/../lib 是为了让 tarball 解压即用：bin/ 下的可执行文件按相对路径找
+# lib/ 里 collect_frozen_libs 收集的动态库，不依赖 RPATH 或 LD_LIBRARY_PATH。
+# 对应 bundle-linux L160-172 的 find_libs / cp -r "${zed_dir}/lib"。
+
+[target.'cfg(target_os = "linux")']
+rustflags = ["-C", "link-args=-Wl,--disable-new-dtags,-rpath,$ORIGIN/../lib"]
+
+[target.'cfg(all(target_os = "linux", target_env = "musl"))']
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[target.aarch64-unknown-linux-musl]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
