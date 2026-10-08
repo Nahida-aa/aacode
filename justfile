@@ -112,8 +112,18 @@ install prefix="$HOME/.local":
     # 该目录在 ~/.cache 下，cargo clean 不会波及。
     #
     # 若要重新拉取：删掉该目录并去掉此 env var，下次构建会自动下载。
+    #
+    # RUSTFLAGS 里的 -fuse-ld=lld：产物 350MB+ 时 GNU ld 的内存开销是 lld 的数倍，
+    # 与 lto="thin"（bitcode 全量载入内存）叠加会撑爆 27G 内存的机器，最后链接被
+    # SIGTERM 杀掉（"Compile terminated by signal 15"）。换成 lld 即可，行为不变。
+    # 注意 bundle-linux 走 .cargo/bundle-config.toml，那边也加了同一条。
+    #
+    # 这里不能用 --config 传 rustflags：RUSTFLAGS 环境变量会覆盖 [target.*] rustflags，
+    # 而 bundle-config 的 rpath=$ORIGIN/../lib 正是靠那条生效的。
     LK_CUSTOM_WEBRTC="$HOME/.cache/aacode/webrtc/webrtc-0001d84-4-linux-x64-release" \
-      ZED_RELEASE_CHANNEL="{{_channel}}" CARGO_BUILD_WARNINGS=allow cargo build --release -p aacode
+      ZED_RELEASE_CHANNEL="{{_channel}}" CARGO_BUILD_WARNINGS=allow \
+      RUSTFLAGS="-C link-arg=-fuse-ld=lld" \
+      cargo build --release -p aacode
     # 与 zed bundle-linux 同样的顺序：先 strip 产物，再把瘦身后的本体装进 PREFIX。
     just strip
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"

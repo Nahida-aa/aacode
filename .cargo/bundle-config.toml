@@ -9,7 +9,15 @@
 # 对应 bundle-linux L160-172 的 find_libs / cp -r "${zed_dir}/lib"。
 
 [target.'cfg(target_os = "linux")']
-rustflags = ["-C", "link-args=-Wl,--disable-new-dtags,-rpath,$ORIGIN/../lib"]
+# -fuse-ld=lld：产物 350MB+ 时 GNU ld 的内存开销是 lld 的数倍，配合 lto="thin"
+# （bitcode 全量载入内存）会把 27G 内存的机器撑到 swap 耗尽，链接进程被 SIGTERM：
+#     sccache: Compile terminated by signal 15
+#     error: could not compile `aacode` (bin "aacode")
+# zed 的 release profile 里没有这条 —— 它假定构建机内存充裕。
+rustflags = [
+    "-C", "link-args=-Wl,--disable-new-dtags,-rpath,$ORIGIN/../lib",
+    "-C", "link-arg=-fuse-ld=lld",
+]
 
 [target.'cfg(all(target_os = "linux", target_env = "musl"))']
 rustflags = ["-C", "target-feature=+crt-static"]
