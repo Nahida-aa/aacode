@@ -360,6 +360,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_clock",
+ "aa_env_vars",
  "aa_gpui_kit_assets",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",

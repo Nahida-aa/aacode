@@ -148,7 +148,7 @@ pub fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &
 ///
 /// Linux/freebsd 走 ashpd 桌面通知（XDG 桌面门户），其余平台直接退出 —— 开不出窗口时
 /// 继续跑一个没有窗口的进程没有意义，故两条路最终都 `process::exit(1)`。
-fn fail_to_open_window_async(e: anyhow::Error, cx: &mut AsyncApp) {
+pub fn fail_to_open_window_async(e: anyhow::Error, cx: &mut AsyncApp) {
     cx.update(|cx| fail_to_open_window(e, cx));
 }
 
@@ -202,7 +202,7 @@ fn fail_to_open_window(e: anyhow::Error, _cx: &mut App) {
 /// 需要的 `restore_multiworkspace` / `open_remote_project` 虽已存在，但
 /// `RemoteSettings::fill_connection_options_from_settings` 等调用点需要
 /// 逐个核对，故当前只保留 local 分支 + 新建兜底。remote 恢复待后续补齐。
-pub(crate) async fn restore_or_create_workspace(
+pub async fn restore_or_create_workspace(
     app_state: Arc<AppState>,
     cx: &mut AsyncApp,
 ) -> Result<()> {
@@ -411,5 +411,32 @@ pub(crate) async fn restorable_workspace_locations(
             }
         }
         _ => None,
+    }
+}
+
+/// 把命令行参数里的一个 path/url 归一化成 URL 字符串。
+/// 对齐 Zed `crates/zed/src/main.rs:1810`。
+///
+/// 先尝试 canonicalize 成绝对路径（成功即 `file://` 前缀）；失败则看它是不是
+/// 已带 scheme 的 URL 或 zed link，都不是就当相对路径补 `file://`。
+///
+/// 注意 scheme 字面量沿用 `zed://` / `zed-cli://` —— aacode 的 open_listener
+/// 与 cli 二进制目前仍按这些字面量解析（open_listener.rs:157-160、
+/// cli/src/main.rs:586），改动需两边同步。
+pub fn parse_url_arg(arg: &str, cx: &App) -> String {
+    match std::fs::canonicalize(std::path::Path::new(arg)) {
+        Ok(path) => format!("file://{}", path.display()),
+        Err(_) => {
+            if arg.starts_with("file://")
+                || arg.starts_with("zed://")
+                || arg.starts_with("zed-cli://")
+                || arg.starts_with("ssh://")
+                || client::parse_zed_link(arg, cx).is_some()
+            {
+                arg.into()
+            } else {
+                format!("file://{arg}")
+            }
+        }
     }
 }

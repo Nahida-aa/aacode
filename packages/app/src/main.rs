@@ -9,8 +9,11 @@
 //!   → `AppState::set_global` → `workspace::init` → `initialize_workspace` → `open_window`。
 //! - Sidebar / TitleBar / Panels 全由 `observe_new` 自动注入。
 
+use clap::Parser;
+use std::io;
+use futures::{FutureExt as _, StreamExt as _, channel::oneshot};
 use gpui::{
-    App, AppContext, SharedString, WindowDecorations, px, size,
+    App, AppContext, SharedString, Task, WindowDecorations, px, size,
 };
 use gpui_platform::application;
 use git::GitHostingProviderRegistry;
@@ -21,6 +24,56 @@ use std::time::Instant;
 use theme::ActiveTheme;
 use util::ResultExt as _;
 
+/// 启动参数。对齐 Zed `crates/zed/src/main.rs` 的 `Args`（L190-291）。
+///
+/// Zed 的原始结构有 18 个字段，其中 windows-only（foreground / etw_* / crash_handler）
+/// 与 aacode 无关的平台特性未搬，`printenv` 用 clap 字段替代了原先手写的
+/// `args().any(|a| a == "--printenv")` 扫描。
+#[derive(Parser, Debug)]
+#[command(name = "aacode", disable_version_flag = true, max_term_width = 100)]
+struct Args {
+    /// A sequence of space-separated paths or urls that you want to open.
+    ///
+    /// Use `path:line:row` syntax to open a file at a specific location.
+    /// Non-existing paths and directories will ignore `:line:row` suffix.
+    ///
+    /// URLs can either be `file://` or `aacode://` scheme, or relative to the app.
+    paths_or_urls: Vec<String>,
+
+    /// Pairs of file paths to diff. Can be specified multiple times.
+    /// When directories are provided, recurses into them and shows all changed files in a single multi-diff view.
+    #[arg(long, action = clap::ArgAction::Append, num_args = 2, value_names = ["OLD_PATH", "NEW_PATH"])]
+    diff: Vec<String>,
+
+    /// Sets a custom directory for all user data (e.g., database, extensions, logs).
+    ///
+    /// This overrides the default platform-specific data directory location.
+    /// On Linux/FreeBSD, the default is `$XDG_DATA_HOME/zed`.
+    #[arg(long, value_name = "DIR", verbatim_doc_comment)]
+    user_data_dir: Option<String>,
+
+    /// The username and WSL distribution to use when opening paths. If not specified,
+    /// aacode will attempt to open the paths directly.
+    #[cfg(target_os = "windows")]
+    #[arg(long, value_name = "USER@DISTRO")]
+    wsl: Option<String>,
+
+    /// Open the project in a dev container.
+    #[arg(long)]
+    dev_container: bool,
+
+    /// Dump all registered gpui actions as JSON（调试用）。
+    #[arg(long)]
+    dump_all_actions: bool,
+
+    /// Outputs environment variables as JSON to stdout。
+    ///
+    /// project/src/environment.rs 的 capture_unix 会 shell exec `<exe> --printenv`
+    /// 来拿子进程的 env vars（Zed main.rs L251-255）。
+    #[arg(long)]
+    printenv: bool,
+}
+
 /// 进程启动时刻，供 miniprofiler_ui 计算「启动到首次交互」的耗时。
 /// 对齐 Zed main.rs L199 / L202（在 main() 首行 get_or_init）。
 static STARTUP_TIME: OnceLock<Instant> = OnceLock::new();
@@ -29,14 +82,32 @@ fn main() {
     STARTUP_TIME.get_or_init(Instant::now);
     tracing_subscriber::fmt::init();
 
+    // 启动参数。对齐 Zed main.rs L213 `let args = Args::parse();`。
+    let args = Args::parse();
+
     // `aacode --printenv` — shell env 捕获子进程（对齐 Zed main.rs L251-L255）。
-    // 二进制产物名是 aacode；project/src/environment.rs 用当前 exe 路径调起本进程。
     // project/src/environment.rs 的 capture_unix 会 shell exec `<exe> --printenv`
     // 来拿到 JSON env vars。没这个分支 shell env 就全是空的。
-    if std::env::args().any(|a| a == "--printenv") {
+    if args.printenv {
         util::shell_env::print_env();
         return;
     }
+
+    if args.dump_all_actions {
+        dump_all_gpui_actions();
+        return;
+    }
+
+    // 自定义数据目录要在建 db / session 之前设好。对齐 Zed main.rs L262-270。
+    let restart_arguments = if let Some(directory) = args.user_data_dir.as_deref() {
+        let directory = paths::set_custom_data_dir(directory);
+        vec![
+            std::ffi::OsString::from("--user-data-dir"),
+            directory.as_os_str().to_owned(),
+        ]
+    } else {
+        Vec::new()
+    };
 
     // git_hosting_providers::init 会读 GlobalGitHostingProviderRegistry 全局，
     // 必须在 app.run 之前把 registry 造好。对齐 Zed main.rs L423。
@@ -44,7 +115,9 @@ fn main() {
         Arc::new(GitHostingProviderRegistry::new());
 
     // —— app.run 外层：db / fs / session（不依赖 gpui App）——
-    let app = application().with_assets(aa_gpui_kit_assets::Assets);
+    let app = application()
+        .with_assets(aa_gpui_kit_assets::Assets)
+        .with_restart_arguments(restart_arguments);
     let app_db = db::AppDatabase::new();
     let fs = fs::RealFs::new(None, app.background_executor());
     let session_id = uuid::Uuid::new_v4().to_string();
@@ -53,7 +126,37 @@ fn main() {
         db::kvp::KeyValueStore::from_app_db(&app_db),
     ));
 
-    app.run(|cx: &mut App| {
+    // —— CLI IPC 监听 ——
+    // 对齐 Zed main.rs L358-368。OpenListener 是「打开请求」的总入口：
+    // 既接启动时 argv 里的路径，也接后续 cli 二进制经 unix socket 转发来的请求。
+    // 无它则 `--new` / desktop 的 [Desktop Action NewWorkspace] 全部无效
+    // （open_listener 里 listen_for_cli_connections / handle_cli_connection 此前
+    // 都只有定义、没有调用点）。
+    let (open_listener, mut open_rx) =
+        aa_app_lib::core::open_listener::OpenListener::new();
+
+    // single-instance 检查：listen 失败说明已有实例占着 socket。对齐 Zed L360-368。
+    // windows/macos 的 handle_single_instance 依赖各自平台模块，aacode 未移植，
+    // 那两个平台下本变量恒为 false（即允许多实例）。
+    let failed_single_instance_check = if *aa_env_vars::ZED_STATELESS
+        || *release_channel::RELEASE_CHANNEL == release_channel::ReleaseChannel::Dev
+    {
+        false
+    } else {
+        #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+        {
+            aa_app_lib::core::open_listener::listen_for_cli_connections(
+                open_listener.clone(),
+            )
+            .is_err()
+        }
+        #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
+        {
+            false
+        }
+    };
+
+    app.run(move |cx: &mut App| {
         cx.set_global(app_db);
 
         aa_gpui_kit_assets::Assets
@@ -436,26 +539,134 @@ fn main() {
         })
         .detach();
 
-        // —— 打开第一个窗口 ——
-        // 对齐 Zed main.rs L877-L953:
-        // 1. initialize_workspace 先注册 observe_new
-        // 2. cx.spawn 异步启动窗口创建（不 block_on！gpui foreground executor 不能嵌套阻塞）
-        // 3. cx.activate(true) 让 app 出现在前台
+        // —— 启动参数 → RawOpenRequest（对齐 Zed main.rs L884-914）——
+        let urls: Vec<_> = args
+            .paths_or_urls
+            .iter()
+            .map(|arg| aa_app_lib::core::parse_url_arg(arg, cx))
+            .collect();
+        let diff_all_mode = args
+            .diff
+            .chunks(2)
+            .any(|pair| PathBuf::from(&pair[0]).is_dir() || PathBuf::from(&pair[1]).is_dir());
+        let diff_paths: Vec<[String; 2]> = args
+            .diff
+            .chunks(2)
+            .map(|chunk| [chunk[0].clone(), chunk[1].clone()])
+            .collect();
+        #[cfg(target_os = "windows")]
+        let wsl = args.wsl;
+        #[cfg(not(target_os = "windows"))]
+        let wsl = None;
+
+        if !urls.is_empty() || !diff_paths.is_empty() {
+            open_listener.open(aa_app_lib::core::open_listener::RawOpenRequest {
+                urls,
+                diff_paths,
+                wsl,
+                diff_all: diff_all_mode,
+                dev_container: args.dev_container,
+                ..Default::default()
+            })
+        }
+
+        // GC 需要知道「本次 session」与「上次 session」的 id，才能判断哪些 workspace
+        // 记录还该保留（对齐 Zed main.rs L919-924）。
+        let (current_session_id, last_session_id) = {
+            let session = app_state.session.read(cx);
+            (
+                session.id().to_owned(),
+                session.last_session_id().map(|id| id.to_owned()),
+            )
+        };
+
+        // —— 打开第一个窗口：恢复上次会话（对齐 Zed main.rs L929-953）——
+        //
+        // 原先这里是无条件 workspace::open_new(Default::default())，闭包还是空的
+        // （注释写着「Zed 原版会在这里调 Editor::new_file 或 Launchpad」），
+        // 结果每次启动都是全新空窗口、上次的项目与窗口布局全丢。
+        // Zed 是三分支：启动参数里有 focus-only 请求 → 恢复；带其他请求 → 交
+        // handle_open_request；没有请求 → 恢复。
+        let restore_task = match open_rx
+            .try_recv()
+            .ok()
+            .and_then(|request| {
+                aa_app_lib::core::open_listener::OpenRequest::parse(request, cx).log_err()
+            }) {
+            Some(request) if request.is_focus_app_only() => cx.spawn({
+                let app_state = app_state.clone();
+                async move |cx| {
+                    if let Err(e) = aa_app_lib::core::restore_or_create_workspace(app_state, cx)
+                        .await
+                    {
+                        aa_app_lib::core::fail_to_open_window_async(e, cx);
+                    }
+                }
+            }),
+            Some(request) => {
+                aa_app_lib::core::handle_open_request(request, app_state.clone(), cx);
+                Task::ready(())
+            }
+            None => cx.spawn({
+                let app_state = app_state.clone();
+                async move |cx| {
+                    if let Err(e) = aa_app_lib::core::restore_or_create_workspace(app_state, cx)
+                        .await
+                    {
+                        aa_app_lib::core::fail_to_open_window_async(e, cx);
+                    }
+                }
+            }),
+        };
+
+        // —— 后续 CLI 请求循环（对齐 Zed main.rs L987-1002）——
+        // 首个窗口就位前先等 restore_finished / first_window_placed，否则
+        // macOS 冷启动的 `aacode <path>` 会因看不到已恢复的窗口而多开一个（zed#61346）。
+        let (first_window_tx, first_window_rx) = oneshot::channel::<()>();
+        let first_window_tx = std::rc::Rc::new(std::cell::RefCell::new(Some(first_window_tx)));
+        let _first_window_subscription = cx.observe_new::<workspace::MultiWorkspace>(move |_, _, _| {
+            if let Some(tx) = first_window_tx.borrow_mut().take() {
+                tx.send(()).ok();
+            }
+        });
+        let restore_finished = cx.background_spawn(restore_task).shared();
         cx.spawn({
+            let restore_finished = restore_finished.clone();
             let app_state = app_state.clone();
             async move |cx| {
-                let _ = cx
-                    .update(|cx| {
-                        workspace::open_new(
-                            workspace::OpenOptions::default(),
-                            app_state,
-                            cx,
-                            |_workspace, _window, _cx| {
-                                // Zed 原版会在这里调 Editor::new_file 或 Launchpad
-                            },
-                        )
-                    })
-                    .await;
+                let _first_window_subscription = _first_window_subscription;
+                let first_window_placed = first_window_rx.shared();
+                while let Some(request) = open_rx.next().await {
+                    futures::select_biased! {
+                        _ = restore_finished.clone() => {}
+                        _ = first_window_placed.clone() => {}
+                    }
+                    cx.update(|cx| {
+                        if let Some(request) =
+                            aa_app_lib::core::open_listener::OpenRequest::parse(request, cx).log_err()
+                        {
+                            aa_app_lib::core::handle_open_request(request, app_state.clone(), cx);
+                        }
+                    });
+                }
+            }
+        })
+        .detach();
+
+        // 恢复完成后清理未被任何 session 引用的 workspace 记录（对齐 Zed L968+）。
+        cx.spawn({
+            let db = workspace::WorkspaceDb::global(cx);
+            let fs = app_state.fs.clone();
+            let restore_finished = restore_finished.clone();
+            async move |_cx| {
+                restore_finished.await;
+                db.garbage_collect_workspaces(
+                    fs.as_ref(),
+                    &current_session_id,
+                    last_session_id.as_deref(),
+                )
+                .await
+                .log_err();
             }
         })
         .detach();
@@ -495,4 +706,49 @@ fn main() {
         })
         .detach();
     });
+}
+
+/// 把所有已注册的 gpui action 导出为 JSON（调试用）。
+/// 对齐 Zed `crates/zed/src/main.rs:2008`。
+fn dump_all_gpui_actions() {
+    #[derive(Debug, serde::Serialize)]
+    struct ActionDef {
+        name: &'static str,
+        human_name: String,
+        schema: Option<serde_json::Value>,
+        deprecated_aliases: &'static [&'static str],
+        deprecation_message: Option<&'static str>,
+        documentation: Option<&'static str>,
+    }
+    let mut generator = settings::KeymapFile::action_schema_generator();
+    let mut actions = gpui::generate_list_of_all_registered_actions()
+        .map(|action| {
+            let schema = (action.json_schema)(&mut generator)
+                .map(|s| serde_json::to_value(s).expect("Failed to serialize action schema"));
+            ActionDef {
+                name: action.name,
+                human_name: command_palette::humanize_action_name(action.name),
+                schema,
+                deprecated_aliases: action.deprecated_aliases,
+                deprecation_message: action.deprecation_message,
+                documentation: action.documentation,
+            }
+        })
+        .collect::<Vec<ActionDef>>();
+
+    actions.sort_by_key(|a| a.name);
+
+    let schema_definitions = serde_json::to_value(generator.definitions())
+        .expect("Failed to serialize schema definitions");
+
+    let output = serde_json::json!({
+        "actions": actions,
+        "schema_definitions": schema_definitions,
+    });
+
+    io::Write::write(
+        &mut std::io::stdout(),
+        serde_json::to_string_pretty(&output).unwrap().as_bytes(),
+    )
+    .unwrap();
 }
