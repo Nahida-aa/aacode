@@ -37,7 +37,7 @@ version = "0.1.0"
 name = "a_util"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-fs",
  "collections",
@@ -258,6 +258,59 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_gpui_kit_grammars"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=4ea3468#4ea3468b8890f3daf3c01aa830ded8fd17fba27f"
+dependencies = [
+ "aa_gpui_kit_language_core",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=4ea3468)",
+ "anyhow",
+ "rust-embed",
+ "tree-sitter",
+ "tree-sitter-bash",
+ "tree-sitter-c",
+ "tree-sitter-cpp",
+ "tree-sitter-css",
+ "tree-sitter-diff",
+ "tree-sitter-gitcommit",
+ "tree-sitter-go",
+ "tree-sitter-gomod",
+ "tree-sitter-gowork",
+ "tree-sitter-jsdoc",
+ "tree-sitter-json",
+ "tree-sitter-md",
+ "tree-sitter-python",
+ "tree-sitter-regex",
+ "tree-sitter-rust",
+ "tree-sitter-typescript",
+ "tree-sitter-yaml",
+]
+
+[[package]]
+name = "aa_gpui_kit_language_core"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=4ea3468#4ea3468b8890f3daf3c01aa830ded8fd17fba27f"
+dependencies = [
+ "anyhow",
+ "bitflags 2.13.2",
+ "collections",
+ "gpui_shared_string",
+ "gpui_util",
+ "log",
+ "lru 0.16.4",
+ "parking_lot",
+ "path",
+ "regex",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "strum 0.28.0",
+ "toml 0.8.23",
+ "tree-sitter",
+]
+
+[[package]]
 name = "aa_gpui_kit_theme"
 version = "0.1.0"
 dependencies = [
@@ -324,6 +377,44 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_util"
 version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=4ea3468#4ea3468b8890f3daf3c01aa830ded8fd17fba27f"
+dependencies = [
+ "anyhow",
+ "async-fs",
+ "async_zip",
+ "collections",
+ "command-fds",
+ "dirs",
+ "futures 0.3.34",
+ "futures-lite 2.6.1",
+ "globset",
+ "gpui_util",
+ "itertools 0.14.0",
+ "libc",
+ "log",
+ "mach2 0.5.0",
+ "nix 0.30.1",
+ "path",
+ "percent-encoding",
+ "regex",
+ "rust-embed",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "shlex 1.3.0",
+ "smol",
+ "take-until",
+ "tempfile",
+ "unicase",
+ "url",
+ "walkdir",
+ "which",
+]
+
+[[package]]
+name = "aa_gpui_kit_util"
+version = "0.1.0"
 source = "git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06#bfaec06c817d349a7819b5e33e2a9da5144f7580"
 dependencies = [
  "aa_gpui_kit_util_macros",
@@ -375,7 +466,7 @@ dependencies = [
 name = "aa_http_client"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-compression",
  "async-fs",
@@ -414,7 +505,7 @@ dependencies = [
  "aa_gpui_kit_assets",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "acp_thread",
  "acp_tools",
@@ -462,6 +553,7 @@ dependencies = [
  "editor",
  "encoding_selector",
  "env_logger 0.11.11",
+ "etw_tracing",
  "extension",
  "extension_host",
  "extensions_ui",
@@ -513,6 +605,7 @@ dependencies = [
  "parking_lot",
  "paths",
  "picker",
+ "pkg-config",
  "pretty_assertions",
  "project",
  "project_panel",
@@ -563,6 +656,8 @@ dependencies = [
  "web_search",
  "web_search_providers",
  "which_key",
+ "windows 0.62.2",
+ "windows_resources",
  "workspace",
 ]
 
@@ -570,7 +665,7 @@ dependencies = [
 name = "aacode_actions"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "gpui",
  "schemars 1.2.2",
  "serde",
@@ -661,7 +756,7 @@ name = "acp_thread"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "action_log",
  "agent-client-protocol",
  "agent_settings",
@@ -712,7 +807,7 @@ name = "acp_tools"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "agent-client-protocol",
  "agent_servers",
  "agent_ui",
@@ -733,7 +828,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "buffer_diff",
  "collections",
@@ -760,7 +855,7 @@ name = "activity_indicator"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "auto_update",
  "editor",
@@ -839,7 +934,7 @@ dependencies = [
  "aa_env_vars",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "acp_thread",
  "action_log",
  "agent-client-protocol",
@@ -968,7 +1063,7 @@ name = "agent_servers"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "acp_thread",
  "action_log",
  "ad_credentials_provider",
@@ -1008,7 +1103,7 @@ dependencies = [
 name = "agent_settings"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "convert_case 0.11.0",
@@ -1031,7 +1126,7 @@ dependencies = [
 name = "agent_skills"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "base64 0.22.1",
  "const_format",
@@ -1053,7 +1148,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "acp_thread",
  "action_log",
@@ -1315,7 +1410,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1326,7 +1421,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1473,7 +1568,7 @@ dependencies = [
 name = "askpass"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "futures 0.3.34",
  "gpui",
@@ -1490,7 +1585,7 @@ dependencies = [
 name = "assets"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "gpui",
 ]
@@ -1876,7 +1971,7 @@ dependencies = [
 name = "audio"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "cpal",
@@ -1908,7 +2003,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "client",
  "ctor",
@@ -1936,7 +2031,7 @@ name = "auto_update_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "agent_skills",
  "anyhow",
@@ -2595,7 +2690,7 @@ dependencies = [
  "bitflags 2.13.2",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "log",
  "prettyplease 0.2.37",
  "proc-macro2",
@@ -2845,7 +2940,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "ctor",
  "gpui",
  "imara-diff",
@@ -3012,7 +3107,7 @@ checksum = "ade8366b8bd5ba243f0a58f036cc0ca8a2f069cff1a2351ef1cac6b083e16fc0"
 name = "call"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "audio",
  "client",
@@ -3040,7 +3135,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "editor",
  "futures 0.3.34",
@@ -3140,7 +3235,7 @@ dependencies = [
  "maybe-owned",
  "rustix",
  "rustix-linux-procfs",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
  "winx",
 ]
 
@@ -3302,7 +3397,7 @@ name = "channel"
 version = "0.1.0"
 dependencies = [
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "client",
  "collections",
@@ -3477,7 +3572,7 @@ dependencies = [
  "aa-llm",
  "aa-server",
  "aa-session",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "askpass",
  "axum",
@@ -3519,7 +3614,7 @@ name = "client"
 version = "0.1.0"
 dependencies = [
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "ad_credentials_provider",
  "anyhow",
  "async-channel 2.5.0",
@@ -3709,7 +3804,7 @@ checksum = "af491d569909a7e4dee0ad7db7f5341fef5c614d5b8ec8cf765732aba3cff681"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.2.2",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -3739,7 +3834,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "call",
@@ -3818,7 +3913,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "client",
@@ -3978,7 +4073,7 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 name = "context_server"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-channel 2.5.0",
  "async-trait",
@@ -4028,7 +4123,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aa_icons",
  "anyhow",
  "collections",
@@ -4061,7 +4156,7 @@ dependencies = [
 name = "copilot_chat"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anthropic",
  "anyhow",
  "collections",
@@ -4080,7 +4175,7 @@ name = "copilot_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "copilot",
  "copilot_chat",
@@ -4995,7 +5090,7 @@ name = "dap"
 version = "0.1.0"
 dependencies = [
  "a_log",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-compression",
  "async-pipe",
@@ -5038,7 +5133,7 @@ dependencies = [
 name = "dap_adapters"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "collections",
@@ -5157,7 +5252,7 @@ name = "db"
 version = "0.1.0"
 dependencies = [
  "aa_env_vars",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "gpui",
  "indoc",
@@ -5175,7 +5270,7 @@ dependencies = [
 name = "debug_adapter_extension"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "collections",
@@ -5190,7 +5285,7 @@ dependencies = [
 name = "debugger_tools"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "dap",
  "editor",
@@ -5211,7 +5306,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "bitflags 2.13.2",
@@ -5380,7 +5475,7 @@ name = "dev_container"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-tar",
  "async-trait",
@@ -5415,7 +5510,7 @@ dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "agent_settings",
  "anyhow",
@@ -5517,7 +5612,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5690,7 +5785,7 @@ dependencies = [
  "a_log",
  "aa_clock",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "ad_credentials_provider",
  "ai_onboarding",
@@ -5728,6 +5823,7 @@ dependencies = [
  "ollama",
  "open_ai",
  "parking_lot",
+ "paths",
  "postage",
  "pretty_assertions",
  "project",
@@ -5745,6 +5841,7 @@ dependencies = [
  "text",
  "thiserror 2.0.21",
  "toml 0.8.23",
+ "tracing",
  "uuid",
  "workspace",
  "worktree",
@@ -5757,7 +5854,7 @@ name = "edit_prediction_context"
 version = "0.1.0"
 dependencies = [
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "env_logger 0.11.11",
@@ -5808,7 +5905,7 @@ name = "edit_prediction_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "buffer_diff",
@@ -5853,7 +5950,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "aho-corasick",
  "anyhow",
@@ -6005,7 +6102,7 @@ name = "encoding_selector"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "editor",
  "encoding_rs",
  "fuzzy",
@@ -6152,7 +6249,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -6182,6 +6279,22 @@ checksum = "fc89bf99e5dc15954a60f707c1e09d7540e5cd9af85fa75caa0b510bc08c5342"
 dependencies = [
  "euclid",
  "svg_fmt",
+]
+
+[[package]]
+name = "etw_tracing"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
+ "anyhow",
+ "gpui",
+ "net",
+ "serde",
+ "serde_json",
+ "windows 0.61.3",
+ "windows-core 0.61.2",
+ "workspace",
+ "wprcontrol",
 ]
 
 [[package]]
@@ -6266,7 +6379,7 @@ name = "extension"
 version = "0.1.0"
 dependencies = [
  "a_tracing",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "cloud_api_types",
@@ -6314,7 +6427,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-compression",
  "async-tar",
@@ -6374,7 +6487,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "cloud_api_types",
@@ -6503,7 +6616,7 @@ dependencies = [
 name = "feedback"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "client",
  "extension_host",
@@ -6521,7 +6634,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "channel",
@@ -6551,7 +6664,7 @@ name = "file_icons"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "gpui",
  "settings_content",
 ]
@@ -6808,7 +6921,7 @@ dependencies = [
 name = "fs"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-channel 2.5.0",
  "async-std",
@@ -7031,7 +7144,7 @@ dependencies = [
  "libc",
  "log",
  "rustversion",
- "windows-link 0.1.3",
+ "windows-link 0.2.1",
  "windows-result 0.4.1",
 ]
 
@@ -7143,7 +7256,7 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -7151,7 +7264,7 @@ name = "git"
 version = "0.1.0"
 dependencies = [
  "a_tracing",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "askpass",
  "async-channel 2.5.0",
@@ -7187,7 +7300,7 @@ dependencies = [
 name = "git_hosting_providers"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "futures 0.3.34",
@@ -7216,7 +7329,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "agent_settings",
  "anyhow",
@@ -7281,7 +7394,7 @@ dependencies = [
  "a_tracing",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "askpass",
@@ -7429,7 +7542,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "editor",
  "gpui",
  "indoc",
@@ -7492,7 +7605,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 2.0.21",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -7841,35 +7954,6 @@ dependencies = [
  "windows-numerics 0.3.1",
  "windows-registry",
  "zed-scap",
-]
-
-[[package]]
-name = "grammars"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
-dependencies = [
- "anyhow",
- "language_core",
- "rust-embed",
- "tree-sitter",
- "tree-sitter-bash",
- "tree-sitter-c",
- "tree-sitter-cpp",
- "tree-sitter-css",
- "tree-sitter-diff",
- "tree-sitter-gitcommit",
- "tree-sitter-go",
- "tree-sitter-gomod",
- "tree-sitter-gowork",
- "tree-sitter-jsdoc",
- "tree-sitter-json",
- "tree-sitter-md",
- "tree-sitter-python",
- "tree-sitter-regex",
- "tree-sitter-rust",
- "tree-sitter-typescript",
- "tree-sitter-yaml",
- "util",
 ]
 
 [[package]]
@@ -8373,7 +8457,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.62.2",
+ "windows-core 0.56.0",
 ]
 
 [[package]]
@@ -8617,7 +8701,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "db",
  "editor",
@@ -8762,7 +8846,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aa_gpui_kit_util_macros",
  "aacode_actions",
  "anyhow",
@@ -8800,7 +8884,7 @@ dependencies = [
 name = "install_cli"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "client",
  "gpui",
@@ -8934,7 +9018,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8953,7 +9037,7 @@ version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82cb6a9f675da968c63b6208c641b9dca58fc0133ae53375736b1767b0cab8bd"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -8967,15 +9051,6 @@ name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -9205,7 +9280,7 @@ name = "json_schema_store"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "dap",
@@ -9347,7 +9422,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "collections",
@@ -9469,8 +9544,10 @@ dependencies = [
  "a_tracing",
  "aa_clock",
  "aa_gpui_fuzzy",
+ "aa_gpui_kit_grammars",
+ "aa_gpui_kit_language_core",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "chardetng",
@@ -9485,12 +9562,10 @@ dependencies = [
  "futures-lite 2.6.1",
  "globset",
  "gpui",
- "grammars",
  "http_client",
  "imara-diff",
  "indoc",
  "itertools 0.14.0",
- "language_core",
  "log",
  "lsp",
  "parking_lot",
@@ -9533,29 +9608,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "language_core"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "bitflags 2.13.2",
- "collections",
- "gpui_shared_string",
- "gpui_util",
- "log",
- "lru 0.16.4",
- "parking_lot",
- "path",
- "regex",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "smallvec",
- "strum 0.28.0",
- "toml 0.8.23",
- "tree-sitter",
-]
-
-[[package]]
 name = "language_detection"
 version = "0.1.0"
 dependencies = [
@@ -9569,7 +9621,7 @@ name = "language_extension"
 version = "0.1.0"
 dependencies = [
  "a_tracing",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "collections",
@@ -9636,7 +9688,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "ai_onboarding",
  "anthropic",
  "anyhow",
@@ -9722,7 +9774,7 @@ name = "language_selector"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "editor",
  "file_icons",
@@ -9744,7 +9796,7 @@ dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "client",
@@ -9776,8 +9828,9 @@ dependencies = [
 name = "languages"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_grammars",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-compression",
  "async-fs",
@@ -9789,7 +9842,6 @@ dependencies = [
  "futures 0.3.34",
  "globset",
  "gpui",
- "grammars",
  "http_client",
  "itertools 0.14.0",
  "json_schema_store",
@@ -10166,7 +10218,7 @@ name = "livekit_client"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-trait",
  "audio",
@@ -10394,7 +10446,7 @@ name = "lsp"
 version = "0.1.0"
 dependencies = [
  "a_log",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-channel 2.5.0",
  "async-pipe",
@@ -10432,7 +10484,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "editor",
  "futures 0.3.34",
@@ -10454,7 +10506,7 @@ name = "lsp_locations"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "editor",
@@ -10601,7 +10653,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "base64 0.22.1",
  "collections",
@@ -10628,7 +10680,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "buffer_diff",
@@ -11010,7 +11062,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 name = "miniprofiler_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "command_palette_hooks",
  "gpui",
@@ -11060,7 +11112,7 @@ version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "536bfad37a309d62069485248eeaba1e8d9853aaf951caaeaed0585a95346f08"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -11120,7 +11172,7 @@ dependencies = [
  "a_tracing",
  "aa_clock",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "buffer_diff",
  "collections",
@@ -11333,7 +11385,7 @@ dependencies = [
 name = "node_runtime"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-compression",
  "async-std",
@@ -11385,7 +11437,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "channel",
@@ -11464,7 +11516,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -12116,7 +12168,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "client",
@@ -12228,7 +12280,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "editor",
  "file_icons",
  "futures 0.3.34",
@@ -12263,7 +12315,7 @@ dependencies = [
 name = "openai_subscribed"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "base64 0.22.1",
  "credentials_provider",
@@ -12393,7 +12445,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "editor",
  "futures 0.3.34",
@@ -12415,11 +12467,11 @@ dependencies = [
 name = "outline-cli"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_grammars",
  "anyhow",
  "clap",
  "futures 0.3.34",
  "gpui",
- "grammars",
  "language",
  "serde",
  "serde_json",
@@ -12431,7 +12483,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "async-channel 2.5.0",
@@ -12616,7 +12668,7 @@ dependencies = [
 name = "paths"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "const_format",
  "dirs",
  "ignore",
@@ -13342,7 +13394,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "db",
@@ -13364,7 +13416,7 @@ name = "picker_preview"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "editor",
  "gpui",
  "language",
@@ -13691,7 +13743,7 @@ checksum = "e8cf8e6a8aa66ce33f63993ffc4ea4271eb5b0530a9002db8455ea6050c77bfa"
 name = "prettier"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "fs",
@@ -13838,7 +13890,7 @@ dependencies = [
  "a_util",
  "aa_clock",
  "aa_gpui_fuzzy",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "ad_credentials_provider",
  "aho-corasick",
  "anyhow",
@@ -13917,7 +13969,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "client",
@@ -13959,7 +14011,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "editor",
  "futures 0.3.34",
@@ -13983,7 +14035,7 @@ dependencies = [
 name = "prompt_store"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "agent_skills",
  "anyhow",
  "assets",
@@ -14065,7 +14117,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
 dependencies = [
  "heck 0.5.0",
- "itertools 0.14.0",
+ "itertools 0.10.5",
  "log",
  "multimap",
  "petgraph",
@@ -14084,7 +14136,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -14368,7 +14420,7 @@ dependencies = [
  "once_cell",
  "socket2 0.5.10",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -14749,7 +14801,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "askpass",
@@ -14930,7 +14982,7 @@ dependencies = [
 name = "remote"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "askpass",
  "async-trait",
@@ -14989,7 +15041,7 @@ dependencies = [
  "a_util",
  "aa_clock",
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "acp_thread",
  "action_log",
  "agent",
@@ -15069,7 +15121,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "async-dispatcher",
@@ -15264,7 +15316,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "a_tracing",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "criterion",
  "ctor",
  "gpui",
@@ -15309,7 +15361,7 @@ name = "rpc"
 version = "0.1.0"
 dependencies = [
  "a_log",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-tungstenite",
  "base64 0.22.1",
@@ -15453,7 +15505,7 @@ dependencies = [
  "errno 0.3.14",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -15533,7 +15585,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -15792,7 +15844,7 @@ dependencies = [
  "a_tracing",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aa_gpui_kit_util_macros",
  "aacode_actions",
  "any_vec",
@@ -16116,7 +16168,7 @@ dependencies = [
 name = "session"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "db",
  "gpui",
  "serde_json",
@@ -16127,7 +16179,7 @@ dependencies = [
 name = "settings"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "ec4rs",
@@ -16163,7 +16215,7 @@ dependencies = [
 name = "settings_content"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "derive_more",
@@ -16186,7 +16238,7 @@ dependencies = [
 name = "settings_json"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "pretty_assertions",
  "serde",
@@ -16214,7 +16266,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "ad_credentials_provider",
  "agent",
@@ -16371,7 +16423,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "acp_thread",
  "action_log",
@@ -16455,7 +16507,7 @@ version = "1.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b"
 dependencies = [
- "errno 0.2.8",
+ "errno 0.3.14",
  "libc",
 ]
 
@@ -16639,7 +16691,7 @@ dependencies = [
 name = "snippet_provider"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "extension",
@@ -16673,7 +16725,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16777,7 +16829,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16817,7 +16869,7 @@ checksum = "2b2231b7c3057d5e4ad0156fb3dc807d900806020c5ffa3ee6ff2c8c76fb8520"
 name = "streaming_diff"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "criterion",
  "ordered-float 5.5.0",
  "rand 0.9.5",
@@ -17280,7 +17332,7 @@ dependencies = [
  "memchr",
  "ntapi",
  "rayon",
- "windows 0.57.0",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -17348,7 +17400,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "collections",
  "ctor",
  "editor",
@@ -17369,7 +17421,7 @@ name = "tabular_data_preview"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "editor",
  "fuzzy",
@@ -17430,7 +17482,7 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 name = "task"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "collections",
@@ -17454,7 +17506,7 @@ name = "tasks_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "collections",
@@ -17512,10 +17564,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand 2.5.0",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17546,7 +17598,7 @@ dependencies = [
  "parking_lot",
  "rustix",
  "signal-hook 0.3.18",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17554,7 +17606,7 @@ name = "terminal"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aa_gpui_kit_util_macros",
  "alacritty_terminal",
  "anyhow",
@@ -17593,7 +17645,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "230a1b821ccbd75b185820a1f1ff7b14d21da1e442e22c0863ea5f08771a8874"
 dependencies = [
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17602,7 +17654,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "anyhow",
  "async-recursion",
@@ -17705,7 +17757,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "collections",
  "ctor",
@@ -17730,7 +17782,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "editor",
  "fs",
@@ -17954,7 +18006,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aa_icons",
  "aacode_actions",
  "agent_settings",
@@ -18223,7 +18275,7 @@ name = "toolchain_selector"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "convert_case 0.11.0",
  "editor",
@@ -18739,7 +18791,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -19154,7 +19206,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aa_gpui_kit_util_macros",
  "aacode_actions",
  "anyhow",
@@ -20531,7 +20583,7 @@ dependencies = [
  "objc2-metal 0.3.2",
  "objc2-quartz-core 0.3.2",
  "once_cell",
- "ordered-float 5.5.0",
+ "ordered-float 4.6.0",
  "parking_lot",
  "portable-atomic",
  "portable-atomic-util",
@@ -20591,7 +20643,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "collections",
  "command_palette",
@@ -20704,7 +20756,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -20744,16 +20796,6 @@ dependencies = [
 
 [[package]]
 name = "windows"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12342cb4d8e3b046f3d80effd474a7a02447231330ef77d71daa6fbc40681143"
-dependencies = [
- "windows-core 0.57.0",
- "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "windows"
 version = "0.58.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd04d41d93c4992d421894c18c8b43496aa748dd4c081bac0dc93eb0489272b6"
@@ -20785,6 +20827,17 @@ dependencies = [
  "windows-core 0.62.2",
  "windows-future 0.3.2",
  "windows-numerics 0.3.1",
+]
+
+[[package]]
+name = "windows-bindgen"
+version = "0.61.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b4e97b01190d32f268a2dfbd3f006f77840633746707fbe40bcee588108a231"
+dependencies = [
+ "serde",
+ "serde_json",
+ "windows-threading 0.1.0",
 ]
 
 [[package]]
@@ -20826,18 +20879,6 @@ checksum = "4698e52ed2d08f8658ab0c39512a7c00ee5fe2688c65f8c0a4f06750d729f2a6"
 dependencies = [
  "windows-implement 0.56.0",
  "windows-interface 0.56.0",
- "windows-result 0.1.2",
- "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "windows-core"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2ed2439a290666cd67ecce2b0ffaad89c2a56b976b736e6ece670297897832d"
-dependencies = [
- "windows-implement 0.57.0",
- "windows-interface 0.57.0",
  "windows-result 0.1.2",
  "windows-targets 0.52.6",
 ]
@@ -20916,17 +20957,6 @@ dependencies = [
 
 [[package]]
 name = "windows-implement"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9107ddc059d5b6fbfbffdfa7a7fe3e22a226def0b2608f72e9d552763d3e1ad7"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "windows-implement"
 version = "0.58.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2bbd5b46c938e506ecbce286b6628a02171d56153ba733b6c741fc627ec9579b"
@@ -20952,17 +20982,6 @@ name = "windows-interface"
 version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08990546bf4edef8f431fa6326e032865f27138718c587dc21bc0265bbcb57cc"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "windows-interface"
-version = "0.57.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29bee4b38ea3cde66011baa44dba677c432a78593e202392d1e9070cf2a7fca7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -21611,7 +21630,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "aacode_actions",
  "agent_settings",
  "any_vec",
@@ -21671,7 +21690,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_clock",
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "async-channel 2.5.0",
  "async-lock",
@@ -21699,6 +21718,17 @@ dependencies = [
  "text",
  "tracing",
  "worktree",
+]
+
+[[package]]
+name = "wprcontrol"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/wprcontrol?rev=cd811f7#cd811f7d744f65291e13131b1d907fda63ed91a1"
+dependencies = [
+ "windows 0.61.3",
+ "windows-bindgen",
+ "windows-core 0.61.2",
+ "windows-link 0.2.1",
 ]
 
 [[package]]
@@ -21757,7 +21787,7 @@ dependencies = [
 name = "x_ai_subscribed"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_util",
+ "aa_gpui_kit_util 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=bfaec06)",
  "anyhow",
  "base64 0.22.1",
  "credentials_provider",

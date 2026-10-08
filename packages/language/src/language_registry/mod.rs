@@ -24,7 +24,7 @@ use lsp::LanguageServerId;
 use parking_lot::{Mutex, RwLock};
 use postage::watch;
 
-use aa_gpui_kit_theme::Theme;
+use theme::Theme;
 use std::{
     ffi::OsStr,
     path::{Path, PathBuf},

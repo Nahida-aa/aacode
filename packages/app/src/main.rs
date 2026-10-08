@@ -440,6 +440,13 @@ fn main() {
                         title: Some(SharedString::from("aacode")),
                         ..Default::default()
                     }),
+                    // Linux/FreeBSD 下设置 X11 窗口图标（_NET_WM_ICON）。由 build.rs 的
+                    // prepare_app_icon_x11 把 resources/app-icon.png 缩到 256x256 写进
+                    // OUT_DIR/app_icon.png，这里读回来。对齐 Zed
+                    // crates/zed/src/zed.rs L378-388（APP_ICON 静态）+ L414（icon 字段）。
+                    // 没有它 Linux 窗口没有应用图标，任务栏/Alt-Tab 走 gpui 的兜底图标。
+                    #[cfg(any(target_os = "linux", target_os = "freebsd"))]
+                    icon: app_icon(),
                     ..Default::default()
                 }
             },
@@ -781,4 +788,28 @@ fn dump_all_gpui_actions() {
         serde_json::to_string_pretty(&output).unwrap().as_bytes(),
     )
     .unwrap();
+}
+
+/// Linux/FreeBSD 的窗口图标（X11 `_NET_WM_ICON`）。
+///
+/// 对齐 Zed `crates/zed/src/zed.rs:378-388`。图片由 `build.rs` 的
+/// `prepare_app_icon_x11` 生成到 `OUT_DIR/app_icon.png`（256x256），
+/// 这里 `include_bytes!` 读回并解码；解码失败只记日志返回 None —— 图标不是
+/// 关键路径，不该因此让窗口开不出来。
+#[cfg(any(target_os = "linux", target_os = "freebsd"))]
+fn app_icon() -> Option<Arc<image::RgbaImage>> {
+    static APP_ICON: std::sync::LazyLock<Option<Arc<image::RgbaImage>>> =
+        std::sync::LazyLock::new(|| {
+            // build.rs 已确保这个文件存在并解码过。
+            const BYTES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/app_icon.png"));
+            util::maybe!({
+                let image = image::ImageReader::new(std::io::Cursor::new(BYTES))
+                    .with_guessed_format()?
+                    .decode()?
+                    .into();
+                anyhow::Ok(Arc::new(image))
+            })
+            .log_err()
+        });
+    APP_ICON.as_ref().cloned()
 }

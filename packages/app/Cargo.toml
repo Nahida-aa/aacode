@@ -172,8 +172,6 @@ install_cli.workspace = true
 project_symbols.workspace = true
 auto_update_ui.workspace = true
 onboarding.workspace = true
-
-
 languages = { workspace = true, features = ["load-grammars"] }
 language_model.workspace = true
 language_models.workspace = true
@@ -191,6 +189,7 @@ settings_ui.workspace = true
 release_channel.workspace = true
 # main.rs 的 single-instance 检查读 ZED_STATELESS（对齐 Zed main.rs L361-362）。
 aa_env_vars.workspace = true
+
 tokio.workspace = true
 gpui_util.workspace = true
 util.workspace = true
@@ -223,7 +222,12 @@ workspace.workspace = true
 watch.workspace = true
 a_log.workspace = true
 a_tracing.workspace = true
-
+gpui_platform = { workspace = true, features = [
+    "screen-capture",
+    "font-kit",
+    "wayland",
+    "x11",
+] }
 # core/open_listener.rs 直接用到这三者（zed 的 crates/zed/Cargo.toml L160/L220/L221
 # 同样把它们放在 [dependencies] 而非 dev-dependencies）。
 # log     —— 解析失败分支的 log::error!
@@ -232,30 +236,42 @@ a_tracing.workspace = true
 log.workspace = true
 url.workspace = true
 urlencoding.workspace = true
+# core/open_listener.rs 用到 remote::{RemoteConnectionOptions, WslConnectionOptions}。
+# 此前只在 [dev-dependencies]（L254），主二进制链接不到 —— open_listener 移进来后才暴露。
+# zed 同样两处都声明（crates/zed/Cargo.toml L184 主依赖 + L269 dev 加 test-support）。
+remote.workspace = true
+wasm-bindgen = "0.2.120"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+etw_tracing.workspace = true
+windows.workspace = true
+gpui = { workspace = true, features = ["profiler", "windows-manifest"] }
+
+[build-dependencies]
+windows_resources = { path = "../windows_resources" }
 
 # ashpd —— core/mod.rs 的 fail_to_open_window 用 ashpd::desktop::notification
 # 在开窗口失败时弹 XDG 桌面通知（对齐 Zed crates/zed/src/main.rs:153-190）。
 # 仅 Linux/freebsd 有效，其余平台走 process::exit，与 Zed 一致。
 [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies]
+gpui = { workspace = true, features = ["profiler", "wayland", "x11"] }
 ashpd.workspace = true
+image = { workspace = true }
 
-# core/open_listener.rs 用到 remote::{RemoteConnectionOptions, WslConnectionOptions}。
-# 此前只在 [dev-dependencies]（L254），主二进制链接不到 —— open_listener 移进来后才暴露。
-# zed 同样两处都声明（crates/zed/Cargo.toml L184 主依赖 + L269 dev 加 test-support）。
-remote.workspace = true
+[target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.build-dependencies]
+image.workspace = true
+
+
+[target.'cfg(target_os = "linux")'.build-dependencies]
+pkg-config = "0.3.22"
+
+
 
 # AppState::test / Project::local 需要的间接依赖（通过 workspace crate re-export 不够，
 # main.rs 直接用了这些类型）—— 但 workspace crate 已经声明了它们，这里只需要保证可访问。
 # 实际上 main.rs 里 workspace::AppState::test() 内部已经处理了一切，main.rs 只需要 project。
 
-gpui_platform = { workspace = true, features = [
-    "screen-capture",
-    "font-kit",
-    "wayland",
-    "x11",
-] }
 
-wasm-bindgen = "0.2.120"
 
 [dev-dependencies]
 activity_indicator = { workspace = true, features = ["test-support"] }

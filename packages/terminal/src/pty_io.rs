@@ -45,7 +45,7 @@ use crate::alacritty::{
     update_selection_to_vi_cursor, update_vi_cursor_for_scroll, vi_goto_point, vi_motion,
 };
 use crate::mappings::colors::to_vte_rgb;
-use aa_gpui_kit_theme::ActiveTheme as _;
+use theme::ActiveTheme as _;
 
 use super::cell::Content;
 use super::colors::get_color_at_index;

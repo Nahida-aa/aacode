@@ -1,6 +1,6 @@
 use super::*;
 
-use aa_gpui_kit_theme::ActiveTheme as _;
+use theme::ActiveTheme as _;
 
 #[derive(Clone)]
 pub struct EditPreview {

@@ -1,6 +1,6 @@
 use crate::{BufferSnapshot, Language, Point, ToPoint, ToTreeSitterPoint};
 use fuzzy_nucleo::{Case, LengthPenalty, StringMatch, StringMatchCandidate};
-use aa_gpui_kit_theme::SyntaxTheme;
+use theme::SyntaxTheme;
 use gpui::{BackgroundExecutor, HighlightStyle, SharedString};
 use std::{ops::Range, sync::Arc};
 use text::Rope;

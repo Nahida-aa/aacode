@@ -76,7 +76,7 @@ pub(crate) use util::{contiguous_ranges, offset_in_sub_ranges, trailing_whitespa
 // 注意：这里不 `use text::*`，因为 `text::Buffer` 与本地 `Buffer` 同名会冲突；改为显式列出所需项。
 pub(crate) use clock::{Global, Lamport,};
 pub use clock::{ReplicaId};
-pub(crate) use aa_gpui_kit_theme::SyntaxTheme;
+pub(crate) use theme::SyntaxTheme;
 pub(crate) use anyhow::{Context as _, Result};
 pub(crate) use collections::HashMap;
 pub(crate) use encoding_rs::Encoding;

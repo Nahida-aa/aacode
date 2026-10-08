@@ -1,4 +1,4 @@
-use aa_gpui_kit_theme::Theme;
+use theme::Theme;
 use gpui::{Hsla, Rgba, black};
 pub use vte::ansi::{Color, NamedColor};
 

@@ -1,4 +1,4 @@
-use aa_gpui_kit_theme::SyntaxTheme;
+use theme::SyntaxTheme;
 use language_core::highlight_map::{HighlightId, HighlightMap};
 
 #[inline]

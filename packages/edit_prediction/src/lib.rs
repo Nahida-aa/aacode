@@ -3494,17 +3494,28 @@ fn is_upsell_dismissed(cx: &App) -> bool {
     // before, by checking the data collection choice which was written to
     // the database once the user clicked on "Accept and Enable"
     let kvp = KeyValueStore::global(cx);
-    if kvp
-        .read_kvp(ZED_PREDICT_DATA_COLLECTION_CHOICE)
+
+    let data_collection_choice = kvp.read_kvp(ZED_PREDICT_DATA_COLLECTION_CHOICE);
+    tracing::info!(
+        key = ZED_PREDICT_DATA_COLLECTION_CHOICE,
+        value = ?data_collection_choice,
+        db_path = ?paths::database_dir().join("0-dev").join("db.sqlite"),
+        "is_upsell_dismissed: data_collection_choice"
+    );
+    if data_collection_choice
         .log_err()
         .is_some_and(|s| s.is_some())
     {
         return true;
     }
 
-    kvp.read_kvp(ZedPredictUpsell::KEY)
-        .log_err()
-        .is_some_and(|s| s.is_some())
+    let upsell = kvp.read_kvp(ZedPredictUpsell::KEY);
+    tracing::info!(
+        key = ZedPredictUpsell::KEY,
+        value = ?upsell,
+        "is_upsell_dismissed: upsell_key"
+    );
+    upsell.log_err().is_some_and(|s| s.is_some())
 }
 
 impl Dismissable for ZedPredictUpsell {

@@ -5,7 +5,7 @@ use std::hash::Hash;
 use std::ops::Range;
 use std::sync::Arc;
 
-use aa_gpui_kit_theme::SyntaxTheme;
+use theme::SyntaxTheme;
 use anyhow::Result;
 use language_core::{
     BlockCommentConfig, BracketPair, CodeLabel, Grammar, HighlightId, LanguageConfig,

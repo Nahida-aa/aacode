@@ -57,7 +57,7 @@ use crate::alacritty::{
     vi_motion,
 };
 use crate::mappings::colors::to_vte_rgb;
-use aa_gpui_kit_theme::ActiveTheme as _;
+use theme::ActiveTheme as _;
 
 use super::cell::Content;
 use super::colors::get_color_at_index;
