@@ -48,7 +48,10 @@ fn prepare_app_icon_x11() {
         _ => "-dev",
     };
 
-    let icon = Path::new(&format!("resources/app-icon{suffix}.png"));
+    // 先把路径存成 String 再借给 Path —— 直接写 Path::new(&format!(...)) 会让
+    // 临时值在语句结束就析构，而 icon 还要用到下一句，borrow checker 报 E0716。
+    let icon_path = format!("resources/app-icon{suffix}.png");
+    let icon = Path::new(&icon_path);
     assert!(
         icon.exists(),
         "missing {} —— run `just icons` to generate it from assets/images/aacode{}.svg",
