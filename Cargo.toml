@@ -778,21 +778,120 @@ aa_gpui_kit_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util" }
 aa_gpui_kit_util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util_macros" }
 
 
-# —— release profile ——
-# 对齐 Zed Cargo.toml L1117-1123。原先本文件**没有任何 [profile] 段**，用的是 cargo
-# 默认值（opt-level=3 / debug=false / lto=false / codegen-units=16），即"优化过但没有
-# 跨 crate 优化"，比 zed 慢也略胖。
+# —— profile ——
+# 对齐 Zed Cargo.toml L1037-1129。原先本文件**没有任何 [profile] 段**，全部用
+# cargo 默认值。
 #
-# - debug = "limited"   保留行号表（panic 仍能指到源码行），但不像 "full" 那样为每个
-#                      类型/泛型实例生成完整 debuginfo。注意用户的 .cargo/config.toml
-#                      已把 [profile.dev] 改成 debug = "line-tables-only"，与此呼应。
-# - lto = "thin"        跨 crate 优化。体积与性能都优于默认。
-# - codegen-units = 1   单编译单元，利于优化；代价是构建显著变慢。
-#
-# [profile.release.package] 那段例外（zed 给自己的主二进制放宽到 16）**未搬**：
-# 目的相反 —— zed 是为了缩短自己主二进制的构建时间，aacode 的主二进制只有
-# packages/app 一个，用不着。
+# crate 名做过映射：zed_actions → aacode_actions、ui_input / ui_macros →
+# aa_gpui_kit_ui_input / aa_gpui_kit_ui_macros、util_macros 的 aacode 侧那份是
+# aa_gpui_kit_util_macros。zed 有而 aacode 没有的（snippets_ui 等）不列。
+# 列的每一条都核对过确实在 aacode 的依赖图里（cargo metadata）。
+
+[profile.dev]
+# Zed L1037-1041。split-debuginfo=unpacked 让 .dwp 单独落盘，避免塞进可执行文件。
+split-debuginfo = "unpacked"
+incremental = true
+codegen-units = 16
+debug = "limited"
+
+# Zed L1045-1048：构建脚本（build.rs）本身也按 limited / cgu=16 编译。
+[profile.dev.build-override]
+codegen-units = 16
+split-debuginfo = "unpacked"
+debug = "limited"
+
+# Zed L1051-1056：`--profile dbg` 用于需要完整 debuginfo 的调试
+# （完整类型/泛型实例信息，代价是体积巨大）。
+[profile.dbg]
+inherits = "dev"
+debug = "full"
+
+[profile.dbg.build-override]
+debug = "full"
+
+[profile.dev.package]
+# proc-macros start
+# proc-macro 在 dev 下默认不优化（它们在宿主编译器里跑），开 opt-level=3 显著
+# 缩短编译时间。Zed L1059-1070。
+gpui_macros = { opt-level = 3 }
+derive_refineable = { opt-level = 3 }
+feature_flags_macros = { opt-level = 3 }
+settings_macros = { opt-level = 3 }
+sqlez_macros = { opt-level = 3, codegen-units = 1 }
+aa_gpui_kit_ui_macros = { opt-level = 3 }
+util_macros = { opt-level = 3 }
+aa_gpui_kit_util_macros = { opt-level = 3 }
+quote = { opt-level = 3 }
+syn = { opt-level = 3 }
+proc-macro2 = { opt-level = 3 }
+# proc-macros end
+
+# 计算密集的依赖：不优化的话 debug 下 tree-sitter 解析、文本布局会慢到不可用。
+# Zed L1073-1082。
+tree-sitter = { opt-level = 3 }
+taffy = { opt-level = 3 }
+resvg = { opt-level = 3 }
+wasmtime = { opt-level = 3 }
+cranelift-codegen = { opt-level = 3 }
+wasmtime-environ = { opt-level = 3 }
+wasmtime-internal-cranelift = { opt-level = 3 }
+minidumper = { opt-level = 3 }
+serde_json = { opt-level = 3 }
+
+# 单文件 crate 用 cgu=1：拆开没有并行收益，反倒增加调度开销。
+# Zed 的原注释：Build single-source-file crates with cg=1 as it helps make
+# `cargo build` of a whole workspace a bit faster。Zed L1085-1115。
+activity_indicator = { codegen-units = 1 }
+assets = { codegen-units = 1 }
+breadcrumbs = { codegen-units = 1 }
+collections = { codegen-units = 1 }
+command_palette = { codegen-units = 1 }
+command_palette_hooks = { codegen-units = 1 }
+edit_prediction_ui = { codegen-units = 1 }
+feature_flags = { codegen-units = 1 }
+file_icons = { codegen-units = 1 }
+image_viewer = { codegen-units = 1 }
+install_cli = { codegen-units = 1 }
+journal = { codegen-units = 1 }
+json_schema_store = { codegen-units = 1 }
+llama_cpp = { codegen-units = 1 }
+lmstudio = { codegen-units = 1 }
+menu = { codegen-units = 1 }
+notifications = { codegen-units = 1 }
+ollama = { codegen-units = 1 }
+outline = { codegen-units = 1 }
+paths = { codegen-units = 1 }
+prettier = { codegen-units = 1 }
+project_symbols = { codegen-units = 1 }
+refineable = { codegen-units = 1 }
+release_channel = { codegen-units = 1 }
+reqwest_client = { codegen-units = 1 }
+session = { codegen-units = 1 }
+sidebar = { codegen-units = 1 }
+snippet = { codegen-units = 1 }
+telemetry_events = { codegen-units = 1 }
+theme_selector = { codegen-units = 1 }
+time_format = { codegen-units = 1 }
+aa_gpui_kit_ui_input = { codegen-units = 1 }
+aacode_actions = { codegen-units = 1 }
+
 [profile.release]
+# Zed L1117-1120。debug=limited 保行号表（panic 仍指得到源码行），
+# lto=thin + cgu=1 做跨 crate 优化。
 debug = "limited"
 lto = "thin"
 codegen-units = 1
+
+# Zed L1122-1123 唯一的 release 例外：放宽主二进制的 cgu 以缩短构建时间。
+# Zed 的键是 `zed`，aacode 对应主二进制 crate 是 `aacode`。
+[profile.release.package]
+aacode = { codegen-units = 16 }
+
+# Zed L1125-1129：带完整符号的快速 release。用于需要真 backtrace 又不想等
+# release（LTO + cgu=1）那么久的场景，例如 aacode 的 track-project-leak：
+#   LEAK_BACKTRACE=1 cargo run --features aacode/track-project-leak --profile release-fast
+[profile.release-fast]
+inherits = "release"
+debug = "full"
+lto = false
+codegen-units = 16
