@@ -218,7 +218,7 @@ async fn capture_windows(
             .map(|quoted| quoted.into_owned())
             .context("unexpected null in directory name")
     };
-    let mut cmd = crate::command::new_command(shell_path);
+    let mut cmd = util::command::new_command(shell_path);
     cmd.args(args);
     let quoted_directory = quote_for_shell(&directory_string)?;
     let quoted_zed_path = quote_for_shell(&zed_path_string)?;
