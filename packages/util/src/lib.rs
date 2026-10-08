@@ -63,8 +63,7 @@ pub use json::{
 };
 pub use misc::default;
 pub use os::{
-    get_shell_safe_zed_path, get_zed_cli_path, increase_open_file_limit,
-    load_login_shell_environment, parse_os_release, prevent_root_execution,
+    increase_open_file_limit, parse_os_release,
     set_pre_exec_to_start_new_session,
 };
 pub use ranges::{RangeExt, expanded_and_wrapped_usize_range, wrapped_usize_outward_from};

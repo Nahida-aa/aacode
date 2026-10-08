@@ -26,6 +26,7 @@ publish = false
 a_log = { path = "packages/a_log",  }
 a_tracing = { path = "packages/a_tracing" }
 a_tracing_macro = { path = "packages/a_tracing_macro" }
+a_util = { path = "packages/a_util" }
 aa_env_vars = { path = "packages/aa_env_vars" }
 aa-kernel = { path = "packages/kernel" }
 aa-core = { path = "packages/core" }

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a1c23" />
+      <stop offset="100%" stop-color="#0f1015" />
+    </radialGradient>
+
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e6b84a" />
+      <stop offset="50%" stop-color="#fbe491" />
+      <stop offset="100%" stop-color="#b38728" />
+    </linearGradient>
+
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#bgGrad)" rx="15" />
+
+  <g transform="translate(200, 215)" filter="url(#shadow)"
+     fill="none" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round">
+
+    <!-- 第 1 条：连接左下顶点与右下顶点 -->
+    <path d="M -71.3,-23.4 A 90,90 0 0 1 71.3,-23.4" />
+
+    <!-- 第 2 条：旋转 120°，连接右下顶点与顶部顶点 -->
+    <path d="M 55.9,-50.1 A 90,90 0 0 1 -15.4,73.5" />
+
+    <!-- 第 3 条：旋转 240°，连接顶部顶点与左下顶点 -->
+    <path d="M 15.4,73.5 A 90,90 0 0 1 -55.9,-50.1" />
+  </g>
+</svg>

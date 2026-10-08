@@ -1,3 +1,7 @@
+# https://github.com/rust-lang/rustfmt?tab=readme-ov-file#rusts-editions
+edition = "2024"
+style_edition = "2024"
+
 # 启用不稳定特性，这是 fn_single_line 生效的前提
 unstable_features = true
 

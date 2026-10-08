@@ -1,0 +1,30 @@
+# 控制 dev 构建的磁盘占用。
+#
+# 实测背景：2026-10-05 一次 cargo clean 释放了 589.1 GiB，其中
+#   target/debug/incremental  272G（3381 个缓存目录，反复改 project/settings/
+#                                 terminal_view 等核心 crate 累积而成）
+#   target/debug/deps         243G
+#   aa-app 二进制            6.3G（debug = "full" 把整个类型图写进 debuginfo）
+#
+# 下面两项分别针对上面两个大头。
+
+[profile.dev]
+# "line-tables-only" 只保留行号表，仍能 backtrace 到源码行，
+# 但不再为每个类型/泛型实例生成完整 debuginfo。
+# 需要完整调试信息时临时用 CARGO_PROFILE_DEV_DEBUG=full cargo build 覆盖。
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+# 只给第三方依赖开优化，自己的 workspace crate 仍按 dev 语义（可 debug）。
+# 代价是依赖编译更慢（优化后无法按 crate 单独回退到 unoptimized），
+# 换来 deps 体积显著下降。
+opt-level = 1
+
+# 摸 Android 编译障碍时的临时 linker 配置（2026-10-07）。
+# NDK r29 的 clang wrapper 已内置 API level 相关的 libc 路径，直接指定它即可。
+[target.aarch64-linux-android]
+linker = "/home/aa/Android/Sdk/ndk/29.0.13846066/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang"
+ar = "/home/aa/Android/Sdk/ndk/29.0.13846066/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar"
+rustflags = [
+  "-C", "link-arg=-fuse-ld=lld",
+]

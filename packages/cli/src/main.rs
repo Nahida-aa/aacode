@@ -483,7 +483,7 @@ fn main() {
 
 fn run() -> Result<()> {
     #[cfg(unix)]
-    util::prevent_root_execution();
+    a_util::prevent_root_execution();
 
     // Exit flatpak sandbox if needed
     #[cfg(target_os = "linux")]

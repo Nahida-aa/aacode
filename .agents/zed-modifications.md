@@ -434,3 +434,56 @@ toolbar item。aacode 已接 24 个，**以下 2 个无对应实现，rev→rev 
 aacode 的 `packages/migrator` 已含这两个函数）。
 `MigrationBanner` 还需在 `initialize_pane` 开头取 `cx.weak_entity()`
 （对齐 zed.rs:1463）。
+
+
+## util → a_util：app 级函数上提（aacode 独有重构）
+
+**新 crate**：`packages/a_util/`，从 `packages/util/src/os.rs` 和
+`packages/util/src/shell_env.rs` 中提取 app 启动/CLI 专属功能。
+
+### 拆分清单
+
+| 功能 | 位置 | 原因 |
+|---|---|---|
+| `prevent_root_execution` | **a_util** | CLI 入口和 app 启动期安全守门，与通用工具无关 |
+| `get_shell_safe_zed_path` | **a_util** | 格式化当前可执行路径供 shell capture 使用 |
+| `get_zed_cli_path` | **a_util** | 定位同级 `zed-cli`（现在是 aacode 的 CLI 二进制） |
+| `load_login_shell_environment` | **a_util** | 加载用户登录 shell 环境（耗 IO、有副作用） |
+| `shell_env::capture` / `*_unix` / `*_windows` / `spawn_and_read_fd` 等整套 | **a_util::shell_env** | 上述 capture 的完整实现，依赖 `command_fds`/`smol::process`/`nix` 等 |
+| `set_pre_exec_to_start_new_session` | **留在 util** | 通用 `Command` 辅助，`terminal`/`a_util::shell_env` 等多处调用 |
+| `increase_open_file_limit` | **留在 util** | 通用 rlimit 工具 |
+| `parse_os_release` | **留在 util** | 通用 os-release 解析 |
+| `shell_env::print_env` | **留在 util** | `--printenv` 子命令入口，纯打印逻辑 |
+
+### 消费者迁移
+
+改完之后，引用 `prevent_root_execution` / `load_login_shell_environment` /
+`shell_env::capture` 的 crate 需要改为 `a_util::`：
+
+| crate | 旧 | 新 |
+|---|---|---|
+| `cli` | `util::prevent_root_execution()` | `a_util::prevent_root_execution()` |
+| `remote_server` | `util::load_login_shell_environment()` | `a_util::load_login_shell_environment()` |
+| `project` | `util::shell_env::capture(...)` | `a_util::shell_env::capture(...)` |
+
+`set_pre_exec_to_start_new_session` 仍留在 `util`，调用方不改。
+
+### rev→rev 同步注意
+
+Zed 上游的 `crates/util/src/os.rs` 和 `crates/util/src/shell_env.rs` 仍包含
+上述所有函数（Zed 没有做这个拆分）。同步时：
+
+1. 对上游这两个文件的改动，先判断**属于哪一类**（a_util 侧 vs util 侧）
+2. a_util 侧的改动手动 port 到 `packages/a_util/src/{os,shell_env}.rs`
+3. util 侧的改动（`set_pre_exec_to_start_new_session` / `increase_open_file_limit` /
+   `parse_os_release` / `shell_env::print_env`）port 到 `packages/util/src/{os,shell_env}.rs`
+4. 不要把 Zed 的完整 `shell_env.rs` 直接覆盖 aacode 的 `util/src/shell_env.rs`，
+   否则会重新引入已迁走的 capture 系列函数 + 关联依赖（`collections::HashMap`
+   已在 util 侧被移除）
+
+### util 侧 Cargo.toml 瘦身
+
+迁走后 `util/Cargo.toml` 的 `[target.'cfg(unix)'.dependencies]` 可移除
+`command-fds`；`nix` 只保留 `resource` feature（`user` 已迁到 a_util）。
+`[dependencies]` 里的 `smol` / `which` / `async-fs` / `walkdir` / `dirs`
+在 wasm 侧仍被其他模块用到，保留不动。

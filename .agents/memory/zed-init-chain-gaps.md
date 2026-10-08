@@ -174,7 +174,7 @@ action handler（`Hide` / `OpenLog` / `OpenSettingsFile` 等 12 个）。其余 
 
 ## 必须实跑验证：init 顺序错误编译期查不出来
 
-补完 init 链后**一定要 `./target/debug/aa-app` 实跑**。编译通过 ≠ 能启动。
+补完 init 链后**一定要 `./target/debug/aacode` 实跑**。编译通过 ≠ 能启动。
 
 本轮实跑抓到 2 个 panic，都是「init 缺前置 set_global」或「init 被插队到依赖方之前」：
 

@@ -1,0 +1,28 @@
+[package]
+name = "a_util"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+collections.workspace = true
+gpui_util.workspace = true
+util.workspace = true
+log.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+serde_json_lenient.workspace = true
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+smol.workspace = true
+which.workspace = true
+async-fs.workspace = true
+walkdir.workspace = true
+dirs.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+command-fds = "0.3.1"
+libc.workspace = true
+nix = { workspace = true, features = ["resource", "user"] }

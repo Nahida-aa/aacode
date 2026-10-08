@@ -9,7 +9,6 @@ anyhow.workspace = true
 async_zip.workspace = true
 collections.workspace = true
 futures.workspace = true
-serde = { workspace = true, features = ["derive"] }
 shlex.workspace = true
 which.workspace = true
 futures-lite.workspace = true
@@ -23,15 +22,15 @@ dirs.workspace = true
 url.workspace = true
 rust-embed.workspace = true
 percent-encoding.workspace = true
-
-[target.'cfg(unix)'.dependencies]
-command-fds = "0.3.1"
-libc.workspace = true
-nix = { workspace = true, features = ["resource", "user"] }
-
 unicase.workspace = true
 take-until.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
 serde_json_lenient.workspace = true
+gpui_util.workspace = true
+schemars.workspace = true
+rand = { workspace = true, optional = true }
+util_macros = { workspace = true, optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 smol.workspace = true
@@ -40,11 +39,11 @@ async-fs.workspace = true
 walkdir.workspace = true
 dirs.workspace = true
 
-gpui_util.workspace = true
-schemars.workspace = true
-serde_json.workspace = true
-rand = { workspace = true, optional = true }
-util_macros = { workspace = true, optional = true }
+[target.'cfg(unix)'.dependencies]
+command-fds = "0.3.1"
+libc.workspace = true
+nix = { workspace = true, features = ["resource", "user"] }
+
 [target.'cfg(target_os = "macos")'.dependencies]
 mach2.workspace = true
 
