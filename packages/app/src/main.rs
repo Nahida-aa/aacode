@@ -26,9 +26,10 @@ use util::ResultExt as _;
 
 /// 启动参数。对齐 Zed `crates/zed/src/main.rs` 的 `Args`（L190-291）。
 ///
-/// Zed 的原始结构有 18 个字段，其中 windows-only（foreground / etw_* / crash_handler）
-/// 与 aacode 无关的平台特性未搬，`printenv` 用 clap 字段替代了原先手写的
-/// `args().any(|a| a == "--printenv")` 扫描。
+/// Zed 的原始结构有 18 个字段，其中 etw_*（Windows ETW 追踪）、crash_handler、
+/// askpass 这几项与 aacode 无关，未搬。`foreground` 与 `dock_action` 是 Windows-only
+/// 但仍保留 —— windows_only_instance.rs 的 handle_single_instance 要用它们转发请求。
+/// `printenv` 用 clap 字段替代了原先手写的 `args().any(...)` 扫描。
 #[derive(Parser, Debug)]
 #[command(name = "aacode", disable_version_flag = true, max_term_width = 100)]
 struct Args {
@@ -65,6 +66,18 @@ struct Args {
     /// Dump all registered gpui actions as JSON（调试用）。
     #[arg(long)]
     dump_all_actions: bool,
+
+    /// Windows 专用：把控制台附着到父进程（GUI 子系统下让 stdout 可见）。
+    #[arg(long)]
+    #[cfg(target_os = "windows")]
+    #[arg(hide = true)]
+    foreground: bool,
+
+    /// Windows 专用：由 explorer 转发来的 dock 右键菜单动作序号。
+    #[arg(long)]
+    #[cfg(target_os = "windows")]
+    #[arg(hide = true)]
+    dock_action: Option<usize>,
 
     /// Outputs environment variables as JSON to stdout。
     ///
@@ -150,11 +163,28 @@ fn main() {
             )
             .is_err()
         }
-        #[cfg(not(any(target_os = "linux", target_os = "freebsd")))]
+        #[cfg(target_os = "windows")]
         {
-            false
+            !aa_app_lib::core::windows_only_instance::handle_single_instance(
+                open_listener.clone(),
+                &args,
+            )
+        }
+
+        #[cfg(target_os = "macos")]
+        {
+            use aa_app_lib::core::mac_only_instance::*;
+            ensure_only_instance() != IsOnlyInstance::Yes
         }
     };
+
+    // 已有实例在跑 → 提示后退出，把打开请求让给首个实例处理。对齐 Zed L382-385。
+    // 少了这段，第二个实例仍会继续启动并开自己的窗口（socket bind 失败只是被记下），
+    // 结果是同一项目开两个互不相干的窗口。
+    if failed_single_instance_check {
+        println!("aacode is already running");
+        return;
+    }
 
     app.run(move |cx: &mut App| {
         cx.set_global(app_db);

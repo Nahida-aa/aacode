@@ -4,9 +4,20 @@
 //! 此模块暂为占位，后续可把与 AppState 无关的纯 crate init 链提取到此。
 
 pub mod about;
+pub mod edit_prediction_registry;
 pub mod migrate;
 pub mod open_listener;
 pub mod quick_action_bar;
+
+// 单实例检测的平台实现。cfg 放在 mod 声明处而非文件内 —— 与 Zed
+// crates/zed/src/zed.rs L3-4 / L15-16 一致：这两个文件整体只服务于各自平台，
+// 内部用了 windows::Win32（需 release_channel::app_identifier，那本身也是
+// #[cfg(target_os = "windows")]）与 sysinfo 等平台相关依赖，文件级编译会导致
+// 在 Linux 上报 unresolved import。
+#[cfg(target_os = "macos")]
+pub mod mac_only_instance;
+#[cfg(target_os = "windows")]
+pub mod windows_only_instance;
 
 pub use about::open_about_window;
 pub use migrate::MigrationBanner;

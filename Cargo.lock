@@ -490,6 +490,7 @@ dependencies = [
  "tab_switcher",
  "tabular_data_preview",
  "tasks_ui",
+ "telemetry",
  "tempfile",
  "terminal",
  "terminal_view",
