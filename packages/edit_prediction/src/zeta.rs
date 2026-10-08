@@ -9,9 +9,8 @@ use crate::{
     udiff::prediction_edits_for_single_file_diff,
 };
 use anyhow::{Context as _, Result};
-use cloud_llm_client::{
-    AcceptEditPredictionBody, EditPredictionRejectReason, predict_edits_v3::RawCompletionRequest,
-};
+use aa_cloud_llm_client::{AcceptEditPredictionBody, EditPredictionRejectReason};
+use zed_cloud_llm_client::predict_edits_v3::RawCompletionRequest;
 use edit_prediction_types::PredictedCursorPosition;
 use gpui::{App, AppContext as _, Entity, Task, TaskExt, WeakEntity, prelude::*};
 use language::{

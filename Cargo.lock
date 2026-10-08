@@ -213,6 +213,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_cloud_llm_client"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "strum 0.28.0",
+ "uuid",
+]
+
+[[package]]
 name = "aa_env_vars"
 version = "0.1.0"
 dependencies = [
@@ -889,6 +900,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_clock",
+ "aa_cloud_llm_client",
  "aa_env_vars",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -905,7 +917,6 @@ dependencies = [
  "chrono",
  "client",
  "cloud_api_types",
- "cloud_llm_client",
  "collections",
  "context_server",
  "ctor",
@@ -1368,7 +1379,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1379,7 +1390,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3193,7 +3204,7 @@ dependencies = [
  "maybe-owned",
  "rustix",
  "rustix-linux-procfs",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
  "winx",
 ]
 
@@ -3572,6 +3583,7 @@ name = "client"
 version = "0.1.0"
 dependencies = [
  "aa_clock",
+ "aa_cloud_llm_client",
  "aa_gpui_kit_util",
  "ad_credentials_provider",
  "anyhow",
@@ -3580,7 +3592,6 @@ dependencies = [
  "chrono",
  "cloud_api_client",
  "cloud_api_types",
- "cloud_llm_client",
  "collections",
  "credentials_provider",
  "derive_more",
@@ -3621,6 +3632,7 @@ dependencies = [
  "url",
  "windows 0.62.2",
  "worktree",
+ "zed_cloud_llm_client",
 ]
 
 [[package]]
@@ -3648,26 +3660,14 @@ dependencies = [
 name = "cloud_api_types"
 version = "0.1.0"
 dependencies = [
+ "aa_cloud_llm_client",
  "anyhow",
  "chrono",
  "ciborium",
- "cloud_llm_client",
  "pretty_assertions",
  "serde",
  "serde_json",
  "strum 0.28.0",
- "zeta_prompt",
-]
-
-[[package]]
-name = "cloud_llm_client"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "serde",
- "serde_json",
- "strum 0.28.0",
- "uuid",
  "zeta_prompt",
 ]
 
@@ -3762,7 +3762,7 @@ checksum = "af491d569909a7e4dee0ad7db7f5341fef5c614d5b8ec8cf765732aba3cff681"
 dependencies = [
  "serde",
  "termcolor",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
@@ -5570,7 +5570,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5742,6 +5742,7 @@ version = "0.1.0"
 dependencies = [
  "a_log",
  "aa_clock",
+ "aa_cloud_llm_client",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_util",
  "aacode_actions",
@@ -5752,7 +5753,6 @@ dependencies = [
  "client",
  "cloud_api_client",
  "cloud_api_types",
- "cloud_llm_client",
  "collections",
  "copilot",
  "copilot_ui",
@@ -5803,6 +5803,7 @@ dependencies = [
  "uuid",
  "workspace",
  "worktree",
+ "zed_cloud_llm_client",
  "zeta_prompt",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -5862,13 +5863,13 @@ dependencies = [
 name = "edit_prediction_ui"
 version = "0.1.0"
 dependencies = [
+ "aa_cloud_llm_client",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_util",
  "aacode_actions",
  "anyhow",
  "buffer_diff",
  "client",
- "cloud_llm_client",
  "codestral",
  "command_palette_hooks",
  "copilot",
@@ -6207,7 +6208,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -7214,7 +7215,7 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -7563,7 +7564,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 2.0.21",
- "windows 0.56.0",
+ "windows 0.58.0",
 ]
 
 [[package]]
@@ -8415,7 +8416,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.56.0",
+ "windows-core 0.58.0",
 ]
 
 [[package]]
@@ -8976,7 +8977,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -8995,7 +8996,7 @@ version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82cb6a9f675da968c63b6208c641b9dca58fc0133ae53375736b1767b0cab8bd"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -9621,9 +9622,9 @@ dependencies = [
 name = "language_model_core"
 version = "0.1.0"
 dependencies = [
+ "aa_cloud_llm_client",
  "anyhow",
  "async-lock",
- "cloud_llm_client",
  "collections",
  "futures 0.3.34",
  "gpui_shared_string",
@@ -9643,6 +9644,7 @@ name = "language_models"
 version = "0.1.0"
 dependencies = [
  "aa_clock",
+ "aa_cloud_llm_client",
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -9660,7 +9662,6 @@ dependencies = [
  "client",
  "cloud_api_client",
  "cloud_api_types",
- "cloud_llm_client",
  "collections",
  "convert_case 0.11.0",
  "copilot_chat",
@@ -9709,10 +9710,10 @@ dependencies = [
 name = "language_models_cloud"
 version = "0.1.0"
 dependencies = [
+ "aa_cloud_llm_client",
  "anthropic",
  "anyhow",
  "cloud_api_client",
- "cloud_llm_client",
  "futures 0.3.34",
  "google_ai",
  "gpui",
@@ -9725,6 +9726,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.21",
+ "zed_cloud_llm_client",
 ]
 
 [[package]]
@@ -11070,7 +11072,7 @@ version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "536bfad37a309d62069485248eeaba1e8d9853aaf951caaeaed0585a95346f08"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -11474,7 +11476,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -14075,7 +14077,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
 dependencies = [
  "heck 0.5.0",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "log",
  "multimap",
  "petgraph",
@@ -14094,7 +14096,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -14378,7 +14380,7 @@ dependencies = [
  "once_cell",
  "socket2 0.5.10",
  "tracing",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -15463,7 +15465,7 @@ dependencies = [
  "errno 0.3.14",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -15543,7 +15545,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -16465,7 +16467,7 @@ version = "1.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b"
 dependencies = [
- "errno 0.3.14",
+ "errno 0.2.8",
  "libc",
 ]
 
@@ -16683,7 +16685,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -16787,7 +16789,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17525,7 +17527,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17556,7 +17558,7 @@ dependencies = [
  "parking_lot",
  "rustix",
  "signal-hook 0.3.18",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -17603,7 +17605,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "230a1b821ccbd75b185820a1f1ff7b14d21da1e442e22c0863ea5f08771a8874"
 dependencies = [
  "rustix",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -18749,7 +18751,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -20261,8 +20263,8 @@ dependencies = [
 name = "web_search"
 version = "0.1.0"
 dependencies = [
+ "aa_cloud_llm_client",
  "anyhow",
- "cloud_llm_client",
  "collections",
  "gpui",
 ]
@@ -20271,11 +20273,11 @@ dependencies = [
 name = "web_search_providers"
 version = "0.1.0"
 dependencies = [
+ "aa_cloud_llm_client",
  "anyhow",
  "client",
  "cloud_api_client",
  "cloud_api_types",
- "cloud_llm_client",
  "futures 0.3.34",
  "gpui",
  "http_client",
@@ -20541,7 +20543,7 @@ dependencies = [
  "objc2-metal 0.3.2",
  "objc2-quartz-core 0.3.2",
  "once_cell",
- "ordered-float 4.6.0",
+ "ordered-float 5.5.0",
  "parking_lot",
  "portable-atomic",
  "portable-atomic-util",
@@ -20714,7 +20716,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -22120,6 +22122,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "zed_cloud_llm_client"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=4a664c0#4a664c0c41686932c171416f9203039a1df08118"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "strum 0.28.0",
+ "uuid",
+ "zeta_prompt",
+]
+
+[[package]]
 name = "zeno"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -22248,10 +22263,10 @@ dependencies = [
 [[package]]
 name = "zeta_prompt"
 version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "anyhow",
  "imara-diff",
- "indoc",
  "serde",
  "strum 0.28.0",
 ]

@@ -16,7 +16,8 @@ client.workspace = true
 clock.workspace = true
 cloud_api_client.workspace = true
 cloud_api_types.workspace = true
-cloud_llm_client = { workspace = true, features = ["predict-edits"] }
+aa_cloud_llm_client.workspace = true
+zed_cloud_llm_client = { workspace = true, features = ["predict-edits"] }
 collections.workspace = true
 copilot.workspace = true
 copilot_ui.workspace = true
@@ -75,7 +76,8 @@ gpui = { workspace = true, features = ["test-support"] }
 languages = { workspace = true, features = ["load-grammars"] }
 node_runtime.workspace = true
 clock = { workspace = true, features = ["test-support"] }
-cloud_llm_client = { workspace = true, features = ["test-support"] }
+aa_cloud_llm_client = { workspace = true, features = ["test-support"] }
+zed_cloud_llm_client = { workspace = true, features = ["test-support"] }
 ctor.workspace = true
 indoc.workspace = true
 language = { workspace = true, features = ["test-support"] }

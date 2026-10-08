@@ -131,6 +131,13 @@ fi
 export CC=${CC:-$(which clang)}
 
 # Build binary in release mode
+# LK_CUSTOM_WEBRTC 同 just install 里的理由：webrtc-sys（git rev 0a1c519）的
+# download_webrtc() 无缓存判断（开头就 remove_dir_all + 无条件下载），且 prebuilt_dir()
+# 落在 OUT_DIR 下 —— 换 --target 或改 profile 都会让 OUT_DIR 变 → 重新下载 575 MB。
+# musl 交叉编译那次的 OUT_DIR 与宿主不同，也用同一份缓存（libwebrtc.a 是静态库，
+# 与 target 无关）。
+export LK_CUSTOM_WEBRTC="${LK_CUSTOM_WEBRTC:-$HOME/.cache/aacode/webrtc/webrtc-0001d84-4-linux-x64-release}"
+
 cargo --config .cargo/bundle-config.toml build --release --target "${target_triple}" --package aacode --package cli
 # Build remote_server in separate invocation to prevent feature unification from other crates
 # from influencing dynamic libraries required by it.

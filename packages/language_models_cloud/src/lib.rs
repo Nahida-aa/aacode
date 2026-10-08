@@ -1,10 +1,12 @@
 use anthropic::AnthropicModelMode;
 use anyhow::{Context as _, Result};
 use cloud_api_client::ClientApiError;
-use cloud_llm_client::{
+use aa_cloud_llm_client::{
+    CompletionBody, CompletionEvent, CompletionRequestStatus, ListModelsResponse,
+};
+use zed_cloud_llm_client::{
     CLIENT_SUPPORTS_STATUS_MESSAGES_HEADER_NAME, CLIENT_SUPPORTS_STATUS_STREAM_ENDED_HEADER_NAME,
-    CLIENT_SUPPORTS_X_AI_HEADER_NAME, CompletionBody, CompletionEvent, CompletionRequestStatus,
-    EXPIRED_LLM_TOKEN_HEADER_NAME, ListModelsResponse, OUTDATED_LLM_TOKEN_HEADER_NAME,
+    CLIENT_SUPPORTS_X_AI_HEADER_NAME, EXPIRED_LLM_TOKEN_HEADER_NAME, OUTDATED_LLM_TOKEN_HEADER_NAME,
     SERVER_SUPPORTS_STATUS_MESSAGES_HEADER_NAME, ZED_VERSION_HEADER_NAME,
 };
 use futures::{
@@ -324,7 +326,7 @@ impl<TP: CloudLlmTokenProvider> CloudModelProvider<TP> {
 }
 
 fn anthropic_request(
-    config: &cloud_llm_client::LanguageModel,
+    config: &aa_cloud_llm_client::LanguageModel,
     request: LanguageModelRequest,
 ) -> Result<anthropic::Request> {
     let enable_thinking = request.thinking_allowed && config.supports_thinking;
@@ -356,7 +358,7 @@ fn anthropic_request(
 }
 
 fn open_ai_request(
-    config: &cloud_llm_client::LanguageModel,
+    config: &aa_cloud_llm_client::LanguageModel,
     request: LanguageModelRequest,
 ) -> Result<open_ai::responses::Request> {
     let enable_thinking = request.thinking_allowed && config.supports_thinking;
@@ -490,8 +492,8 @@ impl From<ApiError> for LanguageModelCompletionError {
 }
 
 /// Describes a model from the Zed cloud model list.
-pub fn language_model(model: &cloud_llm_client::LanguageModel) -> LanguageModel {
-    use cloud_llm_client::LanguageModelProvider::*;
+pub fn language_model(model: &aa_cloud_llm_client::LanguageModel) -> LanguageModel {
+    use aa_cloud_llm_client::LanguageModelProvider::*;
     let supports_explicit_compaction = supports_explicit_compaction(model);
     LanguageModel {
         upstream_provider_id: Some(match model.provider {
@@ -558,16 +560,16 @@ pub fn language_model(model: &cloud_llm_client::LanguageModel) -> LanguageModel 
     }
 }
 
-fn requires_data_retention(model: &cloud_llm_client::LanguageModel) -> bool {
+fn requires_data_retention(model: &aa_cloud_llm_client::LanguageModel) -> bool {
     // Anthropic cannot offer Fable models with Zero Data Retention
     model.id.0.starts_with(anthropic::FABLE_MODEL_ID_PREFIX)
 }
 
-fn supports_explicit_compaction(model: &cloud_llm_client::LanguageModel) -> bool {
+fn supports_explicit_compaction(model: &aa_cloud_llm_client::LanguageModel) -> bool {
     matches!(
         model.provider,
-        cloud_llm_client::LanguageModelProvider::OpenAi
-            | cloud_llm_client::LanguageModelProvider::Anthropic
+        aa_cloud_llm_client::LanguageModelProvider::OpenAi
+            | aa_cloud_llm_client::LanguageModelProvider::Anthropic
     ) && model.supports_server_side_compaction
 }
 
@@ -575,10 +577,10 @@ pub struct CloudModelProvider<TP: CloudLlmTokenProvider> {
     token_provider: Arc<TP>,
     http_client: Arc<HttpClientWithUrl>,
     app_version: Option<Version>,
-    models: Vec<Arc<cloud_llm_client::LanguageModel>>,
-    default_model: Option<Arc<cloud_llm_client::LanguageModel>>,
-    default_fast_model: Option<Arc<cloud_llm_client::LanguageModel>>,
-    recommended_models: Vec<Arc<cloud_llm_client::LanguageModel>>,
+    models: Vec<Arc<aa_cloud_llm_client::LanguageModel>>,
+    default_model: Option<Arc<aa_cloud_llm_client::LanguageModel>>,
+    default_fast_model: Option<Arc<aa_cloud_llm_client::LanguageModel>>,
+    recommended_models: Vec<Arc<aa_cloud_llm_client::LanguageModel>>,
     request_limiters: ModelRateLimiters,
 }
 
@@ -687,7 +689,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
     fn config(
         &self,
         model: &LanguageModel,
-    ) -> Result<Arc<cloud_llm_client::LanguageModel>, LanguageModelCompletionError> {
+    ) -> Result<Arc<aa_cloud_llm_client::LanguageModel>, LanguageModelCompletionError> {
         self.models
             .iter()
             .find(|config| config.id.0.as_ref() == model.id.0.as_ref())
@@ -697,7 +699,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
 
     fn check_data_retention_consent(
         &self,
-        config: &cloud_llm_client::LanguageModel,
+        config: &aa_cloud_llm_client::LanguageModel,
         cx: &App,
     ) -> Result<(), LanguageModelCompletionError> {
         if requires_data_retention(config) && !self.token_provider.has_data_retention_consent(cx) {
@@ -710,7 +712,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
 
     fn compact_anthropic(
         &self,
-        config: &cloud_llm_client::LanguageModel,
+        config: &aa_cloud_llm_client::LanguageModel,
         request_limiter: &RateLimiter,
         request: LanguageModelRequest,
         cx: &App,
@@ -750,7 +752,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                 CompletionBody {
                     thread_id,
                     prompt_id,
-                    provider: cloud_llm_client::LanguageModelProvider::Anthropic,
+                    provider: aa_cloud_llm_client::LanguageModelProvider::Anthropic,
                     model: request.model.clone(),
                     provider_request: serde_json::to_value(&request).map_err(|error| {
                         LanguageModelCompletionError::SerializeRequest {
@@ -780,7 +782,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
     /// through the cloud's `/completions/compact` endpoint.
     fn compact_open_ai(
         &self,
-        config: &cloud_llm_client::LanguageModel,
+        config: &aa_cloud_llm_client::LanguageModel,
         request_limiter: &RateLimiter,
         request: LanguageModelRequest,
         cx: &App,
@@ -887,17 +889,17 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
         }
 
         match config.provider {
-            cloud_llm_client::LanguageModelProvider::OpenAi => {
+            aa_cloud_llm_client::LanguageModelProvider::OpenAi => {
                 self.compact_open_ai(&config, &request_limiter, request, cx)
             }
-            cloud_llm_client::LanguageModelProvider::Anthropic => {
+            aa_cloud_llm_client::LanguageModelProvider::Anthropic => {
                 self.compact_anthropic(&config, &request_limiter, request, cx)
             }
             // Unreachable while the `supports_explicit_compaction` guard
             // above holds, but a provider mismatch should degrade to the
             // same unsupported error rather than panic.
-            cloud_llm_client::LanguageModelProvider::Google
-            | cloud_llm_client::LanguageModelProvider::XAi => async {
+            aa_cloud_llm_client::LanguageModelProvider::Google
+            | aa_cloud_llm_client::LanguageModelProvider::XAi => async {
                 Err(LanguageModelCompletionError::Other(anyhow::anyhow!(
                     "this cloud model does not support explicit compaction"
                 )))
@@ -922,7 +924,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
         if let Err(error) = self.check_data_retention_consent(&config, cx) {
             return async move { Err(error) }.boxed();
         }
-        use cloud_llm_client::LanguageModelProvider;
+        use aa_cloud_llm_client::LanguageModelProvider;
         let provider_request = match config.provider {
             LanguageModelProvider::Anthropic => anthropic_request(&config, request)
                 .and_then(|request| Ok(serde_json::to_value(request)?)),
@@ -1008,7 +1010,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
         let app_version = self.app_version.clone();
         let provider_name = provider_name(&config.provider);
         match config.provider {
-            cloud_llm_client::LanguageModelProvider::Anthropic => {
+            aa_cloud_llm_client::LanguageModelProvider::Anthropic => {
                 let request = match anthropic_request(&config, request) {
                     Ok(request) => request,
                     Err(error) => return async move { Err(error.into()) }.boxed(),
@@ -1030,7 +1032,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                         CompletionBody {
                             thread_id,
                             prompt_id,
-                            provider: cloud_llm_client::LanguageModelProvider::Anthropic,
+                            provider: aa_cloud_llm_client::LanguageModelProvider::Anthropic,
                             model: request.model.clone(),
                             provider_request: serde_json::to_value(&request).map_err(|error| {
                                 LanguageModelCompletionError::SerializeRequest {
@@ -1056,7 +1058,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                 });
                 async move { Ok(future.await?.boxed()) }.boxed()
             }
-            cloud_llm_client::LanguageModelProvider::OpenAi => {
+            aa_cloud_llm_client::LanguageModelProvider::OpenAi => {
                 let http_client = self.http_client.clone();
                 let token_provider = self.token_provider.clone();
                 let request = match open_ai_request(&config, request) {
@@ -1078,7 +1080,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                         CompletionBody {
                             thread_id,
                             prompt_id,
-                            provider: cloud_llm_client::LanguageModelProvider::OpenAi,
+                            provider: aa_cloud_llm_client::LanguageModelProvider::OpenAi,
                             model: request.model.clone(),
                             provider_request: serde_json::to_value(&request).map_err(|error| {
                                 LanguageModelCompletionError::SerializeRequest {
@@ -1103,7 +1105,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                 });
                 async move { Ok(future.await?.boxed()) }.boxed()
             }
-            cloud_llm_client::LanguageModelProvider::XAi => {
+            aa_cloud_llm_client::LanguageModelProvider::XAi => {
                 let http_client = self.http_client.clone();
                 let token_provider = self.token_provider.clone();
                 let request = match into_open_ai(
@@ -1133,7 +1135,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                         CompletionBody {
                             thread_id,
                             prompt_id,
-                            provider: cloud_llm_client::LanguageModelProvider::XAi,
+                            provider: aa_cloud_llm_client::LanguageModelProvider::XAi,
                             model: request.model.clone(),
                             provider_request: serde_json::to_value(&request).map_err(|error| {
                                 LanguageModelCompletionError::SerializeRequest {
@@ -1158,7 +1160,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                 });
                 async move { Ok(future.await?.boxed()) }.boxed()
             }
-            cloud_llm_client::LanguageModelProvider::Google => {
+            aa_cloud_llm_client::LanguageModelProvider::Google => {
                 let http_client = self.http_client.clone();
                 let token_provider = self.token_provider.clone();
                 let request =
@@ -1179,7 +1181,7 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
                         CompletionBody {
                             thread_id,
                             prompt_id,
-                            provider: cloud_llm_client::LanguageModelProvider::Google,
+                            provider: aa_cloud_llm_client::LanguageModelProvider::Google,
                             model: request.model.model_id.clone(),
                             provider_request: serde_json::to_value(&request).map_err(|error| {
                                 LanguageModelCompletionError::SerializeRequest {
@@ -1203,19 +1205,19 @@ impl<TP: CloudLlmTokenProvider + 'static> CloudModelProvider<TP> {
         }
     }
 
-    pub fn models(&self) -> &[Arc<cloud_llm_client::LanguageModel>] {
+    pub fn models(&self) -> &[Arc<aa_cloud_llm_client::LanguageModel>] {
         &self.models
     }
 
-    pub fn default_model(&self) -> Option<&Arc<cloud_llm_client::LanguageModel>> {
+    pub fn default_model(&self) -> Option<&Arc<aa_cloud_llm_client::LanguageModel>> {
         self.default_model.as_ref()
     }
 
-    pub fn default_fast_model(&self) -> Option<&Arc<cloud_llm_client::LanguageModel>> {
+    pub fn default_fast_model(&self) -> Option<&Arc<aa_cloud_llm_client::LanguageModel>> {
         self.default_fast_model.as_ref()
     }
 
-    pub fn recommended_models(&self) -> &[Arc<cloud_llm_client::LanguageModel>] {
+    pub fn recommended_models(&self) -> &[Arc<aa_cloud_llm_client::LanguageModel>] {
         &self.recommended_models
     }
 }
@@ -1291,13 +1293,13 @@ where
 }
 
 pub fn provider_name(
-    provider: &cloud_llm_client::LanguageModelProvider,
+    provider: &aa_cloud_llm_client::LanguageModelProvider,
 ) -> LanguageModelProviderName {
     match provider {
-        cloud_llm_client::LanguageModelProvider::Anthropic => ANTHROPIC_PROVIDER_NAME,
-        cloud_llm_client::LanguageModelProvider::OpenAi => OPEN_AI_PROVIDER_NAME,
-        cloud_llm_client::LanguageModelProvider::Google => GOOGLE_PROVIDER_NAME,
-        cloud_llm_client::LanguageModelProvider::XAi => X_AI_PROVIDER_NAME,
+        aa_cloud_llm_client::LanguageModelProvider::Anthropic => ANTHROPIC_PROVIDER_NAME,
+        aa_cloud_llm_client::LanguageModelProvider::OpenAi => OPEN_AI_PROVIDER_NAME,
+        aa_cloud_llm_client::LanguageModelProvider::Google => GOOGLE_PROVIDER_NAME,
+        aa_cloud_llm_client::LanguageModelProvider::XAi => X_AI_PROVIDER_NAME,
     }
 }
 
@@ -2240,7 +2242,7 @@ mod tests {
             }
         }
         let mut config = cloud_test_config();
-        config.provider = cloud_llm_client::LanguageModelProvider::XAi;
+        config.provider = aa_cloud_llm_client::LanguageModelProvider::XAi;
         let (provider, model) = bind_test_model(
             FakeHttpClient::create(|_| async {
                 panic!("unsupported provider must not send a counting request");
@@ -2258,7 +2260,7 @@ mod tests {
     #[test]
     fn opus_55_hosted_requests_use_adaptive_thinking_with_prefix_binding() -> Result<()> {
         let mut config = cloud_anthropic_test_config();
-        config.id = cloud_llm_client::LanguageModelId("claude-opus-5-5".into());
+        config.id = aa_cloud_llm_client::LanguageModelId("claude-opus-5-5".into());
         for effort in [None, Some("high")] {
             let request = anthropic_request(
                 &config,
@@ -2287,7 +2289,7 @@ mod tests {
     ) {
         let calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
         let mut config = cloud_anthropic_test_config();
-        config.id = cloud_llm_client::LanguageModelId("claude-fable-5-1".into());
+        config.id = aa_cloud_llm_client::LanguageModelId("claude-fable-5-1".into());
         assert!(language_model(&config).requires_data_retention());
         let (provider, model) = bind_test_model(
             FakeHttpClient::create({
@@ -2407,8 +2409,8 @@ mod tests {
             }
         });
         let mut config = cloud_test_config();
-        config.provider = cloud_llm_client::LanguageModelProvider::Google;
-        config.id = cloud_llm_client::LanguageModelId(Arc::from("gemini-3.1-pro-preview"));
+        config.provider = aa_cloud_llm_client::LanguageModelProvider::Google;
+        config.id = aa_cloud_llm_client::LanguageModelId(Arc::from("gemini-3.1-pro-preview"));
         bind_test_model(http_client, config)
     }
 
@@ -2442,7 +2444,7 @@ mod tests {
     /// fetch would.
     fn test_provider(
         http_client: Arc<HttpClientWithUrl>,
-        configs: Vec<cloud_llm_client::LanguageModel>,
+        configs: Vec<aa_cloud_llm_client::LanguageModel>,
     ) -> CloudModelProvider<TestTokenProvider> {
         let mut provider =
             CloudModelProvider::new(Arc::new(TestTokenProvider::default()), http_client, None);
@@ -2458,16 +2460,16 @@ mod tests {
     /// Lists `config` in a provider, and describes the model it lists.
     fn bind_test_model(
         http_client: Arc<HttpClientWithUrl>,
-        config: cloud_llm_client::LanguageModel,
+        config: aa_cloud_llm_client::LanguageModel,
     ) -> (CloudModelProvider<TestTokenProvider>, LanguageModel) {
         let model = language_model(&config);
         (test_provider(http_client, vec![config]), model)
     }
 
-    fn cloud_anthropic_test_config() -> cloud_llm_client::LanguageModel {
-        cloud_llm_client::LanguageModel {
-            provider: cloud_llm_client::LanguageModelProvider::Anthropic,
-            id: cloud_llm_client::LanguageModelId(Arc::from("claude-opus-4-6")),
+    fn cloud_anthropic_test_config() -> aa_cloud_llm_client::LanguageModel {
+        aa_cloud_llm_client::LanguageModel {
+            provider: aa_cloud_llm_client::LanguageModelProvider::Anthropic,
+            id: aa_cloud_llm_client::LanguageModelId(Arc::from("claude-opus-4-6")),
             display_name: "Claude Opus 4.6".to_string(),
             is_latest: true,
             max_token_count: 1_000_000,
@@ -2487,10 +2489,10 @@ mod tests {
         }
     }
 
-    fn cloud_test_config() -> cloud_llm_client::LanguageModel {
-        cloud_llm_client::LanguageModel {
-            provider: cloud_llm_client::LanguageModelProvider::OpenAi,
-            id: cloud_llm_client::LanguageModelId(Arc::from("gpt-5.4")),
+    fn cloud_test_config() -> aa_cloud_llm_client::LanguageModel {
+        aa_cloud_llm_client::LanguageModel {
+            provider: aa_cloud_llm_client::LanguageModelProvider::OpenAi,
+            id: aa_cloud_llm_client::LanguageModelId(Arc::from("gpt-5.4")),
             display_name: "GPT-5.4".to_string(),
             is_latest: true,
             max_token_count: 1_000_000,

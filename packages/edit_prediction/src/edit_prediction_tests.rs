@@ -6,9 +6,11 @@ use cloud_api_types::{
     OrganizationEditPredictionConfiguration, OrganizationId, SettledEditPrediction,
     SubmitEditPredictionSettledBatchBody, SubmitEditPredictionSettledResponse,
 };
-use cloud_llm_client::{
+use aa_cloud_llm_client::{
     EditPredictionRejectReason, EditPredictionRejection, PredictEditsRequestTrigger,
     RejectEditPredictionsBody,
+};
+use zed_cloud_llm_client::{
     predict_edits_v3::{
         PredictEditsV3Request, PredictEditsV3Response, RawCompletionChoice, RawCompletionRequest,
         RawCompletionResponse, RawCompletionUsage,

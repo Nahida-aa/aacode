@@ -7,7 +7,7 @@ pub mod tool_schema;
 pub mod util;
 
 use anyhow::{Context as _, Result, anyhow};
-use cloud_llm_client::CompletionRequestStatus;
+use aa_cloud_llm_client::CompletionRequestStatus;
 use http_client::{StatusCode, http};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};

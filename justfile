@@ -103,7 +103,17 @@ install prefix="$HOME/.local":
     set -euo pipefail
     # RELEASE_CHANNEL 在这里注入 —— 必须在 cargo build 之前，release_channel 的
     # build.rs 是构建期读 env 的（对齐 zed：CI 在编译时注入 ZED_RELEASE_CHANNEL）。
-    ZED_RELEASE_CHANNEL="{{_channel}}" cargo build --release -p aacode
+    # LK_CUSTOM_WEBRTC：webrtc-sys（git rev 0a1c519）的 download_webrtc() **没有缓存
+    # 判断**，开头就 remove_dir_all(prebuilt_dir()) 然后无条件下载（registry 版
+    # webrtc-sys-build 0.3.19 才有 `if exists { return Ok }`）。而它的 prebuilt_dir()
+    # 落在 OUT_DIR 下 —— profile 一改指纹就变 → OUT_DIR 变 → 每次全量重编都要重新
+    # 下载 575 MB 的 libwebrtc.a，GitHub 那边握手失败就直接 build failed。
+    # 设 LK_CUSTOM_WEBRTC 后 download_webrtc() 第一行就 return Ok，改从固定目录读。
+    # 该目录在 ~/.cache 下，cargo clean 不会波及。
+    #
+    # 若要重新拉取：删掉该目录并去掉此 env var，下次构建会自动下载。
+    LK_CUSTOM_WEBRTC="$HOME/.cache/aacode/webrtc/webrtc-0001d84-4-linux-x64-release" \
+      ZED_RELEASE_CHANNEL="{{_channel}}" CARGO_BUILD_WARNINGS=allow cargo build --release -p aacode
     # 与 zed bundle-linux 同样的顺序：先 strip 产物，再把瘦身后的本体装进 PREFIX。
     just strip
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"

@@ -12,7 +12,7 @@ members = [
     "packages/server",
     "packages/settings",
     "packages/session",
-    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/cloud_llm_client", "packages/zeta_prompt", "packages/http_client", "packages/paths", "packages/migrator", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/a_util", "packages/etw_tracing",
+    "packages/app", "packages/ui", "packages/workspace", "packages/settings_content", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/settings_macros", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/fs", "packages/rope", "packages/text", "packages/breadcrumbs", "packages/language", "packages/settings_json", "packages/http_client", "packages/paths", "packages/migrator", "packages/release_channel", "packages/git", "packages/a_log", "packages/a_tracing", "packages/a_tracing_macro", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/proto", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/askpass", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/telemetry", "packages/telemetry_events", "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/a_util", "packages/etw_tracing",
 ]
 
 [workspace.package]
@@ -72,7 +72,12 @@ copilot_ui = { path = "packages/copilot_ui" }
 client = { path = "packages/client" }
 cloud_api_client = { path = "packages/cloud_api_client" }
 cloud_api_types = { path = "packages/cloud_api_types" }
-cloud_llm_client = { path = "packages/cloud_llm_client" }
+aa_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "4a664c0", version = "=0.1.0" }
+zed_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "4a664c0", version = "=0.1.0" }
+# zeta_prompt 从 path → zed git（用户删了 packages/zeta_prompt/）。
+# rev 必须与 gpui_learn workspace 里的 zeta_prompt 一致（afecd6d7），
+# 否则 graph 里会出现两份。
+zeta_prompt = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 dap = { path = "packages/dap" }
 dap_adapters = { path = "packages/dap_adapters" }
 db = { path = "packages/db" }
@@ -220,7 +225,6 @@ worktree = { path = "packages/worktree" }
 windows_resources = { path = "packages/windows_resources" }
 x_ai = { path = "packages/x_ai" }
 x_ai_subscribed = { path = "packages/x_ai_subscribed" }
-zeta_prompt = { path = "packages/zeta_prompt" }
 
 agent-client-protocol = { version = "=2.2.0", features = ["unstable", "unstable_protocol_v2"] }
 aho-corasick = "1.1"
@@ -598,19 +602,6 @@ aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", re
 ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
 aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-
-
-crashes = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
-# zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
-# 签名），language / command_palette 等已迁到 `fuzzy_nucleo`。为了调用点能与 zed
-# 逐行对照，两边都照 zed 的原样声明：
-#   - `fuzzy` 直接用 zed 的真实实现（只依赖 gpui/gpui_util/path/log，全部已在
-#     同一 rev 上，不引入新第三方 crate，也不会出现两份 gpui）。
-#   - `fuzzy_nucleo` 是 gpui_learn 的 aa_gpui_fuzzy 的别名。
-fuzzy = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
-credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
-eval_utils = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
-gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 # grammars 指向 gpui_learn（crate 名 aa_gpui_kit_grammars），用 package= 改名，
 # 使全仓 `grammars::` 的调用点无需改动。
 #
@@ -629,7 +620,19 @@ gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719a
 # gpui_learn 版的 grammars 里 `util.workspace = true` 解析到 aa_gpui_kit_util，
 # 其 features 段有 `default = ["debug-embed"]`，与仓库布局无关；4 个 json 文件
 # （cpp/go/python/rust）都在 packages/grammars/src/ 下。
-grammars  = { package = "aa_gpui_kit_grammars", path = "/home/aa/repos/ide_ls/gpui_learn/packages/grammars" }
+grammars = { package = "aa_gpui_kit_grammars", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+
+crashes = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
+# zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
+# 签名），language / command_palette 等已迁到 `fuzzy_nucleo`。为了调用点能与 zed
+# 逐行对照，两边都照 zed 的原样声明：
+#   - `fuzzy` 直接用 zed 的真实实现（只依赖 gpui/gpui_util/path/log，全部已在
+#     同一 rev 上，不引入新第三方 crate，也不会出现两份 gpui）。
+#   - `fuzzy_nucleo` 是 gpui_learn 的 aa_gpui_fuzzy 的别名。
+fuzzy = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
+credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
+eval_utils = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
+gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 html_to_markdown = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 http_client = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 http_client_tls = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
@@ -765,7 +768,9 @@ aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" 
 # 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
 aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
-aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
+aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_cloud_llm_client" }
+    aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
+    
 # util / util_macros 同样必须走本地，否则图里会同时存在两份：
 #   · aacode 自己的 workspace 声明的是 git rev（workspace.dependencies L203-204）
 #   · 而 gpui_learn 的 grammars / language_core 里的 `util.workspace = true`
@@ -776,7 +781,7 @@ aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/comp
 # 都要在此声明 path patch 才能与其 workspace 解析结果一致。
 aa_gpui_kit_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util" }
 aa_gpui_kit_util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util_macros" }
-
+aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/grammars" }
 
 # —— profile ——
 # 对齐 Zed Cargo.toml L1037-1129。原先本文件**没有任何 [profile] 段**，全部用

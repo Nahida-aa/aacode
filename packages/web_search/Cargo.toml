@@ -6,6 +6,6 @@ license.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-cloud_llm_client.workspace = true
+aa_cloud_llm_client.workspace = true
 collections.workspace = true
 gpui.workspace = true

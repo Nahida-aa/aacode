@@ -786,10 +786,10 @@ mod tests {
     }
 
     fn test_cloud_model(
-        model_id: cloud_llm_client::LanguageModelId,
-    ) -> cloud_llm_client::LanguageModel {
-        cloud_llm_client::LanguageModel {
-            provider: cloud_llm_client::LanguageModelProvider::Anthropic,
+        model_id: aa_cloud_llm_client::LanguageModelId,
+    ) -> aa_cloud_llm_client::LanguageModel {
+        aa_cloud_llm_client::LanguageModel {
+            provider: aa_cloud_llm_client::LanguageModelProvider::Anthropic,
             id: model_id,
             display_name: "Test Model".to_string(),
             is_latest: true,
@@ -905,7 +905,7 @@ mod tests {
     #[gpui::test]
     async fn provided_models_surface_disabled_reason(cx: &mut TestAppContext) {
         let (_client, _user_store, provider) = cx.update(init_test);
-        let model_id = cloud_llm_client::LanguageModelId(Arc::from("disabled-model"));
+        let model_id = aa_cloud_llm_client::LanguageModelId(Arc::from("disabled-model"));
         let disabled_reason = "This model is temporarily unavailable.";
 
         cx.update(|cx| {
@@ -914,7 +914,7 @@ mod tests {
                 let mut model = test_cloud_model(model_id.clone());
                 model.is_disabled = true;
                 model.disabled_reason = Some(disabled_reason.to_string());
-                cloud_model_provider.update_models(cloud_llm_client::ListModelsResponse {
+                cloud_model_provider.update_models(aa_cloud_llm_client::ListModelsResponse {
                     models: vec![model],
                     default_model: Some(model_id.clone()),
                     default_fast_model: None,
@@ -958,11 +958,11 @@ mod tests {
         sign_in_task.await.expect("sign-in should complete");
         cx.executor().run_until_parked();
 
-        let model_id = cloud_llm_client::LanguageModelId(Arc::from("test-model"));
+        let model_id = aa_cloud_llm_client::LanguageModelId(Arc::from("test-model"));
         cx.update(|cx| {
             let cloud_model_provider = provider.state.read(cx).provider.clone();
             cloud_model_provider.update(cx, |cloud_model_provider, cx| {
-                cloud_model_provider.update_models(cloud_llm_client::ListModelsResponse {
+                cloud_model_provider.update_models(aa_cloud_llm_client::ListModelsResponse {
                     models: vec![test_cloud_model(model_id.clone())],
                     default_model: Some(model_id.clone()),
                     default_fast_model: None,

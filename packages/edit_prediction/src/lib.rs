@@ -8,17 +8,18 @@ use cloud_api_types::{
     SettledEditPredictionSampleData, SubmitEditPredictionFeedbackBody,
     SubmitEditPredictionSettledBatchBody, SubmitEditPredictionSettledResponse,
 };
-use cloud_llm_client::predict_edits_v3::{
-    PREDICT_EDITS_MODE_HEADER_NAME, PREDICT_EDITS_REQUEST_ID_HEADER_NAME,
-    PREDICT_EDITS_TRIGGER_HEADER_NAME, PredictEditsMode, PredictEditsV3Request,
-    PredictEditsV3Response, RawCompletionRequest, RawCompletionResponse,
-};
-use cloud_llm_client::predict_edits_v4::{PredictEditsV4Request, PredictEditsV4Response};
-use cloud_llm_client::{
+use aa_cloud_llm_client::{
     EditPredictionRejectReason, EditPredictionRejection,
-    MAX_EDIT_PREDICTION_REJECTIONS_PER_REQUEST, MINIMUM_REQUIRED_VERSION_HEADER_NAME,
-    PREFERRED_EXPERIMENT_HEADER_NAME, PredictEditsRequestTrigger, RejectEditPredictionsBodyRef,
-    ZED_VERSION_HEADER_NAME,
+    MAX_EDIT_PREDICTION_REJECTIONS_PER_REQUEST, PredictEditsRequestTrigger,
+    RejectEditPredictionsBodyRef,
+};
+use zed_cloud_llm_client::{
+    MINIMUM_REQUIRED_VERSION_HEADER_NAME, PREFERRED_EXPERIMENT_HEADER_NAME,
+    ZED_VERSION_HEADER_NAME, predict_edits_v3::{
+        PREDICT_EDITS_MODE_HEADER_NAME, PREDICT_EDITS_REQUEST_ID_HEADER_NAME,
+        PREDICT_EDITS_TRIGGER_HEADER_NAME, PredictEditsMode, PredictEditsV3Request,
+        PredictEditsV3Response, RawCompletionRequest, RawCompletionResponse,
+    }, predict_edits_v4::{PredictEditsV4Request, PredictEditsV4Response},
 };
 use collections::{HashMap, HashSet};
 use copilot::{Copilot, Reinstall};
