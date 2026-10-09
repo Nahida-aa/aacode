@@ -507,6 +507,15 @@ fn main() {
         web_search_providers::init(app_state.client.clone(), app_state.user_store.clone(), cx);
         journal::init(app_state.clone(), cx);
         extensions_ui::init(cx);
+        // zed L708。init 建 EditPredictionStore 全局并用 observe_new 给每个 Editor
+        // 挂上 provider；不调用它 → editor.edit_prediction_provider() 恒为 None →
+        // edit_prediction_ui 的 "Usage" 菜单（读 provider.usage()）永不渲染，
+        // 即「登录后仍看不到 Zeta 额度」。无编译错、无 panic，纯静默失效。
+        aa_app_lib::core::edit_prediction_registry::init(
+            app_state.client.clone(),
+            app_state.user_store.clone(),
+            cx,
+        );
         let prompt_builder = prompt_store::PromptBuilder::load(app_state.fs.clone(), false, cx);
         project::AgentRegistryStore::init_global(
             cx,
