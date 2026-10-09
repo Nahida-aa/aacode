@@ -487,3 +487,84 @@ Zed 上游的 `crates/util/src/os.rs` 和 `crates/util/src/shell_env.rs` 仍包�
 `command-fds`；`nix` 只保留 `resource` feature（`user` 已迁到 a_util）。
 `[dependencies]` 里的 `smol` / `which` / `async-fs` / `walkdir` / `dirs`
 在 wasm 侧仍被其他模块用到，保留不动。
+
+---
+
+## Release channel：去掉 RELEASE_CHANNEL 文件，改为「env 或 dev」
+
+**改动**：`packages/release_channel/src/lib.rs` 的 `compile_time_release_channel_name()`。
+`packages/app/RELEASE_CHANNEL` 已删除。
+
+### Zed 的做法
+
+```rust
+#[cfg(__do_not_set_zed_release_channel)]
+fn compile_time_release_channel_name() -> String {
+    env!("ZED_RELEASE_CHANNEL").trim().to_string()          // 运行期缺它会 panic
+}
+
+#[cfg(not(__do_not_set_zed_release_channel))]
+fn compile_time_release_channel_name() -> String {
+    include_str!("../../zed/RELEASE_CHANNEL").trim().to_string()
+}
+```
+
+`build.rs` 在检测到构建期有 `ZED_RELEASE_CHANNEL` 时置
+`__do_not_set_zed_release_channel` cfg，保证两条分支严格互斥。
+
+**为什么 Zed 需要文件**（源码注释原文）：
+
+> When a crate in zed is used as a dependency that uses the `crane` nix
+> library, it vendors each crate separately and builds it in isolation, which
+> makes the `include_str!` fail.
+
+即 crane/Nix 把每个 crate 单独 vendor 到独立 store 路径编译，`include_str!` 的
+相对路径在那里不存在 → 编译失败。**这是 Nix 构建的约束，aacode 不用 crane 就不成立。**
+
+**文件在 Zed 里的第二重作用**：CI 靠改写它来切频道，且改完连同 tag 一起提交。
+
+| workflow | 操作 |
+|---|---|
+| `bump_zed_version.yml:166` | `echo -n preview > crates/zed/RELEASE_CHANNEL` 后建 preview 分支 |
+| `bump_zed_version.yml:229` | `echo -n stable > ...` 后打 stable tag |
+| `release_nightly.yml:124/174/292/359` | `echo "nightly" > ...`（Windows 两处用 `Set-Content`） |
+
+所以 zed 的发布流程是「改文件 + 提交 + 打 tag」，而非注入 env。
+
+### aacode 的做法
+
+```rust
+fn compile_time_release_channel_name() -> String {
+    option_env!("ZED_RELEASE_CHANNEL").unwrap_or("dev").trim().to_string()
+}
+```
+
+一条路径覆盖两种情况：有 env 用它（等价 zed 的 `env!` 分支但不 panic），
+无 env 则 `dev`。同时删掉 `__do_not_set_zed_release_channel` cfg ——
+它原本只为让两个分支互斥，现在只有一个函数，cfg 已无意义，
+`packages/release_channel/build.rs` 里的 `rustc-cfg` 一并删除。
+
+### 行为对照
+
+| 构建方式 | aacode | Zed |
+|---|---|---|
+| `just install`（注入 `ZED_RELEASE_CHANNEL=stable`） | stable，图标无后缀，db 落 `0-stable` | — |
+| 裸 `cargo build` / `cargo run`（无 env） | dev，图标 `-dev`，db 落 `0-dev` | 同（仓库文件也是 `dev`） |
+| Nix/crane 构建 | 不适用 | 必须注入 env，否则 `include_str!` 失败 |
+
+### 连带改动
+
+`packages/app/build.rs` 的图标后缀取值改为**与 lib.rs 同源**
+（`option_env!("ZED_RELEASE_CHANNEL").unwrap_or("dev")`），并移除对文件的读取与
+`rerun-if-changed`。两者必须同源，否则会出现「图标是 dev 的、实际行为却是
+stable」的不一致。
+
+### rev→rev 同步注意
+
+从 Zed 同步 `release_channel` 时，**不要**把 `#[cfg(__do_not_set_zed_release_channel)`
+双分支和 `include_str!` 带回来（那是 crane 专用）。同时留意 Zed 若新增对
+`RELEASE_CHANNEL` 文件的其他读取点，那些在 aacode 一并不存在。
+
+若将来 aacode 要发正式版：**必须**在构建期注入 `ZED_RELEASE_CHANNEL`，否则产物
+一定是 dev（图标后缀与 db 路径都会暴露出来）。`just install` 已这么做；
+`script/bundle-linux` 目前**尚未确认**是否注入 —— 上 CI 前需检查。
