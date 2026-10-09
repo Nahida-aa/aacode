@@ -258,7 +258,7 @@ dependencies = [
  "notify",
  "parking_lot",
  "path",
- "paths 0.1.0",
+ "paths",
  "rustix",
  "serde",
  "serde_json",
@@ -686,7 +686,6 @@ dependencies = [
  "outline",
  "outline_panel",
  "parking_lot",
- "paths 1.22.1",
  "picker",
  "pkg-config",
  "pretty_assertions",
@@ -741,6 +740,7 @@ dependencies = [
  "windows_resources",
  "workspace",
  "zed_migrator",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
  "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
@@ -989,8 +989,8 @@ dependencies = [
  "credentials_provider",
  "futures 0.3.34",
  "gpui",
- "paths 1.22.1",
  "serde_json",
+ "zed_paths",
 ]
 
 [[package]]
@@ -1085,7 +1085,6 @@ dependencies = [
  "log",
  "lsp",
  "parking_lot",
- "paths 1.22.1",
  "pretty_assertions",
  "project",
  "prompt_store",
@@ -1114,6 +1113,7 @@ dependencies = [
  "uuid",
  "watch",
  "web_search",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -1223,7 +1223,6 @@ dependencies = [
  "gpui",
  "language_model",
  "log",
- "paths 1.22.1",
  "project",
  "regex",
  "schemars 1.2.2",
@@ -1231,6 +1230,7 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "settings",
+ "zed_paths",
 ]
 
 [[package]]
@@ -1244,11 +1244,11 @@ dependencies = [
  "const_format",
  "futures 0.3.34",
  "gpui",
- "paths 1.22.1",
  "serde",
  "serde_json",
  "serde_yaml_ng",
  "url",
+ "zed_paths",
 ]
 
 [[package]]
@@ -1319,7 +1319,6 @@ dependencies = [
  "notifications",
  "ordered-float 5.5.0",
  "parking_lot",
- "paths 1.22.1",
  "picker",
  "platform_title_bar",
  "postage",
@@ -1353,6 +1352,7 @@ dependencies = [
  "vim",
  "watch",
  "workspace",
+ "zed_paths",
  "zed_proto",
 ]
 
@@ -1522,7 +1522,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1533,7 +1533,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2109,7 +2109,6 @@ dependencies = [
  "http_client",
  "log",
  "parking_lot",
- "paths 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -2118,6 +2117,7 @@ dependencies = [
  "tempfile",
  "which",
  "workspace",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
 
@@ -2786,7 +2786,7 @@ dependencies = [
  "bitflags 2.13.2",
  "cexpr",
  "clang-sys",
- "itertools 0.13.0",
+ "itertools 0.10.5",
  "log",
  "prettyplease 0.2.37",
  "proc-macro2",
@@ -3331,7 +3331,7 @@ dependencies = [
  "maybe-owned",
  "rustix",
  "rustix-linux-procfs",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
  "winx",
 ]
 
@@ -3687,7 +3687,6 @@ dependencies = [
  "fork",
  "ipc-channel",
  "parking_lot",
- "paths 1.22.1",
  "plist",
  "pulldown-cmark",
  "ratatui",
@@ -3703,6 +3702,7 @@ dependencies = [
  "walkdir",
  "windows 0.62.2",
  "windows_resources",
+ "zed_paths",
 ]
 
 [[package]]
@@ -3735,7 +3735,6 @@ dependencies = [
  "log",
  "objc2-foundation 0.3.2",
  "parking_lot",
- "paths 1.22.1",
  "postage",
  "proxy_handshake",
  "rand 0.9.5",
@@ -3761,6 +3760,7 @@ dependencies = [
  "windows 0.62.2",
  "worktree",
  "zed_cloud_llm_client",
+ "zed_paths",
 ]
 
 [[package]]
@@ -4226,7 +4226,6 @@ dependencies = [
  "lsp",
  "node_runtime",
  "parking_lot",
- "paths 1.22.1",
  "pretty_assertions",
  "project",
  "rpc",
@@ -4236,6 +4235,7 @@ dependencies = [
  "sum_tree",
  "theme_settings",
  "workspace",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
 
@@ -5194,7 +5194,6 @@ dependencies = [
  "log",
  "node_runtime",
  "parking_lot",
- "paths 1.22.1",
  "schemars 1.2.2",
  "serde",
  "serde_json",
@@ -5203,6 +5202,7 @@ dependencies = [
  "smol",
  "task",
  "telemetry 1.22.1",
+ "zed_paths",
  "zed_proto",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
@@ -5235,11 +5235,11 @@ dependencies = [
  "language",
  "log",
  "node_runtime",
- "paths 1.22.1",
  "serde_json",
  "settings",
  "smol",
  "task",
+ "zed_paths",
 ]
 
 [[package]]
@@ -5347,11 +5347,11 @@ dependencies = [
  "indoc",
  "inventory",
  "log",
- "paths 1.22.1",
  "sqlez",
  "sqlez_macros",
  "tempfile",
  "uuid",
+ "zed_paths",
 ]
 
 [[package]]
@@ -5419,7 +5419,6 @@ dependencies = [
  "notifications",
  "parking_lot",
  "parse_int",
- "paths 1.22.1",
  "picker",
  "pretty_assertions",
  "project",
@@ -5438,6 +5437,7 @@ dependencies = [
  "tree-sitter-go",
  "unindent",
  "workspace",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
 
@@ -5700,7 +5700,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -5912,7 +5912,6 @@ dependencies = [
  "ollama",
  "open_ai",
  "parking_lot",
- "paths 1.22.1",
  "postage",
  "pretty_assertions",
  "project",
@@ -5933,6 +5932,7 @@ dependencies = [
  "workspace",
  "worktree",
  "zed_cloud_llm_client",
+ "zed_paths",
  "zeta_prompt",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
  "zstd 0.11.2+zstd.1.5.2",
@@ -6018,13 +6018,13 @@ dependencies = [
  "markdown",
  "menu",
  "multi_buffer",
- "paths 1.22.1",
  "project",
  "regex",
  "settings",
  "telemetry 1.22.1",
  "theme_settings",
  "workspace",
+ "zed_paths",
  "zeta_prompt",
 ]
 
@@ -6338,7 +6338,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -6539,7 +6539,6 @@ dependencies = [
  "moka",
  "node_runtime",
  "parking_lot",
- "paths 1.22.1",
  "project",
  "remote",
  "reqwest_client",
@@ -6559,6 +6558,7 @@ dependencies = [
  "wasmparser 0.254.2",
  "wasmtime 48.0.5",
  "wasmtime-wasi 48.0.5",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
  "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
@@ -6597,7 +6597,6 @@ dependencies = [
  "log",
  "markdown",
  "num-format",
- "paths 1.22.1",
  "picker",
  "project",
  "schemars 1.2.2",
@@ -6610,6 +6609,7 @@ dependencies = [
  "theme_settings",
  "vim_mode_setting",
  "workspace",
+ "zed_paths",
 ]
 
 [[package]]
@@ -7193,7 +7193,7 @@ dependencies = [
  "libc",
  "log",
  "rustversion",
- "windows-link 0.1.3",
+ "windows-link 0.2.1",
  "windows-result 0.4.1",
 ]
 
@@ -7305,7 +7305,7 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -8870,7 +8870,6 @@ dependencies = [
  "fuzzy",
  "gpui",
  "language",
- "paths 1.22.1",
  "project",
  "serde_json",
  "serde_json_lenient",
@@ -8879,6 +8878,7 @@ dependencies = [
  "theme_settings",
  "util_macros",
  "workspace",
+ "zed_paths",
 ]
 
 [[package]]
@@ -9033,7 +9033,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -9052,7 +9052,7 @@ version = "1.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "82cb6a9f675da968c63b6208c641b9dca58fc0133ae53375736b1767b0cab8bd"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -9066,15 +9066,6 @@ name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -9314,13 +9305,13 @@ dependencies = [
  "gpui",
  "language",
  "parking_lot",
- "paths 1.22.1",
  "project",
  "schemars 1.2.2",
  "serde_json",
  "settings",
  "snippet_provider",
  "task",
+ "zed_paths",
 ]
 
 [[package]]
@@ -9462,7 +9453,6 @@ dependencies = [
  "log",
  "menu",
  "notifications",
- "paths 1.22.1",
  "project",
  "search",
  "serde_json",
@@ -9473,6 +9463,7 @@ dependencies = [
  "tree-sitter-json",
  "tree-sitter-rust",
  "workspace",
+ "zed_paths",
 ]
 
 [[package]]
@@ -9737,7 +9728,6 @@ dependencies = [
  "openai_subscribed",
  "opencode",
  "parking_lot",
- "paths 1.22.1",
  "rand 0.9.5",
  "schemars 1.2.2",
  "serde",
@@ -9748,6 +9738,7 @@ dependencies = [
  "tokio",
  "x_ai",
  "x_ai_subscribed",
+ "zed_paths",
 ]
 
 [[package]]
@@ -11098,7 +11089,7 @@ version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "536bfad37a309d62069485248eeaba1e8d9853aaf951caaeaed0585a95346f08"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -11381,7 +11372,6 @@ dependencies = [
  "futures 0.3.34",
  "http_client",
  "log",
- "paths 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -11390,6 +11380,7 @@ dependencies = [
  "thiserror 2.0.21",
  "watch",
  "which",
+ "zed_paths",
 ]
 
 [[package]]
@@ -11502,7 +11493,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -12662,17 +12653,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "paths"
-version = "1.22.1"
-dependencies = [
- "aa_util",
- "const_format",
- "dirs",
- "ignore",
- "path",
-]
-
-[[package]]
 name = "pbjson"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -13750,9 +13730,9 @@ dependencies = [
  "lsp",
  "node_runtime",
  "parking_lot",
- "paths 1.22.1",
  "serde",
  "serde_json",
+ "zed_paths",
 ]
 
 [[package]]
@@ -13923,7 +13903,6 @@ dependencies = [
  "node_runtime",
  "parking_lot",
  "path",
- "paths 1.22.1",
  "percent-encoding",
  "postage",
  "prettier",
@@ -13955,6 +13934,7 @@ dependencies = [
  "wax",
  "which",
  "worktree",
+ "zed_paths",
  "zeroize",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
  "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
@@ -14048,12 +14028,12 @@ dependencies = [
  "language",
  "log",
  "parking_lot",
- "paths 1.22.1",
  "serde",
  "serde_json",
  "strum 0.28.0",
  "tempfile",
  "uuid",
+ "zed_paths",
 ]
 
 [[package]]
@@ -14113,8 +14093,8 @@ version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "03da047801ff44bb6a4d407d4860c05fd70bb81714e6b2f3812603d5b145b042"
 dependencies = [
- "heck 0.5.0",
- "itertools 0.14.0",
+ "heck 0.4.1",
+ "itertools 0.10.5",
  "log",
  "multimap",
  "petgraph",
@@ -14133,7 +14113,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b570b25f7617e43d59005d0990ccb79e950a423952cea19671b7a876da390adf"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
@@ -14406,7 +14386,7 @@ dependencies = [
  "once_cell",
  "socket2 0.5.10",
  "tracing",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -14809,7 +14789,6 @@ dependencies = [
  "node_runtime",
  "open_path_prompt",
  "ordered-float 5.5.0",
- "paths 1.22.1",
  "picker",
  "project",
  "remote",
@@ -14822,6 +14801,7 @@ dependencies = [
  "windows-registry",
  "workspace",
  "worktree",
+ "zed_paths",
 ]
 
 [[package]]
@@ -14972,7 +14952,6 @@ dependencies = [
  "gpui",
  "log",
  "parking_lot",
- "paths 1.22.1",
  "rpc",
  "schemars 1.2.2",
  "semver",
@@ -14985,6 +14964,7 @@ dependencies = [
  "thiserror 2.0.21",
  "urlencoding",
  "which",
+ "zed_paths",
 ]
 
 [[package]]
@@ -15056,7 +15036,6 @@ dependencies = [
  "lsp",
  "net",
  "node_runtime",
- "paths 1.22.1",
  "pretty_assertions",
  "project",
  "rayon",
@@ -15084,6 +15063,7 @@ dependencies = [
  "windows 0.62.2",
  "workspace",
  "worktree",
+ "zed_paths",
  "zed_proto",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
@@ -15465,7 +15445,7 @@ dependencies = [
  "errno 0.3.14",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -15545,7 +15525,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -16156,7 +16136,6 @@ dependencies = [
  "json5 0.4.1",
  "log",
  "path",
- "paths 1.22.1",
  "pretty_assertions",
  "rust-embed",
  "schemars 1.2.2",
@@ -16169,6 +16148,7 @@ dependencies = [
  "tracing",
  "unindent",
  "zed_migrator",
+ "zed_paths",
 ]
 
 [[package]]
@@ -16216,7 +16196,6 @@ dependencies = [
  "language_models",
  "log",
  "menu",
- "paths 1.22.1",
  "picker",
  "platform_title_bar",
  "pretty_assertions",
@@ -16235,6 +16214,7 @@ dependencies = [
  "theme_settings",
  "url",
  "workspace",
+ "zed_paths",
 ]
 
 [[package]]
@@ -16421,7 +16401,7 @@ version = "1.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b"
 dependencies = [
- "errno 0.2.8",
+ "errno 0.3.14",
  "libc",
 ]
 
@@ -16614,12 +16594,12 @@ dependencies = [
  "gpui",
  "indoc",
  "parking_lot",
- "paths 1.22.1",
  "schemars 1.2.2",
  "serde",
  "serde_json",
  "serde_json_lenient",
  "snippet",
+ "zed_paths",
 ]
 
 [[package]]
@@ -16639,7 +16619,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -16743,7 +16723,7 @@ dependencies = [
  "cfg-if",
  "libc",
  "psm",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17499,10 +17479,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand 2.5.0",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -17533,7 +17513,7 @@ dependencies = [
  "parking_lot",
  "rustix",
  "signal-hook 0.3.18",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -17580,7 +17560,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "230a1b821ccbd75b185820a1f1ff7b14d21da1e442e22c0863ea5f08771a8874"
 dependencies = [
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -18705,7 +18685,7 @@ checksum = "f2f6fb2847f6742cd76af783a2a2c49e9375d0a111c7bef6f71cd9e738c72d6e"
 dependencies = [
  "memoffset",
  "tempfile",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -20669,7 +20649,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -21380,7 +21360,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d6f32a0ff4a9f6f01231eb2059cc85479330739333e0e58cadf03b6af2cca10"
 dependencies = [
  "cfg-if",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -21673,7 +21653,6 @@ dependencies = [
  "language",
  "log",
  "parking_lot",
- "paths 1.22.1",
  "postage",
  "pretty_assertions",
  "rand 0.9.5",
@@ -21684,6 +21663,7 @@ dependencies = [
  "sum_tree",
  "tracing",
  "worktree",
+ "zed_paths",
  "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
  "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
 ]
@@ -22156,6 +22136,18 @@ dependencies = [
  "streaming-iterator",
  "tree-sitter",
  "tree-sitter-json",
+]
+
+[[package]]
+name = "zed_paths"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+dependencies = [
+ "aa_util",
+ "const_format",
+ "dirs",
+ "ignore",
+ "path",
 ]
 
 [[package]]
