@@ -92,7 +92,7 @@ theme = { workspace = true, features = ["test-support"] }
 theme_settings.workspace = true
 unindent.workspace = true
 workspace = { workspace = true, features = ["test-support"] }
-a_log.workspace = true
+zlog.workspace = true
 
 [build-dependencies]
 cargo_toml.workspace = true

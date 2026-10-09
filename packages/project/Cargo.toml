@@ -93,8 +93,8 @@ which.workspace = true
 worktree.workspace = true
 ad_credentials_provider.workspace = true
 zeroize.workspace = true
-a_log.workspace = true
-a_tracing.workspace = true
+zlog.workspace = true
+ztracing.workspace = true
 
 [dev-dependencies]
 client = { workspace = true, features = ["test-support"] }

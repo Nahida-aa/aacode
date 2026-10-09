@@ -36,7 +36,7 @@ watch.workspace = true
 workspace.workspace = true
 aacode_actions.workspace = true
 zeroize.workspace = true
-a_tracing.workspace = true
+ztracing.workspace = true
 
 [dev-dependencies]
 editor = { workspace = true, features = ["test-support"] }
@@ -51,4 +51,4 @@ theme.workspace = true
 theme_settings.workspace = true
 unindent.workspace = true
 workspace = { workspace = true, features = ["test-support"] }
-a_log.workspace = true
+zlog.workspace = true

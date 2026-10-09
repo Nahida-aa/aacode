@@ -39,5 +39,5 @@ pretty_assertions.workspace = true
 serde_json.workspace = true
 theme = { workspace = true, features = ["test-support"] }
 workspace = { workspace = true, features = ["test-support"] }
-a_log.workspace = true
+zlog.workspace = true
 theme_settings = { workspace = true, features = ["test-support"] }

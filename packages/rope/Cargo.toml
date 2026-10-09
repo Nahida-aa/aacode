@@ -14,7 +14,7 @@ rayon.workspace = true
 sum_tree.workspace = true
 unicode-segmentation.workspace = true
 util.workspace = true
-a_tracing.workspace = true
+ztracing.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
@@ -23,4 +23,4 @@ gpui = { workspace = true, features = ["test-support"] }
 rand.workspace = true
 util = { workspace = true, features = ["test-support"] }
 criterion.workspace = true
-a_log.workspace = true
+zlog.workspace = true
