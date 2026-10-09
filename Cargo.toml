@@ -633,7 +633,7 @@ credentials_provider = { git = "https://github.com/zed-industries/zed", rev = "a
 eval_utils = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 gpui_tokio = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 html_to_markdown = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
-http_client = { package = "zed_http_client", git = "https://github.com/Nahida-aa/gpui_learn", rev = "d2ac455", version = "=0.1.0" }
+http_client = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 http_client_tls = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 net = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 menu = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
@@ -770,7 +770,6 @@ aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_in
 aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_cloud_llm_client" }
 zed_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed_cloud_llm_client" }
 aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
-zed_http_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed_http_client" }
 aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_language_model_core" }
 
 # util / util_macros 同样必须走本地，否则图里会同时存在两份：
