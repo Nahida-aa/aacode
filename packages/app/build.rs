@@ -75,7 +75,44 @@ fn prepare_app_icon_x11() {
     println!("cargo:rerun-if-changed=RELEASE_CHANNEL");
 }
 
+/// 对齐 Zed `crates/zed/build.rs` 的 commit sha / build id 注入（L50-82）。
+///
+/// 目的：让 `src/main.rs` 的 `AppVersion::load` 能把 `stable.<build_id>.<sha>`
+/// 拼进 semver 的 build metadata，版本号自带出处（对齐 zed L305-308）。
+/// 优先读 `ZED_COMMIT_SHA` env（Nix 等确定性构建环境会预注入），否则 `git rev-parse HEAD`。
+fn emit_commit_sha() {
+    use std::process::Command;
+
+    let git_sha = match std::env::var("ZED_COMMIT_SHA").ok() {
+        Some(sha) => Some(sha),
+        None => Command::new("git")
+            .args(["rev-parse", "HEAD"])
+            .output()
+            .ok()
+            .filter(|output| output.status.success())
+            .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_string()),
+    };
+
+    let Some(git_sha) = git_sha else {
+        return;
+    };
+
+    println!("cargo:rustc-env=ZED_COMMIT_SHA={git_sha}");
+
+    // Zed 只在 CI（有 GITHUB_RUN_NUMBER）时才带 build id，本地构建不注入。
+    if let Some(build_identifier) = option_env!("GITHUB_RUN_NUMBER") {
+        println!("cargo:rustc-env=ZED_BUILD_ID={build_identifier}");
+    }
+
+    // 这行是 zed 的原注释：release profile 下靠这条 warning 把信息打出来，
+    // 因为没有更好的方式让 build script 的输出不被 cargo 的常规输出淹没。
+    if std::env::var("PROFILE").is_ok_and(|profile| profile == "release") {
+        println!("cargo::warning=Info: using '{git_sha}' hash for ZED_COMMIT_SHA env var");
+    }
+}
+
 fn main() {
+    emit_commit_sha();
     #[cfg(any(target_os = "linux", target_os = "freebsd"))]
     prepare_app_icon_x11();
 }

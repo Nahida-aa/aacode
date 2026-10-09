@@ -98,6 +98,27 @@ fn main() {
     // 启动参数。对齐 Zed main.rs L213 `let args = Args::parse();`。
     let args = Args::parse();
 
+    // 版本号。对齐 Zed main.rs L305-308。
+    //
+    // AppVersion::load 的优先级（crates/release_channel/src/lib.rs:L99-125）：
+    //   1. `ZED_APP_VERSION` 环境变量（CI 注入，用于打 tag 发布）
+    //   2. 回退到 `CARGO_PKG_VERSION`，即 packages/app 的 version（现为 1.22.1）
+    // 3. 再把 channel 名 + build id + commit sha 拼进 semver 的 build metadata
+    //      → 形如 `1.22.1.stable.<GITHUB_RUN_NUMBER>.<sha>`
+    // 也就是说本地构建的版本号自带出处，一眼能看出是哪个 commit 编出来的。
+    //
+    // `ZED_BUILD_ID` / `ZED_COMMIT_SHA` 由 packages/app/build.rs 的 emit_commit_sha()
+    // 通过 `cargo:rustc-env` 注入（对齐 zed crates/zed/build.rs L70-73）；
+    // GITHUB_RUN_NUMBER 只有 CI 才有，本地不注入，故本地版本号不含 build id。
+    let build_id = option_env!("ZED_BUILD_ID");
+    let app_commit_sha =
+        option_env!("ZED_COMMIT_SHA").map(|sha| release_channel::AppCommitSha::new(sha.to_string()));
+    let app_version = release_channel::AppVersion::load(
+        env!("CARGO_PKG_VERSION"),
+        build_id,
+        app_commit_sha.clone(),
+    );
+
     // `aacode --printenv` — shell env 捕获子进程（对齐 Zed main.rs L251-L255）。
     // project/src/environment.rs 的 capture_unix 会 shell exec `<exe> --printenv`
     // 来拿到 JSON env vars。没这个分支 shell env 就全是空的。
@@ -202,7 +223,12 @@ fn main() {
         // ad_credentials_provider::global 会按 Dev/Release 决定用系统 keychain 还是
         // development 文件。原先放在 app_state 之后（第 339 行），导致
         // git_hosting_providers::init 读不到该全局而 panic。对齐 Zed main.rs L492。
-        release_channel::init(semver::Version::new(1, 22, 1), cx);
+        release_channel::init(app_version, cx);
+        // commit sha 全局，对齐 Zed main.rs L494-496。About / 支持信息里会显示它，
+        // 远程会话、崩溃上报也用它标识构建。
+        if let Some(app_commit_sha) = app_commit_sha {
+            release_channel::AppCommitSha::set_global(app_commit_sha, cx);
+        }
         settings::init(cx);
         // 绑定内置默认快捷键（default-<os>.json + base_keymap + vim）。
         // 必须在 settings::init 之后——它要读 BaseKeymap 全局。
