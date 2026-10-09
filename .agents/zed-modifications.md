@@ -500,28 +500,34 @@ Zed 上游的 `crates/util/src/os.rs` 和 `crates/util/src/shell_env.rs` 仍包�
 
 | 旧路径                              | 现在                               | workspace.dependencies key | package 名在 gpui_learn 里 |
 | ----------------------------------- | ---------------------------------- | -------------------------- | -------------------------- |
-| `packages/git/` （aa_gpui_kit_git）  | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_git/` | `git`                      | `aa_gpui_kit_git`          |
-| `packages/fs/` （aa_gpui_kit_fs）    | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_fs/`   | `fs`                       | `aa_gpui_kit_fs`           |
-| `packages/a_log/`                    | gpui_learn `packages/aa/zlog/`     | `zlog`                     | `zlog`                     |
-| `packages/a_tracing/`                | gpui_learn `packages/aa/ztracing/` | `ztracing`                 | `ztracing`                 |
-| `packages/a_tracing_macro/`          | gpui_learn `packages/aa/ztracing_macro/` | `ztracing_macro`       | `ztracing_macro`           |
+| `packages/git/`                     | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_git/` | `git`                      | `aa_gpui_kit_git`          |
+| `packages/fs/`                      | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_fs/`  | `fs`                       | `aa_gpui_kit_fs`           |
+| `packages/askpass/`                 | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_askpass/` | `askpass`              | `aa_gpui_kit_askpass`      |
+| `packages/a_log/`                   | gpui_learn `packages/aa/zlog/`     | `zlog`                     | `zlog`                     |
+| `packages/a_tracing/`               | gpui_learn `packages/aa/ztracing/` | `ztracing`                 | `ztracing`                 |
+| `packages/a_tracing_macro/`         | gpui_learn `packages/aa/ztracing_macro/` | `ztracing_macro`       | `ztracing_macro`           |
+| `packages/proto/`                   | gpui_learn `packages/zed/zed_proto/` | `proto`                  | `zed_proto`                |
+| `packages/rope/`                    | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_rope/` | `rope`              | `aa_gpui_kit_rope`         |
+| `packages/text/`                    | gpui_learn `packages/aa_gpui_kit/aa_gpui_kit_text/` | `text`                | `aa_gpui_kit_text`         |
 
 **消费者源码同步**（一次性完成）：
 
 - `a_log::` → `zlog::`，`a_tracing::` → `ztracing::`（全仓库 `.rs` 文件和 Cargo.toml）
-- workspace.dependencies 里新增 `zlog`/`ztracing`/`ztracing_macro` git 依赖
-- `fs`/`git` 用 `{ package = "aa_gpui_kit_*", git = ..., rev = ... }` 形式
+- `a_util::` → `ac_util::`（cli/main.rs、project/environment.rs、remote_server/lib.rs）
+- workspace.dependencies 里新增 git 依赖，统一用 `{ package = "...", git = ..., rev = ... }` 形式
 
-**rev 管理**：gpui_learn 新提交后 bump aacode 的 workspace.dependencies 里对应 rev
-（目前 5 个 git 依赖同指向 gpui_learn 主分支最新 rev）。
+**rev 管理**：所有 10 个 gpui_learn git 依赖同指向 gpui_learn 主分支最新 rev，
+新增/修改 gpui_learn 后 bump。
+
+**rope/text 额外注意**：gpui_learn 内部原来用 zed git rev 的 rope/text，
+aacode 本地用拆分版——迁到 gpui_learn 后把两者统一成本地 path alias
+（aa_gpui_kit_rope / aa_gpui_kit_text，内容与 aacode 拆分版完全一致），
+避免出现两份同名 crate 分裂导致 E0308/E0277 类型不匹配。
 
 **仍在本地的同类 crate**（未迁移）：
 
-- `packages/askpass/` — gpui_learn 有 `aa_gpui_kit_askpass`，但 aacode 还留着本地版
 - `packages/telemetry/` + `packages/telemetry_events/` — gpui_learn 已有 `zed/telemetry`
-- `packages/proto/` — gpui_learn 已有 `zed_proto`
 - `packages/paths/` — gpui_learn 已有 `zed_paths`
-- `packages/rope/`、`packages/text/` — zed rev 同步，不在 gpui_learn
 
 ## Release channel：去掉 RELEASE_CHANNEL 文件，改为「env 或 dev」
 
