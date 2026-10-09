@@ -1,10 +1,8 @@
 [package]
-name = "a_tracing_macro"
+name = "aa_agent"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
-
-[lib]
-proc-macro = true
+publish.workspace = true
 
 [dependencies]

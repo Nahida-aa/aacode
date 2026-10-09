@@ -20,7 +20,7 @@ test-support = [
 ]
 
 [dependencies]
-a_util.workspace = true
+ac_util.workspace = true
 aho-corasick.workspace = true
 anyhow.workspace = true
 askpass.workspace = true
