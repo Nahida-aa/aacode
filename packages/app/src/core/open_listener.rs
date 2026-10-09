@@ -409,7 +409,13 @@ pub fn listen_for_cli_connections(opener: OpenListener) -> Result<()> {
     use release_channel::RELEASE_CHANNEL_NAME;
     use std::os::unix::net::UnixDatagram;
 
-    let sock_path = paths::data_dir().join(format!("zed-{}.sock", *RELEASE_CHANNEL_NAME));
+    // 路径由 cli::cli_socket_path 统一给出 —— cli 的转发侧（cli/src/main.rs）调的是
+    // 同一个函数，两处不会漂移。deviation 的理由见该函数的文档注释：aacode 与 Zed
+    // 官方版共用 data_dir 且默认 channel 同为 stable，不能共用 socket。
+    //
+    // 注意这里只改 socket 文件名、不动 data_dir，于是 0-stable 数据库、extensions/、
+    // languages/、node/、threads/ 等全部原地保留、与 Zed 共享。
+    let sock_path = cli::cli_socket_path(&paths::data_dir());
     // remove the socket if the process listening on it has died
     if let Err(e) = UnixDatagram::unbound()?.connect(&sock_path)
         && e.kind() == std::io::ErrorKind::ConnectionRefused

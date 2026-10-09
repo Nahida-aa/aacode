@@ -945,10 +945,9 @@ mod linux {
                 .map(PathBuf::from)
                 .unwrap_or_else(|| paths::data_dir().clone());
 
-            let sock_path = data_dir.join(format!(
-                "zed-{}.sock",
-                *release_channel::RELEASE_CHANNEL_NAME
-            ));
+            // 路径由 cli::cli_socket_path 统一给出（bind 侧在 app 的
+            // listen_for_cli_connections，两处必须同源）。
+            let sock_path = cli::cli_socket_path(&data_dir);
             let sock = UnixDatagram::unbound()?;
             if sock.connect(&sock_path).is_err() {
                 self.boot_background(ipc_url, user_data_dir)?;

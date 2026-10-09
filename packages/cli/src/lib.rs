@@ -103,3 +103,28 @@ impl CliResponseSink for ipc::IpcSender<CliResponse> {
         ipc::IpcSender::send(self, response).map_err(|error| anyhow::anyhow!("{error}"))
     }
 }
+
+/// Unix domain socket 的文件名前缀，服务于「第二个实例把打开请求转发给已运行实例」
+/// 这条链路（`--new` / 命令行路径 / desktop 的 [Desktop Action NewWorkspace] 都走它）。
+///
+/// 【有意偏离 Zed】Zed 用 `zed-{channel}.sock`（crates/zed/src/zed.rs:594）——它只有
+/// 自己一个产品，前缀叫什么无所谓。aacode 与 Zed 官方版共用同一个 data_dir
+/// （`paths::APP_NAME` 仍是 `"Zed"`）且默认 channel 同为 `stable`，共用 socket 会导致：
+/// 1. 两者的 bind 互相失败 → 都判定「已有实例在跑」而退出，无法同时运行；
+/// 2. app 侧那段「清理残留 socket」的 `remove_file` 会删掉对方正在用的 socket。
+///
+/// 定义在此处（而非各自硬编码）是因为 bind 方在 app、connect 方在 cli，两处必须一致 ——
+/// 不一致时 cli 会连到不存在的 socket，静默退化成「另起一个实例」而非转发。
+pub const CLI_SOCKET_PREFIX: &str = "aacode-";
+
+/// 首个实例监听的 socket 路径。调用方：`cli` 的转发逻辑、`app` 的
+/// `listen_for_cli_connections`。
+///
+/// 参数 `data_dir` 由调用方决定（cli 支持 `--user-data-dir` 覆盖，故不能在此直接用
+/// `paths::data_dir()`）。
+pub fn cli_socket_path(data_dir: &std::path::Path) -> PathBuf {
+    data_dir.join(format!(
+        "{CLI_SOCKET_PREFIX}{}.sock",
+        *release_channel::RELEASE_CHANNEL_NAME
+    ))
+}

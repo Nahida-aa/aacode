@@ -28,7 +28,9 @@ stats:
 #
 # 注意 RELEASE_CHANNEL 只影响 aacode 自己；它与 paths::APP_NAME（决定数据目录
 # ~/.local/share/<name>）是两件事，见 .agents/zed-modifications.md。
-_channel      := env_var_or_default("RELEASE_CHANNEL", "dev")
+# 默认 stable：本地安装就是正式版，不是 dev 通道（dev 通道的存在意义是让多个版本
+# 并存，改显式指定）。
+_channel      := env_var_or_default("RELEASE_CHANNEL", "stable")
 _app_name    := env_var_or_default("APP_NAME", "AACode")
 _app_id      := env_var_or_default("APP_ID", "dev.aacode.AACode")
 _app_icon    := env_var_or_default("APP_ICON", "aacode")
