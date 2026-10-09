@@ -594,28 +594,28 @@ zeroize = "1.8"
 zstd = "0.11"
 
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
 # 别名为 zed 的新包 `fuzzy_nucleo`：我们对齐的就是它（Case / LengthPenalty /
 # match_strings_async / StringMatch.string: SharedString）。成员包二选一，
 # 不能同时写 aa_gpui_fuzzy 和 fuzzy_nucleo（同一 crate 两个名字 → Cargo 报错）。
-fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
 # zed 里这两个控件包就叫 `ui` / `ui_input`，同样用别名对齐，
 # 让照搬的 zed 代码（`ui::Button`、`ui_input::InputField`）零改动。
-ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
 # zed 里这个包叫 `theme`，别名让照搬的 zed 代码（`theme::SyntaxTheme` 等）原样可用。
 # 与 `aa_gpui_kit_theme` 指向同一个包；**每个包只能选其中一个名字声明**，
 # 否则会报 "depends on crate ... multiple times with different names"。
-theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
 # 图标枚举（gpui_learn packages/icons）在 zed 里叫 `icons`，同样用别名对齐。
-icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
+aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
 # grammars 指向 gpui_learn（crate 名 aa_gpui_kit_grammars），用 package= 改名，
 # 使全仓 `grammars::` 的调用点无需改动。
 #
@@ -634,7 +634,7 @@ aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", r
 # gpui_learn 版的 grammars 里 `util.workspace = true` 解析到 aa_gpui_kit_util，
 # 其 features 段有 `default = ["debug-embed"]`，与仓库布局无关；4 个 json 文件
 # （cpp/go/python/rust）都在 packages/grammars/src/ 下。
-grammars = { package = "aa_gpui_kit_grammars", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+grammars = { package = "aa_gpui_kit_grammars", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "796e0ba" }
 
 crashes = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 # zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
@@ -780,7 +780,7 @@ aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
 aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
 # aa_gpui_fuzzy 的路径类型从 std::path::Path 换成了 zed 的 `path::RelPath`，
 # 与 zed crates/fuzzy_nucleo 对齐；project 因此不再需要手写 PathStyle 转换。
-aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" }
+aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui/gpui_fuzzy" }
 # ui / ui_input / component 必须同源：若 ui_input 与 ui 停在不同 rev，
 # 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
