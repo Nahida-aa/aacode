@@ -3609,7 +3609,7 @@ async fn test_unauthenticated_without_custom_url_blocks_prediction_impl(cx: &mut
         move |_req| {
             request_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
             async move {
-                Ok(gpui::http_client::Response::builder()
+                Ok(http_client::Response::builder()
                     .status(401)
                     .body("Unauthorized".into())
                     .unwrap())
