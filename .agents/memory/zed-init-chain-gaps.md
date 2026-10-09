@@ -220,3 +220,57 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 - `sender was dropped` — oxfmt / prettier 后台任务随进程被杀中断
 - `no language server download dir defined` — 未设 LSP 下载目录
 - `status error 403 ... API rate limit exceeded` — GitHub 匿名 API 限流（本机出口 IP）
+
+---
+
+## 全量 init 差集审计（2026-10-09）
+
+对 `zed/crates/zed/src/main.rs` 与 `packages/app/src/main.rs` 做了 `::init(` / `::register(`
+的机械差集，得出 15 个缺口项。**但逐个核实后发现：绝大多数不是「init 没接线」，
+而是「crate 根本没移植」**——只差集不核实会得出错误结论。
+
+### 已修
+
+| 项 | zed 行号 | 实际情况 |
+|---|---|---|
+| `edit_prediction_registry::init` | L708 | 文件与 zed **逐字一致**、模块已声明，只是 main.rs 没调用。**Zeta 额度菜单不显示的根因** |
+| `project_symbols::init` | L747 | crate 已完整移植（633 行逐字一致），但既没进 app 的 `[dependencies]` 也没调用 → 二进制里根本没有 |
+| `menu::init` | L489 | `menu` 已是依赖，但 `init()` 在 menu crate 里就是 `pub fn init() {}` 空函数，为对齐而补 |
+
+### 未移植（接线无意义，需先移植）
+
+**`cargo new` 桩**（内容是 `pub fn add(left: u64, right: u64) -> u64` 样板）：
+
+- `packages/theme_extension` — zed L672
+- `packages/snippets_ui` — zed L751
+- `packages/etw_tracing` — zed L793，且仅 Windows
+
+**空文件**：
+
+- `packages/app/src/reliability/mod.rs` — 0 字节。zed L661 的
+  `reliability::init(client, workspace_store, cx)` 内部做 hang 检测 + 内存日志 + staff flags。
+
+**aacode 里完全无此 crate**：
+
+`zed_actions`(L490)、`settings_profile_selector`(L773)、`component_preview`(L984)、
+`watcher_debug`(L657)、`trusted_worktrees`(L488)、`telemetry_log`(L702)、
+`remote_debug`(L703)、`move_to_applications`(L589，仅 macOS)
+
+### 不算缺口
+
+- `zlog::init()` / `zlog_settings::init(cx)` / `ztracing::init()` — aacode 改用
+  `tracing_subscriber::fmt::init()`（`main.rs:96`），是 `a_log`/`a_tracing` 重命名的等价物。
+- `crashes::init` — zed L391，是 crash handler 的**完整接线**（spawn + InitCrashHandler +
+  session_id + version），不是一行 init；属于独立任务，尚未处理。
+
+### 方法论教训
+
+差集只能给出「**看起来**缺 init」。必须对每一项追加确认：
+
+```bash
+ls -d packages/<crate>                     # 目录存在？
+grep -rq "pub fn add(left: u64" packages/<crate>/src/   # 是 cargo new 桩？
+grep -c "pub fn init" packages/<crate>/src/lib.rs       # 真的有 init？
+```
+
+三者分别对应「不存在 / 是桩 / 可接线」，只有第三种才需要动 main.rs。
