@@ -236,6 +236,7 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 | `edit_prediction_registry::init` | L708 | 文件与 zed **逐字一致**、模块已声明，只是 main.rs 没调用。**Zeta 额度菜单不显示的根因** |
 | `project_symbols::init` | L747 | crate 已完整移植（633 行逐字一致），但既没进 app 的 `[dependencies]` 也没调用 → 二进制里根本没有 |
 | `menu::init` | L489 | `menu` 已是依赖，但 `init()` 在 menu crate 里就是 `pub fn init() {}` 空函数，为对齐而补 |
+| `aacode_actions::init` | L490 | **即 zed 的 `zed_actions::init`**（见下方「重命名陷阱」），`init()` 同样是空函数 |
 
 ### 未移植（接线无意义，需先移植）
 
@@ -252,9 +253,13 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 
 **aacode 里完全无此 crate**：
 
-`zed_actions`(L490)、`settings_profile_selector`(L773)、`component_preview`(L984)、
-`watcher_debug`(L657)、`trusted_worktrees`(L488)、`telemetry_log`(L702)、
-`remote_debug`(L703)、`move_to_applications`(L589，仅 macOS)
+`settings_profile_selector`(L773)、`component_preview`(L984)、`watcher_debug`(L657)、
+`trusted_worktrees`(L488)、`telemetry_log`(L702)、`remote_debug`(L703)、
+`move_to_applications`(L589，仅 macOS)
+
+其中 `settings_profile_selector` 与 `remote_debug` 在 `packages/aacode_actions/src/lib.rs`
+里只以 **action 定义模块**存在（`pub mod remote_debug { actions!(remote_debug, ...) }`），
+实现它们的 UI crate 没有移植，故 init 无处可调。
 
 ### 不算缺口
 
@@ -262,6 +267,19 @@ grep -rn "X::global\|global::<X>" packages/*/src/
   `tracing_subscriber::fmt::init()`（`main.rs:96`），是 `a_log`/`a_tracing` 重命名的等价物。
 - `crashes::init` — zed L391，是 crash handler 的**完整接线**（spawn + InitCrashHandler +
   session_id + version），不是一行 init；属于独立任务，尚未处理。
+
+### 重命名陷阱（第一次审计时被误判）
+
+**zed 的 crate 在 aacode 里可能被重命名**，只查 `packages/<zed原名>` 会误报「不存在」：
+
+| zed | aacode |
+|---|---|
+| `zed_actions` | **`aacode_actions`** |
+| `cloud_llm_client` | `aa_cloud_llm_client` |
+| `log` / `tracing` | `a_log` / `a_tracing` |
+
+规律：`zed_` 前缀 → `aacode_`；`aa_` 前缀的 crate 基本是 Zed crate 的重命名版本。
+所以判定「不存在」之前，必须同时搜 `packages/aacode_*` 和 workspace 依赖名。
 
 ### 方法论教训
 

@@ -243,6 +243,9 @@ fn main() {
         // zed L489 的 menu::init()。该函数在 menu crate 里就是 `pub fn init() {}`
         // （空实现，对齐 zed 保留，代价为零）。
         menu::init();
+        // zed L490 的 zed_actions::init()，在 aacode 里重命名为 aacode_actions
+        // （沿用与 zed_actions 同款的 `pub fn init() {}` 空实现，为对齐而补）。
+        aacode_actions::init();
         debugger_tools::init(cx); // L592
         command_palette::init(cx); // L677
         acp_tools::init(cx); // L701
