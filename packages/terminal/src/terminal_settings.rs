@@ -7,9 +7,9 @@ use collections::HashMap;
 use gpui::{FontFallbacks, FontFeatures, FontWeight, Pixels};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use settings::{IntoGpui as _, PathHyperlinkRegex};
+use settings::{IntoGpui as _};
 pub use settings_content::AlternateScroll;
-pub use settings_content::{
+pub use settings_content::{PathHyperlinkRegex,
     FontFamilyName, ShowScrollbar, TerminalBell, TerminalBlink, TerminalDockPosition,
     TerminalLineHeight, VenvSettings, WorkingDirectory,
 };
@@ -65,11 +65,11 @@ pub struct ScrollbarSettings {
     pub show: Option<ShowScrollbar>,
 }
 
-fn settings_shell_to_task_shell(shell: settings::Shell) -> Shell {
+fn settings_shell_to_task_shell(shell: settings_content::Shell) -> Shell {
     match shell {
-        settings::Shell::System => Shell::System,
-        settings::Shell::Program(program) => Shell::Program(program),
-        settings::Shell::WithArguments {
+        settings_content::Shell::System => Shell::System,
+        settings_content::Shell::Program(program) => Shell::Program(program),
+        settings_content::Shell::WithArguments {
             program,
             args,
             title_override,
@@ -82,7 +82,7 @@ fn settings_shell_to_task_shell(shell: settings::Shell) -> Shell {
 }
 
 impl settings::Settings for TerminalSettings {
-    fn from_settings(content: &settings::SettingsContent) -> Self {
+    fn from_settings(content: &settings_content::SettingsContent) -> Self {
         let user_content = content.terminal.clone().unwrap();
         // Note: we allow a subset of "terminal" settings in the project files.
         let mut project_content = user_content.project.clone();

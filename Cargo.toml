@@ -206,7 +206,7 @@ toolchain_selector = { path = "packages/toolchain_selector" }
 ui_prompt = { path = "packages/ui_prompt" }
 
 util = { package = "aa_util", git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
-util_macros = { package = "aa_util_macros", git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
+util_macros = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
 vim = { path = "packages/vim" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
 web_search = { path = "packages/web_search" }
@@ -754,7 +754,10 @@ webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev 
 # 统一指到本地这份。
 [patch."https://github.com/zed-industries/zed"]
 language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/language_core" }
-
+# util_macros 源码完全一致（sha256 相同），合并成一份：
+#   Zed 侧的 util_macros（被 gpui 依赖）→ path patch 到 gpui_learn 的 util_macros
+#   与 gpui_learn 侧的 util_macros.workspace = true 最终指向同一份源码
+util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
 
 # gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
 #
@@ -796,7 +799,7 @@ aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packag
 # 与上面 ui / ui_input / component 同理：凡是从 gpui_learn 侧被间接拉进来的 crate，
 # 都要在此声明 path patch 才能与其 workspace 解析结果一致。
 aa_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util" }
-aa_util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
+util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
 aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/grammars" }
 
 # —— profile ——
@@ -841,7 +844,6 @@ settings_macros = { opt-level = 3 }
 sqlez_macros = { opt-level = 3, codegen-units = 1 }
 aa_gpui_kit_ui_macros = { opt-level = 3 }
 util_macros = { opt-level = 3 }
-aa_util_macros = { opt-level = 3 }
 quote = { opt-level = 3 }
 syn = { opt-level = 3 }
 proc-macro2 = { opt-level = 3 }

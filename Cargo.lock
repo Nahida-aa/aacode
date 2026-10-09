@@ -460,7 +460,6 @@ dependencies = [
 name = "aa_util"
 version = "0.1.0"
 dependencies = [
- "aa_util_macros",
  "anyhow",
  "async-fs",
  "async_zip",
@@ -491,17 +490,9 @@ dependencies = [
  "tempfile",
  "unicase",
  "url",
+ "util_macros",
  "walkdir",
  "which",
-]
-
-[[package]]
-name = "aa_util_macros"
-version = "0.1.0"
-dependencies = [
- "perf",
- "quote",
- "syn 2.0.119",
 ]
 
 [[package]]
@@ -8848,7 +8839,6 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
- "aa_util_macros",
  "aacode_actions",
  "anyhow",
  "command_palette_hooks",
@@ -8865,6 +8855,7 @@ dependencies = [
  "settings",
  "snippet_provider",
  "theme_settings",
+ "util_macros",
  "workspace",
 ]
 
@@ -15835,7 +15826,6 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
- "aa_util_macros",
  "aacode_actions",
  "any_vec",
  "anyhow",
@@ -15866,6 +15856,7 @@ dependencies = [
  "theme_settings",
  "tracing",
  "unindent",
+ "util_macros",
  "workspace",
 ]
 
@@ -17552,7 +17543,6 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_settings_macros",
  "aa_util",
- "aa_util_macros",
  "alacritty_terminal",
  "anyhow",
  "async-channel 2.5.0",
@@ -19018,7 +19008,6 @@ dependencies = [
 [[package]]
 name = "util_macros"
 version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "perf",
  "quote",
@@ -19151,7 +19140,6 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
- "aa_util_macros",
  "aacode_actions",
  "anyhow",
  "async-compat",
@@ -19194,6 +19182,7 @@ dependencies = [
  "text",
  "theme_settings",
  "tokio",
+ "util_macros",
  "vim_mode_setting",
  "workspace",
 ]

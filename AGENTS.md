@@ -13,6 +13,7 @@ Before editing files for a substantial task:
 <!-- intent-skills:end -->
 
 - 修改代码后, 如果认为适合提交, 就自行提交
+- 禁止删除或手动修改 `Cargo.lock`
 ## Debug
 
 - 使用 tracing
