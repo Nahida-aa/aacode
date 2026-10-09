@@ -6,7 +6,7 @@ use std::fmt;
 use std::mem;
 use std::ops::Range;
 
-use a_tracing::instrument;
+use ztracing::instrument;
 use heapless::Vec as ArrayVec;
 use rayon::iter::{IntoParallelIterator, ParallelIterator as _};
 use sum_tree::{Bias, Dimension, Dimensions, SumTree};

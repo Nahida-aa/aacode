@@ -32,7 +32,7 @@ use language::{
 #[cfg(any(test, feature = "test-support"))]
 use gpui::AppContext as _;
 
-use a_tracing::instrument;
+use ztracing::instrument;
 use rope::DimensionPair;
 use settings::Settings;
 use smallvec::SmallVec;
@@ -1247,7 +1247,7 @@ impl MultiBuffer {
     pub fn capability(&self) -> Capability { self.capability }
 
     /// Returns an up-to-date snapshot of the MultiBuffer.
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn snapshot(&self, cx: &App) -> MultiBufferSnapshot {
         self.sync(cx);
         self.snapshot.borrow().clone()
@@ -2383,7 +2383,7 @@ impl MultiBuffer {
         });
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn sync(&self, cx: &App) {
         let changed = self.buffer_changed_since_sync.replace(false);
         if !changed {
@@ -5650,7 +5650,7 @@ impl MultiBufferSnapshot {
     /// excerpt
     ///
     /// Can optionally pass a range_filter to filter the ranges of brackets to consider
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn innermost_enclosing_bracket_ranges<T: ToOffset>(
         &self,
         range: Range<T>,
@@ -7874,7 +7874,7 @@ impl<'a> MultiBufferChunks<'a> {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn next_excerpt_chunk(&mut self) -> Option<Chunk<'a>> {
         loop {
             if self.excerpt_offset_range.is_empty() {
@@ -7923,7 +7923,7 @@ impl<'a> Iterator for ReversedMultiBufferChunks<'a> {
 impl<'a> Iterator for MultiBufferChunks<'a> {
     type Item = Chunk<'a>;
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn next(&mut self) -> Option<Chunk<'a>> {
         if self.range.start >= self.range.end {
             return None;

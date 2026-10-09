@@ -334,7 +334,7 @@ impl BufferDiffSnapshot {
 
     fn original_buffer_snapshot(&self) -> &text::BufferSnapshot { &self.buffer_snapshot }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn hunks_intersecting_range<'a>(
         &'a self,
         range: Range<Anchor>,
@@ -2438,7 +2438,7 @@ mod tests {
     use util::test::marked_text_ranges;
 
     #[ctor::ctor(unsafe)]
-    fn init_logger() { a_log::init_test(); }
+    fn init_logger() { zlog::init_test(); }
 
     #[gpui::test]
     async fn test_buffer_diff_simple(cx: &mut gpui::TestAppContext) {

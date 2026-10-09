@@ -46,7 +46,7 @@ util.workspace = true
 wasmparser.workspace = true
 wasmtime-wasi.workspace = true
 wasmtime.workspace = true
-a_tracing.workspace = true
+ztracing.workspace = true
 
 [dev-dependencies]
 criterion.workspace = true
@@ -62,7 +62,7 @@ reqwest_client.workspace = true
 theme = { workspace = true, features = ["test-support"] }
 theme_settings.workspace = true
 theme_extension.workspace = true
-a_log.workspace = true
+zlog.workspace = true
 
 
 [package.metadata.cargo-shear]

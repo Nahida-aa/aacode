@@ -2899,7 +2899,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_breakpoints() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_breakpoints").await;
         let id = db.next_id().await.unwrap();
@@ -3089,7 +3089,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_remove_last_breakpoint() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_remove_last_breakpoint").await;
         let id = db.next_id().await.unwrap();
@@ -3186,7 +3186,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_next_id_stability() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_next_id_stability").await;
 
@@ -3235,7 +3235,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_native_window_state_round_trip() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_native_window_state_round_trip").await;
         let id = db.next_id().await.unwrap();
@@ -3307,7 +3307,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_workspace_id_stability() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_workspace_id_stability").await;
 
@@ -3412,7 +3412,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_full_workspace_serialization() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_full_workspace_serialization").await;
 
@@ -3494,7 +3494,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_workspace_assignment() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_basic_functionality").await;
 
@@ -3598,7 +3598,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_session_workspaces() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_serializing_workspaces_session_id").await;
 
@@ -4411,7 +4411,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_simple_split() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("simple_split").await;
 
@@ -4466,7 +4466,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_cleanup_panes() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_cleanup_panes").await;
 
@@ -4542,7 +4542,7 @@ mod tests {
 
     #[gpui::test]
     async fn test_empty_workspace_window_bounds() {
-        a_log::init_test();
+        zlog::init_test();
 
         let db = WorkspaceDb::open_test_db("test_empty_workspace_window_bounds").await;
         let id = db.next_id().await.unwrap();

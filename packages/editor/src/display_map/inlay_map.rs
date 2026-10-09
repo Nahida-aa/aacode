@@ -60,7 +60,7 @@ enum Transform {
 impl sum_tree::Item for Transform {
     type Summary = TransformSummary;
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn summary(&self, _: ()) -> Self::Summary {
         match self {
             Transform::Isomorphic(summary) => TransformSummary {
@@ -245,7 +245,7 @@ pub struct InlayChunk<'a> {
 }
 
 impl InlayChunks<'_> {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn seek(&mut self, new_range: Range<InlayOffset>) {
         self.transforms.seek(&new_range.start, Bias::Right);
 
@@ -266,7 +266,7 @@ impl InlayChunks<'_> {
 impl<'a> Iterator for InlayChunks<'a> {
     type Item = InlayChunk<'a>;
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.output_offset == self.max_output_offset {
             return None;
@@ -494,7 +494,7 @@ impl<'a> Iterator for InlayChunks<'a> {
 }
 
 impl InlayBufferRows<'_> {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn seek(&mut self, row: u32) {
         let inlay_point = InlayPoint::new(row, 0);
         self.transforms.seek(&inlay_point, Bias::Left);
@@ -519,7 +519,7 @@ impl InlayBufferRows<'_> {
 impl Iterator for InlayBufferRows<'_> {
     type Item = RowInfo;
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn next(&mut self) -> Option<Self::Item> {
         let buffer_row = if self.inlay_row == 0 {
             self.buffer_rows.next().unwrap()
@@ -549,7 +549,7 @@ impl InlayPoint {
 }
 
 impl InlayMap {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn new(buffer: MultiBufferSnapshot) -> (Self, InlaySnapshot) {
         let version = 0;
         let snapshot = InlaySnapshot {
@@ -570,7 +570,7 @@ impl InlayMap {
         )
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn sync(
         &mut self,
         buffer_snapshot: MultiBufferSnapshot,
@@ -726,7 +726,7 @@ impl InlayMap {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn splice(
         &mut self,
         to_remove: &[InlayId],
@@ -777,13 +777,13 @@ impl InlayMap {
         (snapshot, edits)
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn current_inlays(&self) -> impl Iterator<Item = &Inlay> + Default {
         self.inlays.iter()
     }
 
     #[cfg(test)]
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub(crate) fn randomly_mutate(
         &mut self,
         next_inlay_id: &mut usize,
@@ -852,7 +852,7 @@ impl InlayMap {
 }
 
 impl InlaySnapshot {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn to_point(&self, offset: InlayOffset) -> InlayPoint {
         let (start, _, item) = self.transforms.find::<Dimensions<
             InlayOffset,
@@ -876,17 +876,17 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn len(&self) -> InlayOffset {
         InlayOffset(self.transforms.summary().output.len)
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn max_point(&self) -> InlayPoint {
         InlayPoint(self.transforms.summary().output.lines)
     }
 
-    #[a_tracing::instrument(skip_all, fields(point))]
+    #[ztracing::instrument(skip_all, fields(point))]
     pub fn to_offset(&self, point: InlayPoint) -> InlayOffset {
         let (start, _, item) = self
             .transforms
@@ -907,7 +907,7 @@ impl InlaySnapshot {
             None => self.len(),
         }
     }
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn to_buffer_point(&self, point: InlayPoint) -> Point {
         let (start, _, item) =
             self.transforms
@@ -921,7 +921,7 @@ impl InlaySnapshot {
             None => self.buffer.max_point(),
         }
     }
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn to_buffer_offset(&self, offset: InlayOffset) -> MultiBufferOffset {
         let (start, _, item) = self
             .transforms
@@ -936,7 +936,7 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn to_inlay_offset(&self, offset: MultiBufferOffset) -> InlayOffset {
         let mut cursor = self
             .transforms
@@ -973,7 +973,7 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn to_inlay_point(&self, point: Point) -> InlayPoint {
         self.inlay_point_cursor().map(point, Bias::Left)
     }
@@ -1032,7 +1032,7 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn inlay_point_cursor(&self) -> InlayPointCursor<'_> {
         let cursor = self.transforms.cursor::<Dimensions<Point, InlayPoint>>(());
         InlayPointCursor {
@@ -1041,7 +1041,7 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn clip_point(&self, mut point: InlayPoint, mut bias: Bias) -> InlayPoint {
         let mut cursor = self.transforms.cursor::<Dimensions<InlayPoint, Point>>(());
         cursor.seek(&point, Bias::Left);
@@ -1142,12 +1142,12 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn text_summary(&self) -> MBTextSummary {
         self.transforms.summary().output
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn text_summary_for_range(&self, range: Range<InlayOffset>) -> MBTextSummary {
         let mut summary = MBTextSummary::default();
 
@@ -1205,7 +1205,7 @@ impl InlaySnapshot {
         summary
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn row_infos(&self, row: u32) -> InlayBufferRows<'_> {
         let mut cursor = self.transforms.cursor::<Dimensions<InlayPoint, Point>>(());
         let inlay_point = InlayPoint::new(row, 0);
@@ -1233,7 +1233,7 @@ impl InlaySnapshot {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn line_len(&self, row: u32) -> u32 {
         let line_start = self.to_offset(InlayPoint::new(row, 0)).0;
         let line_end = if row >= self.max_point().row() {
@@ -1244,7 +1244,7 @@ impl InlaySnapshot {
         (line_end - line_start) as u32
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub(crate) fn chunks<'a>(
         &'a self,
         range: Range<InlayOffset>,
@@ -1280,7 +1280,7 @@ impl InlaySnapshot {
     }
 
     #[cfg(test)]
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn text(&self) -> String {
         self.chunks(
             Default::default()..self.len(),
@@ -1294,7 +1294,7 @@ impl InlaySnapshot {
         .collect()
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn check_invariants(&self) {
         #[cfg(any(debug_assertions, feature = "test-support"))]
         {
@@ -1321,7 +1321,7 @@ pub struct InlayPointCursor<'transforms> {
 }
 
 impl InlayPointCursor<'_> {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn map(&mut self, point: Point, bias: Bias) -> InlayPoint {
         let cursor = &mut self.cursor;
         if cursor.did_seek() {

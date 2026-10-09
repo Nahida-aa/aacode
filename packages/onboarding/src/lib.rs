@@ -481,7 +481,7 @@ pub async fn handle_import_vscode_settings(
         match settings::VsCodeSettings::load_user_settings(source, fs.clone()).await {
             Ok(vscode_settings) => vscode_settings,
             Err(err) => {
-                a_log::error!("{err:?}");
+                zlog::error!("{err:?}");
                 let _ = cx.prompt(
                     gpui::PromptLevel::Info,
                     &format!("Could not find or load a {source} settings file"),
@@ -516,7 +516,7 @@ pub async fn handle_import_vscode_settings(
         let result_channel = cx
             .global::<SettingsStore>()
             .import_vscode_settings(fs, vscode_settings);
-        a_log::info!("Imported {source} settings from {}", path.display());
+        zlog::info!("Imported {source} settings from {}", path.display());
         result_channel
     }) else {
         return;

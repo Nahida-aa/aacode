@@ -1026,7 +1026,7 @@ mod tests {
         cx: &mut TestAppContext,
         capabilities: lsp::ServerCapabilities,
     ) -> SelectorTest {
-        a_log::init_test();
+        zlog::init_test();
         let app_state = cx.update(|cx| {
             let app_state = AppState::test(cx);
             settings::init(cx);

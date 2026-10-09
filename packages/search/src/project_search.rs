@@ -2448,7 +2448,7 @@ impl ProjectSearchView {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn highlight_matches(
         &self,
         match_ranges: &[Range<Anchor>],

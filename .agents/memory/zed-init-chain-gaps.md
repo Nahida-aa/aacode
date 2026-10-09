@@ -5,6 +5,7 @@
 ## 为什么单独记这个
 
 搬 Zed 代码时，`init` 链（`packages/app/src/main.rs`）是**最容易被漏掉**的部分：
+
 - 漏掉 → 编译通过、能跑、不 panic，只是**功能静默缺失**
 - 比缺 UI 组件更隐蔽：UI 组件缺失会编译报错，init 缺失不会
 
@@ -35,9 +36,11 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
 
 2. **空 provider 列表会渲染成"正常"的空页面**
    `settings_ui/src/pages/llm_providers_page.rs:24-46` 的 `render_llm_providers_page` 内容 100% 来自
+
    ```rust
    let providers = LanguageModelRegistry::read_global(cx).visible_providers();
    ```
+
    为空时 `.children(...)` 就是零子元素 → 一个**没有任何子元素**的 `v_flex` → 全白、零报错。
    Zed 同文件逐字相同，所以**问题一定在 app 侧，不在 settings_ui**。
 
@@ -171,7 +174,6 @@ grep -rhoE "\b[a-z_0-9]+::(init|register)\(" packages/app/src/ | sort -u
 action handler（`Hide` / `OpenLog` / `OpenSettingsFile` 等 12 个）。其余 init 必须住在各自 crate
 里（`crates/zed` 依赖几乎所有 crate，反向依赖会成环），「统一」的只是 `main.rs` 里的调用顺序。
 
-
 ## 必须实跑验证：init 顺序错误编译期查不出来
 
 补完 init 链后**一定要 `./target/debug/aacode` 实跑**。编译通过 ≠ 能启动。
@@ -231,12 +233,12 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 
 ### 已修
 
-| 项 | zed 行号 | 实际情况 |
-|---|---|---|
-| `edit_prediction_registry::init` | L708 | 文件与 zed **逐字一致**、模块已声明，只是 main.rs 没调用。**Zeta 额度菜单不显示的根因** |
-| `project_symbols::init` | L747 | crate 已完整移植（633 行逐字一致），但既没进 app 的 `[dependencies]` 也没调用 → 二进制里根本没有 |
-| `menu::init` | L489 | `menu` 已是依赖，但 `init()` 在 menu crate 里就是 `pub fn init() {}` 空函数，为对齐而补 |
-| `aacode_actions::init` | L490 | **即 zed 的 `zed_actions::init`**（见下方「重命名陷阱」），`init()` 同样是空函数 |
+| 项                               | zed 行号 | 实际情况                                                                                         |
+| -------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `edit_prediction_registry::init` | L708     | 文件与 zed **逐字一致**、模块已声明，只是 main.rs 没调用。**Zeta 额度菜单不显示的根因**          |
+| `project_symbols::init`          | L747     | crate 已完整移植（633 行逐字一致），但既没进 app 的 `[dependencies]` 也没调用 → 二进制里根本没有 |
+| `menu::init`                     | L489     | `menu` 已是依赖，但 `init()` 在 menu crate 里就是 `pub fn init() {}` 空函数，为对齐而补          |
+| `aacode_actions::init`           | L490     | **即 zed 的 `zed_actions::init`**（见下方「重命名陷阱」），`init()` 同样是空函数                 |
 
 ### 未移植（接线无意义，需先移植）
 
@@ -264,7 +266,7 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 ### 不算缺口
 
 - `zlog::init()` / `zlog_settings::init(cx)` / `ztracing::init()` — aacode 改用
-  `tracing_subscriber::fmt::init()`（`main.rs:96`），是 `a_log`/`a_tracing` 重命名的等价物。
+  `tracing_subscriber::fmt::init()`（`main.rs:96`），是 `zlog`/`ztracing` 重命名的等价物。
 - `crashes::init` — zed L391，是 crash handler 的**完整接线**（spawn + InitCrashHandler +
   session_id + version），不是一行 init；属于独立任务，尚未处理。
 
@@ -272,11 +274,11 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 
 **zed 的 crate 在 aacode 里可能被重命名**，只查 `packages/<zed原名>` 会误报「不存在」：
 
-| zed | aacode |
-|---|---|
-| `zed_actions` | **`aacode_actions`** |
+| zed                | aacode                |
+| ------------------ | --------------------- |
+| `zed_actions`      | **`aacode_actions`**  |
 | `cloud_llm_client` | `aa_cloud_llm_client` |
-| `log` / `tracing` | `a_log` / `a_tracing` |
+| `log` / `tracing`  | `zlog` / `ztracing`   |
 
 规律：`zed_` 前缀 → `aacode_`；`aa_` 前缀的 crate 基本是 Zed crate 的重命名版本。
 所以判定「不存在」之前，必须同时搜 `packages/aacode_*` 和 workspace 依赖名。

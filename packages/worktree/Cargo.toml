@@ -43,7 +43,7 @@ sum_tree.workspace = true
 text.workspace = true
 tracing.workspace = true
 util.workspace = true
-a_tracing.workspace = true
+ztracing.workspace = true
 
 [dev-dependencies]
 clock = { workspace = true, features = ["test-support"] }
@@ -56,4 +56,4 @@ serde_json.workspace = true
 settings = { workspace = true, features = ["test-support"] }
 util = { workspace = true, features = ["test-support"] }
 worktree = { workspace = true, features = ["test-support"] }
-a_log.workspace = true
+zlog.workspace = true

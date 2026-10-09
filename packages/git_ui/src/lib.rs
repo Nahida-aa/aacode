@@ -1368,7 +1368,7 @@ mod view_commit_tests {
     use workspace::WorkspaceSettings;
 
     fn init_test(cx: &mut TestAppContext) {
-        a_log::init_test();
+        zlog::init_test();
         cx.update(|cx| {
             let settings_store = SettingsStore::test(cx);
             cx.set_global(settings_store);

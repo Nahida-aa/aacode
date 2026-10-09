@@ -5,7 +5,7 @@ use multi_buffer::MultiBufferOffset;
 use theme::ActiveTheme;
 
 impl Editor {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn refresh_matching_bracket_highlights(
         &mut self,
         snapshot: &DisplaySnapshot,

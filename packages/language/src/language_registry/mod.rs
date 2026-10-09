@@ -628,7 +628,7 @@ impl LanguageRegistry {
         self.language_for_file_internal(path, None, None)
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn load_language_for_file_path<'a>(
         self: &Arc<Self>,
         path: &'a Path,
@@ -657,7 +657,7 @@ impl LanguageRegistry {
             .find_for_file(path, content, user_file_types)
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn load_language(
         self: &Arc<Self>,
         language_id: LanguageId,
@@ -801,7 +801,7 @@ impl LanguageRegistry {
         rx
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn get_or_load_language(
         self: &Arc<Self>,
         language_id: Option<LanguageId>,
@@ -819,7 +819,7 @@ impl LanguageRegistry {
         self: &Arc<Self>,
         name: Arc<str>,
     ) -> impl Future<Output = Result<tree_sitter::Language>> {
-        let span = a_tracing::debug_span!("get_or_load_grammar", name = &*name.clone());
+        let span = ztracing::debug_span!("get_or_load_grammar", name = &*name.clone());
         let _enter = span.enter();
         let (tx, rx) = oneshot::channel();
         let mut state = self.state.write();

@@ -2694,7 +2694,7 @@ fn init_test_with_fake_client_and_legacy_data_collection(
         let settings_store = SettingsStore::test(cx);
         cx.set_global(settings_store);
         disable_jumps_feature_flag(cx);
-        a_log::init_test();
+        zlog::init_test();
 
         if let Some(legacy_data_collection_choice) = legacy_data_collection_choice {
             KeyValueStore::global(cx)
@@ -4702,5 +4702,5 @@ async fn test_upsell_dismissed_via_dismissable_api(cx: &mut TestAppContext) {
 
 #[ctor::ctor(unsafe)]
 fn init_logger() {
-    a_log::init_test();
+    zlog::init_test();
 }

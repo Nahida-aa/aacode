@@ -489,7 +489,7 @@ impl BufferSnapshot {
         self.syntax.captures(range, &self.text, query)
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub(crate) fn get_highlights(
         &self,
         range: Range<usize>,
@@ -512,7 +512,7 @@ impl BufferSnapshot {
     /// in an arbitrary way due to being stored in a [`Rope`](text::Rope). The text is also
     /// returned in chunks where each chunk has a single syntax highlighting style and
     /// diagnostic status.
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub fn chunks<T: ToOffset>(
         &self,
         range: Range<T>,

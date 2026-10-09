@@ -1012,7 +1012,7 @@ mod tests {
 
     #[ctor::ctor(unsafe)]
     fn init_logger() {
-        a_log::init_test();
+        zlog::init_test();
     }
 
     fn init_test(cx: &mut TestAppContext) {

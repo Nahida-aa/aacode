@@ -416,7 +416,7 @@ impl LocalWorktree {
         })
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     pub(crate) fn load_file(
         &self,
         path: &RelPath,

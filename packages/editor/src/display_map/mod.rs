@@ -117,7 +117,7 @@ use text::{BufferId, LineIndent, Patch};
 use theme::StatusColors;
 use ui::{SharedString, px};
 use unicode_segmentation::UnicodeSegmentation;
-use a_tracing::instrument;
+use ztracing::instrument;
 
 use std::cell::RefCell;
 use std::collections::hash_map::Entry;

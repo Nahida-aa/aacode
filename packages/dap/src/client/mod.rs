@@ -262,7 +262,7 @@ mod tests {
     };
 
     pub fn init_test(cx: &mut gpui::TestAppContext) {
-        a_log::init_test();
+        zlog::init_test();
 
         cx.update(|cx| {
             let settings = SettingsStore::test(cx);

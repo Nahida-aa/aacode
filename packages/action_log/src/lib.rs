@@ -1318,7 +1318,7 @@ mod tests {
     use util::{RandomCharIter, path};
 
     #[ctor::ctor(unsafe)]
-    fn init_logger() { a_log::init_test(); }
+    fn init_logger() { zlog::init_test(); }
 
     fn init_test(cx: &mut TestAppContext) {
         cx.update(|cx| {

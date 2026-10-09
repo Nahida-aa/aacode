@@ -18,7 +18,7 @@ name = "aacode"
 path = "src/main.rs"
 
 [features]
-tracy = ["a_tracing/tracy"]
+tracy = ["ztracing/tracy"]
 # LEAK_BACKTRACE=1 cargo run --features zed/track-project-leak --profile release-fast
 track-project-leak = ["gpui/leak-detection"]
 test-support = [
@@ -221,8 +221,8 @@ uuid.workspace = true
 vim.workspace = true
 workspace.workspace = true
 watch.workspace = true
-a_log.workspace = true
-a_tracing.workspace = true
+zlog.workspace = true
+ztracing.workspace = true
 gpui_platform = { workspace = true, features = [
     "screen-capture",
     "font-kit",

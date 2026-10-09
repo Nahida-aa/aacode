@@ -34,7 +34,7 @@ pub fn range_from_lsp(range: lsp::Range) -> Range<Unclipped<PointUtf16>> {
         // range_from_lsp calls (especially during completions), that can hang the main thread.
         //
         // See issue #36223.
-        a_log::debug!("range_from_lsp called with inverted range {start:?}-{end:?}");
+        zlog::debug!("range_from_lsp called with inverted range {start:?}-{end:?}");
         mem::swap(&mut start, &mut end);
     }
     start..end

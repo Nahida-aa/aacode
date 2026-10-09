@@ -5146,7 +5146,7 @@ pub async fn init_test(
 }
 
 fn init_logger() {
-    a_log::init_test();
+    zlog::init_test();
 }
 
 fn build_project(ssh: Entity<RemoteClient>, cx: &mut TestAppContext) -> Entity<Project> {

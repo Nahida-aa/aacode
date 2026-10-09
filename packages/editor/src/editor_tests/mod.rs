@@ -41830,7 +41830,7 @@ pub(crate) fn init_test(cx: &mut TestAppContext, f: fn(&mut AllLanguageSettingsC
         release_channel::init(semver::Version::new(0, 0, 0), cx);
         crate::init(cx);
     });
-    a_log::init_test();
+    zlog::init_test();
     update_test_language_settings(cx, &f);
 }
 

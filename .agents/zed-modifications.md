@@ -5,7 +5,8 @@
 ## 1. 命名空间/命名映射
 
 aacode 在重命名层面做了以下映射（fork-sync 归一化时已考虑）：
-- `zlog` → `a_log`
+
+- `zlog` → `zlog`
 - `zed_actions` → `aacode_actions`
 - `zed_credentials_provider` → `ad_credentials_provider`
 - `zed_resource_manager` → `a_resource_manager`
@@ -64,10 +65,12 @@ GPUI 桌面（`packages/app` + `packages/workspace` + `packages/ui`）是唯一�
 除了结构性拆分外，`packages/project` 相对 `crates/project` 还存在语义层面的有意改动，包括函数签名调整、主动删除部分函数、接口/trait 实现差异等。这些差异需要结合符号级比对来判断，而不是靠行文比对。
 
 **已核对的文件（符号一致性）**：
+
 - `packages/project/src/lsp_store/mod.rs` ↔ `crates/project/src/lsp_store.rs`：函数名集合完全一致（159 个）
 - `packages/project/src/terminals.rs` ↔ `crates/project/src/terminals.rs`：函数名集合完全一致（11 个）
 
 **rev→rev 同步要点**：
+
 - 对 `packages/project/src/project/*`（SPLIT）文件，不能简单整文件替换。区间内若 `crates/project/src/project.rs` 有改动，**必须先用 ast-grep 提取受影响的符号（函数/方法/struct/enum/trait impl 等）清单**，再逐一核对 aacode 对应拆分文件中是否存在同名符号、签名是否一致、是否已实现。
 - 符号级比对优先于全文 diff。对于 SPLIT 组尤其需要按符号清单逐项核对，而不是假设文件内容对应。
 - 遇到符号在 aacode 中不存在但在上游区间改动中涉及时：**先暂停并提问**，判断是「主动删除」（有意）还是「漏实现」（需补充）。
@@ -96,16 +99,18 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
 
 实测（用 `gpui::generate_list_of_all_registered_actions()` / `inventory::iter::<gpui::MacroActionBuilder>` 计数）：
 
-| | TOTAL | DISTINCT | DUP |
-|---|---|---|---|
-| 保留自引用 | 236 | 235 | `context_server::Restart x2`（两个 fn 指针不同） |
-| 移除自引用 | 235 | 235 | 0 |
+|            | TOTAL | DISTINCT | DUP                                              |
+| ---------- | ----- | -------- | ------------------------------------------------ |
+| 保留自引用 | 236   | 235      | `context_server::Restart x2`（两个 fn 指针不同） |
+| 移除自引用 | 235   | 235      | 0                                                |
 
 **为什么 aacode 可以安全移除，而 zed 需要它**：
+
 - zed 的 `crates/project/tests/integration/` 存在，integration test 需要以库的公开 API 链接一份带 test-support 的 project，因此需要自引用来统一 feature
 - aacode 的 `packages/project` **没有 `tests/`、`examples/`、`benches/`** 目录（integration 测试套件在同步时按「有意裁剪」处理掉了），自引用没有任何消费方
 
 **排查这类问题的可复用手法**（下次遇到 action/registry 重复注册直接照搬）：
+
 1. `gpui::generate_list_of_all_registered_actions()` 数 TOTAL / DISTINCT，确认是否真有重名
 2. `inventory::iter::<gpui::MacroActionBuilder>` 取每个 builder 的 `fn` 指针地址，`same_code` 判断是「同一份代码被调用两次」还是「两处独立声明」
 3. `grep -c '^name = "<crate>"' Cargo.lock` 与 `cargo tree -d` 排除「同名 crate 两个来源」（`-d` 里出现 workspace member 或 gpui_learn 包才算异常；第三方 crate 多版本属正常）
@@ -163,6 +168,7 @@ panic 发生在 `TestAppContext::build()` 构造 `ActionRegistry` 阶段，所�
    （锁到精确版本，勿用无 `-p` 的全量 `cargo update`）。
 
 **接线方式**（对齐 zed crates/zed/Cargo.toml L138/L186 + main.rs L725/L781）：
+
 - 这些 crate 的 action 要进 inventory 才会被内置 keymap 解析，因此必须进
   `aacode` 的 `[dependencies]`（**不是** `[dev-dependencies]`，否则不链接进二进制）
 - `repl::init(fs.clone(), cx)` 需要 `Arc<dyn Fs>`，排在 `set_global(fs.clone(), cx)` 之后
@@ -181,11 +187,13 @@ cargo 对 `0.x` 版本的 caret 是限定的（`"0.33"` = `>=0.33.0, <0.34.0`）
 最新的版本**，于是图里同时出现 0.33 与 0.35 两份。
 
 **什么操作会重算 lock**（都会静默改写 Cargo.lock）：
+
 - 裸跑 `cargo metadata`（不带 `--locked`）
 - 不带 `-p` 的 `cargo update`
 - 新增/删除依赖、改 feature、`[patch]` 变更
 
 **规避**：
+
 - 平时用 `cargo check --locked` / `cargo build --locked`；确实需要重算时用
   `cargo update -p <crate> --precise <version>` 精确到单个包
 - 定期跑 `script/check-lock-drift.sh`（等价于上游 zed CI 的
@@ -199,15 +207,14 @@ E0308（`packages/repl/src/kernels/remote_kernels.rs`）。修法
 `cargo update -p async-tungstenite@0.35.0 --precise 0.33.0`，与上游 zed
 Cargo.lock 一致（上游只有一份 0.33）。
 
-
 ## http_client：两套并存，本地 fork 当前零引用
 
 workspace 里有两个 http_client，**别搞混**：
 
-| Cargo 名字 | 来源 | 引用者 |
-|---|---|---|
-| `http_client` | zed git `rev = "afecd6d719aad92aecfa2860f49c4f2956708831"` | app / client / anthropic / dap / extension … 20+ crate，**这是实际运行的** |
-| `aa_http_client` | `path = "packages/http_client"` | **零个 crate** |
+| Cargo 名字       | 来源                                                       | 引用者                                                                     |
+| ---------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `http_client`    | zed git `rev = "afecd6d719aad92aecfa2860f49c4f2956708831"` | app / client / anthropic / dap / extension … 20+ crate，**这是实际运行的** |
+| `aa_http_client` | `path = "packages/http_client"`                            | **零个 crate**                                                             |
 
 **保留本地 fork 的原因**：将来可能不再用 zed 的 `http_client`——代码里存在
 zed 独有字符串。当前无妨，两者并存即可。
@@ -227,7 +234,6 @@ zed 独有字符串。当前无妨，两者并存即可。
 `packages/http_client/src/github.rs:199` ——
 `github_api_request("https://api.github.com/repos/zed-industries/zed/releases")`。
 
-
 ## 全量对照现状（非阻塞，仅记录）
 
 aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多数是小版本升级，
@@ -236,8 +242,6 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 
 如将来要与 zed 完全对齐，用 `cargo update -p <crate> --precise <zed 版本>` 逐个降级，
 不要裸跑不带 `-p` 的 `cargo update`（会重算全图，且可能让同名 crate 分裂成多份）。
-
-
 
 ## LSP 面板：拆分「停止」与「移除」（aacode 有意改动）
 
@@ -295,6 +299,7 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
      name（`lsp_store/mod.rs:13065-13072`），server 才能起来。
 
 5. **新增 `stopped_server_worktrees` 字段**（`lsp_button.rs` 的 `LanguageServers`）
+
    ```rust
    stopped_server_worktrees: HashMap<LanguageServerName, (WeakEntity<Worktree>, LanguageServerId)>
    ```
@@ -330,26 +335,26 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 
 ### 状态矩阵（改动后）
 
-| server 状态 | 可用动作 |
-|---|---|
+| server 状态       | 可用动作                                         |
+| ----------------- | ------------------------------------------------ |
 | 运行中 / Starting | `Restart Server`、`Stop Server`、`Remove Server` |
-| 已停止（Stopped） | `Start Server`、`Remove Server` |
+| 已停止（Stopped） | `Start Server`、`Remove Server`                  |
 
-| 全局（按面板自上而下顺序） | 说明 |
-|---|---|
-| `Restart All Servers` | 全部拉回（**对齐上游，始终排最上面**） |
-| `Stop All Servers` | 条目保留，可逐个单独 Start 恢复 |
-| `Remove All Servers` | 条目消失，只能 Restart All 恢复 |
+| 全局（按面板自上而下顺序） | 说明                                   |
+| -------------------------- | -------------------------------------- |
+| `Restart All Servers`      | 全部拉回（**对齐上游，始终排最上面**） |
+| `Stop All Servers`         | 条目保留，可逐个单独 Start 恢复        |
+| `Remove All Servers`       | 条目消失，只能 Restart All 恢复        |
 
 （有 server 在运行时三者都显示，顺序如上；全部停止时只显示 `Restart All Servers`。）
 
 > 顺序对齐上游：上游 `if can_stop_all` 先 push `restart: true`（Restart All）再 push
 > `restart: false`（Stop All）。新增 `StopAll` 时不要把它排到 Restart 前面。
 
-| 动作 | 条目 | 恢复粒度 |
-|---|---|---|
-| `Stop Server` | 保留（灰色 Stopped） | **单独**恢复：per-item `Start Server` |
-| `Remove Server` | 消失 | **只能全局**恢复：`Restart All Servers`（会顺带重启所有 server） |
+| 动作            | 条目                 | 恢复粒度                                                         |
+| --------------- | -------------------- | ---------------------------------------------------------------- |
+| `Stop Server`   | 保留（灰色 Stopped） | **单独**恢复：per-item `Start Server`                            |
+| `Remove Server` | 消失                 | **只能全局**恢复：`Restart All Servers`（会顺带重启所有 server） |
 
 ### 保留的两个细节（有意为之）
 
@@ -387,6 +392,7 @@ SettingsPageItem::ActionLink(ActionLink {
 `open_input_stream` + `open_test_output`）。
 
 差异点：
+
 - 只播提示音，**不碰麦克风**
 - 放在 Agent 页而非 Collaboration 页，紧邻对应开关，改完立刻能听到效果
 - 用途：排查本机 audio 输出设备是否可用（本机 `alsa::poll()` POLLERR 的排查工具）
@@ -396,16 +402,15 @@ SettingsPageItem::ActionLink(ActionLink {
 注意 `ai_page` 的 `general_section()` 返回类型写死 `[SettingsPageItem; 8]`，
 加项要同步改成 9 —— 该签名是 aacode 自己的简化（zed 是 `Vec`），非移植差异。
 
-
 ## Pane toolbar：2 个 item 未移植（其余 24 个已接）
 
 Zed `crates/zed/src/zed.rs:1457` 的 `initialize_pane` 往每个 pane 挂 26 个
 toolbar item。aacode 已接 24 个，**以下 2 个无对应实现，rev→rev 时不必同步**：
 
-| item | 原因 |
-|---|---|
-| `TelemetryLogToolbarItemView` | zed crate 内部模块（打开遥测日志窗口的入口）。 |
-| `BasedPyrightBanner` | 所属 crate `language_onboarding` **整个未移植**（aacode 有 `packages/languages` 里的 `BasedPyrightLspAdapter`，即 LSP 本身是有的，只缺首次安装引导横幅）。 |
+| item                          | 原因                                                                                                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TelemetryLogToolbarItemView` | zed crate 内部模块（打开遥测日志窗口的入口）。                                                                                                             |
+| `BasedPyrightBanner`          | 所属 crate `language_onboarding` **整个未移植**（aacode 有 `packages/languages` 里的 `BasedPyrightLspAdapter`，即 LSP 本身是有的，只缺首次安装引导横幅）。 |
 
 移植时的两个 import 细节（照抄时会踩）：
 
@@ -424,17 +429,16 @@ toolbar item。aacode 已接 24 个，**以下 2 个无对应实现，rev→rev 
 原属 zed crate、无独立 crate 的组件，移植到 `app/src/core/` 下（模块名可改，
 函数名保留原样）：
 
-| 组件 | aacode 位置 | 上游位置 |
-|---|---|---|
-| `QuickActionBar` | `core/quick_action_bar.rs` + `quick_action_bar/{preview,repl_menu}.rs`（共 1460 行） | `crates/zed/src/zed/quick_action_bar*.rs` |
-| `MigrationBanner` | `core/migrate/mod.rs`（326 行） | `crates/zed/src/zed/migrate.rs` |
+| 组件              | aacode 位置                                                                          | 上游位置                                  |
+| ----------------- | ------------------------------------------------------------------------------------ | ----------------------------------------- |
+| `QuickActionBar`  | `core/quick_action_bar.rs` + `quick_action_bar/{preview,repl_menu}.rs`（共 1460 行） | `crates/zed/src/zed/quick_action_bar*.rs` |
+| `MigrationBanner` | `core/migrate/mod.rs`（326 行）                                                      | `crates/zed/src/zed/migrate.rs`           |
 
 两者照抄所需的 workspace 依赖：`picker` / `markdown` / `migrator`
 （`MigrationBanner` 用 `migrator::{migrate_keymap, migrate_settings}`；
 aacode 的 `packages/migrator` 已含这两个函数）。
 `MigrationBanner` 还需在 `initialize_pane` 开头取 `cx.weak_entity()`
 （对齐 zed.rs:1463）。
-
 
 ## util → a_util：app 级函数上提（aacode 独有重构）
 
@@ -443,28 +447,28 @@ aacode 的 `packages/migrator` 已含这两个函数）。
 
 ### 拆分清单
 
-| 功能 | 位置 | 原因 |
-|---|---|---|
-| `prevent_root_execution` | **a_util** | CLI 入口和 app 启动期安全守门，与通用工具无关 |
-| `get_shell_safe_zed_path` | **a_util** | 格式化当前可执行路径供 shell capture 使用 |
-| `get_zed_cli_path` | **a_util** | 定位同级 `zed-cli`（现在是 aacode 的 CLI 二进制） |
-| `load_login_shell_environment` | **a_util** | 加载用户登录 shell 环境（耗 IO、有副作用） |
+| 功能                                                                       | 位置                  | 原因                                                                 |
+| -------------------------------------------------------------------------- | --------------------- | -------------------------------------------------------------------- |
+| `prevent_root_execution`                                                   | **a_util**            | CLI 入口和 app 启动期安全守门，与通用工具无关                        |
+| `get_shell_safe_zed_path`                                                  | **a_util**            | 格式化当前可执行路径供 shell capture 使用                            |
+| `get_zed_cli_path`                                                         | **a_util**            | 定位同级 `zed-cli`（现在是 aacode 的 CLI 二进制）                    |
+| `load_login_shell_environment`                                             | **a_util**            | 加载用户登录 shell 环境（耗 IO、有副作用）                           |
 | `shell_env::capture` / `*_unix` / `*_windows` / `spawn_and_read_fd` 等整套 | **a_util::shell_env** | 上述 capture 的完整实现，依赖 `command_fds`/`smol::process`/`nix` 等 |
-| `set_pre_exec_to_start_new_session` | **留在 util** | 通用 `Command` 辅助，`terminal`/`a_util::shell_env` 等多处调用 |
-| `increase_open_file_limit` | **留在 util** | 通用 rlimit 工具 |
-| `parse_os_release` | **留在 util** | 通用 os-release 解析 |
-| `shell_env::print_env` | **留在 util** | `--printenv` 子命令入口，纯打印逻辑 |
+| `set_pre_exec_to_start_new_session`                                        | **留在 util**         | 通用 `Command` 辅助，`terminal`/`a_util::shell_env` 等多处调用       |
+| `increase_open_file_limit`                                                 | **留在 util**         | 通用 rlimit 工具                                                     |
+| `parse_os_release`                                                         | **留在 util**         | 通用 os-release 解析                                                 |
+| `shell_env::print_env`                                                     | **留在 util**         | `--printenv` 子命令入口，纯打印逻辑                                  |
 
 ### 消费者迁移
 
 改完之后，引用 `prevent_root_execution` / `load_login_shell_environment` /
 `shell_env::capture` 的 crate 需要改为 `a_util::`：
 
-| crate | 旧 | 新 |
-|---|---|---|
-| `cli` | `util::prevent_root_execution()` | `a_util::prevent_root_execution()` |
+| crate           | 旧                                     | 新                                       |
+| --------------- | -------------------------------------- | ---------------------------------------- |
+| `cli`           | `util::prevent_root_execution()`       | `a_util::prevent_root_execution()`       |
 | `remote_server` | `util::load_login_shell_environment()` | `a_util::load_login_shell_environment()` |
-| `project` | `util::shell_env::capture(...)` | `a_util::shell_env::capture(...)` |
+| `project`       | `util::shell_env::capture(...)`        | `a_util::shell_env::capture(...)`        |
 
 `set_pre_exec_to_start_new_session` 仍留在 `util`，调用方不改。
 
@@ -523,11 +527,11 @@ fn compile_time_release_channel_name() -> String {
 
 **文件在 Zed 里的第二重作用**：CI 靠改写它来切频道，且改完连同 tag 一起提交。
 
-| workflow | 操作 |
-|---|---|
-| `bump_zed_version.yml:166` | `echo -n preview > crates/zed/RELEASE_CHANNEL` 后建 preview 分支 |
-| `bump_zed_version.yml:229` | `echo -n stable > ...` 后打 stable tag |
-| `release_nightly.yml:124/174/292/359` | `echo "nightly" > ...`（Windows 两处用 `Set-Content`） |
+| workflow                              | 操作                                                             |
+| ------------------------------------- | ---------------------------------------------------------------- |
+| `bump_zed_version.yml:166`            | `echo -n preview > crates/zed/RELEASE_CHANNEL` 后建 preview 分支 |
+| `bump_zed_version.yml:229`            | `echo -n stable > ...` 后打 stable tag                           |
+| `release_nightly.yml:124/174/292/359` | `echo "nightly" > ...`（Windows 两处用 `Set-Content`）           |
 
 所以 zed 的发布流程是「改文件 + 提交 + 打 tag」，而非注入 env。
 
@@ -546,11 +550,11 @@ fn compile_time_release_channel_name() -> String {
 
 ### 行为对照
 
-| 构建方式 | aacode | Zed |
-|---|---|---|
-| `just install`（注入 `ZED_RELEASE_CHANNEL=stable`） | stable，图标无后缀，db 落 `0-stable` | — |
-| 裸 `cargo build` / `cargo run`（无 env） | dev，图标 `-dev`，db 落 `0-dev` | 同（仓库文件也是 `dev`） |
-| Nix/crane 构建 | 不适用 | 必须注入 env，否则 `include_str!` 失败 |
+| 构建方式                                            | aacode                               | Zed                                    |
+| --------------------------------------------------- | ------------------------------------ | -------------------------------------- |
+| `just install`（注入 `ZED_RELEASE_CHANNEL=stable`） | stable，图标无后缀，db 落 `0-stable` | —                                      |
+| 裸 `cargo build` / `cargo run`（无 env）            | dev，图标 `-dev`，db 落 `0-dev`      | 同（仓库文件也是 `dev`）               |
+| Nix/crane 构建                                      | 不适用                               | 必须注入 env，否则 `include_str!` 失败 |
 
 ### 连带改动
 

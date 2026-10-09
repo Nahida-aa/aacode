@@ -3,59 +3,6 @@
 version = 4
 
 [[package]]
-name = "a_log"
-version = "1.22.1"
-dependencies = [
- "anyhow",
- "chrono",
- "collections",
- "log",
- "tempfile",
-]
-
-[[package]]
-name = "a_tracing"
-version = "1.22.1"
-dependencies = [
- "a_log",
- "a_tracing_macro",
- "async-channel 2.5.0",
- "js-sys",
- "tracing",
- "tracing-subscriber",
- "tracing-tracy",
- "tracy-client",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "a_tracing_macro"
-version = "1.22.1"
-
-[[package]]
-name = "a_util"
-version = "1.22.1"
-dependencies = [
- "aa_util",
- "anyhow",
- "async-fs",
- "collections",
- "command-fds",
- "dirs",
- "gpui_util",
- "libc",
- "log",
- "nix 0.30.1",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "smol",
- "walkdir",
- "which",
-]
-
-[[package]]
 name = "aa-core"
 version = "1.22.1"
 dependencies = [
@@ -249,6 +196,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_gpui_kit_askpass"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+
+[[package]]
 name = "aa_gpui_kit_assets"
 version = "0.1.0"
 dependencies = [
@@ -266,6 +218,81 @@ dependencies = [
  "inventory",
  "parking_lot",
  "strum 0.28.0",
+]
+
+[[package]]
+name = "aa_gpui_kit_fs"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "aa_gpui_kit_git",
+ "aa_util",
+ "anyhow",
+ "async-channel 2.5.0",
+ "async-std",
+ "async-tar",
+ "async-trait",
+ "collections",
+ "dunce",
+ "futures 0.3.34",
+ "gpui",
+ "ignore",
+ "is_executable",
+ "libc",
+ "log",
+ "notify",
+ "parking_lot",
+ "path",
+ "paths 0.1.0",
+ "rope 0.1.0",
+ "rustix",
+ "serde",
+ "serde_json",
+ "slotmap",
+ "smol",
+ "telemetry 0.1.0",
+ "tempfile",
+ "text 0.1.0",
+ "thiserror 2.0.21",
+ "trash",
+ "unicode-normalization",
+ "windows 0.58.0",
+ "zed_proto",
+]
+
+[[package]]
+name = "aa_gpui_kit_git"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "aa_gpui_kit_askpass",
+ "aa_util",
+ "anyhow",
+ "async-channel 2.5.0",
+ "async-trait",
+ "collections",
+ "derive_more",
+ "futures 0.3.34",
+ "gpui",
+ "http_client",
+ "itertools 0.14.0",
+ "log",
+ "parking_lot",
+ "rand 0.9.5",
+ "regex",
+ "rope 0.1.0",
+ "schemars 1.2.2",
+ "serde",
+ "smallvec",
+ "smol",
+ "sum_tree",
+ "text 0.1.0",
+ "thiserror 2.0.21",
+ "time",
+ "url",
+ "urlencoding",
+ "uuid",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -507,11 +534,11 @@ dependencies = [
 name = "aacode"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_clock",
  "aa_env_vars",
  "aa_gpui_kit_assets",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -570,9 +597,7 @@ dependencies = [
  "extensions_ui",
  "feedback",
  "file_finder",
- "fs",
  "futures 0.3.34",
- "git",
  "git_hosting_providers",
  "git_ui",
  "git_ui_core",
@@ -613,7 +638,7 @@ dependencies = [
  "outline",
  "outline_panel",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "picker",
  "pkg-config",
  "pretty_assertions",
@@ -627,7 +652,7 @@ dependencies = [
  "remote_server",
  "repl",
  "reqwest_client",
- "rope",
+ "rope 1.22.1",
  "search",
  "semver",
  "serde",
@@ -643,7 +668,7 @@ dependencies = [
  "tab_switcher",
  "tabular_data_preview",
  "tasks_ui",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "terminal",
  "terminal_view",
@@ -669,6 +694,8 @@ dependencies = [
  "windows_resources",
  "workspace",
  "zed_migrator",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -684,6 +711,28 @@ dependencies = [
 [[package]]
 name = "ac_constant"
 version = "1.22.1"
+
+[[package]]
+name = "ac_util"
+version = "1.22.1"
+dependencies = [
+ "aa_util",
+ "anyhow",
+ "async-fs",
+ "collections",
+ "command-fds",
+ "dirs",
+ "gpui_util",
+ "libc",
+ "log",
+ "nix 0.30.1",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "smol",
+ "walkdir",
+ "which",
+]
 
 [[package]]
 name = "accesskit"
@@ -806,10 +855,10 @@ dependencies = [
  "serde_json",
  "settings",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "terminal",
- "text",
+ "text 1.22.1",
  "url",
  "urlencoding",
  "uuid",
@@ -840,16 +889,15 @@ dependencies = [
 name = "action_log"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_clock",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_util",
  "anyhow",
  "buffer_diff",
  "collections",
  "ctor",
- "fs",
  "futures 0.3.34",
- "git",
  "gpui",
  "indoc",
  "language",
@@ -859,22 +907,23 @@ dependencies = [
  "rand 0.9.5",
  "serde_json",
  "settings",
- "telemetry",
- "text",
+ "telemetry 1.22.1",
+ "text 1.22.1",
  "watch",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
 name = "activity_indicator"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_ui",
  "aa_util",
  "anyhow",
  "auto_update",
  "editor",
  "extension_host",
- "fs",
  "futures 0.3.34",
  "gpui",
  "language",
@@ -893,7 +942,7 @@ dependencies = [
  "credentials_provider",
  "futures 0.3.34",
  "gpui",
- "paths",
+ "paths 1.22.1",
  "serde_json",
 ]
 
@@ -943,10 +992,11 @@ dependencies = [
 name = "agent"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_clock",
  "aa_cloud_llm_client",
  "aa_env_vars",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -971,9 +1021,7 @@ dependencies = [
  "env_logger 0.11.11",
  "eval_utils",
  "feature_flags",
- "fs",
  "futures 0.3.34",
- "git",
  "gpui",
  "gpui_tokio",
  "handlebars",
@@ -989,7 +1037,7 @@ dependencies = [
  "log",
  "lsp",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "pretty_assertions",
  "project",
  "prompt_store",
@@ -1009,9 +1057,9 @@ dependencies = [
  "streaming_diff",
  "strsim",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "thiserror 2.0.21",
  "unindent",
@@ -1019,6 +1067,7 @@ dependencies = [
  "uuid",
  "watch",
  "web_search",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -1076,6 +1125,7 @@ dependencies = [
 name = "agent_servers"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_util",
@@ -1091,7 +1141,6 @@ dependencies = [
  "collections",
  "env_logger 0.11.11",
  "feature_flags",
- "fs",
  "futures 0.3.34",
  "google_ai",
  "gpui",
@@ -1118,16 +1167,16 @@ dependencies = [
 name = "agent_settings"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "collections",
  "convert_case 0.11.0",
- "fs",
  "futures 0.3.34",
  "gpui",
  "language_model",
  "log",
- "paths",
+ "paths 1.22.1",
  "project",
  "regex",
  "schemars 1.2.2",
@@ -1141,14 +1190,14 @@ dependencies = [
 name = "agent_skills"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "base64 0.22.1",
  "const_format",
- "fs",
  "futures 0.3.34",
  "gpui",
- "paths",
+ "paths 1.22.1",
  "serde",
  "serde_json",
  "serde_yaml_ng",
@@ -1161,6 +1210,8 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -1193,10 +1244,8 @@ dependencies = [
  "extension_host",
  "feature_flags",
  "file_icons",
- "fs",
  "futures 0.3.34",
  "fuzzy",
- "git",
  "git_ui_core",
  "gpui",
  "gpui_tokio",
@@ -1221,7 +1270,7 @@ dependencies = [
  "notifications",
  "ordered-float 5.5.0",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "picker",
  "platform_title_bar",
  "postage",
@@ -1233,7 +1282,7 @@ dependencies = [
  "remote",
  "remote_connection",
  "reqwest_client",
- "rope",
+ "rope 1.22.1",
  "sandbox",
  "schemars 1.2.2",
  "search",
@@ -1245,11 +1294,11 @@ dependencies = [
  "shlex 1.3.0",
  "streaming_diff",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "terminal",
  "terminal_view",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "unicode-script",
  "unicode-segmentation",
@@ -1296,7 +1345,7 @@ dependencies = [
  "gpui",
  "language_model",
  "smallvec",
- "telemetry",
+ "telemetry 1.22.1",
 ]
 
 [[package]]
@@ -2017,7 +2066,6 @@ dependencies = [
 name = "auto_update"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_clock",
  "aa_release_channel",
  "aa_util",
@@ -2031,7 +2079,7 @@ dependencies = [
  "http_client",
  "log",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -2040,6 +2088,7 @@ dependencies = [
  "tempfile",
  "which",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -2064,7 +2113,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smol",
- "telemetry",
+ "telemetry 1.22.1",
  "workspace",
 ]
 
@@ -2954,8 +3003,6 @@ dependencies = [
 name = "buffer_diff"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_clock",
  "aa_util",
  "ctor",
@@ -2965,12 +3012,14 @@ dependencies = [
  "log",
  "pretty_assertions",
  "rand 0.9.5",
- "rope",
+ "rope 1.22.1",
  "settings",
  "sum_tree",
- "text",
+ "text 1.22.1",
  "tracing",
  "unindent",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -3124,13 +3173,13 @@ checksum = "ade8366b8bd5ba243f0a58f036cc0ca8a2f069cff1a2351ef1cac6b083e16fc0"
 name = "call"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "audio",
  "client",
  "collections",
  "feature_flags",
- "fs",
  "futures 0.3.34",
  "gpui",
  "gpui_tokio",
@@ -3142,7 +3191,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "workspace",
 ]
 
@@ -3428,7 +3477,7 @@ dependencies = [
  "rpc",
  "semver",
  "settings",
- "text",
+ "text 1.22.1",
 ]
 
 [[package]]
@@ -3581,7 +3630,6 @@ checksum = "1c133bc6a41be0d194c306b5506d15e6feeea7b1d6604bd3f8310dfb2ca96486"
 name = "cli"
 version = "1.22.1"
 dependencies = [
- "a_util",
  "aa-core",
  "aa-extension-mcp",
  "aa-function-tools",
@@ -3592,6 +3640,7 @@ dependencies = [
  "aa_gpui_kit_settings_content",
  "aa_release_channel",
  "aa_util",
+ "ac_util",
  "anyhow",
  "askpass",
  "axum",
@@ -3608,7 +3657,7 @@ dependencies = [
  "fork",
  "ipc-channel",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "plist",
  "pulldown-cmark",
  "ratatui",
@@ -3632,6 +3681,7 @@ version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
+ "aa_gpui_kit_fs",
  "aa_release_channel",
  "aa_util",
  "ac_constant",
@@ -3646,7 +3696,6 @@ dependencies = [
  "credentials_provider",
  "derive_more",
  "feature_flags",
- "fs",
  "futures 0.3.34",
  "gpui",
  "gpui_tokio",
@@ -3655,7 +3704,7 @@ dependencies = [
  "log",
  "objc2-foundation 0.3.2",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "postage",
  "proxy_handshake",
  "rand 0.9.5",
@@ -3669,9 +3718,9 @@ dependencies = [
  "settings",
  "sha2 0.10.9",
  "smol",
- "telemetry",
- "telemetry_events",
- "text",
+ "telemetry 1.22.1",
+ "telemetry_events 1.22.1",
+ "text 1.22.1",
  "thiserror 2.0.21",
  "time",
  "tiny_http",
@@ -3682,6 +3731,15 @@ dependencies = [
  "windows 0.62.2",
  "worktree",
  "zed_cloud_llm_client",
+]
+
+[[package]]
+name = "clock"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
+dependencies = [
+ "serde",
+ "smallvec",
 ]
 
 [[package]]
@@ -3831,7 +3889,7 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
- "text",
+ "text 1.22.1",
  "zeta_prompt",
 ]
 
@@ -3866,7 +3924,7 @@ dependencies = [
  "settings",
  "smallvec",
  "smol",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "title_bar",
  "workspace",
@@ -3938,7 +3996,7 @@ dependencies = [
  "project",
  "serde",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "time",
  "workspace",
@@ -4129,7 +4187,7 @@ dependencies = [
 name = "copilot"
 version = "1.22.1"
 dependencies = [
- "a_log",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_icons",
  "aa_util",
@@ -4139,7 +4197,6 @@ dependencies = [
  "copilot_chat",
  "edit_prediction_types",
  "editor",
- "fs",
  "futures 0.3.34",
  "gpui",
  "indoc",
@@ -4148,7 +4205,7 @@ dependencies = [
  "lsp",
  "node_runtime",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "pretty_assertions",
  "project",
  "rpc",
@@ -4158,6 +4215,7 @@ dependencies = [
  "sum_tree",
  "theme_settings",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -5098,7 +5156,7 @@ dependencies = [
 name = "dap"
 version = "1.22.1"
 dependencies = [
- "a_log",
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "async-compression",
@@ -5108,7 +5166,6 @@ dependencies = [
  "client",
  "collections",
  "dap-types",
- "fs",
  "futures 0.3.34",
  "gpui",
  "http_client",
@@ -5116,7 +5173,7 @@ dependencies = [
  "log",
  "node_runtime",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "proto",
  "schemars 1.2.2",
  "serde",
@@ -5125,7 +5182,8 @@ dependencies = [
  "smallvec",
  "smol",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -5142,13 +5200,13 @@ dependencies = [
 name = "dap_adapters"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "async-trait",
  "collections",
  "dap",
  "dotenvy",
- "fs",
  "futures 0.3.34",
  "gpui",
  "http_client",
@@ -5156,7 +5214,7 @@ dependencies = [
  "language",
  "log",
  "node_runtime",
- "paths",
+ "paths 1.22.1",
  "serde_json",
  "settings",
  "smol",
@@ -5268,7 +5326,7 @@ dependencies = [
  "indoc",
  "inventory",
  "log",
- "paths",
+ "paths 1.22.1",
  "sqlez",
  "sqlez_macros",
  "tempfile",
@@ -5311,7 +5369,6 @@ dependencies = [
 name = "debugger_ui"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -5340,7 +5397,7 @@ dependencies = [
  "notifications",
  "parking_lot",
  "parse_int",
- "paths",
+ "paths 1.22.1",
  "picker",
  "pretty_assertions",
  "project",
@@ -5355,11 +5412,12 @@ dependencies = [
  "tasks_ui",
  "terminal",
  "terminal_view",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "tree-sitter-go",
  "unindent",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -5483,13 +5541,13 @@ dependencies = [
 name = "dev_container"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_ui",
  "aa_util",
  "anyhow",
  "async-tar",
  "async-trait",
  "env_logger 0.11.11",
- "fs",
  "futures 0.3.34",
  "gpui",
  "http",
@@ -5516,7 +5574,6 @@ dependencies = [
 name = "diagnostics"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -5539,10 +5596,11 @@ dependencies = [
  "rand 0.9.5",
  "serde_json",
  "settings",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "unindent",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -5791,9 +5849,10 @@ checksum = "3b31a881d38439026e3d5dd938ab20328d36e23caca8fd5981c42e4b677f5842"
 name = "edit_prediction"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_clock",
  "aa_cloud_llm_client",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_util",
@@ -5816,9 +5875,7 @@ dependencies = [
  "edit_prediction_metrics",
  "edit_prediction_types",
  "feature_flags",
- "fs",
  "futures 0.3.34",
- "git",
  "gpui",
  "heapless",
  "indoc",
@@ -5833,7 +5890,7 @@ dependencies = [
  "ollama",
  "open_ai",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "postage",
  "pretty_assertions",
  "project",
@@ -5845,9 +5902,9 @@ dependencies = [
  "serde_json",
  "settings",
  "strum 0.28.0",
- "telemetry",
- "telemetry_events",
- "text",
+ "telemetry 1.22.1",
+ "telemetry_events 1.22.1",
+ "text 1.22.1",
  "thiserror 2.0.21",
  "toml 0.8.23",
  "tracing",
@@ -5856,6 +5913,7 @@ dependencies = [
  "worktree",
  "zed_cloud_llm_client",
  "zeta_prompt",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -5880,8 +5938,8 @@ dependencies = [
  "serde_json",
  "settings",
  "smallvec",
- "telemetry",
- "text",
+ "telemetry 1.22.1",
+ "text 1.22.1",
  "tree-sitter",
  "zeta_prompt",
 ]
@@ -5907,7 +5965,7 @@ dependencies = [
  "client",
  "gpui",
  "language",
- "text",
+ "text 1.22.1",
 ]
 
 [[package]]
@@ -5915,6 +5973,7 @@ name = "edit_prediction_ui"
 version = "1.22.1"
 dependencies = [
  "aa_cloud_llm_client",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_ui",
  "aa_util",
  "aacode_actions",
@@ -5930,7 +5989,6 @@ dependencies = [
  "edit_prediction_types",
  "editor",
  "feature_flags",
- "fs",
  "futures 0.3.34",
  "gpui",
  "indoc",
@@ -5938,12 +5996,12 @@ dependencies = [
  "markdown",
  "menu",
  "multi_buffer",
- "paths",
+ "paths 1.22.1",
  "project",
  "regex",
  "settings",
- "telemetry",
- "text",
+ "telemetry 1.22.1",
+ "text 1.22.1",
  "theme_settings",
  "workspace",
  "zeta_prompt",
@@ -5953,10 +6011,10 @@ dependencies = [
 name = "editor"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_clock",
  "aa_gpui_kit_assets",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -5978,11 +6036,9 @@ dependencies = [
  "emojis",
  "feature_flags",
  "file_icons",
- "fs",
  "futures 0.3.34",
  "futures-lite 2.6.1",
  "fuzzy",
- "git",
  "gpui",
  "indoc",
  "itertools 0.14.0",
@@ -6003,7 +6059,7 @@ dependencies = [
  "proptest-derive",
  "rand 0.9.5",
  "regex",
- "rope",
+ "rope 1.22.1",
  "rpc",
  "schemars 1.2.2",
  "semver",
@@ -6014,8 +6070,8 @@ dependencies = [
  "snippet",
  "sum_tree",
  "task",
- "telemetry",
- "text",
+ "telemetry 1.22.1",
+ "text 1.22.1",
  "theme_settings",
  "tree-sitter-bash",
  "tree-sitter-c",
@@ -6035,6 +6091,8 @@ dependencies = [
  "uuid",
  "vim_mode_setting",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -6388,14 +6446,13 @@ checksum = "af9673d8203fcb076b19dfd17e38b3d4ae9f44959416ea532ce72415a6020365"
 name = "extension"
 version = "1.22.1"
 dependencies = [
- "a_tracing",
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "async-trait",
  "cloud_api_types",
  "collections",
  "dap",
- "fs",
  "futures 0.3.34",
  "gpui",
  "heck 0.5.0",
@@ -6419,6 +6476,7 @@ dependencies = [
  "wasm-encoder 0.254.2",
  "wasmparser 0.254.2",
  "which",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -6434,8 +6492,7 @@ dependencies = [
 name = "extension_host"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_release_channel",
  "aa_util",
@@ -6450,7 +6507,6 @@ dependencies = [
  "ctor",
  "dap",
  "extension",
- "fs",
  "futures 0.3.34",
  "gpui",
  "gpui_tokio",
@@ -6462,7 +6518,7 @@ dependencies = [
  "moka",
  "node_runtime",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "project",
  "remote",
  "reqwest_client",
@@ -6472,7 +6528,7 @@ dependencies = [
  "serde_json_lenient",
  "settings",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "theme_extension",
  "theme_settings",
@@ -6482,6 +6538,8 @@ dependencies = [
  "wasmparser 0.254.2",
  "wasmtime 48.0.5",
  "wasmtime-wasi 48.0.5",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -6496,6 +6554,8 @@ name = "extensions_ui"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_util",
@@ -6509,16 +6569,14 @@ dependencies = [
  "extension",
  "extension_host",
  "extension_suggest",
- "fs",
  "fuzzy",
- "git",
  "gpui",
  "http_client",
  "language",
  "log",
  "markdown",
  "num-format",
- "paths",
+ "paths 1.22.1",
  "picker",
  "project",
  "schemars 1.2.2",
@@ -6527,7 +6585,7 @@ dependencies = [
  "serde_json",
  "settings",
  "strum 0.28.0",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
@@ -6603,9 +6661,9 @@ checksum = "b97b65636e5b9ef369943878ac74335ba1c55c1cb6adbf1e2c293c624248d693"
 name = "feature_flags"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "collections",
  "feature_flags_macros",
- "fs",
  "gpui",
  "inventory",
  "schemars 1.2.2",
@@ -6640,7 +6698,6 @@ dependencies = [
 name = "file_finder"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -6667,6 +6724,7 @@ dependencies = [
  "settings",
  "theme_settings",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -6925,46 +6983,6 @@ dependencies = [
  "cc",
  "libc",
  "pkg-config",
-]
-
-[[package]]
-name = "fs"
-version = "1.22.1"
-dependencies = [
- "aa_util",
- "anyhow",
- "async-channel 2.5.0",
- "async-std",
- "async-tar",
- "async-trait",
- "collections",
- "dunce",
- "fs",
- "futures 0.3.34",
- "git",
- "gpui",
- "ignore",
- "is_executable",
- "libc",
- "log",
- "notify",
- "parking_lot",
- "path",
- "paths",
- "proto",
- "rope",
- "rustix",
- "serde",
- "serde_json",
- "slotmap",
- "smol",
- "telemetry",
- "tempfile",
- "text",
- "thiserror 2.0.21",
- "trash",
- "unicode-normalization",
- "windows 0.62.2",
 ]
 
 [[package]]
@@ -7270,51 +7288,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "git"
-version = "1.22.1"
-dependencies = [
- "a_tracing",
- "aa_util",
- "anyhow",
- "askpass",
- "async-channel 2.5.0",
- "async-trait",
- "collections",
- "derive_more",
- "futures 0.3.34",
- "gpui",
- "http_client",
- "itertools 0.14.0",
- "log",
- "parking_lot",
- "pretty_assertions",
- "rand 0.9.5",
- "regex",
- "rope",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "smallvec",
- "smol",
- "sum_tree",
- "tempfile",
- "text",
- "thiserror 2.0.21",
- "time",
- "url",
- "urlencoding",
- "uuid",
-]
-
-[[package]]
 name = "git_hosting_providers"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_git",
  "aa_util",
  "anyhow",
  "async-trait",
  "futures 0.3.34",
- "git",
  "gpui",
  "http_client",
  "indoc",
@@ -7332,10 +7313,10 @@ dependencies = [
 name = "git_ui"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_gpui_fuzzy",
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -7355,11 +7336,9 @@ dependencies = [
  "db",
  "editor",
  "file_icons",
- "fs",
  "futures 0.3.34",
  "futures-lite 2.6.1",
  "fuzzy",
- "git",
  "git_ui_core",
  "gpui",
  "http_client",
@@ -7387,7 +7366,7 @@ dependencies = [
  "strum 0.28.0",
  "sysinfo 0.39.6",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "terminal",
  "theme_settings",
  "time",
@@ -7396,14 +7375,16 @@ dependencies = [
  "unindent",
  "watch",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
 name = "git_ui_core"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -7414,10 +7395,8 @@ dependencies = [
  "collections",
  "db",
  "editor",
- "fs",
  "futures 0.3.34",
  "fuzzy",
- "git",
  "gpui",
  "language",
  "log",
@@ -7439,6 +7418,8 @@ dependencies = [
  "watch",
  "workspace",
  "zeroize",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -7562,10 +7543,10 @@ dependencies = [
  "menu",
  "multi_buffer",
  "project",
- "rope",
+ "rope 1.22.1",
  "serde_json",
  "settings",
- "text",
+ "text 1.22.1",
  "workspace",
 ]
 
@@ -8711,6 +8692,7 @@ dependencies = [
 name = "image_viewer"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -8718,7 +8700,6 @@ dependencies = [
  "db",
  "editor",
  "file_icons",
- "fs",
  "gpui",
  "language",
  "log",
@@ -8856,6 +8837,7 @@ dependencies = [
 name = "inspector_ui"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -8863,12 +8845,11 @@ dependencies = [
  "anyhow",
  "command_palette_hooks",
  "editor",
- "fs",
  "futures 0.3.34",
  "fuzzy",
  "gpui",
  "language",
- "paths",
+ "paths 1.22.1",
  "project",
  "serde_json",
  "serde_json_lenient",
@@ -9301,6 +9282,7 @@ dependencies = [
 name = "json_schema_store"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_util",
  "anyhow",
@@ -9308,11 +9290,10 @@ dependencies = [
  "dap",
  "extension",
  "feature_flags",
- "fs",
  "gpui",
  "language",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "project",
  "schemars 1.2.2",
  "serde_json",
@@ -9441,6 +9422,7 @@ dependencies = [
 name = "keymap_editor"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -9451,7 +9433,6 @@ dependencies = [
  "command_palette",
  "db",
  "editor",
- "fs",
  "fuzzy",
  "gpui",
  "itertools 0.14.0",
@@ -9460,12 +9441,12 @@ dependencies = [
  "log",
  "menu",
  "notifications",
- "paths",
+ "paths 1.22.1",
  "project",
  "search",
  "serde_json",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "theme_settings",
  "tree-sitter-json",
@@ -9562,10 +9543,9 @@ checksum = "884f3e747ed2dcee867cda1b0c31a048f9e20de2d916a248949319921a2e666e"
 name = "language"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_clock",
  "aa_gpui_fuzzy",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_grammars",
  "aa_gpui_kit_language_core",
  "aa_gpui_kit_theme",
@@ -9579,7 +9559,6 @@ dependencies = [
  "diffy 0.4.2",
  "ec4rs",
  "encoding_rs",
- "fs",
  "futures 0.3.34",
  "futures-lite 2.6.1",
  "globset",
@@ -9596,7 +9575,7 @@ dependencies = [
  "pretty_assertions",
  "rand 0.9.5",
  "regex",
- "rope",
+ "rope 1.22.1",
  "rpc",
  "semver",
  "serde",
@@ -9608,7 +9587,7 @@ dependencies = [
  "strsim",
  "sum_tree",
  "task",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "toml 0.8.23",
  "tracing",
@@ -9627,6 +9606,8 @@ dependencies = [
  "unicase",
  "unindent",
  "watch",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -9642,7 +9623,6 @@ dependencies = [
 name = "language_extension"
 version = "1.22.1"
 dependencies = [
- "a_tracing",
  "aa_util",
  "anyhow",
  "async-trait",
@@ -9657,6 +9637,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -9688,6 +9669,7 @@ dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
@@ -9715,7 +9697,6 @@ dependencies = [
  "extension",
  "extension_host",
  "feature_flags",
- "fs",
  "futures 0.3.34",
  "google_ai",
  "gpui",
@@ -9735,7 +9716,7 @@ dependencies = [
  "openai_subscribed",
  "opencode",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "rand 0.9.5",
  "schemars 1.2.2",
  "serde",
@@ -9795,7 +9776,6 @@ dependencies = [
 name = "language_tools"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -9820,16 +9800,18 @@ dependencies = [
  "serde_json",
  "settings",
  "sysinfo 0.39.6",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "tree-sitter",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
 name = "languages"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_grammars",
  "aa_gpui_kit_theme",
  "aa_util",
@@ -9840,7 +9822,6 @@ dependencies = [
  "async-trait",
  "chrono",
  "collections",
- "fs",
  "futures 0.3.34",
  "globset",
  "gpui",
@@ -9862,7 +9843,7 @@ dependencies = [
  "pretty_assertions",
  "project",
  "regex",
- "rope",
+ "rope 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -10447,7 +10428,6 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 name = "lsp"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_release_channel",
  "aa_util",
  "ac_constant",
@@ -10468,6 +10448,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -10485,7 +10466,6 @@ dependencies = [
 name = "lsp_command_selector"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_kit_ui",
  "aa_util",
  "anyhow",
@@ -10502,6 +10482,7 @@ dependencies = [
  "serde_json",
  "settings",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -10524,7 +10505,7 @@ dependencies = [
  "picker_preview",
  "project",
  "settings",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "workspace",
 ]
@@ -10681,6 +10662,7 @@ dependencies = [
 name = "markdown_preview"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -10689,7 +10671,6 @@ dependencies = [
  "buffer_diff",
  "db",
  "editor",
- "fs",
  "gpui",
  "language",
  "log",
@@ -10831,7 +10812,6 @@ dependencies = [
 name = "mermaid_render"
 version = "1.22.1"
 dependencies = [
- "a_tracing",
  "anyhow",
  "gpui",
  "mermaid_render",
@@ -10841,6 +10821,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "usvg",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -11152,8 +11133,6 @@ dependencies = [
 name = "multi_buffer"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_clock",
  "aa_gpui_kit_theme",
  "aa_util",
@@ -11172,15 +11151,17 @@ dependencies = [
  "proptest",
  "proptest-derive",
  "rand 0.9.5",
- "rope",
+ "rope 1.22.1",
  "serde",
  "settings",
  "smallvec",
  "sum_tree",
- "text",
+ "text 1.22.1",
  "tracing",
  "tree-sitter",
  "unicode-segmentation",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -11379,7 +11360,7 @@ dependencies = [
  "futures 0.3.34",
  "http_client",
  "log",
- "paths",
+ "paths 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -12148,8 +12129,8 @@ dependencies = [
 name = "onboarding"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -12160,7 +12141,6 @@ dependencies = [
  "collections",
  "db",
  "documented",
- "fs",
  "fuzzy",
  "gpui",
  "menu",
@@ -12170,10 +12150,11 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -12441,7 +12422,7 @@ dependencies = [
  "picker",
  "picker_preview",
  "project",
- "rope",
+ "rope 1.22.1",
  "serde_json",
  "settings",
  "workspace",
@@ -12465,6 +12446,7 @@ dependencies = [
 name = "outline_panel"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -12478,7 +12460,6 @@ dependencies = [
  "file_icons",
  "futures 0.3.34",
  "fuzzy",
- "git",
  "gpui",
  "language",
  "log",
@@ -12646,6 +12627,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4500030c302e4af1d423f36f3b958d1aecb6c04184356ed5a833bf6b60435777"
 dependencies = [
  "rustc_version",
+]
+
+[[package]]
+name = "paths"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
+dependencies = [
+ "const_format",
+ "dirs",
+ "ignore",
+ "util",
 ]
 
 [[package]]
@@ -13407,7 +13399,7 @@ dependencies = [
  "multi_buffer",
  "picker",
  "project",
- "rope",
+ "rope 1.22.1",
  "settings",
 ]
 
@@ -13727,17 +13719,17 @@ checksum = "e8cf8e6a8aa66ce33f63993ffc4ea4271eb5b0530a9002db8455ea6050c77bfa"
 name = "prettier"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "collections",
- "fs",
  "gpui",
  "language",
  "log",
  "lsp",
  "node_runtime",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "serde",
  "serde_json",
 ]
@@ -13869,13 +13861,13 @@ dependencies = [
 name = "project"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
- "a_util",
  "aa_clock",
  "aa_gpui_fuzzy",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_release_channel",
  "aa_util",
+ "ac_util",
  "ad_credentials_provider",
  "aho-corasick",
  "anyhow",
@@ -13894,9 +13886,7 @@ dependencies = [
  "encoding_rs",
  "extension",
  "fancy-regex 0.19.2",
- "fs",
  "futures 0.3.34",
- "git",
  "git_hosting_providers",
  "globset",
  "gpui",
@@ -13911,7 +13901,7 @@ dependencies = [
  "node_runtime",
  "parking_lot",
  "path",
- "paths",
+ "paths 1.22.1",
  "percent-encoding",
  "postage",
  "prettier",
@@ -13935,7 +13925,7 @@ dependencies = [
  "task",
  "tempfile",
  "terminal",
- "text",
+ "text 1.22.1",
  "toml 0.8.23",
  "tracing",
  "unindent",
@@ -13945,12 +13935,16 @@ dependencies = [
  "which",
  "worktree",
  "zeroize",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
 name = "project_panel"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -13961,9 +13955,7 @@ dependencies = [
  "criterion",
  "editor",
  "file_icons",
- "fs",
  "futures 0.3.34",
- "git",
  "git_ui",
  "git_ui_core",
  "gpui",
@@ -13982,7 +13974,7 @@ dependencies = [
  "serde_json",
  "settings",
  "smallvec",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "theme_settings",
  "workspace",
@@ -14019,6 +14011,7 @@ dependencies = [
 name = "prompt_store"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "agent_skills",
  "anyhow",
@@ -14026,7 +14019,6 @@ dependencies = [
  "chrono",
  "collections",
  "db",
- "fs",
  "futures 0.3.34",
  "gpui",
  "handlebars",
@@ -14034,12 +14026,12 @@ dependencies = [
  "language",
  "log",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "serde",
  "serde_json",
  "strum 0.28.0",
  "tempfile",
- "text",
+ "text 1.22.1",
  "uuid",
 ]
 
@@ -14784,6 +14776,7 @@ name = "recent_projects"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_util",
@@ -14796,7 +14789,6 @@ dependencies = [
  "editor",
  "extension",
  "extension_host",
- "fs",
  "futures 0.3.34",
  "gpui",
  "http_client",
@@ -14807,7 +14799,7 @@ dependencies = [
  "node_runtime",
  "open_path_prompt",
  "ordered-float 5.5.0",
- "paths",
+ "paths 1.22.1",
  "picker",
  "project",
  "remote",
@@ -14816,7 +14808,7 @@ dependencies = [
  "semver",
  "serde_json",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "windows-registry",
  "workspace",
  "worktree",
@@ -14958,6 +14950,7 @@ dependencies = [
 name = "remote"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_release_channel",
  "aa_util",
  "anyhow",
@@ -14965,12 +14958,11 @@ dependencies = [
  "async-trait",
  "base64 0.22.1",
  "collections",
- "fs",
  "futures 0.3.34",
  "gpui",
  "log",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "rpc",
  "schemars 1.2.2",
  "semver",
@@ -14978,7 +14970,7 @@ dependencies = [
  "serde_json",
  "settings",
  "smol",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "thiserror 2.0.21",
  "urlencoding",
@@ -15013,12 +15005,13 @@ dependencies = [
 name = "remote_server"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_util",
  "aa_clock",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_release_channel",
  "aa_util",
+ "ac_util",
  "acp_thread",
  "action_log",
  "agent",
@@ -15037,9 +15030,7 @@ dependencies = [
  "env_logger 0.11.11",
  "extension",
  "extension_host",
- "fs",
  "futures 0.3.34",
- "git",
  "git_hosting_providers",
  "gpui",
  "gpui_platform",
@@ -15055,7 +15046,7 @@ dependencies = [
  "lsp",
  "net",
  "node_runtime",
- "paths",
+ "paths 1.22.1",
  "pretty_assertions",
  "project",
  "proto",
@@ -15071,7 +15062,7 @@ dependencies = [
  "smol",
  "sysinfo 0.39.6",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "terminal",
  "theme_settings",
@@ -15084,6 +15075,7 @@ dependencies = [
  "windows 0.62.2",
  "workspace",
  "worktree",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -15137,7 +15129,7 @@ dependencies = [
  "shlex 1.3.0",
  "smol",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "terminal",
  "terminal_view",
  "theme_settings",
@@ -15289,10 +15281,23 @@ dependencies = [
 
 [[package]]
 name = "rope"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
+dependencies = [
+ "heapless",
+ "log",
+ "rayon",
+ "sum_tree",
+ "tracing",
+ "unicode-segmentation",
+ "util",
+ "ztracing 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
+]
+
+[[package]]
+name = "rope"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_util",
  "criterion",
  "ctor",
@@ -15304,6 +15309,8 @@ dependencies = [
  "sum_tree",
  "tracing",
  "unicode-segmentation",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -15337,7 +15344,6 @@ dependencies = [
 name = "rpc"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_util",
  "anyhow",
  "async-tungstenite",
@@ -15354,6 +15360,7 @@ dependencies = [
  "sha2 0.10.9",
  "strum 0.28.0",
  "tracing",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -15818,7 +15825,7 @@ checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
 name = "search"
 version = "1.22.1"
 dependencies = [
- "a_tracing",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -15830,7 +15837,6 @@ dependencies = [
  "db",
  "editor",
  "file_icons",
- "fs",
  "futures 0.3.34",
  "gpui",
  "itertools 0.14.0",
@@ -15848,12 +15854,13 @@ dependencies = [
  "serde_json",
  "settings",
  "smol",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "tracing",
  "unindent",
  "util_macros",
  "workspace",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -16156,6 +16163,7 @@ dependencies = [
 name = "settings"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_settings_content",
  "aa_release_channel",
  "aa_settings_json",
@@ -16164,7 +16172,6 @@ dependencies = [
  "anyhow",
  "collections",
  "ec4rs",
- "fs",
  "futures 0.3.34",
  "gpui",
  "gpui_util",
@@ -16173,7 +16180,7 @@ dependencies = [
  "json5 0.4.1",
  "log",
  "path",
- "paths",
+ "paths 1.22.1",
  "pretty_assertions",
  "rust-embed",
  "schemars 1.2.2",
@@ -16193,6 +16200,7 @@ name = "settings_ui"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -16220,7 +16228,6 @@ dependencies = [
  "extension",
  "extension_host",
  "feature_flags",
- "fs",
  "futures 0.3.34",
  "fuzzy",
  "gpui",
@@ -16233,7 +16240,7 @@ dependencies = [
  "language_models",
  "log",
  "menu",
- "paths",
+ "paths 1.22.1",
  "picker",
  "platform_title_bar",
  "pretty_assertions",
@@ -16248,7 +16255,7 @@ dependencies = [
  "settings",
  "shell_command_parser",
  "strum 0.28.0",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "url",
  "workspace",
@@ -16352,6 +16359,8 @@ name = "sidebar"
 version = "1.22.1"
 dependencies = [
  "aa_clock",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -16371,8 +16380,6 @@ dependencies = [
  "editor",
  "extension",
  "feature_flags",
- "fs",
- "git",
  "git_ui_core",
  "gpui",
  "http_client",
@@ -16395,7 +16402,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "unicode-segmentation",
  "workspace",
@@ -16622,16 +16629,16 @@ dependencies = [
 name = "snippet_provider"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_util",
  "anyhow",
  "collections",
  "extension",
- "fs",
  "futures 0.3.34",
  "gpui",
  "indoc",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "schemars 1.2.2",
  "serde",
  "serde_json",
@@ -16804,7 +16811,7 @@ dependencies = [
  "criterion",
  "ordered-float 5.5.0",
  "rand 0.9.5",
- "rope",
+ "rope 1.22.1",
 ]
 
 [[package]]
@@ -16904,7 +16911,7 @@ dependencies = [
  "log",
  "rayon",
  "tracing",
- "ztracing",
+ "ztracing 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
 ]
 
 [[package]]
@@ -17328,7 +17335,6 @@ dependencies = [
 name = "tab_switcher"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -17346,6 +17352,7 @@ dependencies = [
  "settings",
  "theme_settings",
  "workspace",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -17364,7 +17371,7 @@ dependencies = [
  "project",
  "proptest",
  "serde_json",
- "text",
+ "text 1.22.1",
  "workspace",
 ]
 
@@ -17473,11 +17480,31 @@ dependencies = [
 
 [[package]]
 name = "telemetry"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "futures 0.3.34",
+ "serde_json",
+ "telemetry_events 0.1.0",
+]
+
+[[package]]
+name = "telemetry"
 version = "1.22.1"
 dependencies = [
  "futures 0.3.34",
  "serde_json",
- "telemetry_events",
+ "telemetry_events 1.22.1",
+]
+
+[[package]]
+name = "telemetry_events"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "semver",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -17685,9 +17712,26 @@ dependencies = [
 
 [[package]]
 name = "text"
+version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
+dependencies = [
+ "anyhow",
+ "clock",
+ "collections",
+ "log",
+ "parking_lot",
+ "postage",
+ "regex",
+ "rope 0.1.0",
+ "smallvec",
+ "sum_tree",
+ "util",
+]
+
+[[package]]
+name = "text"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_clock",
  "aa_util",
  "anyhow",
@@ -17699,9 +17743,10 @@ dependencies = [
  "postage",
  "rand 0.9.5",
  "regex",
- "rope",
+ "rope 1.22.1",
  "smallvec",
  "sum_tree",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -17712,12 +17757,12 @@ version = "1.22.1"
 name = "theme_selector"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_util",
  "aacode_actions",
  "editor",
- "fs",
  "fuzzy",
  "gpui",
  "log",
@@ -17725,7 +17770,7 @@ dependencies = [
  "project",
  "serde_json",
  "settings",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "workspace",
 ]
@@ -17936,6 +17981,7 @@ checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 name = "title_bar"
 version = "1.22.1"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_icons",
@@ -17952,7 +17998,6 @@ dependencies = [
  "cloud_api_types",
  "command_palette_hooks",
  "db",
- "fs",
  "git_ui_core",
  "gpui",
  "livekit_client",
@@ -17967,7 +18012,7 @@ dependencies = [
  "serde",
  "settings",
  "smallvec",
- "telemetry",
+ "telemetry 1.22.1",
  "theme_settings",
  "workspace",
 ]
@@ -19177,7 +19222,7 @@ dependencies = [
  "settings",
  "settings_ui",
  "task",
- "text",
+ "text 1.22.1",
  "theme_settings",
  "tokio",
  "util_macros",
@@ -21609,9 +21654,10 @@ dependencies = [
 name = "workspace"
 version = "1.22.1"
 dependencies = [
- "a_log",
  "aa_clock",
  "aa_gpui_kit_component",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_gpui_kit_settings_content",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -21629,10 +21675,8 @@ dependencies = [
  "collections",
  "db",
  "dirs",
- "fs",
  "futures 0.3.34",
  "futures-lite 2.6.1",
- "git",
  "gpui",
  "gpui_util",
  "http_client",
@@ -21660,39 +21704,38 @@ dependencies = [
  "sqlez",
  "strum 0.28.0",
  "task",
- "telemetry",
+ "telemetry 1.22.1",
  "tempfile",
  "theme_settings",
  "tracing",
  "url",
  "uuid",
  "worktree",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
 name = "worktree"
 version = "1.22.1"
 dependencies = [
- "a_log",
- "a_tracing",
  "aa_clock",
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_git",
  "aa_util",
  "anyhow",
  "async-channel 2.5.0",
  "async-lock",
  "collections",
  "encoding_rs",
- "fs",
  "futures 0.3.34",
  "futures-lite 2.6.1",
  "fuzzy",
- "git",
  "gpui",
  "ignore",
  "language",
  "log",
  "parking_lot",
- "paths",
+ "paths 1.22.1",
  "postage",
  "pretty_assertions",
  "rand 0.9.5",
@@ -21701,9 +21744,11 @@ dependencies = [
  "settings",
  "smallvec",
  "sum_tree",
- "text",
+ "text 1.22.1",
  "tracing",
  "worktree",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
 ]
 
 [[package]]
@@ -22177,6 +22222,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "zed_proto"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "anyhow",
+ "prost",
+ "prost-build",
+ "protox",
+ "serde",
+]
+
+[[package]]
 name = "zeno"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -22342,6 +22399,17 @@ checksum = "b268e58e7c693d7c271f93ffc4ba3b380412554231c85bf61ca7af91042a4112"
 [[package]]
 name = "zlog"
 version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "collections",
+ "log",
+]
+
+[[package]]
+name = "zlog"
+version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "anyhow",
@@ -22406,13 +22474,31 @@ dependencies = [
 [[package]]
 name = "ztracing"
 version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
+dependencies = [
+ "tracing",
+ "tracing-subscriber",
+ "tracing-tracy",
+ "tracy-client",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+ "ztracing_macro 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9)",
+]
+
+[[package]]
+name = "ztracing"
+version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "tracing",
  "tracing-subscriber",
- "zlog",
- "ztracing_macro",
+ "zlog 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
+ "ztracing_macro 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
 ]
+
+[[package]]
+name = "ztracing_macro"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=46869c9#46869c9cb5230c6d7ed316a50b2352545fc45f95"
 
 [[package]]
 name = "ztracing_macro"

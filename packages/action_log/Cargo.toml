@@ -41,4 +41,4 @@ serde_json.workspace = true
 settings = { workspace = true, features = ["test-support"] }
 text = { workspace = true, features = ["test-support"] }
 util = { workspace = true, features = ["test-support"] }
-a_log.workspace = true
+zlog.workspace = true

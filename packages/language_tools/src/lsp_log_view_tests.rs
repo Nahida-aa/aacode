@@ -791,7 +791,7 @@ async fn test_unsharing_releases_only_project_downstream_rpc_streams(cx: &mut Te
 
 #[gpui::test]
 async fn test_lsp_log_view(cx: &mut TestAppContext) {
-    a_log::init_test();
+    zlog::init_test();
 
     init_test(cx);
 

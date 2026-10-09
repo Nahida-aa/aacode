@@ -215,7 +215,7 @@ pub trait ExtensionGrammarProxy: Send + Sync + 'static {
 }
 
 impl ExtensionGrammarProxy for ExtensionHostProxy {
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn register_grammars(&self, grammars: Vec<(Arc<str>, PathBuf)>) {
         let Some(proxy) = self.grammar_proxy.read().clone() else {
             return;
@@ -245,7 +245,7 @@ pub trait ExtensionLanguageProxy: Send + Sync + 'static {
 }
 
 impl ExtensionLanguageProxy for ExtensionHostProxy {
-    #[a_tracing::instrument(skip_all, fields(lang = language.0.as_str()))]
+    #[ztracing::instrument(skip_all, fields(lang = language.0.as_str()))]
     fn register_language(
         &self,
         language: LanguageName,

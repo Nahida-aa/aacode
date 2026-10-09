@@ -606,7 +606,7 @@ impl GitBlame {
         }
     }
 
-    #[a_tracing::instrument(skip_all)]
+    #[ztracing::instrument(skip_all)]
     fn generate(&mut self, cx: &mut Context<Self>) {
         if self.is_static() {
             return;
@@ -632,7 +632,7 @@ impl GitBlame {
             let mut all_errors = Vec::new();
 
             for buffers in buffers_to_blame.chunks(4) {
-                let span = a_tracing::debug_span!("for each chunk of buffers");
+                let span = ztracing::debug_span!("for each chunk of buffers");
                 let _enter = span.enter();
                 let blame = cx.update(|cx| {
                     buffers

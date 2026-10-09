@@ -23,9 +23,9 @@ publish = false
 
 [workspace.dependencies]
 # --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
-a_log = { package = "zlog", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
-a_tracing = { package = "ztracing", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
-a_tracing_macro = { package = "ztracing_macro", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
+zlog = { package = "zlog", git = "https://github.com/Nahida-aa/gpui_learn", rev = "46869c9" }
+ztracing = { package = "ztracing", git = "https://github.com/Nahida-aa/gpui_learn", rev = "46869c9" }
+ztracing_macro = { package = "ztracing_macro", git = "https://github.com/Nahida-aa/gpui_learn", rev = "46869c9" }
 ac_util = { path = "packages/ac_util" }
 aa_env_vars = { path = "packages/aa_env_vars" }
 aa-kernel = { path = "packages/kernel" }
@@ -108,8 +108,8 @@ web_search_providers = { path = "packages/web_search_providers" }
 feature_flags = { path = "packages/feature_flags" }
 feature_flags_macros = { path = "packages/feature_flags_macros" }
 file_icons = { path = "packages/file_icons" }
-fs = { package = "aa_gpui_kit_fs", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
-git = { package = "aa_gpui_kit_git", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
+fs = { package = "aa_gpui_kit_fs", git = "https://github.com/Nahida-aa/gpui_learn", rev = "46869c9" }
+git = { package = "aa_gpui_kit_git", git = "https://github.com/Nahida-aa/gpui_learn", rev = "46869c9" }
 git_hosting_providers = { path = "packages/git_hosting_providers" }
 git_ui = { path = "packages/git_ui" }
 git_ui_core = { path = "packages/git_ui_core" }
@@ -780,7 +780,7 @@ aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
 aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
 # aa_gpui_fuzzy 的路径类型从 std::path::Path 换成了 zed 的 `path::RelPath`，
 # 与 zed crates/fuzzy_nucleo 对齐；project 因此不再需要手写 PathStyle 转换。
-aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/gpui_fuzzy" }
+aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui/gpui_fuzzy" }
 # ui / ui_input / component 必须同源：若 ui_input 与 ui 停在不同 rev，
 # 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
