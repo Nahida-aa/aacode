@@ -613,7 +613,6 @@ dependencies = [
  "prompt_store",
  "rayon",
  "recent_projects",
- "release_channel 1.22.1",
  "remote",
  "remote_server",
  "repl",
@@ -660,6 +659,7 @@ dependencies = [
  "windows_resources",
  "workspace",
  "zed_migrator",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -671,6 +671,10 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
 ]
+
+[[package]]
+name = "ac_constant"
+version = "1.22.1"
 
 [[package]]
 name = "accesskit"
@@ -880,8 +884,8 @@ dependencies = [
  "futures 0.3.34",
  "gpui",
  "paths",
- "release_channel 1.22.1",
  "serde_json",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -983,7 +987,6 @@ dependencies = [
  "quick-xml 0.41.0",
  "rand 0.9.5",
  "regex",
- "release_channel 1.22.1",
  "reqwest_client",
  "sandbox",
  "schemars 1.2.2",
@@ -1006,6 +1009,7 @@ dependencies = [
  "uuid",
  "watch",
  "web_search",
+ "zed_release_channel",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -1086,7 +1090,6 @@ dependencies = [
  "language_model",
  "log",
  "project",
- "release_channel 1.22.1",
  "remote",
  "reqwest_client",
  "serde",
@@ -1098,6 +1101,7 @@ dependencies = [
  "thiserror 2.0.21",
  "uuid",
  "watch",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -1214,7 +1218,6 @@ dependencies = [
  "prompt_store",
  "proto",
  "rand 0.9.5",
- "release_channel 1.22.1",
  "remote",
  "remote_connection",
  "reqwest_client",
@@ -1243,6 +1246,7 @@ dependencies = [
  "vim",
  "watch",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -2016,7 +2020,6 @@ dependencies = [
  "log",
  "parking_lot",
  "paths",
- "release_channel 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -2025,6 +2028,7 @@ dependencies = [
  "tempfile",
  "which",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -2043,13 +2047,13 @@ dependencies = [
  "gpui",
  "markdown_preview",
  "prompt_store",
- "release_channel 1.22.1",
  "semver",
  "serde",
  "serde_json",
  "smol",
  "telemetry",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -3408,11 +3412,11 @@ dependencies = [
  "language",
  "log",
  "postage",
- "release_channel 1.22.1",
  "rpc",
  "semver",
  "settings",
  "text",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -3596,7 +3600,6 @@ dependencies = [
  "pulldown-cmark",
  "ratatui",
  "rayon",
- "release_channel 1.22.1",
  "serde",
  "serde_json",
  "settings",
@@ -3608,6 +3611,7 @@ dependencies = [
  "walkdir",
  "windows 0.62.2",
  "windows_resources",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -3642,7 +3646,6 @@ dependencies = [
  "proxy_handshake",
  "rand 0.9.5",
  "regex",
- "release_channel 1.22.1",
  "rpc",
  "rustls-pki-types",
  "semver",
@@ -3665,6 +3668,7 @@ dependencies = [
  "windows 0.62.2",
  "worktree",
  "zed_cloud_llm_client",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -3841,7 +3845,6 @@ dependencies = [
  "notifications",
  "picker",
  "project",
- "release_channel 1.22.1",
  "rpc",
  "serde",
  "serde_json",
@@ -3852,6 +3855,7 @@ dependencies = [
  "theme_settings",
  "title_bar",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -4175,10 +4179,10 @@ dependencies = [
  "lsp",
  "menu",
  "project",
- "release_channel 1.22.1",
  "serde_json",
  "settings",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -5249,11 +5253,11 @@ dependencies = [
  "inventory",
  "log",
  "paths",
- "release_channel 1.22.1",
  "sqlez",
  "sqlez_macros",
  "tempfile",
  "uuid",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -5820,7 +5824,6 @@ dependencies = [
  "pulldown-cmark",
  "rand 0.9.5",
  "regex",
- "release_channel 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -5836,6 +5839,7 @@ dependencies = [
  "workspace",
  "worktree",
  "zed_cloud_llm_client",
+ "zed_release_channel",
  "zeta_prompt",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -5983,7 +5987,6 @@ dependencies = [
  "proptest-derive",
  "rand 0.9.5",
  "regex",
- "release_channel 1.22.1",
  "rope",
  "rpc",
  "schemars 1.2.2",
@@ -6016,6 +6019,7 @@ dependencies = [
  "uuid",
  "vim_mode_setting",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -6444,7 +6448,6 @@ dependencies = [
  "parking_lot",
  "paths",
  "project",
- "release_channel 1.22.1",
  "remote",
  "reqwest_client",
  "semver",
@@ -6463,6 +6466,7 @@ dependencies = [
  "wasmparser 0.254.2",
  "wasmtime 48.0.5",
  "wasmtime-wasi 48.0.5",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -6501,7 +6505,6 @@ dependencies = [
  "paths",
  "picker",
  "project",
- "release_channel 1.22.1",
  "schemars 1.2.2",
  "semver",
  "serde",
@@ -6512,6 +6515,7 @@ dependencies = [
  "theme_settings",
  "vim_mode_setting",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -7356,7 +7360,6 @@ dependencies = [
  "project",
  "prompt_store",
  "rand 0.9.5",
- "release_channel 1.22.1",
  "remote_connection",
  "schemars 1.2.2",
  "search",
@@ -7376,6 +7379,7 @@ dependencies = [
  "unindent",
  "watch",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -8881,9 +8885,9 @@ dependencies = [
  "client",
  "gpui",
  "log",
- "release_channel 1.22.1",
  "smol",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -9715,7 +9719,6 @@ dependencies = [
  "parking_lot",
  "paths",
  "rand 0.9.5",
- "release_channel 1.22.1",
  "schemars 1.2.2",
  "serde",
  "serde_json",
@@ -9725,6 +9728,7 @@ dependencies = [
  "tokio",
  "x_ai",
  "x_ai_subscribed",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -9794,7 +9798,6 @@ dependencies = [
  "path",
  "project",
  "proto",
- "release_channel 1.22.1",
  "semver",
  "serde_json",
  "settings",
@@ -9803,6 +9806,7 @@ dependencies = [
  "theme_settings",
  "tree-sitter",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -10441,11 +10445,11 @@ dependencies = [
  "lsp-types",
  "parking_lot",
  "postage",
- "release_channel 1.22.1",
  "schemars 1.2.2",
  "semver",
  "serde",
  "serde_json",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -13895,7 +13899,6 @@ dependencies = [
  "pretty_assertions",
  "rand 0.9.5",
  "regex",
- "release_channel 1.22.1",
  "remote",
  "rpc",
  "schemars 1.2.2",
@@ -13922,6 +13925,7 @@ dependencies = [
  "wax",
  "which",
  "worktree",
+ "zed_release_channel",
  "zeroize",
 ]
 
@@ -13985,12 +13989,12 @@ dependencies = [
  "picker",
  "picker_preview",
  "project",
- "release_channel 1.22.1",
  "semver",
  "serde_json",
  "settings",
  "theme_settings",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -14787,7 +14791,6 @@ dependencies = [
  "paths",
  "picker",
  "project",
- "release_channel 1.22.1",
  "remote",
  "remote_connection",
  "remote_server",
@@ -14798,6 +14801,7 @@ dependencies = [
  "windows-registry",
  "workspace",
  "worktree",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -14933,14 +14937,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "release_channel"
-version = "1.22.1"
-dependencies = [
- "gpui",
- "semver",
-]
-
-[[package]]
 name = "remote"
 version = "1.22.1"
 dependencies = [
@@ -14956,7 +14952,6 @@ dependencies = [
  "log",
  "parking_lot",
  "paths",
- "release_channel 1.22.1",
  "rpc",
  "schemars 1.2.2",
  "semver",
@@ -14969,6 +14964,7 @@ dependencies = [
  "thiserror 2.0.21",
  "urlencoding",
  "which",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -14987,12 +14983,12 @@ dependencies = [
  "log",
  "markdown",
  "menu",
- "release_channel 1.22.1",
  "remote",
  "semver",
  "settings",
  "theme_settings",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -15045,7 +15041,6 @@ dependencies = [
  "project",
  "proto",
  "rayon",
- "release_channel 1.22.1",
  "remote",
  "reqwest_client",
  "rpc",
@@ -15069,6 +15064,7 @@ dependencies = [
  "windows 0.62.2",
  "workspace",
  "worktree",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -16159,7 +16155,6 @@ dependencies = [
  "path",
  "paths",
  "pretty_assertions",
- "release_channel 1.22.1",
  "rust-embed",
  "schemars 1.2.2",
  "serde",
@@ -16171,6 +16166,7 @@ dependencies = [
  "tracing",
  "unindent",
  "zed_migrator",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -16222,7 +16218,6 @@ dependencies = [
  "pretty_assertions",
  "project",
  "regex",
- "release_channel 1.22.1",
  "rodio",
  "schemars 1.2.2",
  "search",
@@ -16236,6 +16231,7 @@ dependencies = [
  "theme_settings",
  "url",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -16371,7 +16367,6 @@ dependencies = [
  "project",
  "prompt_store",
  "recent_projects",
- "release_channel 1.22.1",
  "remote",
  "remote_connection",
  "remote_server",
@@ -16383,6 +16378,7 @@ dependencies = [
  "theme_settings",
  "unicode-segmentation",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -17287,7 +17283,7 @@ dependencies = [
  "gpui",
  "human_bytes",
  "pciid-parser",
- "release_channel 0.1.0",
+ "release_channel",
  "semver",
  "serde",
  "sysinfo 0.39.6",
@@ -17301,10 +17297,10 @@ dependencies = [
  "gpui",
  "human_bytes",
  "pciid-parser",
- "release_channel 1.22.1",
  "semver",
  "serde",
  "sysinfo 0.39.6",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -17539,7 +17535,6 @@ dependencies = [
  "percent-encoding",
  "rand 0.9.5",
  "regex",
- "release_channel 1.22.1",
  "schemars 1.2.2",
  "serde",
  "settings",
@@ -17551,6 +17546,7 @@ dependencies = [
  "util_macros",
  "vte",
  "windows 0.62.2",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -17587,7 +17583,6 @@ dependencies = [
  "pretty_assertions",
  "project",
  "regex",
- "release_channel 1.22.1",
  "remote",
  "rpc",
  "schemars 1.2.2",
@@ -17601,6 +17596,7 @@ dependencies = [
  "terminal",
  "theme_settings",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -19151,7 +19147,6 @@ dependencies = [
  "project",
  "project_panel",
  "regex",
- "release_channel 1.22.1",
  "schemars 1.2.2",
  "search",
  "semver",
@@ -19166,6 +19161,7 @@ dependencies = [
  "util_macros",
  "vim_mode_setting",
  "workspace",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -21631,7 +21627,6 @@ dependencies = [
  "proptest",
  "proptest-derive",
  "proto",
- "release_channel 1.22.1",
  "remote",
  "schemars 1.2.2",
  "serde",
@@ -21649,6 +21644,7 @@ dependencies = [
  "url",
  "uuid",
  "worktree",
+ "zed_release_channel",
 ]
 
 [[package]]
@@ -22156,6 +22152,14 @@ dependencies = [
  "streaming-iterator",
  "tree-sitter",
  "tree-sitter-json",
+]
+
+[[package]]
+name = "zed_release_channel"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "semver",
 ]
 
 [[package]]
