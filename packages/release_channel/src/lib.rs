@@ -18,19 +18,26 @@ pub static RELEASE_CHANNEL_NAME: LazyLock<String> = LazyLock::new(|| {
     }
 });
 
-/// When a crate in zed is used as a dependency that uses the `crane` nix
-/// library, it vendors each crate separately and builds it in isolation, which
-/// makes the `include_str!` fail.
+/// 编译期回退的频道名。
 ///
-/// The build script checks for `$ZED_RELEASE_CHANNEL` and emits the `cfg`
-#[cfg(__do_not_set_zed_release_channel)]
+/// 【有意偏离 Zed】Zed 在这里用 `#[cfg]` 在两条路之间二选一：
+/// 构建期有 `ZED_RELEASE_CHANNEL` 就走 `env!`（且运行期缺它会 panic），
+/// 否则走 `include_str!("../../zed/RELEASE_CHANNEL")` 读仓库里那个文件。
+/// 它需要文件是因为 crane/Nix 会把每个 crate 单独 vendor 到独立路径编译，
+/// `include_str!` 的相对路径在那里不存在（见 zed 原注释）。
+///
+/// aacode 不用 crane，且直接规定「设置环境变量，否则默认 dev」，故两条路合并成
+/// `option_env!`：
+///   - 有 env → 用它（等价 zed 的 env! 分支，但不会 panic）
+///   - 无 env → "dev"
+///
+/// 顺带取消了 `__do_not_set_zed_release_channel` 这个 cfg：它原本只为让两个分支
+/// 互斥而存在，现在只有一个函数，cfg 没有意义了（build.rs 里对应的 rustc-cfg 也一并删）。
+///
+/// 代价：没有 env 时编译产物固定是 dev。若要出非 dev 的正式版，必须构建期注入
+/// ZED_RELEASE_CHANNEL —— `just install` 就是这么做的（默认 stable）。
 fn compile_time_release_channel_name() -> String {
-    env!("ZED_RELEASE_CHANNEL").trim().to_string()
-}
-
-#[cfg(not(__do_not_set_zed_release_channel))]
-fn compile_time_release_channel_name() -> String {
-    include_str!("../../app/RELEASE_CHANNEL").trim().to_string()
+    option_env!("ZED_RELEASE_CHANNEL").unwrap_or("dev").trim().to_string()
 }
 
 #[doc(hidden)]

@@ -31,11 +31,12 @@ stats:
 #
 # 默认 stable：本地安装产物是正式版（图标无后缀、db 落在 0-stable）。
 #
-# 注意与 packages/app/RELEASE_CHANNEL 文件的关系：那个文件内容是 `dev`，
-# 是**不注入 env 时的兜底**（对齐 zed —— zed 的 crates/zed/RELEASE_CHANNEL 也是 dev）。
-# 只要构建时注入了 ZED_RELEASE_CHANNEL，release_channel/build.rs 就置
-# __do_not_set_zed_release_channel cfg，lib.rs 转而读 env，文件被完全绕开。
-# 所以：just install → stable（本文档这条默认）；裸 cargo build/run → dev。
+# 与「不设 env 时的默认」的关系：aacode 规定「设置环境变量，否则 dev」
+# （packages/release_channel/src/lib.rs 的 compile_time_release_channel_name，
+# 用 option_env! 而非 zed 的 env! + include_str! 双分支，也不再有 RELEASE_CHANNEL
+# 文件）。所以：
+#   just install                 → stable（本文档这条默认，env 注入）
+#   裸 cargo build / cargo run   → dev   （无 env，代码内兜底）
 # 这样调试时不至于和正式数据混在同一个 0-stable 库里。
 _channel      := env_var_or_default("RELEASE_CHANNEL", "stable")
 _app_name    := env_var_or_default("APP_NAME", "AACode")
@@ -110,8 +111,10 @@ strip:
 install prefix="$HOME/.local":
     #!/usr/bin/env bash
     set -euo pipefail
-    # RELEASE_CHANNEL 在这里注入 —— 必须在 cargo build 之前，release_channel 的
-    # build.rs 是构建期读 env 的（对齐 zed：CI 在编译时注入 ZED_RELEASE_CHANNEL）。
+    # RELEASE_CHANNEL 在这里注入 —— 必须在 cargo build 之前。aacode 的取值规则是
+    # 「env 或 dev」（release_channel/src/lib.rs 用 option_env! 读构建期值），
+    # 所以这条注入就是 stable 与 dev 的唯一区别来源。
+    # 对齐 zed：CI 也是在编译时注入 ZED_RELEASE_CHANNEL。
     # LK_CUSTOM_WEBRTC：webrtc-sys（git rev 0a1c519）的 download_webrtc() **没有缓存
     # 判断**，开头就 remove_dir_all(prebuilt_dir()) 然后无条件下载（registry 版
     # webrtc-sys-build 0.3.19 才有 `if exists { return Ok }`）。而它的 prebuilt_dir()
