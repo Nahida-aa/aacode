@@ -78,4 +78,4 @@ tree-sitter-go.workspace = true
 unindent.workspace = true
 util = { workspace = true, features = ["test-support"] }
 workspace = { workspace = true, features = ["test-support"] }
-zlog.workspace = true
+a_log.workspace = true

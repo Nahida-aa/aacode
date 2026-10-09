@@ -43,7 +43,7 @@ util_macros.workspace = true
 workspace.workspace = true
 aacode_actions.workspace = true
 itertools.workspace = true
-ztracing.workspace = true
+a_tracing.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]

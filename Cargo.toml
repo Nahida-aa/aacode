@@ -23,9 +23,9 @@ publish = false
 
 [workspace.dependencies]
 # --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
-zlog = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
-ztracing = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
-ztracing_macro = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
+a_log = { package = "zlog", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
+a_tracing = { package = "ztracing", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
+a_tracing_macro = { package = "ztracing_macro", git = "https://github.com/Nahida-aa/gpui_learn", rev = "947faee" }
 ac_util = { path = "packages/ac_util" }
 aa_env_vars = { path = "packages/aa_env_vars" }
 aa-kernel = { path = "packages/kernel" }

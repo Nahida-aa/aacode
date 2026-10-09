@@ -23,7 +23,7 @@ sum_tree.workspace = true
 text.workspace = true
 tracing.workspace = true
 util.workspace = true
-ztracing.workspace = true
+a_tracing.workspace = true
 
 [dev-dependencies]
 ctor.workspace = true
@@ -33,7 +33,7 @@ rand.workspace = true
 settings.workspace = true
 text = { workspace = true, features = ["test-support"] }
 unindent.workspace = true
-zlog.workspace = true
+a_log.workspace = true
 
 [package.metadata.cargo-shear]
 ignored = ["tracing"]

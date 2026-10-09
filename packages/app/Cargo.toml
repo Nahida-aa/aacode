@@ -221,8 +221,8 @@ uuid.workspace = true
 vim.workspace = true
 workspace.workspace = true
 watch.workspace = true
-zlog.workspace = true
-ztracing.workspace = true
+a_log.workspace = true
+a_tracing.workspace = true
 gpui_platform = { workspace = true, features = [
     "screen-capture",
     "font-kit",
