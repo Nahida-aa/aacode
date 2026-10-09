@@ -110,7 +110,7 @@ W3 与它们无依赖，可按 crate 多人并行。
 **不要用「本地有没有提交碰过这个文件」判断冲突** —— copy-fork 里port 动作本身就会让每个
 被同步过的文件出现在 `git log` 里，那样判几乎全是误报。本节用的是：把本地文件与
 **上游 old 版本**比，看差异能否被已知变换（workspace-ify / `src/x.rs`→`src/lib.rs` /
-`zed_actions`→`aacode_actions` / `zlog`→`zlog` 等）解释。
+`zed_actions`→`aacode_actions` / `a_log`→`zlog` 等）解释。
 
 | 级别            | 含义                                                 | 本批 |
 | --------------- | ---------------------------------------------------- | ---- |
@@ -192,7 +192,7 @@ diff <(git -C ~/repos/ide_ls/learn_ls/zed show bd747337d7be138834e20972b9e203c7b
 基线对比：zed old = bd747337d7be138834e20972b9e203c7b239cc47 vs aacode 当前 packages/project
 
 - 路径映射策略：精确匹配 → mod.rs→.rs 同名替换；无法映射的归入 NOMAP
-- 归一化：可见性（pub(crate)/pub(super)/pub(in ...)）去除，已知重命名（zlog→zlog、zed_actions→aacode_actions、...）对齐
+- 归一化：可见性（pub(crate)/pub(super)/pub(in ...)）去除，已知重命名（a_log→zlog、zed_actions→aacode_actions、...）对齐
 
 统计：
 

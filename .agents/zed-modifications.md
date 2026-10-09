@@ -6,11 +6,13 @@
 
 aacode 在重命名层面做了以下映射（fork-sync 归一化时已考虑）：
 
-- `zlog` → `zlog`
 - `zed_actions` → `aacode_actions`
 - `zed_credentials_provider` → `ad_credentials_provider`
 - `zed_resource_manager` → `a_resource_manager`
 - `zed_application` → `aagent_application`
+- ~~`zlog` → `a_log`~~ / ~~`ztracing` → `a_tracing`~~ — 曾经的本地 `a_` 前缀，迁移到 gpui_learn 后**已还原**：
+  aacode 源码全局替换 `a_log::` → `zlog::`、`a_tracing::` → `ztracing::`，
+  现在与 zed 上游同名（zed 本来就叫 `zlog` / `ztracing`，不是 `log` / `tracing`）
 
 ## 2. 结构性重组（单文件 → 多文件拆分）
 

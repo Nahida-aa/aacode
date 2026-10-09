@@ -278,10 +278,12 @@ grep -rn "X::global\|global::<X>" packages/*/src/
 | ------------------ | --------------------- |
 | `zed_actions`      | **`aacode_actions`**  |
 | `cloud_llm_client` | `aa_cloud_llm_client` |
-| `log` / `tracing`  | `zlog` / `ztracing`   |
 
 规律：`zed_` 前缀 → `aacode_`；`aa_` 前缀的 crate 基本是 Zed crate 的重命名版本。
 所以判定「不存在」之前，必须同时搜 `packages/aacode_*` 和 workspace 依赖名。
+
+~~`zlog`/`ztracing` 曾被 aacode 本地改名为 `a_log`/`a_tracing`，现已还原~~ —
+迁移到 gpui_learn 后全局替换回 zed 原名，不再是重命名陷阱。
 
 ### 方法论教训
 
