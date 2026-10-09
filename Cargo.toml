@@ -205,8 +205,8 @@ theme_selector = { path = "packages/theme_selector" }
 toolchain_selector = { path = "packages/toolchain_selector" }
 ui_prompt = { path = "packages/ui_prompt" }
 
-util = { package = "aa_gpui_kit_util", git = "https://github.com/Nahida-aa/gpui_learn", rev = "bfaec06", version = "=0.1.0" }
-util_macros = { package = "aa_gpui_kit_util_macros", git = "https://github.com/Nahida-aa/gpui_learn", rev = "bfaec06", version = "=0.1.0" }
+util = { package = "aa_util", git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
+util_macros = { package = "aa_util_macros", git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
 vim = { path = "packages/vim" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
 web_search = { path = "packages/web_search" }
@@ -795,8 +795,8 @@ aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packag
 # 一旦跨 crate 混用就是 E0308「multiple different versions」。
 # 与上面 ui / ui_input / component 同理：凡是从 gpui_learn 侧被间接拉进来的 crate，
 # 都要在此声明 path patch 才能与其 workspace 解析结果一致。
-aa_gpui_kit_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util" }
-aa_gpui_kit_util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/util_macros" }
+aa_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util" }
+aa_util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
 aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/grammars" }
 
 # —— profile ——
@@ -841,7 +841,7 @@ settings_macros = { opt-level = 3 }
 sqlez_macros = { opt-level = 3, codegen-units = 1 }
 aa_gpui_kit_ui_macros = { opt-level = 3 }
 util_macros = { opt-level = 3 }
-aa_gpui_kit_util_macros = { opt-level = 3 }
+aa_util_macros = { opt-level = 3 }
 quote = { opt-level = 3 }
 syn = { opt-level = 3 }
 proc-macro2 = { opt-level = 3 }
