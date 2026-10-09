@@ -110,6 +110,22 @@ zed 参照仓库在 `~/repos/ide_ls/learn_ls/zed`，单文件 crate 拆分后的
 `collections::` vs `std::collections::`、`RelPath` vs `std::path::Path`、
 模块遮蔽要用 `::rpc::` 绝对路径等坑都记在那儿，照搬时直接套用，别重新推演。
 
+## 查上游版本/release：优先用 `tools/gh-releases.ts`
+
+问「zed 最新到哪个版本 / 某 rev 对应什么 / 某功能在哪个版本进的」时，
+**不要用网页搜索**，直接跑：
+
+```bash
+bun tools/gh-releases.ts zed-industries/zed --latest      # 最新稳定版 tag + sha
+bun tools/gh-releases.ts zed-industries/zed --limit 15     # 按时间倒序列表
+```
+
+它走 GitHub GraphQL 拿 tag / commit sha / publishedAt，**比网页搜索准确**：
+搜索结果常是缓存的旧快照，曾据此误判「不存在 1.23」，而实际 1.23.2 已于
+2026-10-07 发布。核对 rev 时还能直接对着 sha 走本地 zed 仓库。
+
+网页搜索只用于「release notes 说了什么」「官方公告/定价」这类 GraphQL 拿不到的内容。
+
 ## 排查经验（`.agents/memory/`）
 
 - **UI「内容不显示」类 bug**：先在数据源函数入口打一行 `len()` 确认数据非空，再碰渲染层。
