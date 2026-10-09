@@ -594,7 +594,6 @@ dependencies = [
  "markdown",
  "markdown_preview",
  "menu",
- "migrator",
  "mimalloc",
  "miniprofiler_ui",
  "multi_buffer",
@@ -660,6 +659,7 @@ dependencies = [
  "windows 0.62.2",
  "windows_resources",
  "workspace",
+ "zed_migrator",
 ]
 
 [[package]]
@@ -10931,25 +10931,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "migrator"
-version = "1.22.1"
-dependencies = [
- "aa_gpui_kit_settings_content",
- "aa_settings_json",
- "anyhow",
- "collections",
- "convert_case 0.11.0",
- "indoc",
- "log",
- "pretty_assertions",
- "serde_json",
- "serde_json_lenient",
- "streaming-iterator",
- "tree-sitter",
- "tree-sitter-json",
-]
-
-[[package]]
 name = "mimalloc"
 version = "0.1.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16175,7 +16156,6 @@ dependencies = [
  "inventory",
  "json5 0.4.1",
  "log",
- "migrator",
  "path",
  "paths",
  "pretty_assertions",
@@ -16190,6 +16170,7 @@ dependencies = [
  "tempfile",
  "tracing",
  "unindent",
+ "zed_migrator",
 ]
 
 [[package]]
@@ -22158,6 +22139,23 @@ dependencies = [
  "strum 0.28.0",
  "uuid",
  "zeta_prompt",
+]
+
+[[package]]
+name = "zed_migrator"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_settings_content",
+ "aa_settings_json",
+ "anyhow",
+ "collections",
+ "convert_case 0.11.0",
+ "log",
+ "serde_json",
+ "serde_json_lenient",
+ "streaming-iterator",
+ "tree-sitter",
+ "tree-sitter-json",
 ]
 
 [[package]]

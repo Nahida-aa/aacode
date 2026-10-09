@@ -28,8 +28,15 @@ stats:
 #
 # 注意 RELEASE_CHANNEL 只影响 aacode 自己；它与 paths::APP_NAME（决定数据目录
 # ~/.local/share/<name>）是两件事，见 .agents/zed-modifications.md。
-# 默认 stable：本地安装就是正式版，不是 dev 通道（dev 通道的存在意义是让多个版本
-# 并存，改显式指定）。
+#
+# 默认 stable：本地安装产物是正式版（图标无后缀、db 落在 0-stable）。
+#
+# 注意与 packages/app/RELEASE_CHANNEL 文件的关系：那个文件内容是 `dev`，
+# 是**不注入 env 时的兜底**（对齐 zed —— zed 的 crates/zed/RELEASE_CHANNEL 也是 dev）。
+# 只要构建时注入了 ZED_RELEASE_CHANNEL，release_channel/build.rs 就置
+# __do_not_set_zed_release_channel cfg，lib.rs 转而读 env，文件被完全绕开。
+# 所以：just install → stable（本文档这条默认）；裸 cargo build/run → dev。
+# 这样调试时不至于和正式数据混在同一个 0-stable 库里。
 _channel      := env_var_or_default("RELEASE_CHANNEL", "stable")
 _app_name    := env_var_or_default("APP_NAME", "AACode")
 _app_id      := env_var_or_default("APP_ID", "dev.aacode.AACode")
