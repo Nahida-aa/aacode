@@ -47,6 +47,7 @@ regex.workspace = true
 platform_title_bar.workspace = true
 project.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 rodio.workspace = true
 schemars.workspace = true
 search.workspace = true

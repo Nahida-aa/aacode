@@ -696,10 +696,10 @@ impl AcpConnection {
         } = transport::spawn_stdio(&project, command, cx)?;
         let sessions = Rc::new(RefCell::new(HashMap::default()));
 
-        let (release_channel, version): (Option<&str>, String) = cx.update(|cx| {
+        let (release_channel, version): (Option<String>, String) = cx.update(|cx| {
             (
                 release_channel::ReleaseChannel::try_global(cx)
-                    .map(|release_channel| release_channel.display_name()),
+                    .map(|release_channel| release_channel.display_name(ac_constant::BRAND)),
                 release_channel::AppVersion::global(cx).to_string(),
             )
         });
@@ -800,7 +800,7 @@ impl AcpConnection {
                     ))
                     .client_info(
                         acp::Implementation::new("zed", version)
-                            .title(release_channel.map(ToOwned::to_owned)),
+                            .title(release_channel),
                     ),
             )
             .block_task()

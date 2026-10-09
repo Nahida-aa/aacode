@@ -1129,7 +1129,7 @@ impl LanguageServer {
             workspace_folders: Some(workspace_folders),
             client_info: release_channel::ReleaseChannel::try_global(cx).map(|release_channel| {
                 ClientInfo {
-                    name: release_channel.display_name().to_string(),
+                    name: release_channel.display_name(ac_constant::BRAND),
                     version: Some(release_channel::AppVersion::global(cx).to_string()),
                 }
             }),

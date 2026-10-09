@@ -169,7 +169,7 @@ recent_projects = { path = "packages/recent_projects" }
 repl = { path = "packages/repl" }
 rope = { path = "packages/rope" }
 rpc = { path = "packages/rpc" }
-release_channel = { package = "aa_release_channel", git = "https://github.com/Nahida-aa/gpui_learn", rev = "7a5246f", version = "=0.1.0" }
+release_channel = { package = "aa_release_channel", git = "https://github.com/Nahida-aa/gpui_learn", rev = "f753769", version = "=0.1.0" }
 remote = { path = "packages/remote" }
 remote_connection = { path = "packages/remote_connection" }
 remote_server = { path = "packages/remote_server" }

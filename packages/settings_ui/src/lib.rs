@@ -879,7 +879,7 @@ fn open_settings_editor_with(
         let scale_factor = current_rem_size / default_rem_size;
         let scaled_bounds: gpui::Size<Pixels> = default_bounds.map(|axis| axis * scale_factor);
 
-        let app_id = ReleaseChannel::global(cx).app_id();
+        let app_id = ReleaseChannel::global(cx).app_id(ac_constant::APP_ID);
         let window_decorations = match std::env::var("ZED_WINDOW_DECORATIONS") {
             Ok(val) if val == "server" => gpui::WindowDecorations::Server,
             Ok(val) if val == "client" => gpui::WindowDecorations::Client,

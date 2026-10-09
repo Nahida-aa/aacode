@@ -80,6 +80,7 @@ prompt_store.workspace = true
 proto.workspace = true
 rand.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 remote.workspace = true
 remote_connection.workspace = true
 rope.workspace = true

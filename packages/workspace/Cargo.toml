@@ -46,6 +46,7 @@ parking_lot.workspace = true
 postage.workspace = true
 project.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 schemars = { workspace = true, features = ["derive"] }
 serde.workspace = true
 serde_json.workspace = true

@@ -1,4 +1,5 @@
 pub use gpui::GpuSpecs;
+use ac_constant::BRAND;
 use gpui::{App, AppContext as _, Task, Window, actions};
 use human_bytes::human_bytes;
 use release_channel::{AppCommitSha, AppVersion, ReleaseChannel};
@@ -18,7 +19,7 @@ actions!(
 #[derive(Clone, Debug, Serialize)]
 pub struct SystemSpecs {
     app_version: String,
-    release_channel: &'static str,
+    release_channel: String,
     os_name: String,
     os_version: String,
     memory: u64,
@@ -60,7 +61,7 @@ impl SystemSpecs {
         cx.background_spawn(async move {
             SystemSpecs {
                 app_version,
-                release_channel: release_channel.display_name(),
+                release_channel: release_channel.display_name(BRAND),
                 bundle_type,
                 os_name,
                 os_version,
@@ -92,7 +93,7 @@ impl SystemSpecs {
 
         Self {
             app_version: app_version.to_string(),
-            release_channel: release_channel.display_name(),
+            release_channel: release_channel.display_name(BRAND),
             os_name,
             os_version,
             memory,
@@ -108,7 +109,7 @@ impl Display for SystemSpecs {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let os_information = format!("OS: {} {}", self.os_name, self.os_version);
         let app_version_information = format!(
-            "Zed: v{} ({}) {}{}",
+            "{BRAND}: v{} ({}) {}{}",
             self.app_version,
             match &self.commit_sha {
                 Some(commit_sha) => format!("{} {}", self.release_channel, commit_sha),

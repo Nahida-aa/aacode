@@ -91,7 +91,7 @@ pub fn channels_with_threads(cx: &App) -> Task<Vec<SharedString>> {
                     && *channel != ReleaseChannel::Dev
                     && channel_has_threads(database_dir, *channel)
             })
-            .map(|channel| SharedString::new_static(channel.display_name()))
+            .map(|channel| SharedString::from(channel.display_name(ac_constant::BRAND)))
             .collect()
     })
 }

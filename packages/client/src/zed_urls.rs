@@ -4,6 +4,7 @@
 //! links appropriate for the environment (e.g., by linking to a local copy of
 //! zed.dev in development).
 
+use ac_constant::DOCS_URL;
 use gpui::App;
 use release_channel::ReleaseChannel;
 use settings::Settings;
@@ -76,7 +77,7 @@ pub fn skills_docs(cx: &App) -> String { format!("{docs_url}/ai/skills", docs_ur
 /// docs are a static site hosted on `zed.dev`, so pointing at a local dev
 /// `server_url` would 404.
 pub fn sandboxing_docs(section: Option<&str>, cx: &App) -> String {
-    let base = release_channel::docs_url("ai/sandboxing", cx);
+    let base = release_channel::docs_url(DOCS_URL, "ai/sandboxing", cx);
     match section {
         Some(section) => format!("{base}#{section}"),
         None => base,

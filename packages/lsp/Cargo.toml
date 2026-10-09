@@ -21,6 +21,7 @@ lsp-types.workspace = true
 parking_lot.workspace = true
 postage.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 schemars.workspace = true
 serde.workspace = true
 serde_json.workspace = true

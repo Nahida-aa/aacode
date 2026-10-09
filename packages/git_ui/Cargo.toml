@@ -41,6 +41,7 @@ project.workspace = true
 prompt_store.workspace = true
 rand.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 remote_connection.workspace = true
 schemars.workspace = true
 serde.workspace = true

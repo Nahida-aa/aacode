@@ -335,7 +335,7 @@ fn show_update_notification(cx: &mut App) {
     let mut version = updater.read(cx).current_version();
     version.pre = semver::Prerelease::EMPTY;
     version.build = semver::BuildMetadata::EMPTY;
-    let app_name = ReleaseChannel::global(cx).display_name();
+    let app_name = ReleaseChannel::global(cx).display_name(ac_constant::BRAND);
 
     if let Some(content) = announcement_for_version(&version, cx) {
         show_app_notification(

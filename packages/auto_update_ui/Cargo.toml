@@ -20,6 +20,7 @@ gpui.workspace = true
 markdown_preview.workspace = true
 prompt_store.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 semver.workspace = true
 serde.workspace = true
 serde_json.workspace = true

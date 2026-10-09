@@ -22,6 +22,7 @@ lsp.workspace = true
 menu.workspace = true
 project.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 serde_json.workspace = true
 settings.workspace = true
 ui.workspace = true

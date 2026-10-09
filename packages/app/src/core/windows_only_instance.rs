@@ -35,7 +35,7 @@ fn is_first_instance() -> bool {
         CreateMutexW(
             None,
             false,
-            &HSTRING::from(format!("{}-Instance-Mutex", app_identifier())),
+            &HSTRING::from(format!("{}-Instance-Mutex", app_identifier(ac_constant::APP_IDENTIFIER_PREFIX))),
         )
         .expect("Unable to create instance mutex.")
     };
@@ -68,7 +68,7 @@ pub fn handle_single_instance(opener: OpenListener, args: &Args) -> bool {
 fn with_pipe(f: &dyn Fn(String)) {
     let pipe = unsafe {
         CreateNamedPipeW(
-            &HSTRING::from(format!("\\\\.\\pipe\\{}-Named-Pipe", app_identifier())),
+            &HSTRING::from(format!("\\\\.\\pipe\\{}-Named-Pipe", app_identifier(ac_constant::APP_IDENTIFIER_PREFIX))),
             PIPE_ACCESS_INBOUND,
             PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
             1,
@@ -213,7 +213,7 @@ fn send_args_to_instance(args: &Args) -> anyhow::Result<()> {
 fn write_message_to_instance_pipe(message: &[u8]) -> anyhow::Result<()> {
     unsafe {
         let pipe = CreateFileW(
-            &HSTRING::from(format!("\\\\.\\pipe\\{}-Named-Pipe", app_identifier())),
+            &HSTRING::from(format!("\\\\.\\pipe\\{}-Named-Pipe", app_identifier(ac_constant::APP_IDENTIFIER_PREFIX))),
             GENERIC_WRITE.0,
             FILE_SHARE_MODE::default(),
             None,

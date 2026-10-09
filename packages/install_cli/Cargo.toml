@@ -18,6 +18,7 @@ client.workspace = true
 gpui.workspace = true
 log.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 smol.workspace = true
 util.workspace = true
 workspace.workspace = true

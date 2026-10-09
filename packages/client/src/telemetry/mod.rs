@@ -1,6 +1,7 @@
 mod event_coalescer;
 
 use crate::TelemetrySettings;
+use ac_constant::BRAND;
 use anyhow::{Context as _, Result};
 use clock::SystemClock;
 use fs::Fs;
@@ -677,7 +678,7 @@ impl Telemetry {
 
                     release_channel: state
                         .release_channel
-                        .map(|channel| channel.display_name().to_owned()),
+                        .map(|channel| channel.display_name(ac_constant::BRAND)),
                     events,
                 },
             )

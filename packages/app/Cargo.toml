@@ -187,6 +187,7 @@ title_bar.workspace = true
 settings.workspace = true
 settings_ui.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 # main.rs 的 single-instance 检查读 ZED_STATELESS（对齐 Zed main.rs L361-362）。
 aa_env_vars.workspace = true
 

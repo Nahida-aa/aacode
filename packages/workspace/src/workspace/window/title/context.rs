@@ -8,7 +8,7 @@ pub(crate) struct WindowTitleContext {
     pub file_stem: Option<String>,
     pub remote_name: Option<String>,
     pub remote_host: Option<String>,
-    pub app_name: &'static str,
+    pub app_name: String,
     pub branch: Option<String>,
 }
 
@@ -22,7 +22,7 @@ impl WindowTitleContext {
             "fileStem" => self.file_stem.as_deref(),
             "remoteName" => self.remote_name.as_deref(),
             "remoteHost" => self.remote_host.as_deref(),
-            "appName" => Some(self.app_name),
+            "appName" => Some(self.app_name.as_str()),
             "branch" => self.branch.as_deref(),
             // Unknown placeholders collapse like missing values so imported and
             // native templates follow the same rendering rules.
@@ -108,9 +108,9 @@ impl Workspace {
             app_name: if needs.app_name {
                 ReleaseChannel::try_global(cx)
                     .unwrap_or(ReleaseChannel::Stable)
-                    .display_name()
+                    .display_name(ac_constant::BRAND)
             } else {
-                ""
+                String::new()
             },
             branch,
         }

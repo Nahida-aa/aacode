@@ -131,7 +131,7 @@ pub fn install_cli_binary(window: &mut Window, cx: &mut Context<Workspace>) {
                     format!(
                         "Installed `zed` to {}. You can launch {} from your terminal.",
                         path.to_string_lossy(),
-                        ReleaseChannel::global(cx).display_name()
+                        ReleaseChannel::global(cx).display_name(ac_constant::BRAND)
                     ),
                 ),
                 cx,

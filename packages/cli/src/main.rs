@@ -1495,7 +1495,7 @@ mod mac_os {
 
         let app_path_prompt = format!(
             "POSIX path of (path to application \"{}\")",
-            channel.display_name()
+            channel.display_name(ac_constant::BRAND)
         );
         let app_path_output = Command::new("osascript")
             .arg("-e")
@@ -1504,7 +1504,7 @@ mod mac_os {
         if !app_path_output.status.success() {
             bail!(
                 "Could not determine app path for {}",
-                channel.display_name()
+                channel.display_name(ac_constant::BRAND)
             );
         }
         let app_path = String::from_utf8(app_path_output.stdout)?.trim().to_owned();

@@ -62,7 +62,7 @@ fn open_copilot_code_verification_window(copilot: &Entity<Copilot>, window: &Win
         current_window_center - point(width / 2.0, height / 2.0),
         gpui::size(width, height),
     ));
-    let app_id = ReleaseChannel::global(cx).app_id();
+    let app_id = ReleaseChannel::global(cx).app_id(ac_constant::APP_ID);
     cx.open_window(
         WindowOptions {
             kind: gpui::WindowKind::Floating,

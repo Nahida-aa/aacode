@@ -273,7 +273,7 @@ pub fn open_audio_test_window(_window: &mut Window, cx: &mut App) {
         return;
     }
 
-    let app_id = ReleaseChannel::global(cx).app_id();
+    let app_id = ReleaseChannel::global(cx).app_id(ac_constant::APP_ID);
     let window_size = Size {
         width: px(640.0),
         height: px(300.0),

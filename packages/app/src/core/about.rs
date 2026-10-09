@@ -40,7 +40,7 @@ struct AboutWindow {
 impl AboutWindow {
     fn new(cx: &mut Context<Self>) -> Self {
         let release_channel = ReleaseChannel::global(cx);
-        let release_channel_name = release_channel.display_name();
+        let release_channel_name = release_channel.display_name(ac_constant::BRAND);
         let full_version: SharedString = AppVersion::global(cx).to_string().into();
         let version = env!("CARGO_PKG_VERSION");
 
@@ -202,7 +202,7 @@ pub fn open_about_window(cx: &mut App) {
             is_resizable: false,
             is_minimizable: false,
             kind: WindowKind::Floating,
-            app_id: Some(ReleaseChannel::global(cx).app_id().to_owned()),
+            app_id: Some(ReleaseChannel::global(cx).app_id(ac_constant::APP_ID)),
             ..Default::default()
         },
         |window, cx| {

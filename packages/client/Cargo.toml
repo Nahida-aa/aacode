@@ -35,6 +35,7 @@ proxy_handshake = { workspace = true, features = ["tokio"] }
 rand.workspace = true
 regex.workspace = true
 release_channel.workspace = true
+ac_constant.workspace = true
 rpc = { workspace = true, features = ["gpui"] }
 serde.workspace = true
 serde_json.workspace = true
