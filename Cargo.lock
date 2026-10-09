@@ -460,6 +460,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_settings_json"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_util",
+ "anyhow",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "serde_path_to_error",
+ "tree-sitter",
+ "tree-sitter-json",
+]
+
+[[package]]
+name = "aa_settings_macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
 name = "aacode"
 version = "0.1.0"
 dependencies = [
@@ -10898,6 +10920,7 @@ dependencies = [
 name = "migrator"
 version = "0.1.0"
 dependencies = [
+ "aa_settings_json",
  "anyhow",
  "collections",
  "convert_case 0.11.0",
@@ -10907,7 +10930,6 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "settings_content",
- "settings_json",
  "streaming-iterator",
  "tree-sitter",
  "tree-sitter-json",
@@ -16125,6 +16147,8 @@ name = "settings"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_util",
+ "aa_settings_json",
+ "aa_settings_macros",
  "anyhow",
  "collections",
  "ec4rs",
@@ -16147,8 +16171,6 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "settings_content",
- "settings_json",
- "settings_macros",
  "smallvec",
  "strum 0.28.0",
  "tempfile",
@@ -16162,6 +16184,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_util",
  "aa_language_model_core",
+ "aa_settings_json",
+ "aa_settings_macros",
  "anyhow",
  "collections",
  "derive_more",
@@ -16173,34 +16197,8 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "serde_path_to_error",
- "settings_json",
- "settings_macros",
  "strum 0.28.0",
  "tempfile",
-]
-
-[[package]]
-name = "settings_json"
-version = "0.1.0"
-dependencies = [
- "aa_gpui_kit_util",
- "anyhow",
- "pretty_assertions",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "serde_path_to_error",
- "tree-sitter",
- "tree-sitter-json",
- "unindent",
-]
-
-[[package]]
-name = "settings_macros"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn 2.0.119",
 ]
 
 [[package]]
@@ -17553,6 +17551,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_util",
  "aa_gpui_kit_util_macros",
+ "aa_settings_macros",
  "alacritty_terminal",
  "anyhow",
  "async-channel 2.5.0",
@@ -17573,7 +17572,6 @@ dependencies = [
  "serde",
  "settings",
  "settings_content",
- "settings_macros",
  "sysinfo 0.39.6",
  "task",
  "thiserror 2.0.21",
@@ -17749,6 +17747,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_assets",
  "aa_gpui_kit_theme",
+ "aa_settings_macros",
  "anyhow",
  "collections",
  "gpui",
@@ -17760,7 +17759,6 @@ dependencies = [
  "serde_json",
  "settings",
  "settings_content",
- "settings_macros",
  "tracing",
 ]
 
