@@ -97,3 +97,4 @@ a_log.workspace = true
 [build-dependencies]
 cargo_toml.workspace = true
 toml.workspace = true
+toml_edit.workspace = true

@@ -7,19 +7,18 @@
 # 与 Zed 的差异（均为有意为之，改动前先读这里）：
 #
 # 1. crate / 路径改名
-#    zed → aacode，crates/zed/RELEASE_CHANNEL → packages/app/RELEASE_CHANNEL
-#    （两者都放在**主二进制 crate** 目录下：zed 是 crates/zed、aacode 是 packages/app；
-#    release_channel crate 用 include_str!("../../app/RELEASE_CHANNEL") 读同一个文件），
-#    crates/zed/resources/ → packages/app/resources/。
+#    zed → aacode，crates/zed/resources/ → packages/app/resources/。
+#    注意**没有** crates/zed/RELEASE_CHANNEL → packages/app/RELEASE_CHANNEL 的对应，
+#    因为 aacode 已删除那个文件（见下面第 4 条）。
 #
 # 2. 图标分 channel（与 Zed 一致）
 #    按 $suffix 取 app-icon$suffix.png —— stable 无后缀，其余带 -<channel>。
-#    $suffix 由上方的 channel 变量算出，与 Zed `crates/zed/build.rs` 的 icon_path()
+#    $suffix 由下方的 channel 变量算出，与 Zed `crates/zed/build.rs` 的 icon_path()
 #    （L221-240）同一套规则；`just icons` 从 assets/images/aacode{,-dev,-nightly,
 #    -preview}.svg 生成这 8 个文件（4 channel × 512/1024）。
-#    差异：Zed 用 `option_env!("RELEASE_CHANNEL")` 决定后缀（build.rs 编译期读 env），
-#    这里用运行时读到的 $channel 变量 —— 两者取值同源（都源于
-#    packages/app/RELEASE_CHANNEL），只是 zed 在 build.rs 里做、这里在脚本里做。
+#    差异：Zed 在 build.rs 里用 `option_env!("RELEASE_CHANNEL")` 决定后缀，
+#    aacode 同样在 build.rs 里用 `option_env!("ZED_RELEASE_CHANNEL")`；脚本侧的
+#    $channel 只是**同一个 env 的副本**，用于算 tarball 名和拷图标，取值同源。
 #
 # 3. libexec 里的名字
 #    Zed: release/zed → libexec/zed-editor、release/cli → bin/zed。
@@ -102,7 +101,22 @@ fi
 
 export ZED_BUNDLE=true
 
-channel=$(<packages/app/RELEASE_CHANNEL)
+# 【有意偏离 Zed】Zed 在这里是 `channel=$(<crates/zed/RELEASE_CHANNEL)`，从仓库里
+# 那个文件读 —— 因为它的 CI 靠改写文件来切频道（bump_zed_version.yml /
+# release_nightly.yml 里 `echo -n preview > crates/zed/RELEASE_CHANNEL` 后连同 tag
+# 一起提交）。
+#
+# aacode 已删除该文件，改为「设置环境变量，否则 dev」
+# （packages/release_channel/src/lib.rs 的 compile_time_release_channel_name 用
+# option_env! 读构建期值）。所以这里必须**显式 export** ZED_RELEASE_CHANNEL：
+#   - 不 export 的话，lib.rs 与 app/build.rs 都会兜底成 dev，
+#     而脚本自己算 suffix 用的是本行的 $channel → 会出现
+#     「tarball 名叫 aacode-nightly.app、里面的二进制却是 dev」的不一致；
+#   - 发布 tarball 不该是 dev，故默认值取 stable（可用环境变量覆盖，
+#     如 RELEASE_CHANNEL=nightly ./script/bundle-linux）。
+channel="${RELEASE_CHANNEL:-stable}"
+export ZED_RELEASE_CHANNEL="${channel}"
+
 target_dir="${CARGO_TARGET_DIR:-target}"
 
 version="$(script/get-crate-version aacode)"

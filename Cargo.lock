@@ -435,6 +435,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_release_channel"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+ "semver",
+]
+
+[[package]]
 name = "aa_settings_json"
 version = "0.1.0"
 dependencies = [
@@ -506,8 +514,10 @@ dependencies = [
  "aa_gpui_kit_assets",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
+ "ac_constant",
  "acp_thread",
  "acp_tools",
  "action_log",
@@ -659,7 +669,6 @@ dependencies = [
  "windows_resources",
  "workspace",
  "zed_migrator",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -879,13 +888,13 @@ dependencies = [
 name = "ad_credentials_provider"
 version = "1.22.1"
 dependencies = [
+ "aa_release_channel",
  "anyhow",
  "credentials_provider",
  "futures 0.3.34",
  "gpui",
  "paths",
  "serde_json",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -940,6 +949,7 @@ dependencies = [
  "aa_env_vars",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "acp_thread",
  "action_log",
@@ -1009,7 +1019,6 @@ dependencies = [
  "uuid",
  "watch",
  "web_search",
- "zed_release_channel",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -1068,7 +1077,9 @@ name = "agent_servers"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
+ "ac_constant",
  "acp_thread",
  "action_log",
  "ad_credentials_provider",
@@ -1101,7 +1112,6 @@ dependencies = [
  "thiserror 2.0.21",
  "uuid",
  "watch",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -1153,6 +1163,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "acp_thread",
@@ -1246,7 +1257,6 @@ dependencies = [
  "vim",
  "watch",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -2008,6 +2018,7 @@ version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "client",
@@ -2028,7 +2039,6 @@ dependencies = [
  "tempfile",
  "which",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -2036,6 +2046,7 @@ name = "auto_update_ui"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "agent_skills",
@@ -2053,7 +2064,6 @@ dependencies = [
  "smol",
  "telemetry",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -3402,6 +3412,7 @@ name = "channel"
 version = "1.22.1"
 dependencies = [
  "aa_clock",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "client",
@@ -3416,7 +3427,6 @@ dependencies = [
  "semver",
  "settings",
  "text",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -3578,6 +3588,7 @@ dependencies = [
  "aa-server",
  "aa-session",
  "aa_gpui_kit_settings_content",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "askpass",
@@ -3611,7 +3622,6 @@ dependencies = [
  "walkdir",
  "windows 0.62.2",
  "windows_resources",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -3620,7 +3630,9 @@ version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
+ "aa_release_channel",
  "aa_util",
+ "ac_constant",
  "ad_credentials_provider",
  "anyhow",
  "async-channel 2.5.0",
@@ -3668,7 +3680,6 @@ dependencies = [
  "windows 0.62.2",
  "worktree",
  "zed_cloud_llm_client",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -3828,6 +3839,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -3855,7 +3867,6 @@ dependencies = [
  "theme_settings",
  "title_bar",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -4169,6 +4180,7 @@ name = "copilot_ui"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "copilot",
@@ -4182,7 +4194,6 @@ dependencies = [
  "serde_json",
  "settings",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -5246,6 +5257,7 @@ name = "db"
 version = "1.22.1"
 dependencies = [
  "aa_env_vars",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "gpui",
@@ -5257,7 +5269,6 @@ dependencies = [
  "sqlez_macros",
  "tempfile",
  "uuid",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -5780,6 +5791,7 @@ dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "ad_credentials_provider",
@@ -5839,7 +5851,6 @@ dependencies = [
  "workspace",
  "worktree",
  "zed_cloud_llm_client",
- "zed_release_channel",
  "zeta_prompt",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -5945,6 +5956,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "aho-corasick",
@@ -6019,7 +6031,6 @@ dependencies = [
  "uuid",
  "vim_mode_setting",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -6422,6 +6433,7 @@ dependencies = [
  "a_log",
  "a_tracing",
  "aa_gpui_kit_theme",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "async-compression",
@@ -6466,7 +6478,6 @@ dependencies = [
  "wasmparser 0.254.2",
  "wasmtime 48.0.5",
  "wasmtime-wasi 48.0.5",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -6482,6 +6493,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -6515,7 +6527,6 @@ dependencies = [
  "theme_settings",
  "vim_mode_setting",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -7324,6 +7335,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "agent_settings",
@@ -7379,7 +7391,6 @@ dependencies = [
  "unindent",
  "watch",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -8880,6 +8891,7 @@ dependencies = [
 name = "install_cli"
 version = "1.22.1"
 dependencies = [
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "client",
@@ -8887,7 +8899,6 @@ dependencies = [
  "log",
  "smol",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -9673,6 +9684,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_release_channel",
  "aa_util",
  "ai_onboarding",
  "anthropic",
@@ -9728,7 +9740,6 @@ dependencies = [
  "tokio",
  "x_ai",
  "x_ai_subscribed",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -9781,6 +9792,7 @@ dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -9806,7 +9818,6 @@ dependencies = [
  "theme_settings",
  "tree-sitter",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -10431,7 +10442,9 @@ name = "lsp"
 version = "1.22.1"
 dependencies = [
  "a_log",
+ "aa_release_channel",
  "aa_util",
+ "ac_constant",
  "anyhow",
  "async-channel 2.5.0",
  "async-pipe",
@@ -10449,7 +10462,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -13856,6 +13868,7 @@ dependencies = [
  "a_util",
  "aa_clock",
  "aa_gpui_fuzzy",
+ "aa_release_channel",
  "aa_util",
  "ad_credentials_provider",
  "aho-corasick",
@@ -13925,7 +13938,6 @@ dependencies = [
  "wax",
  "which",
  "worktree",
- "zed_release_channel",
  "zeroize",
 ]
 
@@ -13977,6 +13989,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "editor",
@@ -13994,7 +14007,6 @@ dependencies = [
  "settings",
  "theme_settings",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -14767,6 +14779,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -14801,7 +14814,6 @@ dependencies = [
  "windows-registry",
  "workspace",
  "worktree",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -14940,6 +14952,7 @@ dependencies = [
 name = "remote"
 version = "1.22.1"
 dependencies = [
+ "aa_release_channel",
  "aa_util",
  "anyhow",
  "askpass",
@@ -14964,7 +14977,6 @@ dependencies = [
  "thiserror 2.0.21",
  "urlencoding",
  "which",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -14974,6 +14986,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_release_channel",
  "anyhow",
  "askpass",
  "auto_update",
@@ -14988,7 +15001,6 @@ dependencies = [
  "settings",
  "theme_settings",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -14999,6 +15011,7 @@ dependencies = [
  "a_util",
  "aa_clock",
  "aa_gpui_kit_theme",
+ "aa_release_channel",
  "aa_util",
  "acp_thread",
  "action_log",
@@ -15058,13 +15071,13 @@ dependencies = [
  "theme_settings",
  "thiserror 2.0.21",
  "toml 0.8.23",
+ "toml_edit 0.22.27",
  "unindent",
  "uuid",
  "watch",
  "windows 0.62.2",
  "workspace",
  "worktree",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -16138,6 +16151,7 @@ name = "settings"
 version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_settings_content",
+ "aa_release_channel",
  "aa_settings_json",
  "aa_settings_macros",
  "aa_util",
@@ -16166,7 +16180,6 @@ dependencies = [
  "tracing",
  "unindent",
  "zed_migrator",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -16177,6 +16190,7 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "ad_credentials_provider",
@@ -16231,7 +16245,6 @@ dependencies = [
  "theme_settings",
  "url",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -16334,6 +16347,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "acp_thread",
@@ -16378,7 +16392,6 @@ dependencies = [
  "theme_settings",
  "unicode-segmentation",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -17293,6 +17306,8 @@ dependencies = [
 name = "system_specs"
 version = "1.22.1"
 dependencies = [
+ "aa_release_channel",
+ "ac_constant",
  "anyhow",
  "gpui",
  "human_bytes",
@@ -17300,7 +17315,6 @@ dependencies = [
  "semver",
  "serde",
  "sysinfo 0.39.6",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -17518,6 +17532,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_settings_content",
  "aa_gpui_kit_theme",
+ "aa_release_channel",
  "aa_settings_macros",
  "aa_util",
  "alacritty_terminal",
@@ -17546,7 +17561,6 @@ dependencies = [
  "util_macros",
  "vte",
  "windows 0.62.2",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -17565,6 +17579,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -17596,7 +17611,6 @@ dependencies = [
  "terminal",
  "theme_settings",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -19116,6 +19130,7 @@ version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -19161,7 +19176,6 @@ dependencies = [
  "util_macros",
  "vim_mode_setting",
  "workspace",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -21595,8 +21609,10 @@ dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_release_channel",
  "aa_util",
  "aacode_actions",
+ "ac_constant",
  "agent_settings",
  "any_vec",
  "anyhow",
@@ -21644,7 +21660,6 @@ dependencies = [
  "url",
  "uuid",
  "worktree",
- "zed_release_channel",
 ]
 
 [[package]]
@@ -22152,14 +22167,6 @@ dependencies = [
  "streaming-iterator",
  "tree-sitter",
  "tree-sitter-json",
-]
-
-[[package]]
-name = "zed_release_channel"
-version = "0.1.0"
-dependencies = [
- "gpui",
- "semver",
 ]
 
 [[package]]

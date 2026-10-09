@@ -23,7 +23,7 @@ publish = false
 
 [workspace.dependencies]
 # --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
-a_log = { path = "packages/a_log",  }
+a_log = { path = "packages/a_log" }
 a_tracing = { path = "packages/a_tracing" }
 a_tracing_macro = { path = "packages/a_tracing_macro" }
 a_util = { path = "packages/a_util" }
@@ -169,7 +169,7 @@ recent_projects = { path = "packages/recent_projects" }
 repl = { path = "packages/repl" }
 rope = { path = "packages/rope" }
 rpc = { path = "packages/rpc" }
-release_channel = { package = "zed_release_channel", git = "https://github.com/Nahida-aa/gpui_learn", rev = "626210d", version = "=0.1.0" }
+release_channel = { package = "aa_release_channel", git = "https://github.com/Nahida-aa/gpui_learn", rev = "7a5246f", version = "=0.1.0" }
 remote = { path = "packages/remote" }
 remote_connection = { path = "packages/remote_connection" }
 remote_server = { path = "packages/remote_server" }
@@ -216,6 +216,7 @@ workspace = { path = "packages/workspace" }
 # 用户新增 crate（workspace member，但尚未全部被 app 直接依赖）。
 # 这里补齐 workspace.dependencies 条目，便于 app 按需引用。
 feedback = { path = "packages/feedback" }
+ac_constant = { path = "packages/ac_constant" }
 install_cli = { path = "packages/install_cli" }
 onboarding = { path = "packages/onboarding" }
 project_symbols = { path = "packages/project_symbols" }
@@ -271,6 +272,8 @@ betlang = "0.1.1"
 bitflags = "2.6.0"
 bytes = "1.0"
 cargo_toml = "0.21"
+# zed remote_server/build.rs 用它解析 app 的 Cargo.toml 取版本（对齐 zed L890）
+toml_edit = { version = "0.22", default-features = false, features = ["parse"] }
 chardetng = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 const_format = "0.2"
@@ -785,7 +788,7 @@ aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_in
 aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_cloud_llm_client" }
 zed_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed_cloud_llm_client" }
 zed_migrator = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_migrator" }
-zed_release_channel = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_release_channel" }
+aa_release_channel = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_release_channel" }
 aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
 aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_language_model_core" }
 aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_settings_macros" }
