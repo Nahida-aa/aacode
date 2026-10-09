@@ -625,7 +625,7 @@ pub fn execute_run(
         let (shell_env_loaded_tx, shell_env_loaded_rx) = oneshot::channel();
         app.background_executor()
             .spawn(async {
-                a_util::load_login_shell_environment().await.log_err();
+                ac_util::load_login_shell_environment().await.log_err();
                 shell_env_loaded_tx.send(()).ok();
             })
             .detach();
