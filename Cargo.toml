@@ -366,6 +366,18 @@ json_dotpath = "1.1"
 jsonschema = { version = "0.51", default-features = false }
 jsonwebtoken = "10.0"
 jupyter-protocol = "1.4.0"
+# jupyter-websocket-client 声明的是 `async-tungstenite = ">= 0.29.1"` —— 开区间、
+# 不设上限，所以 cargo 默认会解析到最新版（本例 0.35）。而本 workspace 自己声明的是
+# async-tungstenite = "0.33"（同 zed Cargo.toml:557），于是图里同时存在两份，
+# repl/src/kernels/remote_kernels.rs 把 jupyter 传进来的 ws_stream 直接赋给
+# async-tungstenite 0.33 的字段就报：
+#     error[E0308]: mismatched types
+#       expected `WebSocketStream<Stream<_, _>>`, found a different `WebSocketStream<...>`
+#     note: there are multiple different versions of crate `async_tungstenite`
+#
+# zed 的 manifest 与此处完全相同，它的 lock 里只有 async-tungstenite 0.33.0，
+# 同样是靠提交的 Cargo.lock 挡住的。本仓库须保持：
+#     cargo update -p async-tungstenite:0.35.0 --precise 0.33.0
 jupyter-websocket-client = "1.1.0"
 json5 = "0.4"
 linkify = "0.10.0"
