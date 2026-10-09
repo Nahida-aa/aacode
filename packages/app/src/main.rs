@@ -240,6 +240,9 @@ fn main() {
         // 必须先 set_global —— 对齐 Zed main.rs L519。
         GitHostingProviderRegistry::set_global(git_hosting_provider_registry, cx);
         git_hosting_providers::init(cx); // L520
+        // zed L489 的 menu::init()。该函数在 menu crate 里就是 `pub fn init() {}`
+        // （空实现，对齐 zed 保留，代价为零）。
+        menu::init();
         debugger_tools::init(cx); // L592
         command_palette::init(cx); // L677
         acp_tools::init(cx); // L701
@@ -257,6 +260,11 @@ fn main() {
         file_finder::init(cx); // L743
         outline::init(cx); // L745
         call_hierarchy::init(cx); // L746
+        // zed L747。注册 workspace::ToggleProjectSymbols —— 项目符号搜索
+        // （ctrl-shift-shift / 命令面板 "project symbols"）。此前 crate 已完整移植
+        // （633 行，与 zed 逐字一致），但既没进 [dependencies] 也没调用，
+        // 于是该 action 不在 inventory 里，内置 keymap 的绑定被静默跳过。
+        project_symbols::init(cx); // L747
         tasks_ui::init(cx); // L750
         search::init(cx); // L753
         lsp_locations::init(cx); // L754
