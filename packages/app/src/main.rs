@@ -202,7 +202,7 @@ fn main() {
         // ad_credentials_provider::global 会按 Dev/Release 决定用系统 keychain 还是
         // development 文件。原先放在 app_state 之后（第 339 行），导致
         // git_hosting_providers::init 读不到该全局而 panic。对齐 Zed main.rs L492。
-        release_channel::init(semver::Version::new(0, 1, 0), cx);
+        release_channel::init(semver::Version::new(1, 22, 1), cx);
         settings::init(cx);
         // 绑定内置默认快捷键（default-<os>.json + base_keymap + vim）。
         // 必须在 settings::init 之后——它要读 BaseKeymap 全局。

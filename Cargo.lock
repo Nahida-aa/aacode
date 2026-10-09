@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "a_log"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "chrono",
@@ -15,7 +15,7 @@ dependencies = [
 
 [[package]]
 name = "a_tracing"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing_macro",
@@ -31,11 +31,11 @@ dependencies = [
 
 [[package]]
 name = "a_tracing_macro"
-version = "0.1.0"
+version = "1.22.1"
 
 [[package]]
 name = "a_util"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -57,7 +57,7 @@ dependencies = [
 
 [[package]]
 name = "aa-core"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-kernel",
  "async-trait",
@@ -73,7 +73,7 @@ dependencies = [
 
 [[package]]
 name = "aa-extension-mcp"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-kernel",
  "anyhow",
@@ -86,7 +86,7 @@ dependencies = [
 
 [[package]]
 name = "aa-extension-sdk"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-core",
  "aa-kernel",
@@ -99,7 +99,7 @@ dependencies = [
 
 [[package]]
 name = "aa-extensions"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-core",
  "aa-extension-sdk",
@@ -121,7 +121,7 @@ dependencies = [
 
 [[package]]
 name = "aa-function-tools"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-kernel",
  "async-trait",
@@ -137,7 +137,7 @@ dependencies = [
 
 [[package]]
 name = "aa-kernel"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "async-trait",
  "serde",
@@ -148,7 +148,7 @@ dependencies = [
 
 [[package]]
 name = "aa-llm"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-core",
  "async-trait",
@@ -162,7 +162,7 @@ dependencies = [
 
 [[package]]
 name = "aa-server"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-core",
  "aa-extension-mcp",
@@ -192,7 +192,7 @@ dependencies = [
 
 [[package]]
 name = "aa-session"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa-core",
  "aa-kernel",
@@ -225,7 +225,7 @@ dependencies = [
 
 [[package]]
 name = "aa_env_vars"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "env_var",
 ]
@@ -506,7 +506,7 @@ dependencies = [
 
 [[package]]
 name = "aacode"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -623,7 +623,7 @@ dependencies = [
  "prompt_store",
  "rayon",
  "recent_projects",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "remote_server",
  "repl",
@@ -673,7 +673,7 @@ dependencies = [
 
 [[package]]
 name = "aacode_actions"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "gpui",
@@ -763,7 +763,7 @@ dependencies = [
 
 [[package]]
 name = "acp_thread"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -814,7 +814,7 @@ dependencies = [
 
 [[package]]
 name = "acp_tools"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -834,7 +834,7 @@ dependencies = [
 
 [[package]]
 name = "action_log"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
@@ -862,7 +862,7 @@ dependencies = [
 
 [[package]]
 name = "activity_indicator"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -882,14 +882,14 @@ dependencies = [
 
 [[package]]
 name = "ad_credentials_provider"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "credentials_provider",
  "futures 0.3.34",
  "gpui",
  "paths",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "serde_json",
 ]
 
@@ -937,7 +937,7 @@ dependencies = [
 
 [[package]]
 name = "agent"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
@@ -992,7 +992,7 @@ dependencies = [
  "quick-xml 0.41.0",
  "rand 0.9.5",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "reqwest_client",
  "sandbox",
  "schemars 1.2.2",
@@ -1070,7 +1070,7 @@ dependencies = [
 
 [[package]]
 name = "agent_servers"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -1095,7 +1095,7 @@ dependencies = [
  "language_model",
  "log",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "reqwest_client",
  "serde",
@@ -1111,7 +1111,7 @@ dependencies = [
 
 [[package]]
 name = "agent_settings"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -1134,7 +1134,7 @@ dependencies = [
 
 [[package]]
 name = "agent_skills"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -1152,7 +1152,7 @@ dependencies = [
 
 [[package]]
 name = "agent_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_component",
@@ -1223,7 +1223,7 @@ dependencies = [
  "prompt_store",
  "proto",
  "rand 0.9.5",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "remote_connection",
  "reqwest_client",
@@ -1280,7 +1280,7 @@ dependencies = [
 
 [[package]]
 name = "ai_onboarding"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
@@ -1436,7 +1436,7 @@ dependencies = [
 
 [[package]]
 name = "anthropic"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -1576,7 +1576,7 @@ dependencies = [
 
 [[package]]
 name = "askpass"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -1593,7 +1593,7 @@ dependencies = [
 
 [[package]]
 name = "assets"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -1979,7 +1979,7 @@ dependencies = [
 
 [[package]]
 name = "audio"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -2009,7 +2009,7 @@ dependencies = [
 
 [[package]]
 name = "auto_update"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
@@ -2025,7 +2025,7 @@ dependencies = [
  "log",
  "parking_lot",
  "paths",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -2038,7 +2038,7 @@ dependencies = [
 
 [[package]]
 name = "auto_update_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -2052,7 +2052,7 @@ dependencies = [
  "gpui",
  "markdown_preview",
  "prompt_store",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -2546,7 +2546,7 @@ dependencies = [
 
 [[package]]
 name = "aws_http_client"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aws-smithy-runtime-api",
  "aws-smithy-types",
@@ -2653,7 +2653,7 @@ checksum = "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06"
 
 [[package]]
 name = "bedrock"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "aws-sdk-bedrockruntime",
@@ -2901,7 +2901,7 @@ dependencies = [
 
 [[package]]
 name = "breadcrumbs"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "gpui",
@@ -2945,7 +2945,7 @@ dependencies = [
 
 [[package]]
 name = "buffer_diff"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -3115,7 +3115,7 @@ checksum = "ade8366b8bd5ba243f0a58f036cc0ca8a2f069cff1a2351ef1cac6b083e16fc0"
 
 [[package]]
 name = "call"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -3141,7 +3141,7 @@ dependencies = [
 
 [[package]]
 name = "call_hierarchy"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -3404,7 +3404,7 @@ dependencies = [
 
 [[package]]
 name = "channel"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_util",
@@ -3417,7 +3417,7 @@ dependencies = [
  "language",
  "log",
  "postage",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rpc",
  "semver",
  "settings",
@@ -3572,7 +3572,7 @@ checksum = "1c133bc6a41be0d194c306b5506d15e6feeea7b1d6604bd3f8310dfb2ca96486"
 
 [[package]]
 name = "cli"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_util",
  "aa-core",
@@ -3605,7 +3605,7 @@ dependencies = [
  "pulldown-cmark",
  "ratatui",
  "rayon",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "serde",
  "serde_json",
  "settings",
@@ -3621,7 +3621,7 @@ dependencies = [
 
 [[package]]
 name = "client"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
@@ -3651,7 +3651,7 @@ dependencies = [
  "proxy_handshake",
  "rand 0.9.5",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rpc",
  "rustls-pki-types",
  "semver",
@@ -3678,7 +3678,7 @@ dependencies = [
 
 [[package]]
 name = "cloud_api_client"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "async-lock",
@@ -3699,7 +3699,7 @@ dependencies = [
 
 [[package]]
 name = "cloud_api_types"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_cloud_llm_client",
  "anyhow",
@@ -3808,7 +3808,7 @@ dependencies = [
 
 [[package]]
 name = "codestral"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_icons",
  "ad_credentials_provider",
@@ -3829,7 +3829,7 @@ dependencies = [
 
 [[package]]
 name = "collab_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -3850,7 +3850,7 @@ dependencies = [
  "notifications",
  "picker",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rpc",
  "serde",
  "serde_json",
@@ -3907,7 +3907,7 @@ dependencies = [
 
 [[package]]
 name = "command_palette"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
@@ -3937,7 +3937,7 @@ dependencies = [
 
 [[package]]
 name = "command_palette_hooks"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "collections",
  "derive_more",
@@ -4070,7 +4070,7 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 
 [[package]]
 name = "context_server"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -4118,7 +4118,7 @@ dependencies = [
 
 [[package]]
 name = "copilot"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
@@ -4153,7 +4153,7 @@ dependencies = [
 
 [[package]]
 name = "copilot_chat"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anthropic",
@@ -4171,7 +4171,7 @@ dependencies = [
 
 [[package]]
 name = "copilot_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -4184,7 +4184,7 @@ dependencies = [
  "lsp",
  "menu",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "serde_json",
  "settings",
  "workspace",
@@ -4790,7 +4790,7 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
- "system_specs 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
+ "system_specs 0.1.0",
  "windows 0.62.2",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -5086,7 +5086,7 @@ dependencies = [
 
 [[package]]
 name = "dap"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_util",
@@ -5130,7 +5130,7 @@ dependencies = [
 
 [[package]]
 name = "dap_adapters"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -5248,7 +5248,7 @@ checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 
 [[package]]
 name = "db"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_env_vars",
  "aa_util",
@@ -5258,7 +5258,7 @@ dependencies = [
  "inventory",
  "log",
  "paths",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "sqlez",
  "sqlez_macros",
  "tempfile",
@@ -5267,7 +5267,7 @@ dependencies = [
 
 [[package]]
 name = "debug_adapter_extension"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -5282,7 +5282,7 @@ dependencies = [
 
 [[package]]
 name = "debugger_tools"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -5299,7 +5299,7 @@ dependencies = [
 
 [[package]]
 name = "debugger_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
@@ -5363,7 +5363,7 @@ dependencies = [
 
 [[package]]
 name = "deepseek"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "futures 0.3.34",
@@ -5471,7 +5471,7 @@ dependencies = [
 
 [[package]]
 name = "dev_container"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -5504,7 +5504,7 @@ dependencies = [
 
 [[package]]
 name = "diagnostics"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
@@ -5779,7 +5779,7 @@ checksum = "3b31a881d38439026e3d5dd938ab20328d36e23caca8fd5981c42e4b677f5842"
 
 [[package]]
 name = "edit_prediction"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
@@ -5829,7 +5829,7 @@ dependencies = [
  "pulldown-cmark",
  "rand 0.9.5",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "semver",
  "serde",
  "serde_json",
@@ -5851,7 +5851,7 @@ dependencies = [
 
 [[package]]
 name = "edit_prediction_context"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_util",
@@ -5878,7 +5878,7 @@ dependencies = [
 
 [[package]]
 name = "edit_prediction_metrics"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "imara-diff",
  "indoc",
@@ -5891,7 +5891,7 @@ dependencies = [
 
 [[package]]
 name = "edit_prediction_types"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_icons",
  "client",
@@ -5902,7 +5902,7 @@ dependencies = [
 
 [[package]]
 name = "edit_prediction_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_cloud_llm_client",
  "aa_gpui_kit_ui",
@@ -5941,7 +5941,7 @@ dependencies = [
 
 [[package]]
 name = "editor"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -5992,7 +5992,7 @@ dependencies = [
  "proptest-derive",
  "rand 0.9.5",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rope",
  "rpc",
  "schemars 1.2.2",
@@ -6099,7 +6099,7 @@ dependencies = [
 
 [[package]]
 name = "encoding_selector"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -6189,7 +6189,7 @@ dependencies = [
 
 [[package]]
 name = "env_var"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "gpui_shared_string",
 ]
@@ -6283,7 +6283,7 @@ dependencies = [
 
 [[package]]
 name = "etw_tracing"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -6376,7 +6376,7 @@ checksum = "af9673d8203fcb076b19dfd17e38b3d4ae9f44959416ea532ce72415a6020365"
 
 [[package]]
 name = "extension"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_tracing",
  "aa_util",
@@ -6413,7 +6413,7 @@ dependencies = [
 
 [[package]]
 name = "extension_api"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -6422,7 +6422,7 @@ dependencies = [
 
 [[package]]
 name = "extension_host"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -6453,7 +6453,7 @@ dependencies = [
  "parking_lot",
  "paths",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "reqwest_client",
  "semver",
@@ -6476,14 +6476,14 @@ dependencies = [
 
 [[package]]
 name = "extension_suggest"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "path",
 ]
 
 [[package]]
 name = "extensions_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
@@ -6510,7 +6510,7 @@ dependencies = [
  "paths",
  "picker",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "schemars 1.2.2",
  "semver",
  "serde",
@@ -6591,7 +6591,7 @@ checksum = "b97b65636e5b9ef369943878ac74335ba1c55c1cb6adbf1e2c293c624248d693"
 
 [[package]]
 name = "feature_flags"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "collections",
  "feature_flags_macros",
@@ -6605,7 +6605,7 @@ dependencies = [
 
 [[package]]
 name = "feature_flags_macros"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6614,21 +6614,21 @@ dependencies = [
 
 [[package]]
 name = "feedback"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "aacode_actions",
  "client",
  "extension_host",
  "gpui",
- "system_specs 0.1.0",
+ "system_specs 1.22.1",
  "urlencoding",
  "workspace",
 ]
 
 [[package]]
 name = "file_finder"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_fuzzy",
@@ -6661,7 +6661,7 @@ dependencies = [
 
 [[package]]
 name = "file_icons"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_settings_content",
  "aa_gpui_kit_theme",
@@ -6919,7 +6919,7 @@ dependencies = [
 
 [[package]]
 name = "fs"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -7261,7 +7261,7 @@ dependencies = [
 
 [[package]]
 name = "git"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_tracing",
  "aa_util",
@@ -7298,7 +7298,7 @@ dependencies = [
 
 [[package]]
 name = "git_hosting_providers"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -7320,7 +7320,7 @@ dependencies = [
 
 [[package]]
 name = "git_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -7365,7 +7365,7 @@ dependencies = [
  "project",
  "prompt_store",
  "rand 0.9.5",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote_connection",
  "schemars 1.2.2",
  "search",
@@ -7389,7 +7389,7 @@ dependencies = [
 
 [[package]]
 name = "git_ui_core"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -7539,7 +7539,7 @@ dependencies = [
 
 [[package]]
 name = "go_to_line"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -7582,7 +7582,7 @@ dependencies = [
 
 [[package]]
 name = "google_ai"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -8336,7 +8336,7 @@ dependencies = [
 
 [[package]]
 name = "http_proxy"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "base64 0.22.1",
@@ -8698,7 +8698,7 @@ dependencies = [
 
 [[package]]
 name = "image_viewer"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -8843,7 +8843,7 @@ dependencies = [
 
 [[package]]
 name = "inspector_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -8883,14 +8883,14 @@ dependencies = [
 
 [[package]]
 name = "install_cli"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
  "client",
  "gpui",
  "log",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "smol",
  "workspace",
 ]
@@ -9229,7 +9229,7 @@ dependencies = [
 
 [[package]]
 name = "journal"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "chrono",
@@ -9287,7 +9287,7 @@ dependencies = [
 
 [[package]]
 name = "json_schema_store"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_util",
@@ -9427,7 +9427,7 @@ dependencies = [
 
 [[package]]
 name = "keymap_editor"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -9548,7 +9548,7 @@ checksum = "884f3e747ed2dcee867cda1b0c31a048f9e20de2d916a248949319921a2e666e"
 
 [[package]]
 name = "language"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -9619,7 +9619,7 @@ dependencies = [
 
 [[package]]
 name = "language_detection"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "betlang",
  "gpui",
@@ -9628,7 +9628,7 @@ dependencies = [
 
 [[package]]
 name = "language_extension"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_tracing",
  "aa_util",
@@ -9649,7 +9649,7 @@ dependencies = [
 
 [[package]]
 name = "language_model"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_icons",
  "aa_language_model_core",
@@ -9671,7 +9671,7 @@ dependencies = [
 
 [[package]]
 name = "language_models"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
@@ -9724,7 +9724,7 @@ dependencies = [
  "parking_lot",
  "paths",
  "rand 0.9.5",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "schemars 1.2.2",
  "serde",
  "serde_json",
@@ -9738,7 +9738,7 @@ dependencies = [
 
 [[package]]
 name = "language_models_cloud"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_cloud_llm_client",
  "anthropic",
@@ -9761,7 +9761,7 @@ dependencies = [
 
 [[package]]
 name = "language_selector"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -9781,7 +9781,7 @@ dependencies = [
 
 [[package]]
 name = "language_tools"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_kit_theme",
@@ -9803,7 +9803,7 @@ dependencies = [
  "path",
  "project",
  "proto",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "semver",
  "serde_json",
  "settings",
@@ -9816,7 +9816,7 @@ dependencies = [
 
 [[package]]
 name = "languages"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_grammars",
  "aa_gpui_kit_theme",
@@ -10044,7 +10044,7 @@ dependencies = [
 
 [[package]]
 name = "line_ending_selector"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "editor",
@@ -10189,7 +10189,7 @@ dependencies = [
 
 [[package]]
 name = "livekit_api"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -10205,7 +10205,7 @@ dependencies = [
 
 [[package]]
 name = "livekit_client"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -10245,7 +10245,7 @@ dependencies = [
 
 [[package]]
 name = "llama_cpp"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -10270,7 +10270,7 @@ dependencies = [
 
 [[package]]
 name = "lmstudio"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -10433,7 +10433,7 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 
 [[package]]
 name = "lsp"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_util",
@@ -10450,7 +10450,7 @@ dependencies = [
  "lsp-types",
  "parking_lot",
  "postage",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "schemars 1.2.2",
  "semver",
  "serde",
@@ -10470,7 +10470,7 @@ dependencies = [
 
 [[package]]
 name = "lsp_command_selector"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_kit_ui",
@@ -10493,7 +10493,7 @@ dependencies = [
 
 [[package]]
 name = "lsp_locations"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -10639,7 +10639,7 @@ dependencies = [
 
 [[package]]
 name = "markdown"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -10666,7 +10666,7 @@ dependencies = [
 
 [[package]]
 name = "markdown_preview"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -10816,7 +10816,7 @@ dependencies = [
 
 [[package]]
 name = "mermaid_render"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_tracing",
  "anyhow",
@@ -10941,7 +10941,7 @@ dependencies = [
 
 [[package]]
 name = "migrator"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_settings_content",
  "aa_settings_json",
@@ -11050,7 +11050,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "miniprofiler_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "aacode_actions",
@@ -11107,7 +11107,7 @@ dependencies = [
 
 [[package]]
 name = "mistral"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "futures 0.3.34",
@@ -11156,7 +11156,7 @@ dependencies = [
 
 [[package]]
 name = "multi_buffer"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -11373,7 +11373,7 @@ dependencies = [
 
 [[package]]
 name = "node_runtime"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -11423,7 +11423,7 @@ checksum = "0676bb32a98c1a483ce53e500a81ad9c3d5b3f7c920c28c24e9cb0980d0b5bc8"
 
 [[package]]
 name = "notifications"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_ui",
@@ -12139,7 +12139,7 @@ dependencies = [
 
 [[package]]
 name = "ollama"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "futures 0.3.34",
@@ -12152,7 +12152,7 @@ dependencies = [
 
 [[package]]
 name = "onboarding"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_kit_component",
@@ -12247,7 +12247,7 @@ dependencies = [
 
 [[package]]
 name = "open_ai"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -12266,7 +12266,7 @@ dependencies = [
 
 [[package]]
 name = "open_path_prompt"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -12287,7 +12287,7 @@ dependencies = [
 
 [[package]]
 name = "open_router"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -12303,7 +12303,7 @@ dependencies = [
 
 [[package]]
 name = "openai_subscribed"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -12327,7 +12327,7 @@ dependencies = [
 
 [[package]]
 name = "opencode"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_language_model_core",
  "anyhow",
@@ -12430,7 +12430,7 @@ dependencies = [
 
 [[package]]
 name = "outline"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
@@ -12455,7 +12455,7 @@ dependencies = [
 
 [[package]]
 name = "outline-cli"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_grammars",
  "anyhow",
@@ -12469,7 +12469,7 @@ dependencies = [
 
 [[package]]
 name = "outline_panel"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -12656,7 +12656,7 @@ dependencies = [
 
 [[package]]
 name = "paths"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "const_format",
@@ -13379,7 +13379,7 @@ dependencies = [
 
 [[package]]
 name = "picker"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -13403,7 +13403,7 @@ dependencies = [
 
 [[package]]
 name = "picker_preview"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -13501,7 +13501,7 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 
 [[package]]
 name = "platform_title_bar"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -13731,7 +13731,7 @@ checksum = "e8cf8e6a8aa66ce33f63993ffc4ea4271eb5b0530a9002db8455ea6050c77bfa"
 
 [[package]]
 name = "prettier"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -13873,7 +13873,7 @@ dependencies = [
 
 [[package]]
 name = "project"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -13923,7 +13923,7 @@ dependencies = [
  "pretty_assertions",
  "rand 0.9.5",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "rpc",
  "schemars 1.2.2",
@@ -13955,7 +13955,7 @@ dependencies = [
 
 [[package]]
 name = "project_panel"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -13997,7 +13997,7 @@ dependencies = [
 
 [[package]]
 name = "project_symbols"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_theme",
@@ -14013,7 +14013,7 @@ dependencies = [
  "picker",
  "picker_preview",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "semver",
  "serde_json",
  "settings",
@@ -14023,7 +14023,7 @@ dependencies = [
 
 [[package]]
 name = "prompt_store"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "agent_skills",
@@ -14155,7 +14155,7 @@ dependencies = [
 
 [[package]]
 name = "proto"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "prost",
@@ -14787,7 +14787,7 @@ checksum = "03251193000f4bd3b042892be858ee50e8b3719f2b08e5833ac4353724632430"
 
 [[package]]
 name = "recent_projects"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_ui",
@@ -14815,7 +14815,7 @@ dependencies = [
  "paths",
  "picker",
  "project",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "remote_connection",
  "remote_server",
@@ -14954,14 +14954,6 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 [[package]]
 name = "release_channel"
 version = "0.1.0"
-dependencies = [
- "gpui",
- "semver",
-]
-
-[[package]]
-name = "release_channel"
-version = "0.1.0"
 source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "gpui",
@@ -14969,8 +14961,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "release_channel"
+version = "1.22.1"
+dependencies = [
+ "gpui",
+ "semver",
+]
+
+[[package]]
 name = "remote"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -14984,7 +14984,7 @@ dependencies = [
  "log",
  "parking_lot",
  "paths",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rpc",
  "schemars 1.2.2",
  "semver",
@@ -15001,7 +15001,7 @@ dependencies = [
 
 [[package]]
 name = "remote_connection"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -15015,7 +15015,7 @@ dependencies = [
  "log",
  "markdown",
  "menu",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "semver",
  "settings",
@@ -15025,7 +15025,7 @@ dependencies = [
 
 [[package]]
 name = "remote_server"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_util",
@@ -15073,7 +15073,7 @@ dependencies = [
  "project",
  "proto",
  "rayon",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "reqwest_client",
  "rpc",
@@ -15107,7 +15107,7 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 
 [[package]]
 name = "repl"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -15206,7 +15206,7 @@ dependencies = [
 
 [[package]]
 name = "reqwest_client"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "bytes 1.12.1",
@@ -15302,7 +15302,7 @@ dependencies = [
 
 [[package]]
 name = "rope"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -15348,7 +15348,7 @@ dependencies = [
 
 [[package]]
 name = "rpc"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_util",
@@ -15661,7 +15661,7 @@ dependencies = [
 
 [[package]]
 name = "sandbox"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "futures 0.3.34",
@@ -15829,7 +15829,7 @@ checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
 
 [[package]]
 name = "search"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_tracing",
  "aa_gpui_kit_theme",
@@ -16156,7 +16156,7 @@ dependencies = [
 
 [[package]]
 name = "session"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "db",
@@ -16167,7 +16167,7 @@ dependencies = [
 
 [[package]]
 name = "settings"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_settings_content",
  "aa_settings_json",
@@ -16188,7 +16188,7 @@ dependencies = [
  "path",
  "paths",
  "pretty_assertions",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rust-embed",
  "schemars 1.2.2",
  "serde",
@@ -16203,7 +16203,7 @@ dependencies = [
 
 [[package]]
 name = "settings_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_theme",
@@ -16250,7 +16250,7 @@ dependencies = [
  "pretty_assertions",
  "project",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "rodio",
  "schemars 1.2.2",
  "search",
@@ -16361,7 +16361,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
 name = "sidebar"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_clock",
  "aa_gpui_kit_theme",
@@ -16399,7 +16399,7 @@ dependencies = [
  "project",
  "prompt_store",
  "recent_projects",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "remote_connection",
  "remote_server",
@@ -16632,7 +16632,7 @@ dependencies = [
 
 [[package]]
 name = "snippet_provider"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -16810,7 +16810,7 @@ checksum = "2b2231b7c3057d5e4ad0156fb3dc807d900806020c5ffa3ee6ff2c8c76fb8520"
 
 [[package]]
 name = "streaming_diff"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "criterion",
@@ -17006,7 +17006,7 @@ checksum = "0193cc4331cfd2f3d2011ef287590868599a2f33c3e69bc22c1a3d3acf9e02fb"
 
 [[package]]
 name = "svg_preview"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aacode_actions",
@@ -17309,6 +17309,7 @@ dependencies = [
 [[package]]
 name = "system_specs"
 version = "0.1.0"
+source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
 dependencies = [
  "anyhow",
  "gpui",
@@ -17322,14 +17323,13 @@ dependencies = [
 
 [[package]]
 name = "system_specs"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "gpui",
  "human_bytes",
  "pciid-parser",
- "release_channel 0.1.0 (git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831)",
+ "release_channel 1.22.1",
  "semver",
  "serde",
  "sysinfo 0.39.6",
@@ -17337,7 +17337,7 @@ dependencies = [
 
 [[package]]
 name = "tab_switcher"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_gpui_fuzzy",
@@ -17361,7 +17361,7 @@ dependencies = [
 
 [[package]]
 name = "tabular_data_preview"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -17423,7 +17423,7 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 
 [[package]]
 name = "task"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "aacode_actions",
@@ -17446,7 +17446,7 @@ dependencies = [
 
 [[package]]
 name = "tasks_ui"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -17484,7 +17484,7 @@ dependencies = [
 
 [[package]]
 name = "telemetry"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "futures 0.3.34",
  "serde_json",
@@ -17493,7 +17493,7 @@ dependencies = [
 
 [[package]]
 name = "telemetry_events"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "semver",
  "serde",
@@ -17546,7 +17546,7 @@ dependencies = [
 
 [[package]]
 name = "terminal"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_settings_content",
  "aa_gpui_kit_theme",
@@ -17568,7 +17568,7 @@ dependencies = [
  "percent-encoding",
  "rand 0.9.5",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "schemars 1.2.2",
  "serde",
  "settings",
@@ -17593,7 +17593,7 @@ dependencies = [
 
 [[package]]
 name = "terminal_view"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -17615,7 +17615,7 @@ dependencies = [
  "pretty_assertions",
  "project",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "rpc",
  "schemars 1.2.2",
@@ -17696,7 +17696,7 @@ dependencies = [
 
 [[package]]
 name = "text"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
@@ -17717,11 +17717,11 @@ dependencies = [
 
 [[package]]
 name = "theme_extension"
-version = "0.1.0"
+version = "1.22.1"
 
 [[package]]
 name = "theme_selector"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -17743,7 +17743,7 @@ dependencies = [
 
 [[package]]
 name = "theme_settings"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_assets",
  "aa_gpui_kit_settings_content",
@@ -17945,7 +17945,7 @@ checksum = "fd3ca314f692efd6c868f8408f53fe444634a845f96c028b97d35f6a1f79f0ee"
 
 [[package]]
 name = "title_bar"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -18215,7 +18215,7 @@ checksum = "06bdbd8cfc056b8d2e2e85f29b56a3bdbecb527cef81eb39e3e7b98af4652770"
 
 [[package]]
 name = "toolchain_selector"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_ui",
  "aa_util",
@@ -18739,11 +18739,11 @@ dependencies = [
 
 [[package]]
 name = "ui"
-version = "0.1.0"
+version = "1.22.1"
 
 [[package]]
 name = "ui_prompt"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -19145,7 +19145,7 @@ checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
 
 [[package]]
 name = "vim"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -19181,7 +19181,7 @@ dependencies = [
  "project",
  "project_panel",
  "regex",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "schemars 1.2.2",
  "search",
  "semver",
@@ -19199,7 +19199,7 @@ dependencies = [
 
 [[package]]
 name = "vim_mode_setting"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "gpui",
  "settings",
@@ -20244,7 +20244,7 @@ dependencies = [
 
 [[package]]
 name = "web_search"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_cloud_llm_client",
  "anyhow",
@@ -20254,7 +20254,7 @@ dependencies = [
 
 [[package]]
 name = "web_search_providers"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_cloud_llm_client",
  "anyhow",
@@ -20582,7 +20582,7 @@ dependencies = [
 
 [[package]]
 name = "which_key"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -21310,7 +21310,7 @@ checksum = "1e7ac75179f18232fe9c285163565a57ef8d3c89254a30685b57d83a38d326c2"
 
 [[package]]
 name = "windows_resources"
-version = "0.1.0"
+version = "1.22.1"
 
 [[package]]
 name = "windows_x86_64_gnu"
@@ -21619,7 +21619,7 @@ dependencies = [
 
 [[package]]
 name = "workspace"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "aa_clock",
@@ -21660,7 +21660,7 @@ dependencies = [
  "proptest",
  "proptest-derive",
  "proto",
- "release_channel 0.1.0",
+ "release_channel 1.22.1",
  "remote",
  "schemars 1.2.2",
  "serde",
@@ -21682,7 +21682,7 @@ dependencies = [
 
 [[package]]
 name = "worktree"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "a_log",
  "a_tracing",
@@ -21772,7 +21772,7 @@ checksum = "ea6fc2961e4ef194dcbfe56bb845534d0dc8098940c7e5c012a258bfec6701bd"
 
 [[package]]
 name = "x_ai"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "anyhow",
  "schemars 1.2.2",
@@ -21782,7 +21782,7 @@ dependencies = [
 
 [[package]]
 name = "x_ai_subscribed"
-version = "0.1.0"
+version = "1.22.1"
 dependencies = [
  "aa_util",
  "anyhow",
