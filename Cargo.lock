@@ -128,13 +128,13 @@ dependencies = [
  "nix 0.29.0",
  "serde",
  "serde_json",
- "settings",
  "tokio",
  "tower-http",
  "tracing",
  "tracing-subscriber",
  "utoipa",
  "uuid",
+ "zed_settings",
 ]
 
 [[package]]
@@ -198,7 +198,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_askpass"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -236,7 +236,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_fs"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_rope",
@@ -258,7 +258,6 @@ dependencies = [
  "notify",
  "parking_lot",
  "path",
- "paths",
  "rustix",
  "serde",
  "serde_json",
@@ -270,13 +269,14 @@ dependencies = [
  "trash",
  "unicode-normalization",
  "windows 0.58.0",
+ "zed_paths",
  "zed_proto",
 ]
 
 [[package]]
 name = "aa_gpui_kit_git"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_rope",
@@ -305,7 +305,7 @@ dependencies = [
  "url",
  "urlencoding",
  "uuid",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -362,7 +362,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_rope"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_util",
  "heapless",
@@ -371,7 +371,7 @@ dependencies = [
  "sum_tree",
  "tracing",
  "unicode-segmentation",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -400,7 +400,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_text"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_clock",
  "aa_gpui_kit_rope",
@@ -704,7 +704,6 @@ dependencies = [
  "serde",
  "serde_json",
  "session",
- "settings",
  "settings_ui",
  "shellexpand",
  "sidebar",
@@ -741,8 +740,9 @@ dependencies = [
  "workspace",
  "zed_migrator",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -901,7 +901,6 @@ dependencies = [
  "sandbox",
  "serde",
  "serde_json",
- "settings",
  "task",
  "telemetry",
  "tempfile",
@@ -910,6 +909,7 @@ dependencies = [
  "urlencoding",
  "uuid",
  "watch",
+ "zed_settings",
 ]
 
 [[package]]
@@ -927,9 +927,9 @@ dependencies = [
  "markdown",
  "project",
  "serde_json",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -954,10 +954,10 @@ dependencies = [
  "project",
  "rand 0.9.5",
  "serde_json",
- "settings",
  "telemetry",
  "watch",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -1097,7 +1097,6 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "shell_command_parser",
  "smallvec",
  "sqlez",
@@ -1114,7 +1113,8 @@ dependencies = [
  "watch",
  "web_search",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -1201,13 +1201,13 @@ dependencies = [
  "reqwest_client",
  "serde",
  "serde_json",
- "settings",
  "task",
  "tempfile",
  "terminal",
  "thiserror 2.0.21",
  "uuid",
  "watch",
+ "zed_settings",
 ]
 
 [[package]]
@@ -1229,8 +1229,8 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
- "settings",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -1336,7 +1336,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
- "settings",
  "shlex 1.3.0",
  "streaming_diff",
  "task",
@@ -1354,6 +1353,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_proto",
+ "zed_settings",
 ]
 
 [[package]]
@@ -2076,8 +2076,8 @@ dependencies = [
  "log",
  "parking_lot",
  "rodio",
- "settings",
  "thiserror 2.0.21",
+ "zed_settings",
 ]
 
 [[package]]
@@ -2112,13 +2112,13 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "smol",
  "tempfile",
  "which",
  "workspace",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -3044,12 +3044,12 @@ dependencies = [
  "log",
  "pretty_assertions",
  "rand 0.9.5",
- "settings",
  "sum_tree",
  "tracing",
  "unindent",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -3220,9 +3220,9 @@ dependencies = [
  "project",
  "serde",
  "serde_json",
- "settings",
  "telemetry",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -3244,11 +3244,11 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
- "settings",
  "theme_settings",
  "tree-sitter-rust",
  "workspace",
  "zed_proto",
+ "zed_settings",
 ]
 
 [[package]]
@@ -3507,7 +3507,7 @@ dependencies = [
  "postage",
  "rpc",
  "semver",
- "settings",
+ "zed_settings",
 ]
 
 [[package]]
@@ -3693,7 +3693,6 @@ dependencies = [
  "rayon",
  "serde",
  "serde_json",
- "settings",
  "tempfile",
  "tokio",
  "tracing",
@@ -3703,6 +3702,7 @@ dependencies = [
  "windows 0.62.2",
  "windows_resources",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -3745,7 +3745,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "settings",
  "sha2 0.10.9",
  "smol",
  "telemetry",
@@ -3761,6 +3760,7 @@ dependencies = [
  "worktree",
  "zed_cloud_llm_client",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -3942,13 +3942,13 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
- "settings",
  "smallvec",
  "smol",
  "telemetry",
  "theme_settings",
  "title_bar",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -4016,11 +4016,11 @@ dependencies = [
  "postage",
  "project",
  "serde",
- "settings",
  "telemetry",
  "theme_settings",
  "time",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -4179,11 +4179,11 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "sha2 0.10.9",
  "slotmap",
  "tempfile",
  "url",
+ "zed_settings",
 ]
 
 [[package]]
@@ -4231,12 +4231,12 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
- "settings",
  "sum_tree",
  "theme_settings",
  "workspace",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -4275,8 +4275,8 @@ dependencies = [
  "menu",
  "project",
  "serde_json",
- "settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -5197,14 +5197,14 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "smallvec",
  "smol",
  "task",
  "telemetry",
  "zed_paths",
  "zed_proto",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -5236,10 +5236,10 @@ dependencies = [
  "log",
  "node_runtime",
  "serde_json",
- "settings",
  "smol",
  "task",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -5381,9 +5381,9 @@ dependencies = [
  "gpui",
  "project",
  "serde_json",
- "settings",
  "smol",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -5427,7 +5427,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
- "settings",
  "sysinfo 0.39.6",
  "task",
  "tasks_ui",
@@ -5438,7 +5437,8 @@ dependencies = [
  "unindent",
  "workspace",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -5583,12 +5583,12 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "serde_yaml",
- "settings",
  "shlex 1.3.0",
  "walkdir",
  "workspace",
  "worktree",
  "yaml-rust2",
+ "zed_settings",
 ]
 
 [[package]]
@@ -5617,11 +5617,11 @@ dependencies = [
  "project",
  "rand 0.9.5",
  "serde_json",
- "settings",
  "theme_settings",
  "unindent",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -5921,7 +5921,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "strum 0.28.0",
  "telemetry",
  "telemetry_events",
@@ -5933,8 +5932,9 @@ dependencies = [
  "worktree",
  "zed_cloud_llm_client",
  "zed_paths",
+ "zed_settings",
  "zeta_prompt",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -5958,10 +5958,10 @@ dependencies = [
  "pretty_assertions",
  "project",
  "serde_json",
- "settings",
  "smallvec",
  "telemetry",
  "tree-sitter",
+ "zed_settings",
  "zeta_prompt",
 ]
 
@@ -6020,11 +6020,11 @@ dependencies = [
  "multi_buffer",
  "project",
  "regex",
- "settings",
  "telemetry",
  "theme_settings",
  "workspace",
  "zed_paths",
+ "zed_settings",
  "zeta_prompt",
 ]
 
@@ -6087,7 +6087,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "smallvec",
  "snippet",
  "sum_tree",
@@ -6112,8 +6111,9 @@ dependencies = [
  "uuid",
  "vim_mode_setting",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -6497,7 +6497,7 @@ dependencies = [
  "wasmparser 0.254.2",
  "which",
  "zed_proto",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -6546,7 +6546,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
- "settings",
  "task",
  "telemetry",
  "tempfile",
@@ -6559,8 +6558,9 @@ dependencies = [
  "wasmtime 48.0.5",
  "wasmtime-wasi 48.0.5",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -6603,13 +6603,13 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "strum 0.28.0",
  "telemetry",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -6689,7 +6689,7 @@ dependencies = [
  "inventory",
  "schemars 1.2.2",
  "serde_json",
- "settings",
+ "zed_settings",
 ]
 
 [[package]]
@@ -6742,10 +6742,10 @@ dependencies = [
  "pretty_assertions",
  "project",
  "serde_json",
- "settings",
  "theme_settings",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -7325,9 +7325,9 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "settings",
  "url",
  "urlencoding",
+ "zed_settings",
 ]
 
 [[package]]
@@ -7382,7 +7382,6 @@ dependencies = [
  "search",
  "serde",
  "serde_json",
- "settings",
  "smallvec",
  "strum 0.28.0",
  "sysinfo 0.39.6",
@@ -7396,8 +7395,9 @@ dependencies = [
  "unindent",
  "watch",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -7430,7 +7430,6 @@ dependencies = [
  "remote_connection",
  "serde",
  "serde_json",
- "settings",
  "task",
  "terminal",
  "theme_settings",
@@ -7438,9 +7437,10 @@ dependencies = [
  "watch",
  "workspace",
  "zed_proto",
+ "zed_settings",
  "zeroize",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -7567,8 +7567,8 @@ dependencies = [
  "multi_buffer",
  "project",
  "serde_json",
- "settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -8726,9 +8726,9 @@ dependencies = [
  "log",
  "menu",
  "project",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -8873,12 +8873,12 @@ dependencies = [
  "project",
  "serde_json",
  "serde_json_lenient",
- "settings",
  "snippet_provider",
  "theme_settings",
  "util_macros",
  "workspace",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -9241,9 +9241,9 @@ dependencies = [
  "editor",
  "gpui",
  "log",
- "settings",
  "shellexpand",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -9308,10 +9308,10 @@ dependencies = [
  "project",
  "schemars 1.2.2",
  "serde_json",
- "settings",
  "snippet_provider",
  "task",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -9456,7 +9456,6 @@ dependencies = [
  "project",
  "search",
  "serde_json",
- "settings",
  "telemetry",
  "tempfile",
  "theme_settings",
@@ -9464,6 +9463,7 @@ dependencies = [
  "tree-sitter-rust",
  "workspace",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -9593,7 +9593,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "shellexpand",
  "smallvec",
  "streaming-iterator",
@@ -9618,8 +9617,9 @@ dependencies = [
  "unicase",
  "unindent",
  "watch",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -9649,7 +9649,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -9732,13 +9732,13 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "sha2 0.10.9",
  "strum 0.28.0",
  "tokio",
  "x_ai",
  "x_ai_subscribed",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -9780,8 +9780,8 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
- "settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -9809,14 +9809,14 @@ dependencies = [
  "project",
  "semver",
  "serde_json",
- "settings",
  "sysinfo 0.39.6",
  "telemetry",
  "theme_settings",
  "tree-sitter",
  "workspace",
  "zed_proto",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -9860,7 +9860,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
- "settings",
  "smallvec",
  "smol",
  "snippet",
@@ -9879,6 +9878,7 @@ dependencies = [
  "tree-sitter-typescript",
  "unindent",
  "url",
+ "zed_settings",
 ]
 
 [[package]]
@@ -10240,12 +10240,12 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "settings",
  "simplelog",
  "smallvec",
  "tokio",
  "webrtc-sys",
  "zed-scap",
+ "zed_settings",
 ]
 
 [[package]]
@@ -10460,7 +10460,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -10492,9 +10492,9 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
- "settings",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -10517,9 +10517,9 @@ dependencies = [
  "picker",
  "picker_preview",
  "project",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -10663,11 +10663,11 @@ dependencies = [
  "mermaid_render",
  "pulldown-cmark",
  "refineable",
- "settings",
  "smallvec",
  "stacksafe",
  "sum_tree",
  "theme_settings",
+ "zed_settings",
 ]
 
 [[package]]
@@ -10689,10 +10689,10 @@ dependencies = [
  "markdown",
  "project",
  "serde_json",
- "settings",
  "theme_settings",
  "urlencoding",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -10833,7 +10833,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "usvg",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -11045,10 +11045,10 @@ dependencies = [
  "gpui",
  "rpc",
  "serde_json",
- "settings",
  "smol",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -11166,14 +11166,14 @@ dependencies = [
  "proptest-derive",
  "rand 0.9.5",
  "serde",
- "settings",
  "smallvec",
  "sum_tree",
  "tracing",
  "tree-sitter",
  "unicode-segmentation",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -12134,7 +12134,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
+ "zed_settings",
 ]
 
 [[package]]
@@ -12161,12 +12161,12 @@ dependencies = [
  "project",
  "schemars 1.2.2",
  "serde",
- "settings",
  "telemetry",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -12267,9 +12267,9 @@ dependencies = [
  "project",
  "serde",
  "serde_json",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -12284,8 +12284,8 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "thiserror 2.0.21",
+ "zed_settings",
 ]
 
 [[package]]
@@ -12436,8 +12436,8 @@ dependencies = [
  "picker_preview",
  "project",
  "serde_json",
- "settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -12483,11 +12483,11 @@ dependencies = [
  "search",
  "serde",
  "serde_json",
- "settings",
  "smallvec",
  "theme_settings",
  "workspace",
  "worktree",
+ "zed_settings",
 ]
 
 [[package]]
@@ -12639,17 +12639,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4500030c302e4af1d423f36f3b958d1aecb6c04184356ed5a833bf6b60435777"
 dependencies = [
  "rustc_version",
-]
-
-[[package]]
-name = "paths"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=afecd6d719aad92aecfa2860f49c4f2956708831#afecd6d719aad92aecfa2860f49c4f2956708831"
-dependencies = [
- "const_format",
- "dirs",
- "ignore",
- "util",
 ]
 
 [[package]]
@@ -13383,9 +13372,9 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -13401,7 +13390,7 @@ dependencies = [
  "multi_buffer",
  "picker",
  "project",
- "settings",
+ "zed_settings",
 ]
 
 [[package]]
@@ -13495,11 +13484,11 @@ dependencies = [
  "aacode_actions",
  "gpui",
  "project",
- "settings",
  "smallvec",
  "theme_settings",
  "windows 0.62.2",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -13915,7 +13904,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "sha2 0.10.9",
  "shellexpand",
  "smallvec",
@@ -13935,9 +13923,10 @@ dependencies = [
  "which",
  "worktree",
  "zed_paths",
+ "zed_settings",
  "zeroize",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -13973,13 +13962,13 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "smallvec",
  "telemetry",
  "tempfile",
  "theme_settings",
  "workspace",
  "worktree",
+ "zed_settings",
 ]
 
 [[package]]
@@ -14003,9 +13992,9 @@ dependencies = [
  "project",
  "semver",
  "serde_json",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -14796,12 +14785,12 @@ dependencies = [
  "remote_server",
  "semver",
  "serde_json",
- "settings",
  "telemetry",
  "windows-registry",
  "workspace",
  "worktree",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -14957,7 +14946,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "smol",
  "telemetry",
  "tempfile",
@@ -14965,6 +14953,7 @@ dependencies = [
  "urlencoding",
  "which",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -14986,9 +14975,9 @@ dependencies = [
  "menu",
  "remote",
  "semver",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -15045,7 +15034,6 @@ dependencies = [
  "rust-embed",
  "semver",
  "serde_json",
- "settings",
  "shellexpand",
  "smol",
  "sysinfo 0.39.6",
@@ -15065,7 +15053,8 @@ dependencies = [
  "worktree",
  "zed_paths",
  "zed_proto",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -15115,7 +15104,6 @@ dependencies = [
  "runtimelib",
  "serde",
  "serde_json",
- "settings",
  "shlex 1.3.0",
  "smol",
  "task",
@@ -15128,6 +15116,7 @@ dependencies = [
  "tree-sitter-typescript",
  "uuid",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -15316,7 +15305,7 @@ dependencies = [
  "strum 0.28.0",
  "tracing",
  "zed_proto",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -15808,7 +15797,6 @@ dependencies = [
  "project",
  "regex",
  "serde_json",
- "settings",
  "smol",
  "theme_settings",
  "tracing",
@@ -15816,7 +15804,8 @@ dependencies = [
  "util_macros",
  "workspace",
  "zed_proto",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -16116,42 +16105,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "settings"
-version = "1.22.1"
-dependencies = [
- "aa_gpui_kit_fs",
- "aa_gpui_kit_settings_content",
- "aa_release_channel",
- "aa_settings_json",
- "aa_settings_macros",
- "aa_util",
- "anyhow",
- "collections",
- "ec4rs",
- "futures 0.3.34",
- "gpui",
- "gpui_util",
- "indoc",
- "inventory",
- "json5 0.4.1",
- "log",
- "path",
- "pretty_assertions",
- "rust-embed",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "smallvec",
- "strum 0.28.0",
- "tempfile",
- "tracing",
- "unindent",
- "zed_migrator",
- "zed_paths",
-]
-
-[[package]]
 name = "settings_ui"
 version = "1.22.1"
 dependencies = [
@@ -16207,7 +16160,6 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml_ng",
- "settings",
  "shell_command_parser",
  "strum 0.28.0",
  "telemetry",
@@ -16215,6 +16167,7 @@ dependencies = [
  "url",
  "workspace",
  "zed_paths",
+ "zed_settings",
 ]
 
 [[package]]
@@ -16357,11 +16310,11 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "telemetry",
  "theme_settings",
  "unicode-segmentation",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -17305,10 +17258,10 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "theme_settings",
  "workspace",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -17437,7 +17390,7 @@ dependencies = [
 [[package]]
 name = "telemetry"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "futures 0.3.34",
  "serde_json",
@@ -17447,7 +17400,7 @@ dependencies = [
 [[package]]
 name = "telemetry_events"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "semver",
  "serde",
@@ -17524,7 +17477,6 @@ dependencies = [
  "regex",
  "schemars 1.2.2",
  "serde",
- "settings",
  "sysinfo 0.39.6",
  "task",
  "thiserror 2.0.21",
@@ -17533,6 +17485,7 @@ dependencies = [
  "util_macros",
  "vte",
  "windows 0.62.2",
+ "zed_settings",
 ]
 
 [[package]]
@@ -17576,13 +17529,13 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "shellexpand",
  "shlex 1.3.0",
  "task",
  "terminal",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -17668,10 +17621,10 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
- "settings",
  "telemetry",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -17691,8 +17644,8 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "settings",
  "tracing",
+ "zed_settings",
 ]
 
 [[package]]
@@ -17909,11 +17862,11 @@ dependencies = [
  "schemars 1.2.2",
  "semver",
  "serde",
- "settings",
  "smallvec",
  "telemetry",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -18683,9 +18636,9 @@ dependencies = [
  "gpui",
  "markdown",
  "menu",
- "settings",
  "theme_settings",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -19119,7 +19072,6 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "settings",
  "settings_ui",
  "task",
  "theme_settings",
@@ -19127,6 +19079,7 @@ dependencies = [
  "util_macros",
  "vim_mode_setting",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -19134,7 +19087,7 @@ name = "vim_mode_setting"
 version = "1.22.1"
 dependencies = [
  "gpui",
- "settings",
+ "zed_settings",
 ]
 
 [[package]]
@@ -20523,10 +20476,10 @@ dependencies = [
  "collections",
  "command_palette",
  "gpui",
- "settings",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
+ "zed_settings",
 ]
 
 [[package]]
@@ -21597,7 +21550,6 @@ dependencies = [
  "serde",
  "serde_json",
  "session",
- "settings",
  "smallvec",
  "sqlez",
  "strum 0.28.0",
@@ -21610,7 +21562,8 @@ dependencies = [
  "uuid",
  "worktree",
  "zed_proto",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -21640,14 +21593,14 @@ dependencies = [
  "rand 0.9.5",
  "rpc",
  "serde_json",
- "settings",
  "smallvec",
  "sum_tree",
  "tracing",
  "worktree",
  "zed_paths",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zed_settings",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -22123,7 +22076,7 @@ dependencies = [
 [[package]]
 name = "zed_paths"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_util",
  "const_format",
@@ -22135,13 +22088,46 @@ dependencies = [
 [[package]]
 name = "zed_proto"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "anyhow",
  "prost",
  "prost-build",
  "protox",
  "serde",
+]
+
+[[package]]
+name = "zed_settings"
+version = "0.1.0"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+dependencies = [
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_settings_content",
+ "aa_release_channel",
+ "aa_settings_json",
+ "aa_settings_macros",
+ "aa_util",
+ "anyhow",
+ "collections",
+ "ec4rs",
+ "futures 0.3.34",
+ "gpui",
+ "gpui_util",
+ "inventory",
+ "json5 0.4.1",
+ "log",
+ "path",
+ "rust-embed",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "smallvec",
+ "strum 0.28.0",
+ "tracing",
+ "zed_migrator",
+ "zed_paths",
 ]
 
 [[package]]
@@ -22310,7 +22296,7 @@ checksum = "b268e58e7c693d7c271f93ffc4ba3b380412554231c85bf61ca7af91042a4112"
 [[package]]
 name = "zlog"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "anyhow",
  "chrono",
@@ -22385,14 +22371,14 @@ dependencies = [
 [[package]]
 name = "ztracing"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-tracy",
  "tracy-client",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
- "ztracing_macro 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing_macro 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
 ]
 
 [[package]]
@@ -22409,7 +22395,7 @@ dependencies = [
 [[package]]
 name = "ztracing_macro"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=a24ce02#a24ce02f4c44a1494325a8f32e9f615fded447a8"
+source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 
 [[package]]
 name = "ztracing_macro"

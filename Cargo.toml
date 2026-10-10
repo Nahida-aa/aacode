@@ -10,7 +10,6 @@ members = [
     "packages/llm",
     "packages/cli",
     "packages/server",
-    "packages/settings",
     "packages/session",
     "packages/app", "packages/ui", "packages/workspace", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/breadcrumbs", "packages/language", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/anthropic", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/open_ai", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/ac_util", "packages/etw_tracing", "packages/ac_constant",
 ]
@@ -23,9 +22,9 @@ publish = false
 
 [workspace.dependencies]
 # --- Workspace-internal path deps (统一管理，子 crate 用 .workspace = true) ---
-zlog = { package = "zlog", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
-ztracing = { package = "ztracing", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
-ztracing_macro = { package = "ztracing_macro", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+zlog = { package = "zlog", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
+ztracing = { package = "ztracing", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
+ztracing_macro = { package = "ztracing_macro", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 ac_util = { path = "packages/ac_util" }
 aa_env_vars = { path = "packages/aa_env_vars" }
 aa-kernel = { path = "packages/kernel" }
@@ -50,7 +49,7 @@ agent_skills = { path = "packages/agent_skills" }
 agent_ui = { path = "packages/agent_ui" }
 ai_onboarding = { path = "packages/ai_onboarding" }
 anthropic = { path = "packages/anthropic" }
-askpass = { package = "aa_gpui_kit_askpass", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+askpass = { package = "aa_gpui_kit_askpass", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 assets = { path = "packages/assets" }
 audio = { path = "packages/audio" }
 auto_update = { path = "packages/auto_update" }
@@ -72,8 +71,8 @@ copilot_ui = { path = "packages/copilot_ui" }
 client = { path = "packages/client" }
 cloud_api_client = { path = "packages/cloud_api_client" }
 cloud_api_types = { path = "packages/cloud_api_types" }
-aa_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "4a664c0", version = "=0.1.0" }
-zed_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "4a664c0", version = "=0.1.0" }
+aa_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
+zed_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
 # zeta_prompt 从 path → zed git（用户删了 packages/zeta_prompt/）。
 # rev 必须与 gpui_learn workspace 里的 zeta_prompt 一致（afecd6d7），
 # 否则 graph 里会出现两份。
@@ -108,8 +107,8 @@ web_search_providers = { path = "packages/web_search_providers" }
 feature_flags = { path = "packages/feature_flags" }
 feature_flags_macros = { path = "packages/feature_flags_macros" }
 file_icons = { path = "packages/file_icons" }
-fs = { package = "aa_gpui_kit_fs", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
-git = { package = "aa_gpui_kit_git", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+fs = { package = "aa_gpui_kit_fs", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
+git = { package = "aa_gpui_kit_git", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 git_hosting_providers = { path = "packages/git_hosting_providers" }
 git_ui = { path = "packages/git_ui" }
 git_ui_core = { path = "packages/git_ui_core" }
@@ -121,13 +120,13 @@ inspector_ui = { path = "packages/inspector_ui" }
 json_schema_store = { path = "packages/json_schema_store" }
 keymap_editor = { path = "packages/keymap_editor" }
 language = { path = "packages/language" }
-language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/language_core" }
+language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/language_core" }
 language_detection = { path = "packages/language_detection" }
 language_extension = { path = "packages/language_extension" }
 lsp_command_selector = { path = "packages/lsp_command_selector" }
 lsp_locations = { path = "packages/lsp_locations" }
 language_model = { path = "packages/language_model" }
-language_model_core = { package = "aa_language_model_core", git = "https://github.com/Nahida-aa/gpui_learn", rev = "d2ac455", version = "=0.1.0" }
+language_model_core = { package = "aa_language_model_core", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
 language_models = { path = "packages/language_models" }
 language_models_cloud = { path = "packages/language_models_cloud" }
 language_tools = { path = "packages/language_tools" }
@@ -142,7 +141,7 @@ lsp = { path = "packages/lsp" }
 markdown = { path = "packages/markdown" }
 markdown_preview = { path = "packages/markdown_preview" }
 mermaid_render = { path = "packages/mermaid_render" }
-migrator = { package = "zed_migrator", git = "https://github.com/Nahida-aa/gpui_learn", rev = "626210d", version = "=0.1.0" }
+migrator = { package = "zed_migrator", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
 miniprofiler_ui = { path = "packages/miniprofiler_ui" }
 mistral = { path = "packages/mistral" }
 multi_buffer = { path = "packages/multi_buffer" }
@@ -156,20 +155,20 @@ openai_subscribed = { path = "packages/openai_subscribed" }
 opencode = { path = "packages/opencode" }
 outline = { path = "packages/outline" }
 outline_panel = { path = "packages/outline_panel" }
-paths = { package = "zed_paths", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+paths = { package = "zed_paths", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 picker = { path = "packages/picker" }
 picker_preview = { path = "packages/picker_preview" }
 platform_title_bar = { path = "packages/platform_title_bar" }
 project = { path = "packages/project" }
 project_panel = { path = "packages/project_panel" }
 prompt_store = { path = "packages/prompt_store" }
-proto = { package = "zed_proto", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+proto = { package = "zed_proto", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 prettier = { path = "packages/prettier" }
 recent_projects = { path = "packages/recent_projects" }
 repl = { path = "packages/repl" }
-rope = { package = "aa_gpui_kit_rope", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+rope = { package = "aa_gpui_kit_rope", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 rpc = { path = "packages/rpc" }
-release_channel = { package = "aa_release_channel", git = "https://github.com/Nahida-aa/gpui_learn", rev = "f753769", version = "=0.1.0" }
+release_channel = { package = "aa_release_channel", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
 remote = { path = "packages/remote" }
 remote_connection = { path = "packages/remote_connection" }
 remote_server = { path = "packages/remote_server" }
@@ -177,13 +176,13 @@ reqwest_client = { path = "packages/reqwest_client" }
 
 sandbox = { path = "packages/sandbox" }
 search = { path = "packages/search" }
-settings = { path = "packages/settings" }
-settings_content = { package = "aa_gpui_kit_settings_content", git = "https://github.com/Nahida-aa/gpui_learn", rev = "8856672", version = "=0.1.0" }
-settings_macros = { package = "aa_settings_macros", git = "https://github.com/Nahida-aa/gpui_learn", rev = "7af42f9", version = "=0.1.0" }
+settings = { package = "zed_settings", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
+settings_content = { package = "aa_gpui_kit_settings_content", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
+settings_macros = { package = "aa_settings_macros", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
 settings_ui = { path = "packages/settings_ui" }
 snippet_provider = { path = "packages/snippet_provider" }
 snippets_ui = { path = "packages/snippets_ui" }
-settings_json = { package = "aa_settings_json", git = "https://github.com/Nahida-aa/gpui_learn", rev = "7af42f9", version = "=0.1.0", default-features = false }
+settings_json = { package = "aa_settings_json", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0", default-features = false }
 sidebar = { path = "packages/sidebar" }
 session = { path = "packages/session" }
 streaming_diff = { path = "packages/streaming_diff" }
@@ -193,9 +192,9 @@ task = { path = "packages/task" }
 tabular_data_preview = { path = "packages/tabular_data_preview" }
 tab_switcher = { path = "packages/tab_switcher" }
 tasks_ui = { path = "packages/tasks_ui" }
-text = { package = "aa_gpui_kit_text", git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
-telemetry = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
-telemetry_events = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "a24ce02" }
+text = { package = "aa_gpui_kit_text", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
+telemetry = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
+telemetry_events = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190" }
 terminal = { path = "packages/terminal" }
 terminal_view = { path = "packages/terminal_view" }
 title_bar = { path = "packages/title_bar" }
@@ -205,8 +204,8 @@ theme_selector = { path = "packages/theme_selector" }
 toolchain_selector = { path = "packages/toolchain_selector" }
 ui_prompt = { path = "packages/ui_prompt" }
 
-util = { package = "aa_util", git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
-util_macros = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "eb08078", version = "=0.1.0" }
+util = { package = "aa_util", git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
+util_macros = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "2c77190", version = "=0.1.0" }
 vim = { path = "packages/vim" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
 web_search = { path = "packages/web_search" }
@@ -594,28 +593,28 @@ zeroize = "1.8"
 zstd = "0.11"
 
 # 外部 gpui_learn 共享库（GitHub git 依赖，稳定可复现）
-clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+clock = { package = "aa_clock", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
 # 别名为 zed 的新包 `fuzzy_nucleo`：我们对齐的就是它（Case / LengthPenalty /
 # match_strings_async / StringMatch.string: SharedString）。成员包二选一，
 # 不能同时写 aa_gpui_fuzzy 和 fuzzy_nucleo（同一 crate 两个名字 → Cargo 报错）。
-fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
 # zed 里这两个控件包就叫 `ui` / `ui_input`，同样用别名对齐，
 # 让照搬的 zed 代码（`ui::Button`、`ui_input::InputField`）零改动。
-ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
 # zed 里这个包叫 `theme`，别名让照搬的 zed 代码（`theme::SyntaxTheme` 等）原样可用。
 # 与 `aa_gpui_kit_theme` 指向同一个包；**每个包只能选其中一个名字声明**，
 # 否则会报 "depends on crate ... multiple times with different names"。
-theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
 # 图标枚举（gpui_learn packages/icons）在 zed 里叫 `icons`，同样用别名对齐。
-icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
-aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
+aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
 # grammars 指向 gpui_learn（crate 名 aa_gpui_kit_grammars），用 package= 改名，
 # 使全仓 `grammars::` 的调用点无需改动。
 #
@@ -634,7 +633,7 @@ aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", r
 # gpui_learn 版的 grammars 里 `util.workspace = true` 解析到 aa_gpui_kit_util，
 # 其 features 段有 `default = ["debug-embed"]`，与仓库布局无关；4 个 json 文件
 # （cpp/go/python/rust）都在 packages/grammars/src/ 下。
-grammars = { package = "aa_gpui_kit_grammars", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "6c5073d13958f78fe94b9ee54e9c1be8313550ae" }
+grammars = { package = "aa_gpui_kit_grammars", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "2c77190" }
 
 crashes = { git = "https://github.com/zed-industries/zed", rev = "afecd6d719aad92aecfa2860f49c4f2956708831" }
 # zed 的模糊匹配正在迁移中：editor / worktree 仍用旧包 `fuzzy`（bool 参数那套
@@ -756,7 +755,7 @@ webrtc-sys = { git = "https://github.com/zed-industries/livekit-rust-sdks", rev 
 # `LanguageName` 全都"类型不同"（E0308 + 「multiple different versions」）。
 # 统一指到本地这份。
 [patch."https://github.com/zed-industries/zed"]
-language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/language_core" }
+language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/language_core" }
 # util_macros 源码完全一致（sha256 相同），合并成一份：
 #   Zed 侧的 util_macros（被 gpui 依赖）→ path patch 到 gpui_learn 的 util_macros
 #   与 gpui_learn 侧的 util_macros.workspace = true 最终指向同一份源码
@@ -785,14 +784,14 @@ aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui/gpui
 # 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
 aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
-aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_cloud_llm_client" }
-zed_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed_cloud_llm_client" }
+aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_cloud_llm_client" }
+zed_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_cloud_llm_client" }
 zed_migrator = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_migrator" }
 aa_release_channel = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_release_channel" }
 aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
-aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_language_model_core" }
-aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_settings_macros" }
-aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_settings_json" }
+aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_language_model_core" }
+aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_macros" }
+aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_json" }
 aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/settings_content" }
 
 # util / util_macros 同样必须走本地，否则图里会同时存在两份：
@@ -805,7 +804,7 @@ aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packag
 # 都要在此声明 path patch 才能与其 workspace 解析结果一致。
 aa_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util" }
 util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
-aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/grammars" }
+aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/grammars" }
 
 # —— profile ——
 # 对齐 Zed Cargo.toml L1037-1129。原先本文件**没有任何 [profile] 段**，全部用
