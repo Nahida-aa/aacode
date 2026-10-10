@@ -1,4 +1,4 @@
-use gpui::{Context, Entity, Subscription, Task, WeakEntity, Window};
+use gpui::{Context, Entity, Pixels, Subscription, Task, WeakEntity, Window};
 use settings::Settings;
 use terminal::{Event, MaybeNavigationTarget, Terminal};
 use terminal::terminal_settings::{TerminalBell, TerminalBlink, TerminalSettings};
@@ -36,6 +36,20 @@ pub fn subscribe_for_terminal_events(
                     cx.emit(Event::Wakeup);
                     cx.emit(ItemEvent::UpdateTab);
                     cx.emit(SearchEvent::MatchesInvalidated);
+                }
+
+                Event::OutputReplaced => {
+                    terminal_view.hover = None;
+                    terminal_view.hover_tooltip_update = Task::ready(());
+                    terminal_view.scroll_top = Pixels::ZERO;
+                    terminal_view.scroll_handle.future_display_offset.set(None);
+                    terminal_view.scroll_handle.update(terminal.read(cx));
+                    terminal_view.block_below_cursor = None;
+                    window.invalidate_character_coordinates();
+                    cx.emit(SearchEvent::MatchesInvalidated);
+                    cx.emit(SearchEvent::ActiveMatchChanged);
+                    cx.emit(ItemEvent::UpdateTab);
+                    cx.notify();
                 }
 
                 Event::Bell => {
