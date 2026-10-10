@@ -249,7 +249,7 @@ windows.workspace = true
 gpui = { workspace = true, features = ["profiler", "windows-manifest"] }
 
 [build-dependencies]
-windows_resources = { path = "../windows_resources" }
+windows_resources = { path = "../../windows_resources" }
 
 # ashpd —— core/mod.rs 的 fail_to_open_window 用 ashpd::desktop::notification
 # 在开窗口失败时弹 XDG 桌面通知（对齐 Zed crates/zed/src/main.rs:153-190）。

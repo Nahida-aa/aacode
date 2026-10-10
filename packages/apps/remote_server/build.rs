@@ -1,7 +1,7 @@
 #![allow(clippy::disallowed_methods, reason = "build scripts are exempt")]
 use std::process::Command;
 
-const APP_MANIFEST: &str = include_str!("../../app/Cargo.toml");
+const APP_MANIFEST: &str = include_str!("../aacode/Cargo.toml");
 const WORKSPACE_MANIFEST: &str = include_str!("../../../Cargo.toml");
 
 /// 从 manifest 里取 `package.version` 的字符串值。
