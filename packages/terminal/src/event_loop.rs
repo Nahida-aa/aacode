@@ -56,7 +56,11 @@ use super::colors::get_color_at_index;
 impl Terminal {
     pub(crate) fn process_pty_event(&mut self, event: PtyEvent, cx: &mut Context<Self>) {
         match event {
-            PtyEvent::Event(event) => self.process_event(event, cx),
+            PtyEvent::Event(event, generation) => {
+                if self.output_events_tx.is_none() || generation == self.output_generation {
+                    self.process_event(event, cx);
+                }
+            }
         }
     }
 

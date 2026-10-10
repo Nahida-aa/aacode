@@ -91,6 +91,7 @@ pub(crate) fn new_term(
     bounds: TerminalBounds,
     events_tx: UnboundedSender<PtyEvent>,
     alternate_scroll: AlternateScroll,
+    _generation: u64,
 ) -> Arc<AlacrittyTermLock> {
     let mut term = Term::new(config.clone(), &bounds, ZedListener(events_tx));
 

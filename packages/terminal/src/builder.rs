@@ -93,7 +93,13 @@ impl TerminalBuilder {
         let config = display_only_term_config(scrolling_history, cursor_shape);
 
         let (events_tx, events_rx) = unbounded();
-        let term = new_term(&config, terminal_bounds, events_tx, alternate_scroll);
+        let term = new_term(
+            &config,
+            terminal_bounds,
+            events_tx.clone(),
+            alternate_scroll,
+            0,
+        );
 
         let terminal = Terminal {
             task: None,
@@ -103,6 +109,8 @@ impl TerminalBuilder {
             term,
             term_config: config,
             output_processor: None,
+            output_events_tx: Some(events_tx),
+            output_generation: 0,
             title_override: None,
             events: VecDeque::with_capacity(10),
             last_content: Content {
@@ -297,6 +305,7 @@ impl TerminalBuilder {
                 TerminalBounds::default(),
                 events_tx.clone(),
                 alternate_scroll,
+                0,
             );
 
             // When `no_pty` is set (headless hosts), run the task as a plain
@@ -390,6 +399,8 @@ impl TerminalBuilder {
                 term,
                 term_config: config,
                 output_processor: None,
+                output_events_tx: None,
+                output_generation: 0,
                 title_override: terminal_title_override,
                 events: VecDeque::with_capacity(10), //Should never get this high.
                 last_content: Default::default(),
@@ -502,17 +513,17 @@ impl TerminalBuilder {
                         .timer(std::time::Duration::from_millis(4))
                         .fuse();
 
-                    let mut wakeup = false;
+                    let mut wakeup = None;
                     loop {
                         futures::select_biased! {
                             _ = timer => break,
                             event = self.events_rx.next() => {
                                 if let Some(event) = event {
-                                    if matches!(event, PtyEvent::Event(TerminalBackendEvent::Wakeup))
-                                    {
-                                        wakeup = true;
-                                    } else {
-                                        events.push(event);
+                                    match event {
+                                        PtyEvent::Event(TerminalBackendEvent::Wakeup, generation) => {
+                                            wakeup = Some(generation);
+                                        }
+                                        event => events.push(event),
                                     }
 
                                     if events.len() > 100 {
@@ -525,14 +536,17 @@ impl TerminalBuilder {
                         }
                     }
 
-                    if events.is_empty() && !wakeup {
+                    if events.is_empty() && wakeup.is_none() {
                         yield_now().await;
                         break 'outer;
                     }
 
                     terminal.update(cx, |this, cx| {
-                        if wakeup {
-                            this.process_event(TerminalBackendEvent::Wakeup, cx);
+                        if let Some(generation) = wakeup {
+                            this.process_pty_event(
+                                PtyEvent::Event(TerminalBackendEvent::Wakeup, generation),
+                                cx,
+                            );
                         }
 
                         for event in events {
@@ -624,7 +638,7 @@ fn spawn_task_subprocess(
                                     processor.advance(&mut *term, &converted);
                                 }
                                 events_tx
-                                    .unbounded_send(PtyEvent::Event(TerminalBackendEvent::Wakeup))
+                                    .unbounded_send(PtyEvent::Event(TerminalBackendEvent::Wakeup, 0))
                                     .ok();
                             }
                         }
@@ -658,7 +672,7 @@ fn spawn_task_subprocess(
                 Some(status) => TerminalBackendEvent::ChildExit(status),
                 None => TerminalBackendEvent::Exit,
             };
-            events_tx.unbounded_send(PtyEvent::Event(event)).ok();
+            events_tx.unbounded_send(PtyEvent::Event(event, 0)).ok();
         }
     });
 

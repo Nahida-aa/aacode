@@ -23,6 +23,7 @@ use gpui::{
 pub enum Event {
     TitleChanged,
     BreadcrumbsChanged,
+    OutputReplaced,
     CloseTerminal,
     Bell,
     Wakeup,
@@ -106,7 +107,7 @@ impl fmt::Debug for TerminalBackendEvent {
     }
 }
 pub enum PtyEvent {
-    Event(TerminalBackendEvent),
+    Event(TerminalBackendEvent, u64),
 }
 
 type ClipboardFormatter = Arc<dyn Fn(&str) -> String + Sync + Send + 'static>;

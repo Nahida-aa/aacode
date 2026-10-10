@@ -2,8 +2,10 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{Duration, Instant};
 
-use super::task::{TaskStatus, task_summary};
+use anyhow::{bail, Result};
 use vte::ansi::{Processor, StdSyncHandler};
+
+use super::task::{TaskStatus, task_summary};
 
 use crate::bounds::normalize_terminal_bounds;
 use crate::cell::{GridLinesChange, RenderableCells};
@@ -11,9 +13,10 @@ use crate::mappings::keys::to_esc_str;
 use crate::pty_info::ProcessIdGetter;
 use crate::subprocess::convert_lf_to_crlf;
 use crate::task::TaskState;
-use crate::{CwdHistoryEntry, HyperlinkMatch};
 use crate::{
+    HyperlinkMatch, RegexSearches, CwdHistoryEntry,
     TerminalBounds,
+    alacritty::new_term,
     cursor::{Point, Range},
     events::{
         Event, InternalEvent, MaybeNavigationTarget, PathLikeTarget, PtyEvent, TerminalBackendEvent,
@@ -28,7 +31,7 @@ use crate::{
 use gpui::{
     App, Bounds, ClipboardItem, Context, Keystroke, Modifiers, MouseButton, MouseDownEvent,
     MouseMoveEvent, MouseUpEvent, Pixels, Point as GpuiPoint, ScrollWheelEvent, Task, TouchPhase,
-    Window,
+    Window, px,
 };
 
 use std::{
@@ -102,7 +105,7 @@ impl Terminal {
     }
 
     /// Terminal byte streams already contain their control sequences and must not be normalized.
-    fn write_raw_output(&mut self, bytes: &[u8], cx: &mut Context<Self>) {
+    pub fn write_raw_output(&mut self, bytes: &[u8], cx: &mut Context<Self>) {
         let mut term = self.term.lock();
         self.output_processor
             .get_or_insert_with(Processor::<StdSyncHandler>::new)
@@ -110,6 +113,61 @@ impl Terminal {
         drop(term);
         self.detect_init_command_startup_marker();
         cx.emit(Event::Wakeup);
+    }
+
+    /// Replaces all display-only output while retaining the terminal entity and its dimensions.
+    pub fn replace_display_output(&mut self, bytes: &[u8], cx: &mut Context<Self>) -> Result<()> {
+        if !matches!(self.terminal_type, TerminalType::DisplayOnly) || self.subprocess.is_some() {
+            bail!("cannot replace output of a process-backed terminal");
+        }
+        let Some(events_tx) = &self.output_events_tx else {
+            bail!("display-only terminal has no output event channel");
+        };
+        let Some(generation) = self.output_generation.checked_add(1) else {
+            bail!("display output generation exhausted");
+        };
+        let bounds = self.last_content.terminal_bounds;
+        let term = new_term(
+            &self.term_config,
+            bounds,
+            events_tx.clone(),
+            self.template.alternate_scroll,
+            generation,
+        );
+        self.output_generation = generation;
+        self.term = term;
+        self.output_processor = None;
+        // The new emulator already has the latest requested size; older resizes can truncate it.
+        self.events.clear();
+        self.last_content = Content {
+            terminal_bounds: bounds,
+            ..Default::default()
+        };
+        self.last_mouse = None;
+        self.mouse_down_position = None;
+        self.matches.clear();
+        self.selection_head = None;
+        self.breadcrumb_text.clear();
+        self.scroll_px = px(0.);
+        self.next_link_id = 0;
+        self.selection_phase = SelectionPhase::Ended;
+        self.hyperlink_regex_searches = RegexSearches::new(
+            &self.template.path_hyperlink_regexes,
+            self.template.path_hyperlink_timeout,
+        );
+        self.vi_mode_enabled = false;
+        self.last_hyperlink_search_position = None;
+        self.mouse_down_hyperlink = None;
+        self.cwd_history.clear();
+        self.pending_cwd_boundary = None;
+        self.write_raw_output(bytes, cx);
+        cx.emit(Event::BlinkChanged(
+            self.term.lock().cursor_style().blinking,
+        ));
+        cx.emit(Event::BreadcrumbsChanged);
+        cx.emit(Event::NewNavigationTarget(None));
+        cx.emit(Event::OutputReplaced);
+        Ok(())
     }
 
     pub fn total_lines(&self) -> usize { total_lines(&self.term.lock_unfair()) }

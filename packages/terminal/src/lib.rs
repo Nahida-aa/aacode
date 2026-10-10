@@ -114,6 +114,8 @@ pub struct Terminal {
     pub(crate) term: Arc<AlacrittyTermLock>,
     pub(crate) term_config: AlacrittyTermConfig,
     pub(crate) output_processor: Option<Processor<StdSyncHandler>>,
+    pub(crate) output_events_tx: Option<futures::channel::mpsc::UnboundedSender<PtyEvent>>,
+    pub(crate) output_generation: u64,
     pub(crate) events: VecDeque<InternalEvent>,
     /// This is only used for mouse mode cell change detection
     pub(crate) last_mouse: Option<(Point, SelectionSide)>,

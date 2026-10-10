@@ -82,7 +82,10 @@ pub(crate) fn spawn_task_subprocess(
                                     processor.advance(&mut *term, &converted);
                                 }
                                 events_tx
-                                    .unbounded_send(PtyEvent::Event(TerminalBackendEvent::Wakeup))
+                                    .unbounded_send(PtyEvent::Event(
+                                        TerminalBackendEvent::Wakeup,
+                                        0,
+                                    ))
                                     .ok();
                             }
                         }
@@ -116,7 +119,7 @@ pub(crate) fn spawn_task_subprocess(
                 Some(status) => TerminalBackendEvent::ChildExit(status),
                 None => TerminalBackendEvent::Exit,
             };
-            events_tx.unbounded_send(PtyEvent::Event(event)).ok();
+            events_tx.unbounded_send(PtyEvent::Event(event, 0)).ok();
         }
     });
 
