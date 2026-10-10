@@ -6,9 +6,9 @@ license.workspace = true
 publish = false
 description = "aacode GPUI desktop client"
 
-# lib 名显式定为 aa_app_lib，与 package 名解耦（改名 package 不影响 lib 的 crate 名）。
+# lib / bin 名都与 package 名一致 = aacode
 [lib]
-name = "aa_app_lib"
+name = "aacode"
 path = "src/lib.rs"
 
 # package name 与 [[bin]] name 一致 = aacode，与 zed 的约定相同

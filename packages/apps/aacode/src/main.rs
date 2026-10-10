@@ -167,7 +167,7 @@ fn main() {
     // （open_listener 里 listen_for_cli_connections / handle_cli_connection 此前
     // 都只有定义、没有调用点）。
     let (open_listener, mut open_rx) =
-        aa_app_lib::core::open_listener::OpenListener::new();
+        aacode::core::open_listener::OpenListener::new();
 
     // single-instance 检查：listen 失败说明已有实例占着 socket。对齐 Zed L360-368。
     // windows/macos 的 handle_single_instance 依赖各自平台模块，aacode 未移植，
@@ -179,14 +179,14 @@ fn main() {
     } else {
         #[cfg(any(target_os = "linux", target_os = "freebsd"))]
         {
-            aa_app_lib::core::open_listener::listen_for_cli_connections(
+            aacode::core::open_listener::listen_for_cli_connections(
                 open_listener.clone(),
             )
             .is_err()
         }
         #[cfg(target_os = "windows")]
         {
-            !aa_app_lib::core::windows_only_instance::handle_single_instance(
+            !aacode::core::windows_only_instance::handle_single_instance(
                 open_listener.clone(),
                 &args,
             )
@@ -194,7 +194,7 @@ fn main() {
 
         #[cfg(target_os = "macos")]
         {
-            use aa_app_lib::core::mac_only_instance::*;
+            use aacode::core::mac_only_instance::*;
             ensure_only_instance() != IsOnlyInstance::Yes
         }
     };
@@ -234,7 +234,7 @@ fn main() {
         // 必须在 settings::init 之后——它要读 BaseKeymap 全局。
         // 缺这步的话应用里一个默认快捷键都没有：backspace / ctrl-a / ctrl-s
         // 之类全部静默失效（编辑器自身 on_key_down 的少数键仍可用）。
-        aa_app_lib::initialize::load_default_keymap(cx);
+        aacode::initialize::load_default_keymap(cx);
         // 传资产源：theme_settings 据此装载内嵌的 `themes/**/*.json`
         // （内置 Catppuccin 主题 —— 语法高亮的 102 个 capture 都来自那份 JSON）。
         theme_settings::init(
@@ -548,7 +548,7 @@ fn main() {
         // 挂上 provider；不调用它 → editor.edit_prediction_provider() 恒为 None →
         // edit_prediction_ui 的 "Usage" 菜单（读 provider.usage()）永不渲染，
         // 即「登录后仍看不到 Zeta 额度」。无编译错、无 panic，纯静默失效。
-        aa_app_lib::core::edit_prediction_registry::init(
+        aacode::core::edit_prediction_registry::init(
             app_state.client.clone(),
             app_state.user_store.clone(),
             cx,
@@ -581,19 +581,19 @@ fn main() {
         debugger_ui::init(cx);
 
         // —— observe_new 注册 ——
-        aa_app_lib::initialize::initialize_workspace(app_state.clone(), cx);
+        aacode::initialize::initialize_workspace(app_state.clone(), cx);
 
         // —— 设置应用菜单（application_menu 靠 cx.get_menus() 读取数据）——
         // 对齐 Zed：菜单体系由 app_menus.rs 构建；App 级 action 的 handler 在这里注册。
         // 放在 open_window 之前因为 title_bar::init 已在上面 observe 了 Workspace。
         // 对齐 Zed main.rs L587 `zed::init(cx)`：注册 App 级 action handler。
-        aa_app_lib::initialize::init(cx);
+        aacode::initialize::init(cx);
         // 对齐 Zed main.rs：`auto_update_ui::init` 注册 Release Notes 本地查看 /
         // 更新通知的 handler；`onboarding::init` 注册 ShowWelcome / OpenOnboarding 等。
         auto_update_ui::init(cx);
         onboarding::init(cx);
         // 对齐 Zed main.rs L856-L857：先取菜单再 set，避免 `&mut App` 借用冲突。
-        let menus = aa_app_lib::app_menus::app_menus(cx);
+        let menus = aacode::app_menus::app_menus(cx);
         cx.set_menus(menus);
 
         // —— 语法高亮：把当前主题灌进语言注册表（对齐 Zed main.rs L830-L839）——
@@ -626,7 +626,7 @@ fn main() {
         let urls: Vec<_> = args
             .paths_or_urls
             .iter()
-            .map(|arg| aa_app_lib::core::parse_url_arg(arg, cx))
+            .map(|arg| aacode::core::parse_url_arg(arg, cx))
             .collect();
         let diff_all_mode = args
             .diff
@@ -643,7 +643,7 @@ fn main() {
         let wsl = None;
 
         if !urls.is_empty() || !diff_paths.is_empty() {
-            open_listener.open(aa_app_lib::core::open_listener::RawOpenRequest {
+            open_listener.open(aacode::core::open_listener::RawOpenRequest {
                 urls,
                 diff_paths,
                 wsl,
@@ -674,29 +674,29 @@ fn main() {
             .try_recv()
             .ok()
             .and_then(|request| {
-                aa_app_lib::core::open_listener::OpenRequest::parse(request, cx).log_err()
+                aacode::core::open_listener::OpenRequest::parse(request, cx).log_err()
             }) {
             Some(request) if request.is_focus_app_only() => cx.spawn({
                 let app_state = app_state.clone();
                 async move |cx| {
-                    if let Err(e) = aa_app_lib::core::restore_or_create_workspace(app_state, cx)
+                    if let Err(e) = aacode::core::restore_or_create_workspace(app_state, cx)
                         .await
                     {
-                        aa_app_lib::core::fail_to_open_window_async(e, cx);
+                        aacode::core::fail_to_open_window_async(e, cx);
                     }
                 }
             }),
             Some(request) => {
-                aa_app_lib::core::handle_open_request(request, app_state.clone(), cx);
+                aacode::core::handle_open_request(request, app_state.clone(), cx);
                 Task::ready(())
             }
             None => cx.spawn({
                 let app_state = app_state.clone();
                 async move |cx| {
-                    if let Err(e) = aa_app_lib::core::restore_or_create_workspace(app_state, cx)
+                    if let Err(e) = aacode::core::restore_or_create_workspace(app_state, cx)
                         .await
                     {
-                        aa_app_lib::core::fail_to_open_window_async(e, cx);
+                        aacode::core::fail_to_open_window_async(e, cx);
                     }
                 }
             }),
@@ -726,9 +726,9 @@ fn main() {
                     }
                     cx.update(|cx| {
                         if let Some(request) =
-                            aa_app_lib::core::open_listener::OpenRequest::parse(request, cx).log_err()
+                            aacode::core::open_listener::OpenRequest::parse(request, cx).log_err()
                         {
-                            aa_app_lib::core::handle_open_request(request, app_state.clone(), cx);
+                            aacode::core::handle_open_request(request, app_state.clone(), cx);
                         }
                     });
                 }
