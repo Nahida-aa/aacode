@@ -13,6 +13,7 @@ use gpui::{
 };
 use language::{Language, ResolvedHighlights, Rope};
 use smallvec::SmallVec;
+use pulldown_cmark::Alignment;
 use sum_tree::TreeMap;
 
 use crate::element::{AnyDiv, MetadataCellStyle, TableState};
@@ -159,7 +160,27 @@ impl MarkdownElementBuilder {
     }
 
     pub(super) fn push_image_child(&mut self, child: impl IntoElement) {
-        self.modify_current_div(|el| el.flex().flex_row().flex_wrap().items_start());
+        let table_cell_alignment = self
+            .table
+            .in_cell
+            .then(|| self.table.current_cell_alignment());
+        self.modify_current_div(|el| {
+            let el = el.flex().flex_row().flex_wrap();
+            // Table cells center their content vertically and apply column alignment via a
+            // column-direction container. Switching it to a row moves those axes, so the
+            // alignment has to be restated for the row.
+            match table_cell_alignment {
+                Some(alignment) => {
+                    let el = el.items_center().content_center();
+                    match alignment {
+                        Some(Alignment::Center) => el.justify_center(),
+                        Some(Alignment::Right) => el.justify_end(),
+                        _ => el.justify_start(),
+                    }
+                }
+                None => el.items_start(),
+            }
+        });
         self.div_stack.last_mut().unwrap().line_break_mode = LineBreakMode::FlexWrap;
         self.append_child(child.into_any_element());
     }

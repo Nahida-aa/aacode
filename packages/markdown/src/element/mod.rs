@@ -257,7 +257,11 @@ impl MarkdownElement {
         let fallback_opens_image_url = enclosing_link_url.is_none();
 
         let image_element = {
-            let wrapper = div().id(("markdown-image-link", range.start)).min_w_0();
+            let image_start = range.start;
+            let wrapper = div()
+                .id(("markdown-image-link", range.start))
+                .debug_selector(move || format!("markdown_image_{image_start}"))
+                .min_w_0();
             let wrapper = if !self.style.prevent_mouse_interaction
                 && let Some(url) = enclosing_link_url
             {
@@ -1346,6 +1350,7 @@ impl Element for MarkdownElement {
                             builder.table.start_row();
                         }
                         MarkdownTag::TableCell => {
+                            builder.table.start_cell();
                             let is_header = builder.table.in_head;
                             let row_index = builder.table.row_index;
                             let col_index = builder.table.col_index;
@@ -1355,6 +1360,13 @@ impl Element for MarkdownElement {
                                 .unwrap_or(self.style.base_text_style.text_align);
 
                             let mut cell_div = div()
+                                .debug_selector(|| {
+                                    if is_header {
+                                        format!("markdown_table_header_cell_{col_index}")
+                                    } else {
+                                        format!("markdown_table_cell_{row_index}_{col_index}")
+                                    }
+                                })
                                 .flex()
                                 .flex_col()
                                 .h_full()
@@ -1766,6 +1778,7 @@ impl ParentElement for AnyDiv {
 pub(crate) struct TableState {
     alignments: Vec<Alignment>,
     in_head: bool,
+    pub(crate) in_cell: bool,
     row_index: usize,
     col_index: usize,
 }
@@ -1774,6 +1787,7 @@ impl TableState {
     fn start(&mut self, alignments: Vec<Alignment>) {
         self.alignments = alignments;
         self.in_head = false;
+        self.in_cell = false;
         self.row_index = 0;
         self.col_index = 0;
     }
@@ -1781,6 +1795,7 @@ impl TableState {
     fn end(&mut self) {
         self.alignments.clear();
         self.in_head = false;
+        self.in_cell = false;
         self.row_index = 0;
         self.col_index = 0;
     }
@@ -1793,9 +1808,16 @@ impl TableState {
 
     fn end_row(&mut self) { self.row_index += 1; }
 
-    fn end_cell(&mut self) { self.col_index += 1; }
+pub(crate) fn start_cell(&mut self) {
+        self.in_cell = true;
+    }
 
-    fn current_cell_alignment(&self) -> Option<Alignment> {
+pub(crate) fn end_cell(&mut self) {
+        self.in_cell = false;
+        self.col_index += 1;
+    }
+
+pub(crate) fn current_cell_alignment(&self) -> Option<Alignment> {
         if self.alignments.is_empty() {
             return None;
         }
