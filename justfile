@@ -10,9 +10,9 @@ stats:
 
 # —— 本地安装 ——
 # 布局与 zed 的 crates/zed/resources + script/bundle-linux 对齐：
-#   packages/app/resources/aacode.desktop.in       .desktop 模板（envsubst 填充）
-#   packages/app/resources/app-icon<suffix>.png     512x512，按 channel 取（stable 无后缀）
-#   packages/app/resources/app-icon<suffix>@2x.png  1024x1024（HiDPI）
+#   packages/apps/aacode/resources/aacode.desktop.in       .desktop 模板（envsubst 填充）
+#   packages/apps/aacode/resources/app-icon<suffix>.png     512x512，按 channel 取（stable 无后缀）
+#   packages/apps/aacode/resources/app-icon<suffix>@2x.png  1024x1024（HiDPI）
 # 全部走 zed 的注入方式，值在本 recipe 执行时由环境变量决定，不写进源码：
 #   RELEASE_CHANNEL  同 zed 的 ZED_RELEASE_CHANNEL —— release_channel crate 在
 #                    **构建期**读它（build.rs 检测到该 env 就置
@@ -67,12 +67,12 @@ icons:
       # stable 的源文件是 aacode.svg（无后缀），其余带 -<channel>。
       suffix=$(echo "$pair" | cut -d: -f1)
       src="assets/images/$(echo "$pair" | cut -d: -f2).svg"
-      base="packages/app/resources/app-icon"
+      base="packages/apps/aacode/resources/app-icon"
       if [ "$suffix" != "stable" ]; then base="$base-$suffix"; fi
       resvg -w 512  -h 512  "$src" "$base.png"
       resvg -w 1024 -h 1024 "$src" "$base@2x.png"
     done
-    echo "生成完成：packages/app/resources/app-icon{,-dev,-nightly,-preview}{,@2x}.png"
+    echo "生成完成：packages/apps/aacode/resources/app-icon{,-dev,-nightly,-preview}{,@2x}.png"
 
 # 渲染 .desktop 模板到标准输出（调试用，不安装）。
 # channel 变体：APP_NAME=AACode\ Nightly APP_ID=dev.aacode.AACode-Nightly just desktop
@@ -81,7 +81,7 @@ desktop:
     set -euo pipefail
     export DO_STARTUP_NOTIFY="true" APP_CLI="aacode" APP_ICON="{{_app_icon}}" APP_ARGS="{{_app_args}}"
     export APP_NAME="{{_app_name}}" APP_ID="{{_app_id}}"
-    envsubst < packages/app/resources/aacode.desktop.in
+    envsubst < packages/apps/aacode/resources/aacode.desktop.in
 
 # 把调试符号拆到 .dbg，再 strip 掉本体里的 debug info 与局部符号。
 # 对齐 Zed `script/bundle-linux` L119-129（含其注释里的 objcopy 选型理由）。
@@ -141,9 +141,9 @@ install prefix="$HOME/.local":
     install -Dm755 target/release/aacode "{{prefix}}/bin/aacode"
 
     # 512 + 1024 两个尺寸，对齐 zed bundle-linux L174-177。
-    install -Dm644 "packages/app/resources/app-icon{{_icon_suffix}}.png" \
+    install -Dm644 "packages/apps/aacode/resources/app-icon{{_icon_suffix}}.png" \
       "{{prefix}}/share/icons/hicolor/512x512/apps/{{_app_icon}}.png"
-    install -Dm644 "packages/app/resources/app-icon{{_icon_suffix}}@2x.png" \
+    install -Dm644 "packages/apps/aacode/resources/app-icon{{_icon_suffix}}@2x.png" \
       "{{prefix}}/share/icons/hicolor/1024x1024/apps/{{_app_icon}}.png"
 
     # .desktop 由模板 envsubst 生成，再把 APP_CLI 绝对化。
@@ -151,7 +151,7 @@ install prefix="$HOME/.local":
     export APP_NAME="{{_app_name}}" APP_ID="{{_app_id}}"
     export APP_CLI="{{prefix}}/bin/aacode"
     mkdir -p "{{prefix}}/share/applications"
-    envsubst < packages/app/resources/aacode.desktop.in \
+    envsubst < packages/apps/aacode/resources/aacode.desktop.in \
       > "{{prefix}}/share/applications/{{_app_id}}.desktop"
     chmod +x "{{prefix}}/share/applications/{{_app_id}}.desktop"
 

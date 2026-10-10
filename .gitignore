@@ -15,3 +15,7 @@ node_modules/
 .delta/
 __pycache__/
 *.pyc
+.skill/
+.cursor/rules/skill-context.md
+.windsurf/rules/skill-context.md
+.claude/commands/
