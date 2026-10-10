@@ -29,6 +29,11 @@ impl AgentNotification {
         }
     }
 
+    #[cfg(test)]
+    pub fn title(&self) -> &SharedString {
+        &self.title
+    }
+
     pub fn window_options(screen: Rc<dyn PlatformDisplay>, cx: &App) -> WindowOptions {
         let size = Size {
             width: px(450.),
@@ -47,7 +52,7 @@ impl AgentNotification {
             size,
         };
 
-        let app_id = ReleaseChannel::global(cx).app_id(ac_constant::APP_ID);
+        let app_id = ReleaseChannel::global(cx).app_id();
 
         WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(bounds)),

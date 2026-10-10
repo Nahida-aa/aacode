@@ -10,7 +10,7 @@ use std::{
     time::Duration,
 };
 
-use acp_thread::{AcpThread, AcpThreadEvent, MentionUri, ThreadStatus, line_range_suffix};
+use acp_thread::{AcpThread, AcpThreadEvent, MentionUri, line_range_suffix};
 use agent::{ContextServerRegistry, SharedThread, ThreadStore};
 use agent_client_protocol::schema::v1 as acp;
 use agent_servers::AgentServer;
@@ -22,7 +22,7 @@ use project::agent_server_store::AllAgentServersSettings;
 use project::{AgentId, ProjectItem};
 use serde::{Deserialize, Serialize};
 
-use aacode_actions::{
+use zed_actions::{
     DecreaseBufferFontSize, IncreaseBufferFontSize, ResetBufferFontSize,
     agent::{
         AddSelectionToThread, ConflictContent, LogoutAgent, OpenSettings, ReauthenticateAgent,
@@ -2221,6 +2221,7 @@ impl AgentPanel {
                     this.request_close_terminal_from_terminal_event(terminal_id, cx);
                 }
                 TerminalEvent::BlinkChanged(_)
+                | TerminalEvent::OutputReplaced
                 | TerminalEvent::SelectionsChanged
                 | TerminalEvent::NewNavigationTarget(_)
                 | TerminalEvent::Open(_) => {}
@@ -3534,8 +3535,8 @@ impl AgentPanel {
         cx: &mut Context<Self>,
     ) {
         window.dispatch_action(
-            Box::new(aacode_actions::OpenSettingsAt {
-                path: aacode_actions::AGENT_SKILLS_SETTINGS_PATH.to_string(),
+            Box::new(zed_actions::OpenSettingsAt {
+                path: zed_actions::AGENT_SKILLS_SETTINGS_PATH.to_string(),
                 target: None,
             }),
             cx,
@@ -3703,7 +3704,7 @@ impl AgentPanel {
 
     pub(crate) fn open_configuration(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         window.dispatch_action(
-            Box::new(aacode_actions::OpenSettingsPage {
+            Box::new(zed_actions::OpenSettingsPage {
                 page: "AI".to_string(),
                 target: None,
             }),
@@ -4230,8 +4231,13 @@ impl AgentPanel {
     ) {
         let subscription = if let Some(acp_thread) = conversation_view.read(cx).root_thread(cx) {
             let subscription = cx.subscribe(&acp_thread, |this, acp_thread, event, cx| {
-                if matches!(event, AcpThreadEvent::StatusChanged)
-                    && acp_thread.read(cx).status() == ThreadStatus::Idle
+                if matches!(
+                    event,
+                    AcpThreadEvent::StatusChanged
+                        | AcpThreadEvent::SubmissionUpdated(_)
+                        | AcpThreadEvent::ToolAuthorizationReceived(_)
+                        | AcpThreadEvent::ElicitationResponded(_)
+                ) && acp_thread.read(cx).is_idle_for_retention()
                 {
                     this.cleanup_retained_threads(cx);
                 }
@@ -4262,7 +4268,7 @@ impl AgentPanel {
                     return true;
                 };
                 let thread = thread_view.read(cx).thread.read(cx);
-                thread.connection().supports_load_session() && thread.status() == ThreadStatus::Idle
+                thread.connection().supports_load_session() && thread.is_idle_for_retention()
             })
             .collect::<Vec<_>>();
 
@@ -4859,12 +4865,12 @@ impl agent::SiblingThreadHost for AgentPanelSiblingHost {
                 // detached HEAD state — the agent can attach to a branch via
                 // git afterwards.
                 let branch_target = match request.base_ref.as_ref() {
-                    Some(ref_name) => aacode_actions::NewWorktreeBranchTarget::ExistingBranch {
+                    Some(ref_name) => zed_actions::NewWorktreeBranchTarget::ExistingBranch {
                         name: ref_name.clone(),
                     },
-                    None => aacode_actions::NewWorktreeBranchTarget::CurrentBranch,
+                    None => zed_actions::NewWorktreeBranchTarget::CurrentBranch,
                 };
-                let action = aacode_actions::CreateWorktree {
+                let action = zed_actions::CreateWorktree {
                     worktree_name: request.worktree_name.clone(),
                     branch_target,
                 };
@@ -5705,16 +5711,16 @@ impl AgentPanel {
                                 .header("MCP Servers")
                                 .action(
                                     "Add Server…",
-                                    Box::new(aacode_actions::OpenSettingsAt {
+                                    Box::new(zed_actions::OpenSettingsAt {
                                         path: "context_servers".to_string(),
                                         target: None,
                                     }),
                                 )
                                 .action(
                                     "Install New Servers…",
-                                    Box::new(aacode_actions::Extensions {
+                                    Box::new(zed_actions::Extensions {
                                         category_filter: Some(
-                                            aacode_actions::ExtensionCategoryFilter::ContextServers,
+                                            zed_actions::ExtensionCategoryFilter::ContextServers,
                                         ),
                                         id: None,
                                     }),
@@ -6033,7 +6039,7 @@ impl AgentPanel {
                                 .handler({
                                     move |window, cx| {
                                         window
-                                            .dispatch_action(Box::new(aacode_actions::AcpRegistry), cx)
+                                            .dispatch_action(Box::new(zed_actions::AcpRegistry), cx)
                                     }
                                 }),
                         )
@@ -7296,7 +7302,7 @@ mod tests {
             acp::ContentChunk::new("New response".into()),
         )]);
         user_message_editor.update_in(cx, |_editor, window, cx| {
-            window.dispatch_action(Box::new(aacode_actions::agent::Chat), cx);
+            window.dispatch_action(Box::new(zed_actions::agent::Chat), cx);
         });
         cx.update(|window, cx| window.blur(cx));
         cx.run_until_parked();
