@@ -1,6 +1,6 @@
 use anyhow::{Context as _, Result, anyhow};
 use buffer_diff::BufferDiff;
-use client::{Client, EditPredictionUsage, UserStore, global_llm_token};
+use client::{Client, EditPredictionUsage, UserStore, global_llm_token, zed_urls};
 use cloud_api_client::LlmApiToken;
 use cloud_api_types::{
     EditPredictionRecentFile, EditPredictionSettledKeptChars,
@@ -8,18 +8,17 @@ use cloud_api_types::{
     SettledEditPredictionSampleData, SubmitEditPredictionFeedbackBody,
     SubmitEditPredictionSettledBatchBody, SubmitEditPredictionSettledResponse,
 };
-use aa_cloud_llm_client::{
-    EditPredictionRejectReason, EditPredictionRejection,
-    MAX_EDIT_PREDICTION_REJECTIONS_PER_REQUEST, PredictEditsRequestTrigger,
-    RejectEditPredictionsBodyRef,
+use cloud_llm_client::predict_edits_v3::{
+    PREDICT_EDITS_MODE_HEADER_NAME, PREDICT_EDITS_REQUEST_ID_HEADER_NAME,
+    PREDICT_EDITS_TRIGGER_HEADER_NAME, PredictEditsMode, PredictEditsV3Request,
+    PredictEditsV3Response, RawCompletionRequest, RawCompletionResponse,
 };
-use zed_cloud_llm_client::{
-    MINIMUM_REQUIRED_VERSION_HEADER_NAME, PREFERRED_EXPERIMENT_HEADER_NAME,
-    ZED_VERSION_HEADER_NAME, predict_edits_v3::{
-        PREDICT_EDITS_MODE_HEADER_NAME, PREDICT_EDITS_REQUEST_ID_HEADER_NAME,
-        PREDICT_EDITS_TRIGGER_HEADER_NAME, PredictEditsMode, PredictEditsV3Request,
-        PredictEditsV3Response, RawCompletionRequest, RawCompletionResponse,
-    }, predict_edits_v4::{PredictEditsV4Request, PredictEditsV4Response},
+use cloud_llm_client::predict_edits_v4::{PredictEditsV4Request, PredictEditsV4Response};
+use cloud_llm_client::{
+    EditPredictionRejectReason, EditPredictionRejection,
+    MAX_EDIT_PREDICTION_REJECTIONS_PER_REQUEST, MINIMUM_REQUIRED_VERSION_HEADER_NAME,
+    PREFERRED_EXPERIMENT_HEADER_NAME, PredictEditsRequestTrigger, RejectEditPredictionsBodyRef,
+    ZED_VERSION_HEADER_NAME,
 };
 use collections::{HashMap, HashSet};
 use copilot::{Copilot, Reinstall};
@@ -36,7 +35,7 @@ use futures::{
 use git::repository::FileHistoryChangedFileSets;
 use gpui::BackgroundExecutor;
 use gpui::TaskExt;
-use http_client::Url;
+use gpui::http_client::Url;
 use gpui::{
     App, AsyncApp, Context, Entity, EntityId, Global, SharedString, Task, WeakEntity, actions,
     http_client::{self, AsyncBody, Method},
@@ -53,12 +52,16 @@ use release_channel::AppVersion;
 use semver::Version;
 use serde::de::DeserializeOwned;
 use settings::{
-    EditPredictionDataCollectionChoice, EditPredictionProvider, Settings as _, update_settings_file,
+    EditPredictionDataCollectionChoice, EditPredictionProvider, Settings as _, SettingsStore,
+    update_settings_file,
 };
 use std::collections::{VecDeque, hash_map};
 use std::env;
 use std::rc::Rc;
 use text::{AnchorRangeExt, Edit};
+use workspace::notifications::{
+    NotificationId, show_app_notification, simple_message_notification::MessageNotification,
+};
 use workspace::{AppState, Workspace};
 use zeta_prompt::ContextSource;
 use zeta_prompt::{Zeta2PromptInput, Zeta3PromptInput, ZetaFormat};
@@ -167,6 +170,7 @@ pub struct EditPredictionStore {
     user_store: Entity<UserStore>,
     llm_token: LlmApiToken,
     _fetch_experiments_task: Task<()>,
+    _user_store_subscription: gpui::Subscription,
     projects: HashMap<EntityId, ProjectState>,
     update_required: bool,
     edit_prediction_model: EditPredictionModel,
@@ -1031,7 +1035,13 @@ impl EditPredictionStore {
             .log_err();
         });
 
-        let credentials_provider = ad_credentials_provider::global(cx);
+        let user_store_subscription = cx.subscribe(&user_store, |_, user_store, event, cx| {
+            if let client::user::Event::PrivateUserInfoUpdated = event {
+                show_free_plan_edit_predictions_ended_notice_once(&user_store, cx);
+            }
+        });
+
+        let credentials_provider = zed_credentials_provider::global(cx);
 
         let this = Self {
             projects: HashMap::default(),
@@ -1039,6 +1049,7 @@ impl EditPredictionStore {
             user_store,
             llm_token,
             _fetch_experiments_task: fetch_experiments_task,
+            _user_store_subscription: user_store_subscription,
             update_required: false,
             edit_prediction_model: EditPredictionModel::Zeta,
             zeta2_raw_config: Self::zeta2_raw_config_from_env(),
@@ -3495,28 +3506,17 @@ fn is_upsell_dismissed(cx: &App) -> bool {
     // before, by checking the data collection choice which was written to
     // the database once the user clicked on "Accept and Enable"
     let kvp = KeyValueStore::global(cx);
-
-    let data_collection_choice = kvp.read_kvp(ZED_PREDICT_DATA_COLLECTION_CHOICE);
-    tracing::info!(
-        key = ZED_PREDICT_DATA_COLLECTION_CHOICE,
-        value = ?data_collection_choice,
-        db_path = ?paths::database_dir().join("0-dev").join("db.sqlite"),
-        "is_upsell_dismissed: data_collection_choice"
-    );
-    if data_collection_choice
+    if kvp
+        .read_kvp(ZED_PREDICT_DATA_COLLECTION_CHOICE)
         .log_err()
         .is_some_and(|s| s.is_some())
     {
         return true;
     }
 
-    let upsell = kvp.read_kvp(ZedPredictUpsell::KEY);
-    tracing::info!(
-        key = ZedPredictUpsell::KEY,
-        value = ?upsell,
-        "is_upsell_dismissed: upsell_key"
-    );
-    upsell.log_err().is_some_and(|s| s.is_some())
+    kvp.read_kvp(ZedPredictUpsell::KEY)
+        .log_err()
+        .is_some_and(|s| s.is_some())
 }
 
 impl Dismissable for ZedPredictUpsell {
@@ -3531,10 +3531,90 @@ pub fn should_show_upsell_modal(cx: &App) -> bool {
     !is_upsell_dismissed(cx)
 }
 
+/// Returns whether the user is set up to use Zed's hosted edit predictions but their plan
+/// doesn't include them. Other providers, including Ollama and OpenAI-compatible servers that
+/// run Zeta, don't go through Zed's servers and are unaffected.
+pub fn zed_edit_predictions_excluded_from_plan(user_store: &UserStore, cx: &App) -> bool {
+    all_language_settings(None, cx).edit_predictions.provider == EditPredictionProvider::Zed
+        && user_store.edit_predictions_excluded_from_plan()
+}
+
+/// Returns whether Zed's edit predictions should be treated as turned off: the user's plan
+/// doesn't include them and Zed is only their provider by default. Users who explicitly chose
+/// Zed keep the status bar button, which explains why predictions aren't available.
+pub fn zed_edit_predictions_off_for_plan(user_store: &UserStore, cx: &App) -> bool {
+    let provider_explicitly_chosen = cx
+        .global::<SettingsStore>()
+        .raw_user_settings()
+        .and_then(|settings| {
+            settings
+                .content
+                .project
+                .all_languages
+                .edit_predictions
+                .as_ref()?
+                .provider
+        })
+        .is_some();
+
+    !provider_explicitly_chosen && zed_edit_predictions_excluded_from_plan(user_store, cx)
+}
+
+struct FreePlanEditPredictionsEndedNotice;
+
+impl Dismissable for FreePlanEditPredictionsEndedNotice {
+    const KEY: &'static str = "free-plan-edit-predictions-ended-notice";
+}
+
+fn show_free_plan_edit_predictions_ended_notice_once(user_store: &Entity<UserStore>, cx: &mut App) {
+    // Accepted predictions are metered per billing period, so a nonzero count identifies users
+    // who were actually relying on edit predictions rather than just having the default provider.
+    let has_accepted_predictions = user_store
+        .read(cx)
+        .edit_prediction_usage()
+        .is_some_and(|usage| usage.amount > 0);
+
+    if DisableAiSettings::get_global(cx).disable_ai
+        || !has_accepted_predictions
+        || !zed_edit_predictions_excluded_from_plan(user_store.read(cx), cx)
+        || FreePlanEditPredictionsEndedNotice::dismissed(cx)
+    {
+        return;
+    }
+
+    // Recorded when shown rather than when dismissed, so users see this once even if they
+    // never interact with it.
+    FreePlanEditPredictionsEndedNotice::set_dismissed(true, cx);
+    telemetry::event!("Free Plan Edit Predictions Ended Notice Shown");
+
+    show_app_notification(
+        NotificationId::unique::<FreePlanEditPredictionsEndedNotice>(),
+        cx,
+        |cx| {
+            cx.new(|cx| {
+                MessageNotification::new(
+                    "Edit predictions are no longer included in the Free plan. \
+                    Upgrade to Pro for unlimited edit predictions.",
+                    cx,
+                )
+                .primary_message("Upgrade")
+                .primary_on_click(|_window, cx| {
+                    telemetry::event!(
+                        "Upgrade To Pro Clicked",
+                        state = "free-plan-edit-predictions-ended"
+                    );
+                    cx.open_url(&zed_urls::upgrade_to_zed_pro_url(cx));
+                })
+                .show_suppress_button(false)
+            })
+        },
+    );
+}
+
 pub fn init(cx: &mut App) {
     cx.observe_new(move |workspace: &mut Workspace, _, _cx| {
         workspace.register_action(
-            move |workspace, _: &aacode_actions::OpenZedPredictOnboarding, window, cx| {
+            move |workspace, _: &zed_actions::OpenZedPredictOnboarding, window, cx| {
                 ZedPredictModal::toggle(
                     workspace,
                     workspace.user_store().clone(),
