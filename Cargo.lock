@@ -198,7 +198,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_askpass"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_util",
  "anyhow",
@@ -236,7 +236,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_fs"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_rope",
@@ -276,7 +276,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_git"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_rope",
@@ -305,7 +305,7 @@ dependencies = [
  "url",
  "urlencoding",
  "uuid",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -362,7 +362,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_rope"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_util",
  "heapless",
@@ -371,7 +371,7 @@ dependencies = [
  "sum_tree",
  "tracing",
  "unicode-segmentation",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -400,7 +400,7 @@ dependencies = [
 [[package]]
 name = "aa_gpui_kit_text"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_clock",
  "aa_gpui_kit_rope",
@@ -745,8 +745,8 @@ dependencies = [
  "zed_migrator",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -961,7 +961,7 @@ dependencies = [
  "telemetry",
  "watch",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -1118,7 +1118,7 @@ dependencies = [
  "web_search",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -2122,7 +2122,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -3052,8 +3052,8 @@ dependencies = [
  "tracing",
  "unindent",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -4240,7 +4240,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -5208,7 +5208,7 @@ dependencies = [
  "zed_paths",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -5442,7 +5442,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -5625,7 +5625,7 @@ dependencies = [
  "unindent",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -5938,7 +5938,7 @@ dependencies = [
  "zed_paths",
  "zed_settings",
  "zeta_prompt",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -6116,8 +6116,8 @@ dependencies = [
  "vim_mode_setting",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -6501,7 +6501,7 @@ dependencies = [
  "wasmparser 0.254.2",
  "which",
  "zed_proto",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -6563,8 +6563,8 @@ dependencies = [
  "wasmtime-wasi 48.0.5",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -6749,7 +6749,7 @@ dependencies = [
  "theme_settings",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -7400,8 +7400,8 @@ dependencies = [
  "watch",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -7443,8 +7443,8 @@ dependencies = [
  "zed_proto",
  "zed_settings",
  "zeroize",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -9622,8 +9622,8 @@ dependencies = [
  "unindent",
  "watch",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -9653,7 +9653,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -9820,7 +9820,7 @@ dependencies = [
  "workspace",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -10464,7 +10464,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -10498,7 +10498,7 @@ dependencies = [
  "serde_json",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -10837,7 +10837,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "usvg",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -11176,8 +11176,8 @@ dependencies = [
  "tree-sitter",
  "unicode-segmentation",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -12170,7 +12170,7 @@ dependencies = [
  "vim_mode_setting",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -13929,8 +13929,8 @@ dependencies = [
  "zed_paths",
  "zed_settings",
  "zeroize",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -15058,7 +15058,7 @@ dependencies = [
  "zed_paths",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -15309,7 +15309,7 @@ dependencies = [
  "strum 0.28.0",
  "tracing",
  "zed_proto",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -15809,7 +15809,7 @@ dependencies = [
  "workspace",
  "zed_proto",
  "zed_settings",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -17265,7 +17265,7 @@ dependencies = [
  "theme_settings",
  "workspace",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -17394,7 +17394,7 @@ dependencies = [
 [[package]]
 name = "telemetry"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "futures 0.3.34",
  "serde_json",
@@ -17404,7 +17404,7 @@ dependencies = [
 [[package]]
 name = "telemetry_events"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "semver",
  "serde",
@@ -21567,7 +21567,7 @@ dependencies = [
  "worktree",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -21603,8 +21603,8 @@ dependencies = [
  "worktree",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -22080,7 +22080,7 @@ dependencies = [
 [[package]]
 name = "zed_paths"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_util",
  "const_format",
@@ -22092,7 +22092,7 @@ dependencies = [
 [[package]]
 name = "zed_proto"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "anyhow",
  "prost",
@@ -22104,7 +22104,7 @@ dependencies = [
 [[package]]
 name = "zed_settings"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_settings_content",
@@ -22300,7 +22300,7 @@ checksum = "b268e58e7c693d7c271f93ffc4ba3b380412554231c85bf61ca7af91042a4112"
 [[package]]
 name = "zlog"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "anyhow",
  "chrono",
@@ -22375,14 +22375,14 @@ dependencies = [
 [[package]]
 name = "ztracing"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 dependencies = [
  "tracing",
  "tracing-subscriber",
  "tracing-tracy",
  "tracy-client",
- "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
- "ztracing_macro 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190)",
+ "zlog 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
+ "ztracing_macro 0.1.0 (git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190)",
 ]
 
 [[package]]
@@ -22399,7 +22399,7 @@ dependencies = [
 [[package]]
 name = "ztracing_macro"
 version = "0.1.0"
-source = "git+https://github.com/Nahida-aa/gpui_learn?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
+source = "git+https://github.com/Nahida-aa/gpui_learn.git?rev=2c77190#2c77190424c60582d4425e30c353a8343277613c"
 
 [[package]]
 name = "ztracing_macro"
