@@ -1,6 +1,13 @@
 [package]
 name = "aacode"
-version.workspace = true
+# 【有意偏离 Zed】Zed 只有 crates/zed 一个 crate 带真实版本，其余 244 个写死
+# "0.1.0"。这个「不一致」是刻意的：cargo 的 PackageId 形如
+#   path+file:///...#aacode@1.22.1
+# **版本是 PackageId 的一部分**，而构建图/指纹/产物路径全以 PackageId 为键。
+# 若所有 crate 继承 workspace 版本，每次 bump 都会让全部 173 个 PackageId
+# 变化 → 全量重编且增量缓存全失效。写死 0.1.0 的 crate 则永远不失效。
+# 所以版本号只在这里维护，改完不影响任何依赖方。
+version = "1.22.1"
 edition.workspace = true
 license.workspace = true
 publish = false

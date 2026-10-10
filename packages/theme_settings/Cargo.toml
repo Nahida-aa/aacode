@@ -1,6 +1,6 @@
 [package]
 name = "theme_settings"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 license.workspace = true
 description = "aacode Theme + UI settings struct + 主题系统初始化（对齐 Zed crates/theme_settings）"

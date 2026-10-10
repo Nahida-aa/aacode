@@ -1,6 +1,6 @@
 [package]
 name = "aa-extension-sdk"
-version.workspace = true
+version = "0.1.0"
 edition.workspace = true
 license.workspace = true
 description = "aacode Extension SDK: 扩展开发的公共 API"
