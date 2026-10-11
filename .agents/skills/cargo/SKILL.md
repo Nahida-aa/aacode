@@ -1,6 +1,6 @@
 ---
 name: rust-cargo
-description: crago 使用指南
+description: cargo 使用指南
 ---
 
 看谁直接依赖 language_models
