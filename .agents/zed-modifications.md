@@ -409,10 +409,14 @@ Start Server**」—— 标签对了但按钮仍把它当停止。现在三处�
 |---|---|
 | 状态标签 | `stopped_server_worktrees`(按id) > `health` > `binary_statuses` |
 | `can_stop` | 主动停过(按id)→不可停；有 `health`→可停；否则退回上游 `can_stop()` 判据 |
-| `can_start` | 必须 `health` 为 None 且未主动停过，再按 `binary_status==Stopped` 或按 id 命中 |
+| `can_start` | **`health` 为 None** 且（主动停过(按id) 或 `binary_status==Stopped`） |
 
 原则：**只要该实例自己有 `health`，就忽略 name-keyed 的 `Stopping`/`Stopped`** ——
 那一定是别的同名实例造成的。
+
+⚠️ **`can_start` 别写成 `!is_manually_stopped && (… || map.contains_key(id))`**：
+`is_manually_stopped` 本身就是 `map.contains_key(id)`，这样写会让后半支**永远不可达**，
+主动停止的条目反而没有 Start 按钮（2026-10-12 踩过，修了好几轮才定位到）。
 
 ### 状态矩阵（改动后）
 

@@ -522,18 +522,17 @@ impl LanguageServerState {
                     };
                     // 能 Start 的前提是本实例没在跑：有 health 就不该给 Start
                     // （否则正在运行的同名实例会因 name-keyed 的 Stopped 而多个 Start 按钮）。
-                    let can_start = !is_manually_stopped
-                        && submenu_server_info.health.is_none()
-                        && (submenu_server_info
-                            .binary_status
-                            .as_ref()
-                            .is_some_and(|binary_status| {
-                                matches!(binary_status.status, BinaryStatus::Stopped)
-                            })
-                            || self
-                                .language_servers
-                                .stopped_server_worktrees
-                                .contains_key(&submenu_server_id));
+                    // 注意 `is_manually_stopped` 本身就是 `map.contains_key(id)`，
+                    // 不能写成 `!is_manually_stopped && (… || map.contains_key(id))` ——
+                    // 那样后半支永远不可达，主动停止的条目会没有 Start 按钮。
+                    let can_start = submenu_server_info.health.is_none()
+                        && (is_manually_stopped
+                            || submenu_server_info
+                                .binary_status
+                                .as_ref()
+                                .is_some_and(|binary_status| {
+                                    matches!(binary_status.status, BinaryStatus::Stopped)
+                                }));
                     let process_memory_cache = process_memory_cache.clone();
 
                     move |menu, _window, _cx| {
