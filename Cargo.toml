@@ -794,6 +794,18 @@ aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/comp
 aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_language_model_core" }
 aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_macros" }
 aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_json" }
+# zed_settings 必须走本地，否则 release 构建启动即 panic：
+#   panics at gpui_learn/packages/aa/util/src/embed.rs:9: settings/default.json
+# 原因是 fs_embed! 的两条路径在 git rev 24001e5 里层级错位：
+#   · dev（root_relative = "assets"）→ 从 git 根找 → 命中 ✅ 所以 cargo run 一直正常
+#   · release（crate_relative = "../../assets"）→ 相对 crate 的 Cargo.toml 目录解析，
+#     该 crate 在 packages/zed/zed_settings/，两级只回到 packages/，指向
+#     packages/assets —— 那是 aa_gpui_kit_assets 的 crate 目录（只有 src/ 和
+#     Cargo.toml，没有任何 settings 文件）→ 内嵌了空目录 → asset_str 拿不到文件。
+# 对照：aa_gpui_kit_assets 在 packages/assets/，两级正好落到仓库根 assets/，所以
+# 它用 "../../assets" 是对的 —— 不能照抄，得按各 crate 的实际层级数。
+# 本地版已改为 ../../../assets。
+zed_settings = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_settings" }
 aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/settings_content" }
 
 # util / util_macros 同样必须走本地，否则图里会同时存在两份：
