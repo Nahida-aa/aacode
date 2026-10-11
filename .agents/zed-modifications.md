@@ -10,6 +10,13 @@ aacode 在重命名层面做了以下映射（fork-sync 归一化时已考虑）
 - `zed_credentials_provider` → `ad_credentials_provider`
 - `zed_resource_manager` → `a_resource_manager`
 - `zed_application` → `aagent_application`
+- **`cloud_llm_client` → `aa_cloud_llm_client` + `zed_cloud_llm_client`（一分为二，不是改名）**
+  —— 上游只有一个 `cloud_llm_client`，aacode 侧拆成两个 crate，都来自 gpui_learn：
+  - `aa_cloud_llm_client` → `gpui_learn/packages/aa/aa_cloud_llm_client`
+  - `zed_cloud_llm_client` → `gpui_learn/packages/zed/zed_cloud_llm_client`
+  （Cargo.toml workspace.dependencies L76-77，[patch] 在 L818-819）
+  ⚠️ 因此搬上游代码遇到 `cloud_llm_client::` 时，**不能一律替换成 `aa_` 前缀** ——
+  要先确认该符号实际归属哪个 crate。曾有人把它当成单向改名而写错。
 - ~~`zlog` → `a_log`~~ / ~~`ztracing` → `a_tracing`~~ — 曾经的本地 `a_` 前缀，迁移到 gpui_learn 后**已还原**：
   aacode 源码全局替换 `a_log::` → `zlog::`、`a_tracing::` → `ztracing::`，
   现在与 zed 上游同名（zed 本来就叫 `zlog` / `ztracing`，不是 `log` / `tracing`）
