@@ -768,6 +768,18 @@ util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros
 # 唯一还留在 zed git 上的常用 crate。改名之前无法 patch：gpui_learn 那份叫
 # zed_http_client，而 cargo 的 [patch] 要求被 patch 的包同名同版本。
 http_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/http_client" }
+# zlog / ztracing / ztracing_macro 此前在依赖图里各有两份：
+#   一份来自 gpui_learn（本 patch 段指向本地），一份来自 zed git。
+# 后者是 zed 的 `sum_tree` 传递引入的 —— sum_tree 本身走 zed git 且 gpui_learn
+# 没有对应 crate（sum_tree 无法 patch），于是它依赖的 ztracing/zlog 也就跟着
+# 来自 zed git。链条：sum_tree(zed) → ztracing(zed) → zlog(zed) + ztracing_macro(zed)。
+#
+# 与 http_client 同理补上，使这三个 crate 全局只有一份来源。两份内容已比对：
+# ztracing 实质差异 0 行；zlog 仅 8 行差异且全在 macro_rules! 体内（rustfmt 对
+# 宏体缩进的处理差异，非语义）；ztracing_macro 逐字节一致。
+zlog = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/zlog" }
+ztracing = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing" }
+ztracing_macro = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing_macro" }
 
 # gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
 #

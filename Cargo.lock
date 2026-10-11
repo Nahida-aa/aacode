@@ -306,7 +306,7 @@ dependencies = [
  "url",
  "urlencoding",
  "uuid",
- "ztracing 0.1.0",
+ "ztracing",
 ]
 
 [[package]]
@@ -371,7 +371,7 @@ dependencies = [
  "sum_tree",
  "tracing",
  "unicode-segmentation",
- "ztracing 0.1.0",
+ "ztracing",
 ]
 
 [[package]]
@@ -744,8 +744,8 @@ dependencies = [
  "zed_migrator",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -960,7 +960,7 @@ dependencies = [
  "telemetry",
  "watch",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -1117,7 +1117,7 @@ dependencies = [
  "web_search",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -2121,7 +2121,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -3051,8 +3051,8 @@ dependencies = [
  "tracing",
  "unindent",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -4239,7 +4239,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -5207,7 +5207,7 @@ dependencies = [
  "zed_paths",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -5441,7 +5441,7 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -5624,7 +5624,7 @@ dependencies = [
  "unindent",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -5937,7 +5937,7 @@ dependencies = [
  "zed_paths",
  "zed_settings",
  "zeta_prompt",
- "zlog 0.1.0",
+ "zlog",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -6115,8 +6115,8 @@ dependencies = [
  "vim_mode_setting",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -6500,7 +6500,7 @@ dependencies = [
  "wasmparser 0.254.2",
  "which",
  "zed_proto",
- "ztracing 0.1.0",
+ "ztracing",
 ]
 
 [[package]]
@@ -6562,8 +6562,8 @@ dependencies = [
  "wasmtime-wasi 48.0.5",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -6748,7 +6748,7 @@ dependencies = [
  "theme_settings",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -7399,8 +7399,8 @@ dependencies = [
  "watch",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -7442,8 +7442,8 @@ dependencies = [
  "zed_proto",
  "zed_settings",
  "zeroize",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -9620,8 +9620,8 @@ dependencies = [
  "unindent",
  "watch",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -9651,7 +9651,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
- "ztracing 0.1.0",
+ "ztracing",
 ]
 
 [[package]]
@@ -9818,7 +9818,7 @@ dependencies = [
  "workspace",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -10462,7 +10462,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -10496,7 +10496,7 @@ dependencies = [
  "serde_json",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -10835,7 +10835,7 @@ dependencies = [
  "serde_json",
  "tracing",
  "usvg",
- "ztracing 0.1.0",
+ "ztracing",
 ]
 
 [[package]]
@@ -11174,8 +11174,8 @@ dependencies = [
  "tree-sitter",
  "unicode-segmentation",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -12168,7 +12168,7 @@ dependencies = [
  "vim_mode_setting",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -13927,8 +13927,8 @@ dependencies = [
  "zed_paths",
  "zed_settings",
  "zeroize",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -15056,7 +15056,7 @@ dependencies = [
  "zed_paths",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -15307,7 +15307,7 @@ dependencies = [
  "strum 0.28.0",
  "tracing",
  "zed_proto",
- "zlog 0.1.0",
+ "zlog",
  "zstd 0.11.2+zstd.1.5.2",
 ]
 
@@ -15807,7 +15807,7 @@ dependencies = [
  "workspace",
  "zed_proto",
  "zed_settings",
- "ztracing 0.1.0",
+ "ztracing",
 ]
 
 [[package]]
@@ -16822,7 +16822,7 @@ dependencies = [
  "log",
  "rayon",
  "tracing",
- "ztracing 0.1.0 (git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5)",
+ "ztracing",
 ]
 
 [[package]]
@@ -17263,7 +17263,7 @@ dependencies = [
  "theme_settings",
  "workspace",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -21563,7 +21563,7 @@ dependencies = [
  "worktree",
  "zed_proto",
  "zed_settings",
- "zlog 0.1.0",
+ "zlog",
 ]
 
 [[package]]
@@ -21599,8 +21599,8 @@ dependencies = [
  "worktree",
  "zed_paths",
  "zed_settings",
- "zlog 0.1.0",
- "ztracing 0.1.0",
+ "zlog",
+ "ztracing",
 ]
 
 [[package]]
@@ -22301,17 +22301,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "zlog"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5#c0199504b9cce79bc27524950022ed701bc3ebd5"
-dependencies = [
- "anyhow",
- "chrono",
- "collections",
- "log",
-]
-
-[[package]]
 name = "zmij"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -22372,29 +22361,13 @@ dependencies = [
  "tracing-subscriber",
  "tracing-tracy",
  "tracy-client",
- "zlog 0.1.0",
- "ztracing_macro 0.1.0",
-]
-
-[[package]]
-name = "ztracing"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5#c0199504b9cce79bc27524950022ed701bc3ebd5"
-dependencies = [
- "tracing",
- "tracing-subscriber",
- "zlog 0.1.0 (git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5)",
- "ztracing_macro 0.1.0 (git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5)",
+ "zlog",
+ "ztracing_macro",
 ]
 
 [[package]]
 name = "ztracing_macro"
 version = "0.1.0"
-
-[[package]]
-name = "ztracing_macro"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5#c0199504b9cce79bc27524950022ed701bc3ebd5"
 
 [[package]]
 name = "zune-core"
