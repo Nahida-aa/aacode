@@ -315,7 +315,8 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 5. **新增 `stopped_server_worktrees` 字段**（`lsp_button.rs` 的 `LanguageServers`）
 
    ```rust
-   stopped_server_worktrees: HashMap<LanguageServerName, (WeakEntity<Worktree>, LanguageServerId)>
+   // 按 server **id** 记，不能按 name —— 多项目工作区下同名 server 有多个实例
+   stopped_server_worktrees: HashMap<LanguageServerId, (LanguageServerName, WeakEntity<Worktree>)>
    ```
    - **这是 aacode 新增的状态，上游没有**，rev→rev 同步时注意
    - 用弱引用，与 `ServersForPath.worktree` 的 `Option<WeakEntity<Worktree>>` 风格一致
@@ -346,6 +347,26 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
      `stop_language_servers_for_buffers(Vec::new(), {所有 id}, cx)` 一次停掉，
      **不设**那个总闸
    - `RemoveAll` 仍走 `stop_all_language_servers`（设总闸、条目消失、靠 Restart All 恢复）
+
+### 多项目工作区：去重必须按 id，不能按 name（2026-10-12 修）
+
+**症状**：初版按 `LanguageServerName` 记录与去重，多项目工作区下点某项目的
+`Stop Server` 后**该条目消失**（同名实例在另一项目仍在运行）。
+
+**根因**：多项目下同名 server（如 rust-analyzer）有**多个实例、不同 `LanguageServerId`**。
+初版用 `emitted_server_names` 去重，另一个项目里仍在运行的同名实例会先把 name 占住，
+第三来源便 `continue` 跳过；而 binary_statuses 分支本身又被
+`.filter(|(name, _)| !servers_with_health_checks.contains(name))` 整名跳过 ——
+两条路都不通，于是彻底不渲染。
+
+**修法**：`stopped_server_worktrees` 改按 **id** 做 key，新增 `emitted_server_ids` 并在
+health / binary 两个分支记录 id；第三来源按 id 去重，**不再按 name 去重**
+（多项目下同名不同实例本就该各显示一条）。Remove / Start 的移除也改按 id。
+
+**遗留（上游既有行为，未改）**：`binary_statuses` 也是按 name 存的，停止一个实例会把
+同名实例的二进制状态也置为 `Stopped`，导致另一项目中**仍在运行**的同名 server 标签也显示
+"Stopped"（状态标签逻辑 `lsp_button.rs` 中 `binary_status` 优先于 `health`）。
+这是上游 name-keyed 设计导致，本次未动；若要修需一并改 `binary_statuses` 的 key 或标签优先级。
 
 ### 状态矩阵（改动后）
 

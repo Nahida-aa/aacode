@@ -162,7 +162,9 @@ struct LanguageServers {
     servers_per_buffer_abs_path: HashMap<PathBuf, ServersForPath>,
     /// 用户主动「停止」（可单独恢复）的 server 的展示归属。
     /// 单独维护，避免与 servers_per_buffer_abs_path 混淆产生残留死 id 的幽灵条目。
-    stopped_server_worktrees: HashMap<LanguageServerName, (WeakEntity<Worktree>, LanguageServerId)>,
+    /// 用 server id 而不是 name 做 key：多项目工作区下同名 server 会有多个实例
+    /// （不同 LanguageServerId），按 name 记录会互相覆盖 / 去重误删，导致条目丢失。
+    stopped_server_worktrees: HashMap<LanguageServerId, (LanguageServerName, WeakEntity<Worktree>)>,
 }
 
 #[derive(Debug, Clone)]
@@ -336,8 +338,8 @@ impl LanguageServerState {
                                                     },
                                                 )?;
                                                 Some((
-                                                    status.name.clone(),
-                                                    (worktree.downgrade(), server_id),
+                                                    server_id,
+                                                    (status.name.clone(), worktree.downgrade()),
                                                 ))
                                             })
                                             .collect::<Vec<_>>()
@@ -495,7 +497,7 @@ impl LanguageServerState {
                         || self
                             .language_servers
                             .stopped_server_worktrees
-                            .contains_key(&submenu_server_name);
+                            .contains_key(&submenu_server_id);
                     let process_memory_cache = process_memory_cache.clone();
 
                     move |menu, _window, _cx| {
@@ -692,7 +694,7 @@ impl LanguageServerState {
                                                     .worktree_for_id(worktree_id, cx)
                                             });
                                         worktree.map(|worktree| {
-                                            (worktree.downgrade(), server_id_for_stop)
+                                            (server_name_for_stop.clone(), worktree.downgrade())
                                         })
                                     })
                                     .ok()
@@ -704,10 +706,7 @@ impl LanguageServerState {
                                             state
                                                 .language_servers
                                                 .stopped_server_worktrees
-                                                .insert(
-                                                    server_name_for_stop.clone(),
-                                                    stopped_entry,
-                                                );
+                                                .insert(server_id_for_stop, stopped_entry);
                                         })
                                         .ok();
                                 }
@@ -737,7 +736,7 @@ impl LanguageServerState {
                         let lsp_store_for_remove = lsp_store.clone();
                         let server_selector_for_remove = server_selector.clone();
                         let state_for_remove = state.clone();
-                        let server_name_for_remove = submenu_server_name.clone();
+                        let server_id_for_remove = submenu_server_id;
 
                         submenu = submenu.entry("Remove Server", None, move |_window, cx| {
                             state_for_remove
@@ -745,7 +744,7 @@ impl LanguageServerState {
                                     state
                                         .language_servers
                                         .stopped_server_worktrees
-                                        .remove(&server_name_for_remove);
+                                        .remove(&server_id_for_remove);
                                 })
                                 .ok();
 
@@ -768,6 +767,7 @@ impl LanguageServerState {
                             let lsp_store_for_start = lsp_store.clone();
                             let state_for_start = state.clone();
                             let server_name_for_start = submenu_server_name.clone();
+                            let server_id_for_start = submenu_server_id;
 
                             submenu = submenu.entry("Start Server", None, move |_window, cx| {
                                 state_for_start
@@ -775,7 +775,7 @@ impl LanguageServerState {
                                         state
                                             .language_servers
                                             .stopped_server_worktrees
-                                            .remove(&server_name_for_start);
+                                            .remove(&server_id_for_start);
                                     })
                                     .ok();
 
@@ -1355,6 +1355,7 @@ impl LspButton {
             let mut servers_per_worktree = BTreeMap::<SharedString, Vec<ServerData>>::new();
             let mut servers_with_health_checks = HashSet::default();
             let mut emitted_server_names = HashSet::default();
+            let mut emitted_server_ids = HashSet::default();
 
             for (server_id, health) in &state.language_servers.health_statuses {
                 let worktree = server_ids_to_worktrees.get(server_id).or_else(|| {
@@ -1367,6 +1368,7 @@ impl LspButton {
                 });
                 servers_with_health_checks.insert(&health.name);
                 emitted_server_names.insert(&health.name);
+                emitted_server_ids.insert(*server_id);
                 let worktree_name =
                     worktree.map(|worktree| SharedString::new(worktree.read(cx).root_name_str()));
 
@@ -1425,6 +1427,7 @@ impl LspButton {
                 {
                     let worktree_name = SharedString::new(worktree.read(cx).root_name_str());
                     emitted_server_names.insert(server_name);
+                    emitted_server_ids.insert(*server_id);
                     servers_per_worktree
                         .entry(worktree_name.clone())
                         .or_default()
@@ -1438,10 +1441,11 @@ impl LspButton {
 
             // 被用户单独「停止」的 server 已不在 servers_per_buffer_abs_path /
             // language_server_statuses 中，从独立记录里补回条目（灰色 + "Stopped"）。
-            for (server_name, (worktree, server_id)) in
+            // 这里刻意只按 server id 去重：多项目下同名不同实例本就该各显示一条。
+            for (server_id, (server_name, worktree)) in
                 &state.language_servers.stopped_server_worktrees
             {
-                if emitted_server_names.contains(server_name) {
+                if emitted_server_ids.contains(server_id) {
                     continue;
                 }
                 let Some(binary_status) =
