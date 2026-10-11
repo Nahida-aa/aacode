@@ -820,6 +820,41 @@ aa_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util" }
 util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
 aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/grammars" }
 
+# gpui_learn 剩余的 git 依赖也一并指向本地，让「暂时全部走本地路径」这一意图真正
+# 落实。之前只 patch 了 20 个 crate，剩下的（fs / git / rope / text / askpass /
+# paths / proto / telemetry / telemetry_events / zlog / ztracing / ztracing_macro）
+# 仍走 rev 24001e5。
+#
+# 为什么必须补全：`[patch]` 是**按 crate 名逐个覆盖**的，没有通配。它只作用于被
+# 写进 `[patch]` 的那些 crate —— 而本地 patch 的 crate 若依赖了某个未被 patch 的
+# gpui_learn crate，后者的 `xxx.workspace = true` 会在 gpui_learn 的 workspace 内
+# 解析到本地 path，于是依赖图里同时出现同一 crate 的两份来源。
+#
+# 实例：zed_settings 依赖 `fs.workspace = true`，patch 它之后 fs 出现两份：
+#   E0308 mismatched types ... expected `aa_gpui_kit_fs::traits::Fs`, found `Fs`
+#   aa_gpui_kit_fs v0.1.0 (/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_fs)
+#   aa_gpui_kit_fs v0.1.0 (https://github.com/Nahida-aa/gpui_learn?rev=24001e5#...)
+# 表现是 feature_flags 传 fs 给 update_settings_file 时类型不匹配。
+#
+# 补全前已逐个 `diff -rq` 核对，这 12 个 crate 的 src 与 Cargo.toml 在本地与
+# rev 24001e5 **逐字节一致**，所以改成 path 不引入任何代码变化，只是让 cargo
+# 认出它们是同一个包。
+#
+# 代价（已知且有意）：aacode 从此绑定本机 /home/aa/repos/ide_ls/gpui_learn，
+# 换机器构建不了。与「16 处绝对路径待统一去掉」是同一件事，上 CI 前一并处理。
+aa_gpui_kit_fs = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_fs" }
+aa_gpui_kit_git = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_git" }
+aa_gpui_kit_rope = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_rope" }
+aa_gpui_kit_text = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_text" }
+aa_gpui_kit_askpass = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_askpass" }
+zed_paths = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_paths" }
+zed_proto = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_proto" }
+telemetry = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/telemetry" }
+telemetry_events = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/telemetry/telemetry_events" }
+zlog = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/zlog" }
+ztracing = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing" }
+ztracing_macro = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing_macro" }
+
 # —— profile ——
 # 对齐 Zed Cargo.toml L1037-1129。原先本文件**没有任何 [profile] 段**，全部用
 # cargo 默认值。
