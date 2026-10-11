@@ -259,8 +259,8 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 
 ## LSP 面板：拆分「停止」与「移除」（aacode 有意改动）
 
-**文件**：`packages/language_tools/src/lsp_button.rs`（改动前与 Zed **零差异**，改动后
-`diff` 约 234 行）
+**文件**：`packages/language_tools/src/lsp_button.rs`（改动前与 Zed **零差异**，2026-10-12
+时 `diff` 约 500 行，随后续修复仍在增长 —— 行数以实测为准，不要引用旧数字）
 
 ### 动机：上游命名与实际行为不符
 
@@ -363,10 +363,7 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 health / binary 两个分支记录 id；第三来源按 id 去重，**不再按 name 去重**
 （多项目下同名不同实例本就该各显示一条）。Remove / Start 的移除也改按 id。
 
-**遗留（上游既有行为，未改）**：`binary_statuses` 也是按 name 存的，停止一个实例会把
-同名实例的二进制状态也置为 `Stopped`，导致另一项目中**仍在运行**的同名 server 标签也显示
-"Stopped"（状态标签逻辑 `lsp_button.rs` 中 `binary_status` 优先于 `health`）。
-这是上游 name-keyed 设计导致，本次未动；若要修需一并改 `binary_statuses` 的 key 或标签优先级。
+（该 bug 的连带症状 —— 另一项目同名实例被误标 Stopped —— 见下一小节，已一并修掉。）
 
 ### 停止状态污染：name-keyed binary_statuses 误标同名实例（2026-10-12 修）
 
