@@ -762,6 +762,12 @@ language_core = { package = "aa_gpui_kit_language_core", path = "/home/aa/repos/
 #   Zed 侧的 util_macros（被 gpui 依赖）→ path patch 到 gpui_learn 的 util_macros
 #   与 gpui_learn 侧的 util_macros.workspace = true 最终指向同一份源码
 util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros" }
+# http_client 同理指向 gpui_learn 的本地 fork（源已逐字同步到同一个 rev
+# c0199504，见 gpui_learn a1d9f84）。它是 aacode 依赖最多的 crate 之一
+# （20+ crate，gpui 自身也依赖它），此前是「gpui_learn 全部走本地」原则下
+# 唯一还留在 zed git 上的常用 crate。改名之前无法 patch：gpui_learn 那份叫
+# zed_http_client，而 cargo 的 [patch] 要求被 patch 的包同名同版本。
+http_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/http_client" }
 
 # gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
 #
