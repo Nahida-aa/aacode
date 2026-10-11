@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/lsp_store/emmet_ext.rs:17`](../../../../packa
 ## Definition
 
 ```rust
-pub const EMMET_SERVER_NAME: LanguageServerName
+pub const EMMET_SERVER_NAME: LanguageServerName = lsp::LanguageServerName::new_static("emmet-language-server")
 ```
 

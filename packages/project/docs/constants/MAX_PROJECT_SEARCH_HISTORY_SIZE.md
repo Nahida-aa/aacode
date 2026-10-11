@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/constants.rs:3`](../../../../packages/project
 ## Definition
 
 ```rust
-pub const MAX_PROJECT_SEARCH_HISTORY_SIZE: usize
+pub const MAX_PROJECT_SEARCH_HISTORY_SIZE: usize = 500
 ```
 

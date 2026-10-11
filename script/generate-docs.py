@@ -29,6 +29,11 @@ from pathlib import Path
 DEFAULT_CRATE = "aa_workflow_core"
 EMPTY_G = {"params": [], "where_predicates": []}
 
+# (repo, filename) → 源码行缓存（仅常量/static 回读值用）
+_source_line_cache: dict[tuple[str, str], list[str]] = {}
+# main() 里设置：回读源码定义行用的仓库根
+_SOURCE_REPO: Path | None = None
+
 # inner kind -> (dirname, page title prefix)
 KIND_DIRS = {
     "struct": ("structs", "Struct"),
@@ -382,6 +387,37 @@ def expand_docs(it: dict, here: str) -> str:
     return text.rstrip() + "\n\n"
 
 
+def _source_value(it: dict) -> str:
+    """非字面量常量的 JSON 里 expr 是占位符 "_"，回读源码定义取 “=” 右侧的值。
+    定义可能跨多行（“=” 在行尾、值在下一行），所以拼接整个 span 的行再截取。"""
+    sp = it.get("span")
+    if not sp or _SOURCE_REPO is None:
+        return ""
+    fname = sp["filename"]
+    key = (str(_SOURCE_REPO), fname)
+    lines = _source_line_cache.get(key)
+    if lines is None:
+        path = _SOURCE_REPO / fname
+        if not path.exists():
+            return ""
+        lines = path.read_text(encoding="utf-8").splitlines()
+        _source_line_cache[key] = lines
+    start, end = sp["begin"][0], sp["end"][0]
+    if start < 1 or start > len(lines):
+        return ""
+    end = min(end, len(lines))
+    joined = " ".join(ln.strip() for ln in lines[start - 1:end])
+    # 取首个 “=” 作为赋值号（const/static 定义前缀 pub const NAME: TYPE 不含 “=”）
+    eq = joined.find("=")
+    if eq < 0:
+        return ""
+    val = joined[eq + 1 :].strip()
+    # 去掉末尾分号
+    if val.endswith(";"):
+        val = val[:-1].rstrip()
+    return val
+
+
 def defined_in(it: dict, depth: int) -> str:
     sp = it.get("span")
     if not sp:
@@ -617,8 +653,26 @@ def render_item_page(docs: Docs, kind: str, it: dict, here: str, depth: int) -> 
         if kind in ("constant", "static"):
             kw = "const" if kind == "constant" else "static"
             body += "## Definition\n\n```rust\npub " + kw + " " + (it["name"] or "?") + ": " + render_type(inner.get("type"))
-            if inner.get("value") is not None:
-                body += " = " + json.dumps(inner["value"])
+            # 值在 JSON 里（源码原文）：constant → inner.const.expr；static → inner.expr。
+            # 旧版 rustdoc 把这两层包在 inner["constant"]/inner["static"] 里，两种都兼容。
+            expr = None
+            for base in (inner, inner.get("constant") or {}, inner.get("static") or {}):
+                c = base.get("const")
+                if isinstance(c, dict) and c.get("expr"):
+                    expr = c["expr"]
+                    break
+                if isinstance(c, str) and c:
+                    expr = c
+                    break
+                e = base.get("expr")
+                if e:
+                    expr = e
+                    break
+            # rustdoc 对非字面量常量存的是占位符 "_"，此时回读源码定义行取 “=” 右侧
+            if not expr or expr == "_":
+                expr = _source_value(it)
+            if expr:
+                body += " = " + expr
             body += "\n```\n\n"
         methods, trait_impls, synthetic = [], [], []
 
@@ -646,6 +700,8 @@ def main() -> None:
     args = ap.parse_args()
 
     repo = Path(args.repo).resolve()
+    global _SOURCE_REPO
+    _SOURCE_REPO = repo
     crate_slug = args.crate.replace("-", "_")
     json_p = json_path(repo, args.crate, args.json)
     if args.out:

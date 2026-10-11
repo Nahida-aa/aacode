@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/git_store/mod.rs:124`](../../../../packages/p
 ## Definition
 
 ```rust
-pub const MAX_CONCURRENT_OBJECT_READS: usize
+pub const MAX_CONCURRENT_OBJECT_READS: usize = 16
 ```
 

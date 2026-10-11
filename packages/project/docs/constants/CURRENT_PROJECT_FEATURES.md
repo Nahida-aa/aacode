@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/constants.rs:5`](../../../../packages/project
 ## Definition
 
 ```rust
-pub const CURRENT_PROJECT_FEATURES: &[&str]
+pub const CURRENT_PROJECT_FEATURES: &[&str] = &["new-style-anchors"]
 ```
 

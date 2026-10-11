@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/task_inventory.rs:33`](../../../../packages/p
 ## Definition
 
 ```rust
-pub const GIT_COMMAND_TASK_TAG: &str
+pub const GIT_COMMAND_TASK_TAG: &str = "git-command"
 ```
 

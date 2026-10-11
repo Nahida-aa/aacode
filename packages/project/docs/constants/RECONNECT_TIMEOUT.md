@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/connection_manager.rs:15`](../../../../packag
 ## Definition
 
 ```rust
-pub const RECONNECT_TIMEOUT: Duration
+pub const RECONNECT_TIMEOUT: Duration = Duration::from_secs(30)
 ```
 

@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/lsp_store/rust_analyzer_ext.rs:11`](../../../
 ## Definition
 
 ```rust
-pub const CARGO_DIAGNOSTICS_SOURCE_NAME: &str
+pub const CARGO_DIAGNOSTICS_SOURCE_NAME: &str = "rustc"
 ```
 

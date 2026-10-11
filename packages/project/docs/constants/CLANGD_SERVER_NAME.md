@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/lsp_store/clangd_ext.rs:11`](../../../../pack
 ## Definition
 
 ```rust
-pub const CLANGD_SERVER_NAME: LanguageServerName
+pub const CLANGD_SERVER_NAME: LanguageServerName = LanguageServerName::new_static("clangd")
 ```
 

@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/lsp_store/rust_analyzer_ext.rs:10`](../../../
 ## Definition
 
 ```rust
-pub const RUST_ANALYZER_NAME: LanguageServerName
+pub const RUST_ANALYZER_NAME: LanguageServerName = LanguageServerName::new_static("rust-analyzer")
 ```
 

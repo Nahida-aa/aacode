@@ -10,6 +10,6 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:177`](../../../../packages/p
 ## Definition
 
 ```rust
-pub const SERVER_PROGRESS_THROTTLE_TIMEOUT: Duration
+pub const SERVER_PROGRESS_THROTTLE_TIMEOUT: Duration = Duration::from_millis(100)
 ```
 
