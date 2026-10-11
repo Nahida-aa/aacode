@@ -29,6 +29,11 @@ aacode 在重命名层面做了以下映射（fork-sync 归一化时已考虑）
 - `crates/project/src/project.rs`（大文件） → `packages/project/src/project/*.rs`（state.rs、lsp_events.rs、git.rs、diagnostics.rs、ai.rs、dap.rs、init.rs、helpers.rs、test_support.rs、toolchains.rs、buffers.rs、collab.rs、constructors.rs、events.rs、images.rs、lifecycle.rs、lsp.rs、paths.rs、rpc.rs、worktrees.rs 等）——标记为 SPLIT，rev 同步时按需核对区间变更
 - `crates/project/src/lsp_store.rs`（单文件） → `packages/project/src/lsp_store/mod.rs` + 多个子模块（code_lens.rs、document_colors.rs、document_links.rs、document_symbols.rs、folding_ranges.rs、semantic_tokens.rs、inlay_hints.rs、rust_analyzer_ext.rs、vue_language_server_ext.rs、clangd_ext.rs、json_language_server_ext.rs 等）
 - `crates/conversation_view.rs` → `packages/agent_ui/src/conversation_view/`（mod.rs、thread_view.rs、thread_search_bar.rs、message_queue.rs、elicitation.rs）
+- **`crates/terminal_view/src/terminal_panel.rs`（上游单文件 127k）→ `packages/terminal_view/src/panel/`（目录）**
+  —— 上游还有 `terminal_element.rs` / `terminal_view.rs` 等单文件，aacode 侧对应为
+  `element/` / `view/` 目录。**搬 terminal_view 相关代码时路径要按这个映射改**，
+  不要照抄 `terminal_panel.rs` 这个名字（aacode 里不存在）。
+  AGENTS.md 的 rev→rev 章节一直引用这条，此前本文件漏记，2026-10-11 补上。
 
 ## 3. 路径/布局映射
 
