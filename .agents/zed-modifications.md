@@ -368,6 +368,42 @@ health / binary 两个分支记录 id；第三来源按 id 去重，**不再按 
 "Stopped"（状态标签逻辑 `lsp_button.rs` 中 `binary_status` 优先于 `health`）。
 这是上游 name-keyed 设计导致，本次未动；若要修需一并改 `binary_statuses` 的 key 或标签优先级。
 
+### 停止状态污染：name-keyed binary_statuses 误标同名实例（2026-10-12 修）
+
+**症状**：多项目下停止 A 项目的 rust-analyzer 后，**B 项目仍在运行**的 rust-analyzer
+标签也变灰显示 "Stopped"。
+
+**根因（两处，都是 name 与 id 的粒度错配）**：
+
+1. `LanguageServers::update_binary_status`（`lsp_button.rs`）对
+   `Stopped | Failed` 一律执行 `health_statuses.retain(|_, s| s.name != name)`
+   → 把**所有同名实例**的 health 删掉，B 因而无法显示 Running。
+2. 状态标签逻辑里 `binary_status` 优先于 `health` → `binary_statuses[name] = Stopped`
+   让 B（已掉到 binary 分支）显示 Stopped。
+
+**为什么不能简单把 `binary_statuses` 改成按 id 存**：上游是**有意**按 name 的。
+`lsp_store/mod.rs:15268-15271` 的注释明说 binary 更新「那时可能还没有任何 language
+server id」，并在事件里塞了假 id `LanguageServerId(0)`。因为 `CheckingForUpdate` /
+`Downloading` 发生在**下载阶段**，确实无 id 可用。所以这个通道天生只能按 name。
+
+**真正的错配**：`Stopped` 是**实例级**事件，却走了 name 级通道
+（`lsp_store/mod.rs:12939/12948` 只传 name，不传 id）。
+
+**修法（方案 A，只在 `language_tools/src/lsp_button.rs` 面板侧，不动 lsp_store / proto）**：
+
+1. `update_binary_status` 的连带清 health **只对 `Failed` 生效**，移除 `Stopped`
+   —— 二进制下载失败确实影响所有同名实例，该连带；而单实例停止不该连带。
+   被停实例自己的 health 已由 `remove_server(server_id)` 按 id 删掉，不依赖这条 retain。
+2. 状态标签改用**实例级**判据，优先级：
+   1. id 在 `stopped_server_worktrees`（按 id）→ "Stopped"
+   2. 有 `health` → Running / Warning / Error（**此时忽略 name-keyed 的
+      `Stopping`/`Stopped`**，那是别的同名实例停的）
+   3. 否则退回 `binary_statuses` 的下载类状态（Starting… / Error）
+
+修完后：A 保持灰色 Stopped，B 恢复绿色 Running，互不干扰。
+（方案 B「让 stop 走 id-scoped 事件、`binary_statuses` 只管下载状态」更彻底，但需动
+lsp_store + proto，rev 同步成本更高，暂不做。）
+
 ### 状态矩阵（改动后）
 
 | server 状态       | 可用动作                                         |

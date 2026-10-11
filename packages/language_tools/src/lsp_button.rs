@@ -158,6 +158,14 @@ impl std::fmt::Debug for ActiveEditor {
 #[derive(Debug, Default, Clone)]
 struct LanguageServers {
     health_statuses: HashMap<LanguageServerId, LanguageServerHealthStatus>,
+    /// **按 name 而非 id，这是上游有意为之**：本字段覆盖的是「二进制文件」的状态，
+    /// 包括 `CheckingForUpdate` / `Downloading` —— 这些发生在**下载阶段，那时还没有
+    /// 任何 language server id**。上游为此在事件里塞了个假 id
+    /// （`lsp_store/mod.rs:15271` 的 `LanguageServerId(0)`，注释明说 receiver 不会用它）。
+    ///
+    /// 副作用：`Stopped` 是**实例级**事件却也走这条 name 级通道，导致停止一个实例会把
+    /// 同名实例一并标记（面板无从区分是哪个实例停的）。缓解见 `update_binary_status`
+    /// 与状态标签逻辑 —— 实例自身的停止状态以 `stopped_server_worktrees`（按 id）为准。
     binary_statuses: HashMap<LanguageServerName, LanguageServerBinaryStatus>,
     servers_per_buffer_abs_path: HashMap<PathBuf, ServersForPath>,
     /// 用户主动「停止」（可单独恢复）的 server 的展示归属。
@@ -430,27 +438,43 @@ impl LanguageServerState {
                     )
                 });
 
-            let (status_color, status_label) = server_info
-                .binary_status
-                .as_ref()
-                .and_then(|binary_status| match binary_status.status {
-                    BinaryStatus::None => None,
-                    BinaryStatus::CheckingForUpdate
-                    | BinaryStatus::Downloading
-                    | BinaryStatus::Starting => Some((Color::Modified, "Starting…")),
-                    BinaryStatus::Stopping | BinaryStatus::Stopped => {
-                        Some((Color::Disabled, "Stopped"))
-                    }
-                    BinaryStatus::Failed { .. } => Some((Color::Error, "Error")),
-                })
-                .or_else(|| {
-                    Some(match server_info.health? {
-                        ServerHealth::Ok => (Color::Success, "Running"),
-                        ServerHealth::Warning => (Color::Warning, "Warning"),
-                        ServerHealth::Error => (Color::Error, "Error"),
+            // 状态标签优先级：
+            // 1) 本面板主动停止的（按 id 查 `stopped_server_worktrees`）→ "Stopped"。
+            //    这是**实例级**判据，不受 name 级 `binary_statuses` 污染影响。
+            // 2) 其次看 health（Running / Warning / Error）——有 health 说明该实例仍在运行。
+            //    此时**必须忽略** name-keyed 的 `Stopping`/`Stopped`：那是别的同名实例
+            //    停下来的（`binary_statuses` 按 name 存，见字段注释），否则正在运行的同名
+            //    实例会被误标成 Stopped。
+            // 3) 最后才退回 `binary_statuses` 的下载类状态（Starting… / Error）。
+            let is_manually_stopped = self
+                .language_servers
+                .stopped_server_worktrees
+                .contains_key(&server_info.id);
+
+            let (status_color, status_label) = if is_manually_stopped {
+                (Color::Disabled, "Stopped")
+            } else if let Some(health) = server_info.health {
+                match health {
+                    ServerHealth::Ok => (Color::Success, "Running"),
+                    ServerHealth::Warning => (Color::Warning, "Warning"),
+                    ServerHealth::Error => (Color::Error, "Error"),
+                }
+            } else {
+                server_info
+                    .binary_status
+                    .as_ref()
+                    .and_then(|binary_status| match binary_status.status {
+                        BinaryStatus::None => None,
+                        BinaryStatus::CheckingForUpdate
+                        | BinaryStatus::Downloading
+                        | BinaryStatus::Starting => Some((Color::Modified, "Starting…")),
+                        BinaryStatus::Stopping | BinaryStatus::Stopped => {
+                            Some((Color::Disabled, "Stopped"))
+                        }
+                        BinaryStatus::Failed { .. } => Some((Color::Error, "Error")),
                     })
-                })
-                .unwrap_or((Color::Success, "Running"));
+                    .unwrap_or((Color::Success, "Running"))
+            };
 
             let message = server_info
                 .message
@@ -932,10 +956,14 @@ impl LanguageServers {
         name: LanguageServerName,
     ) {
         let binary_status_message = message.map(SharedString::new);
-        if matches!(
-            binary_status,
-            BinaryStatus::Stopped | BinaryStatus::Failed { .. }
-        ) {
+        // 只对 `Failed` 连带清 health：二进制下载失败确实影响**所有**同名实例。
+        //
+        // 上游这里还带了 `Stopped`，但 `Stopped` 是**实例级**事件却走 name 级通道，
+        // 于是停止一个实例会把其它项目里仍在运行的同名实例的 health 一起删掉，
+        // 使其无法显示 Running（只能掉到 binary 分支显示 "Stopped"）。
+        // 而**被停的那个实例**的 health 已由 `remove_server(server_id)` 按 id 删除，
+        // 不需要靠这条 retain —— 所以 `Stopped` 从这里移除是安全的。
+        if matches!(binary_status, BinaryStatus::Failed { .. }) {
             self.health_statuses.retain(|_, server| server.name != name);
         }
         self.binary_statuses.insert(
