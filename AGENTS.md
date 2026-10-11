@@ -111,6 +111,33 @@ zed 参照仓库在 `~/repos/ide_ls/learn_ls/zed`，单文件 crate 拆分后的
 `collections::` vs `std::collections::`、`RelPath` vs `std::path::Path`、
 模块遮蔽要用 `::rpc::` 绝对路径等坑都记在那儿，照搬时直接套用，别重新推演。
 
+## rev→rev fork 同步（**必须先读 `.agents/zed-modifications.md`**）
+
+同步 zed rev（afecd6d → c019950 这类区间）或 fork crate 时，**第一步必须读
+`.agents/zed-modifications.md`**，尤其是：
+
+- **第 1 节 命名空间/命名映射** —— `zed_actions`→`aacode_actions`、
+  `cloud_llm_client`→`aa_cloud_llm_client`/`zed_cloud_llm_client` 等。
+  cp 上游源码前先查这张表，确认目标 crate 名在 aacode Cargo.toml 里的对应关系。
+- **第 2 节 结构性重组** —— 上游单文件拆成 aacode 多文件（`terminal_panel`→`panel`、
+  `conversation_view.rs`→目录等）。模块路径可能不同。
+
+**典型踩坑**（已发生多次）：
+
+- cp `edit_prediction` 时源码里是 `cloud_llm_client`，但 aacode Cargo.toml 里根本没有
+  这个 crate —— 必须先 grep workspace.dependencies 里的实际名字
+- cp `agent_ui` 时源码里是 `zed_actions`，但 aacode 已 rename 成 `aacode_actions` ——
+  源码里所有 crate 引用都要手动改
+- 这两项在 zed-modifications.md 第 1 节里**明明白白列出来了**，只是没读
+
+**正确流程**：
+
+1. 读 `.agents/zed-modifications.md` 第 1 节 + 第 2 节
+2. 对每个要同步的 crate，先 `grep '<crate>' packages/<path>/Cargo.toml` 验证依赖名
+3. cp 上游 diff，按第 1 节映射表改 crate 名、按第 2 节改模块路径
+4. 每个 crate 同步完跑 `cargo check -p <crate>`，不过不进下一个
+5. 最后 `cargo check --workspace` exit=0 才算完成
+
 ## 查上游版本/release：优先用 `tools/gh-releases.ts`
 
 问「zed 最新到哪个版本 / 某 rev 对应什么 / 某功能在哪个版本进的」时，
