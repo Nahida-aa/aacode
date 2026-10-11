@@ -1,3 +1,4 @@
+use ac_constant;
 use gpui::{
     App, Context, EventEmitter, IntoElement, PlatformDisplay, Size, Window,
     WindowBackgroundAppearance, WindowBounds, WindowDecorations, WindowKind, WindowOptions,
@@ -52,7 +53,7 @@ impl AgentNotification {
             size,
         };
 
-        let app_id = ReleaseChannel::global(cx).app_id();
+        let app_id = ReleaseChannel::global(cx).app_id(ac_constant::APP_ID);
 
         WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(bounds)),

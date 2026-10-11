@@ -2653,7 +2653,7 @@ impl ThreadView {
 
     fn handle_message_editor_move_up(
         &mut self,
-        _: &zed_actions::editor::MoveUp,
+        _: &aacode_actions::editor::MoveUp,
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
@@ -5228,8 +5228,8 @@ impl ThreadView {
                         }))
                         .on_click(|_, window, cx| {
                             window.dispatch_action(
-                                Box::new(zed_actions::OpenSettingsAt {
-                                    path: zed_actions::AGENT_SANDBOX_SETTINGS_PATH.to_string(),
+                                Box::new(aacode_actions::OpenSettingsAt {
+                                    path: aacode_actions::AGENT_SANDBOX_SETTINGS_PATH.to_string(),
                                     target: None,
                                 }),
                                 cx,
@@ -5880,7 +5880,7 @@ impl ThreadView {
                         .handler({
                             move |window, cx| {
                                 window.dispatch_action(
-                                    zed_actions::agent::AddSelectionToThread.boxed_clone(),
+                                    aacode_actions::agent::AddSelectionToThread.boxed_clone(),
                                     cx,
                                 );
                             }
@@ -9401,8 +9401,8 @@ impl ThreadView {
                             .tooltip(Tooltip::text("Configure unicode confusables warning"))
                             .on_click(|_, window, cx| {
                                 window.dispatch_action(
-                                    Box::new(zed_actions::OpenSettingsAt {
-                                        path: zed_actions::AGENT_SANDBOX_SETTINGS_PATH.to_string(),
+                                    Box::new(aacode_actions::OpenSettingsAt {
+                                        path: aacode_actions::AGENT_SANDBOX_SETTINGS_PATH.to_string(),
                                         target: None,
                                     }),
                                     cx,
@@ -9501,8 +9501,8 @@ impl ThreadView {
                             .tooltip(Tooltip::text("Configure Windows-drive warning"))
                             .on_click(|_, window, cx| {
                                 window.dispatch_action(
-                                    Box::new(zed_actions::OpenSettingsAt {
-                                        path: zed_actions::AGENT_SANDBOX_SETTINGS_PATH.to_string(),
+                                    Box::new(aacode_actions::OpenSettingsAt {
+                                        path: aacode_actions::AGENT_SANDBOX_SETTINGS_PATH.to_string(),
                                         target: None,
                                     }),
                                     cx,
@@ -11719,7 +11719,7 @@ impl ThreadView {
             .on_click(cx.listener(|this, _, window, cx| {
                 this.clear_thread_error(cx);
                 window.dispatch_action(
-                    Box::new(zed_actions::OpenSettingsAt {
+                    Box::new(aacode_actions::OpenSettingsAt {
                         path: "llm_providers".to_string(),
                         target: None,
                     }),
@@ -11964,7 +11964,7 @@ impl ThreadView {
                     move |_, _, _window, cx| {
                         #[cfg(windows)]
                         _window.dispatch_action(
-                            zed_actions::wsl_actions::OpenWsl::default().boxed_clone(),
+                            aacode_actions::wsl_actions::OpenWsl::default().boxed_clone(),
                             cx,
                         );
                         cx.notify();

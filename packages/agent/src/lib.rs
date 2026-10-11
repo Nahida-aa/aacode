@@ -3627,26 +3627,7 @@ impl SubagentHandle for NativeSubagentHandle {
                     }),
                 },
                 Ok(Some(SubmissionResponse::Accepted(_))) => {
-                    thread.read_with(cx, |thread, _cx| {
-                        thread
-                            .last_message()
-                            .and_then(|message| {
-                                let content = message.as_agent_message()?
-                                    .content
-                                    .iter()
-                                    .filter_map(|content| match content {
-                                        AgentMessageContent::Text(text) => Some(text.as_str()),
-                                        _ => None,
-                                    })
-                                    .join("\n\n");
-                                if content.is_empty() {
-                                    None
-                                } else {
-                                    Some(content)
-                                }
-                            })
-                            .context("No response from subagent")
-                    })
+                    Err(anyhow!("Native subagent returned acceptance instead of turn completion"))
                 }
                 Ok(None) => Err(anyhow!("No response from the agent. You can try messaging again.")),
                 Err(error) => Err(error),
