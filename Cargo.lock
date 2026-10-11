@@ -4882,7 +4882,7 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
- "system_specs 0.1.0 (git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5)",
+ "system_specs",
  "windows 0.62.2",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -6713,7 +6713,7 @@ dependencies = [
  "client",
  "extension_host",
  "gpui",
- "system_specs 0.1.0",
+ "system_specs",
  "urlencoding",
  "workspace",
 ]
@@ -14919,15 +14919,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
-name = "release_channel"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5#c0199504b9cce79bc27524950022ed701bc3ebd5"
-dependencies = [
- "gpui",
- "semver",
-]
-
-[[package]]
 name = "remote"
 version = "0.1.0"
 dependencies = [
@@ -17222,21 +17213,6 @@ dependencies = [
  "gpui",
  "human_bytes",
  "pciid-parser",
- "semver",
- "serde",
- "sysinfo 0.39.6",
-]
-
-[[package]]
-name = "system_specs"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5#c0199504b9cce79bc27524950022ed701bc3ebd5"
-dependencies = [
- "anyhow",
- "gpui",
- "human_bytes",
- "pciid-parser",
- "release_channel",
  "semver",
  "serde",
  "sysinfo 0.39.6",

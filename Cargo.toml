@@ -781,6 +781,17 @@ zlog = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/zlog" }
 ztracing = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing" }
 ztracing_macro = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing_macro" }
 
+# system_specs 同样是跨源两份：aacode 的 workspace.dependencies 已指向本地
+# packages/system_specs，但 zed 的 `crashes` 从 zed git 声明它，于是图里并存两份。
+#
+# 归一是有实际收益的：本地 fork 带有 aacode 定制（ac_constant::BRAND、
+# release_channel 字段为 String 而非 &'static str、display_name(BRAND)），
+# 让 zed 侧也用同一份才能保证两边行为一致。
+#
+# 已确认 crashes 用到的三个 API（GpuSpecs / GpuInfo / read_gpu_info_from_sys_class_drm）
+# 在 fork 里都存在，patch 后 crashes 的调用面不受影响。
+system_specs = { path = "/home/aa/repos/ai_ls/AAgent/packages/system_specs" }
+
 # gpui_learn 的 7 个包**全部走本地 path**：改完 gpui_learn 立即生效，不用 commit + 顶 rev。
 #
 # 当前是个人迭代阶段，构建可复现性不是目标，迭代速度优先。代价是本段含绝对路径，
