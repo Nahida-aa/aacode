@@ -15,7 +15,7 @@ Defined in: [`packages/project/src/lsp_command/mod.rs:2181`](../../../../package
 
 ### location
 
-`LocationLink`
+[`LocationLink`](../structs/LocationLink.md)
 
 ### lsp_store
 

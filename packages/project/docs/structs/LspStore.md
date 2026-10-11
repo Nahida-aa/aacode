@@ -134,7 +134,7 @@ Defined in: [`packages/project/src/lsp_store/document_colors.rs:239`](../../../.
 
 ##### color
 
-`DocumentColor`
+[`DocumentColor`](DocumentColor.md)
 
 ##### buffer
 
@@ -654,7 +654,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:6540`](../../../../packages/
 
 ##### action
 
-`CodeAction`
+[`CodeAction`](CodeAction.md)
 
 ##### push_to_history
 
@@ -720,7 +720,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:6720`](../../../../packages/
 
 ##### action
 
-`CodeAction`
+[`CodeAction`](CodeAction.md)
 
 ##### cx
 
@@ -782,7 +782,7 @@ Defined in: [`packages/project/src/lsp_store/mod.rs:6855`](../../../../packages/
 
 ##### id
 
-`InlayId`
+[`InlayId`](../enums/InlayId.md)
 
 ##### cx
 

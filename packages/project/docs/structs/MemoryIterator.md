@@ -61,10 +61,10 @@ Defined in: [`packages/project/src/debugger/memory.rs:276`](../../../../packages
 - `impl IntoEither for MemoryIterator`
 - `impl ErasedDestructor for MemoryIterator`
 - `impl Same for MemoryIterator`
-- `impl TakeUntilExt for MemoryIterator`
 - `impl Pointable for MemoryIterator`
 - `impl Instrument for MemoryIterator`
 - `impl WithSubscriber for MemoryIterator`
+- `impl TakeUntilExt for MemoryIterator`
 - `impl IntoStreamingIterator for MemoryIterator`
 - `impl TryCollect for MemoryIterator`
 - `impl IteratorRandom for MemoryIterator`

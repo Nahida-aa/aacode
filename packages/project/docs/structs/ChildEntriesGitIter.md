@@ -62,10 +62,10 @@ Defined in: [`packages/project/src/git_store/git_traversal.rs:165`](../../../../
 - `impl IntoEither for ChildEntriesGitIter`
 - `impl ErasedDestructor for ChildEntriesGitIter`
 - `impl Same for ChildEntriesGitIter`
-- `impl TakeUntilExt for ChildEntriesGitIter`
 - `impl Pointable for ChildEntriesGitIter`
 - `impl Instrument for ChildEntriesGitIter`
 - `impl WithSubscriber for ChildEntriesGitIter`
+- `impl TakeUntilExt for ChildEntriesGitIter`
 - `impl IntoStreamingIterator for ChildEntriesGitIter`
 - `impl TryCollect for ChildEntriesGitIter`
 - `impl IteratorRandom for ChildEntriesGitIter`

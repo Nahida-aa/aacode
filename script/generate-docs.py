@@ -292,24 +292,33 @@ class Docs:
     def __init__(self, data: dict):
         self.idx: dict[int, dict] = {int(k): v for k, v in data["index"].items()}
         self.root_id = int(data["root"])
+        self.reexport_ids: set[int] = set()
 
     def collect_public(self) -> dict[str, list[dict]]:
         """从 crate root 递归收集 public items（含 re-export，按 id 去重）。
 
-        每个 item 附带 `_path`（所属模块名列表，根为 crate 名）供重名 item 的文件名消歧。
+        - 显式 `pub use` 跟随目标 item；glob `pub use M::*` 展开为对 M 的递归收集。
+        - 每个 item 附带 `_path`（所属模块名列表，根为 crate 名）供重名 item 的文件名消歧。
+        - 经 `pub use` 进入的 item 记入 `self.reexport_ids`，供生成 re-exports.md。
         """
         found: dict[str, dict[int, dict]] = defaultdict(dict)
         seen: set[int] = set()
+        reexports: set[int] = set()
+        best_path: dict[int, list] = {}  # item id → 最短模块路径（多条路可达时优先短路径）
         crate = self.idx[self.root_id].get("name") or "crate"
 
-        def register(it: dict, path: list) -> None:
-            it["_path"] = path
+        def register(it: dict, path: list, via_use: bool) -> None:
+            if via_use:
+                reexports.add(it["id"])
+            cur = best_path.get(it["id"])
+            if cur is None or len(path) < len(cur):
+                best_path[it["id"]] = path
             for kind in KIND_DIRS:
                 if kind in it["inner"]:
                     found[kind][it["id"]] = it
                     break
 
-        def walk(module_id: int, path: list) -> None:
+        def walk(module_id: int, path: list, via_use: bool = False) -> None:
             mod = self.idx[module_id]["inner"]["module"]
             for iid in mod.get("items") or []:
                 if iid in seen:
@@ -320,21 +329,30 @@ class Docs:
                     continue
                 inner = it["inner"]
                 if "use" in inner:
-                    # pub use 再导出：跟随目标 id 分类注册（glob/外部目标跳过）。
-                    # 以目标 id 为 key——若该 item 也能经 pub module 走到，两路会
-                    # 落到同一个 key 上，天然去重。
+                    # 再导出：以目标 id 为 key，若同一 item 也能经 pub module 走到，
+                    # 两路落到同一 key，天然去重。
                     u = inner["use"]
-                    if u.get("is_glob") or u.get("id") is None or u["id"] not in self.idx:
+                    if u.get("is_glob"):
+                        # 展开 glob：目标若是本 crate 内的模块，递归收集其 public 项
+                        tid = u.get("id")
+                        if tid is not None and tid in self.idx and "module" in self.idx[tid]["inner"]:
+                            walk(tid, path + [self.idx[tid].get("name") or "?"], via_use=True)
                         continue
-                    tgt = self.idx[u["id"]]
-                    register(tgt, path)
+                    if u.get("id") is None or u["id"] not in self.idx:
+                        continue
+                    register(self.idx[u["id"]], path, via_use=True)
                     continue
                 if "module" in inner:
-                    walk(iid, path + [it["name"]])
+                    walk(iid, path + [it["name"]], via_use)
                 else:
-                    register(it, path)
+                    register(it, path, via_use)
 
         walk(self.root_id, [crate])
+        # 多条路可达的 item 用最短路径，保证直接重导出的 item 保留无模块前缀的干净名
+        for kind_items in found.values():
+            for it in kind_items.values():
+                it["_path"] = best_path[it["id"]]
+        self.reexport_ids = reexports
         return {k: sorted(v.values(), key=lambda x: x["name"] or "") for k, v in found.items()}
 
 
@@ -752,9 +770,36 @@ def main() -> None:
 
     (out / "index.md").write_text(
         f"---\nid: {crate_slug}\ntitle: {crate_slug}\n---\n\n# {crate_slug}\n\n"
+        "[Re-exports](re-exports.md)\n\n"
         + "".join(index_sections),
         encoding="utf-8",
     )
+
+    # re-exports.md：列出经 crate 根 `pub use` 重导出的 item（含 glob 展开），按 kind 分组
+    plural = {"struct": "Structs", "enum": "Enums", "trait": "Traits", "function": "Functions",
+              "type_alias": "Type Aliases", "constant": "Constants", "static": "Statics"}
+    rex_lines = [
+        "---", f"id: {crate_slug}-re-exports", f"title: {crate_slug} Re-exports", "---", "",
+        f"# {crate_slug} Re-exports", "",
+        "以下 item 经 crate 根的 `pub use` 重导出（含 `*` glob 展开），完整文档见其分类目录。", "",
+    ]
+    any_rex = False
+    for kind in ("struct", "enum", "trait", "function", "type_alias", "constant", "static"):
+        items = [it for it in (found.get(kind) or []) if it["id"] in docs.reexport_ids]
+        if not items:
+            continue
+        any_rex = True
+        dirname, _prefix = KIND_DIRS[kind]
+        rex_lines.append(f"## {plural[kind]}")
+        rex_lines.append("")
+        for it in items:
+            s = slugs[it["id"]]
+            label = it["name"] if s == it["name"] else s
+            rex_lines.append(f"- [{label}]({dirname}/{s}.md)")
+        rex_lines.append("")
+    if not any_rex:
+        rex_lines.append("_本 crate 无重导出。_")
+    (out / "re-exports.md").write_text("\n".join(rex_lines), encoding="utf-8")
 
     total = sum(len(v) for v in found.values())
     print(f"[{args.crate}] 生成完毕：{total} 个 item → {out}（源 {json_p}）")

@@ -150,10 +150,10 @@ Defined in: [`packages/project/src/git_store/git_traversal.rs:139`](../../../../
 - `impl IntoEither for GitTraversal`
 - `impl ErasedDestructor for GitTraversal`
 - `impl Same for GitTraversal`
-- `impl TakeUntilExt for GitTraversal`
 - `impl Pointable for GitTraversal`
 - `impl Instrument for GitTraversal`
 - `impl WithSubscriber for GitTraversal`
+- `impl TakeUntilExt for GitTraversal`
 - `impl IntoStreamingIterator for GitTraversal`
 - `impl TryCollect for GitTraversal`
 - `impl IteratorRandom for GitTraversal`
