@@ -1,7 +1,7 @@
 use std::{cmp, sync::Arc, time::Duration};
 
 use client::{Client, UserStore};
-use cloud_llm_client::EditPredictionRejectReason;
+use aa_cloud_llm_client::EditPredictionRejectReason;
 use edit_prediction_types::{
     DataCollectionState, EditPredictionDelegate, EditPredictionDiscardReason,
     EditPredictionIconSet, EditPredictionRequestTrigger, SuggestionDisplayType,
@@ -148,10 +148,8 @@ impl EditPredictionDelegate for ZedEditPredictionDelegate {
     ) {
         let store = self.store.read(cx);
 
-        if store.user_store.read_with(cx, |user_store, cx| {
-            user_store.account_too_young()
-                || user_store.has_overdue_invoices()
-                || crate::zed_edit_predictions_excluded_from_plan(user_store, cx)
+        if store.user_store.read_with(cx, |user_store, _cx| {
+            user_store.account_too_young() || user_store.has_overdue_invoices()
         }) {
             return;
         }

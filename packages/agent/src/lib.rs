@@ -31,7 +31,8 @@ pub use tools::*;
 
 use acp_thread::{
     AcpThread, AgentModelId, AgentModelSelector, AgentSessionInfo, AgentSessionList,
-    AgentSessionListRequest, AgentSessionListResponse, ClientUserMessageId, TokenUsageRatio,
+    AgentSessionListRequest, AgentSessionListResponse, ClientUserMessageId, SubmissionResponse,
+    TokenUsageRatio,
 };
 use agent_client_protocol::schema::v1 as acp_v1;
 use agent_skills::{
@@ -3594,11 +3595,12 @@ impl SubagentHandle for NativeSubagentHandle {
             };
             let discard_partial_output = matches!(
                 &response,
-                Ok(Some(response)) if response.stop_reason == acp_v1::StopReason::Cancelled
-                    || response.stop_reason == acp_v1::StopReason::Refusal
+                Ok(Some(SubmissionResponse::LegacyCompleted(r)))
+                    if r.stop_reason == acp_v1::StopReason::Cancelled
+                    || r.stop_reason == acp_v1::StopReason::Refusal
             );
             let result = match response {
-                Ok(Some(response)) => match response.stop_reason {
+                Ok(Some(SubmissionResponse::LegacyCompleted(r))) => match r.stop_reason {
                     acp_v1::StopReason::Cancelled => Err(anyhow!("User canceled")),
                     acp_v1::StopReason::MaxTokens => Err(anyhow!("The agent reached the maximum number of tokens.")),
                     acp_v1::StopReason::MaxTurnRequests => Err(anyhow!("The agent reached the maximum number of allowed requests between user turns. Try prompting again.")),
@@ -3624,6 +3626,28 @@ impl SubagentHandle for NativeSubagentHandle {
                             .context("No response from subagent")
                     }),
                 },
+                Ok(Some(SubmissionResponse::Accepted(_))) => {
+                    thread.read_with(cx, |thread, _cx| {
+                        thread
+                            .last_message()
+                            .and_then(|message| {
+                                let content = message.as_agent_message()?
+                                    .content
+                                    .iter()
+                                    .filter_map(|content| match content {
+                                        AgentMessageContent::Text(text) => Some(text.as_str()),
+                                        _ => None,
+                                    })
+                                    .join("\n\n");
+                                if content.is_empty() {
+                                    None
+                                } else {
+                                    Some(content)
+                                }
+                            })
+                            .context("No response from subagent")
+                    })
+                }
                 Ok(None) => Err(anyhow!("No response from the agent. You can try messaging again.")),
                 Err(error) => Err(error),
             };
