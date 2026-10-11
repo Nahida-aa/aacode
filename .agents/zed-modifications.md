@@ -607,3 +607,69 @@ stable」的不一致。
 若将来 aacode 要发正式版：**必须**在构建期注入 `ZED_RELEASE_CHANNEL`，否则产物
 一定是 dev（图标后缀与 db 路径都会暴露出来）。`just install` 已这么做；
 `script/bundle-linux` 目前**尚未确认**是否注入 —— 上 CI 前需检查。
+
+---
+
+## `fs_embed!`：aacode 是首个真实使用者，故踩到了上游从未触发的路径层级坑
+
+### 背景差异
+
+Zed 上游有同一套 `fs_embed!`（`crates/util/src/util.rs`），但**没有任何 crate 在用它**
+—— 只有 `util.rs` 自己的测试在用。所以上游不存在「`crate_relative` 层数算错」
+这个问题的暴露面。aacode 把它真正用起来（`aa_gpui_kit_assets`、`zed_settings`、
+`aa_gpui_kit_grammars`）后才踩到。
+
+### 已发生的 bug（gpui_learn `980ac7b` + aacode `7fb683e`）
+
+`zed_settings`（位于 `packages/zed/zed_settings/`）写的是 `crate_relative = "../../assets"`，
+两级只回到 `packages/`，指向 `packages/assets` —— 那是 `aa_gpui_kit_assets` 的
+crate 目录（只有 `src/` 和 `Cargo.toml`，**没有任何 settings 文件**）。
+
+于是：
+
+| 构建 | 用哪条路径 | 结果 |
+|---|---|---|
+| dev（`cargo run`） | `root_relative`（相对仓库根） | 从 git 根找 `assets/settings/` → 命中，**一直正常** |
+| release（`cargo build --release`） | `crate_relative`（相对 crate 的 Cargo.toml 目录） | 内嵌了空目录 → `asset_str` 的 `.expect` 在**运行期** panic |
+
+症状：`just install` 装出的二进制一启动就
+`panicked at util/src/embed.rs:9:24: settings/default.json`。
+
+修正为 `../../../assets`。**不能照抄 `aa_gpui_kit_assets` 的 `"../../assets"`** ——
+它在 `packages/assets/`（深度 1），两级正好落到仓库根；各 crate 嵌套深度不同，
+需要的 `../` 层数也不同。
+
+连带：aacode 把 `zed_settings` 加进 `[patch]`（`Cargo.toml:797`），否则修的是 git
+rev `24001e5` 那份、而 aacode 编译的仍是有 bug 的版本。
+
+### rev→rev 同步注意
+
+从 Zed 同步 `util` / `embed.rs` 时，`fs_embed!` 与 `__fs_embed!` 两个宏应保持与
+`crates/util/src/util.rs` L882-887 逐字一致（含 `$($tokens:tt)*` 匹配 +
+`$($tokens)*` 转发的写法，二者不同会报 `no rules expected`）。只同步宏实现，
+**不要**删 gpui_learn 侧新增的文档段落（见下）。
+
+### 为什么没有编译期校验（有意为之）
+
+`fs_embed!` 是 `macro_rules!`，只能展开成 Rust 代码。而校验需要判断
+「`crate_relative` 指向的目录是否存在」与「目录内是否有匹配 `include` 的文件」，
+两者都必须访问文件系统 —— `const fn` 无法调用 `std::fs::read_dir` / `metadata`。
+可行的只有 (a) 每个消费方 crate 各写一份 `build.rs`，或 (b) 新增 proc-macro crate。
+
+对一个已修复的问题，这属于较大范围的基础设施改造，故**不做**，改用两层约束：
+
+1. **文档**（gpui_learn `3a3690c`）：`fs_embed!` 的 doc comment 里给出
+   「层数 = crate 在仓库内的嵌套深度」对照表、dev/release 失败形态对照表、
+   实际 panic 文本，并明确警告「不要照抄邻近 crate 的 `crate_relative`」。
+2. **回归测试**（gpui_learn `980ac7b`）：`zed_settings` 里三个测试
+   （`settings_assets_embed_default_settings` / `..._semantic_token_rules` /
+   `..._keymaps`）。因 `debug-embed` 是 `aa_util` 的默认 feature，debug 下的测试
+   走的就是编译期内嵌，与 release 同一条路径 —— 已验证把这批测试的路径改回
+   `"../../assets"` 时它们会 FAILED 且 panic 于 `embed.rs:9:24`，即精确复现原 bug。
+
+### 另一处待查（本次未动）
+
+`packages/aa/grammars/src/lib.rs` 的 `root_relative = "crates/grammars/src"`
+指向的是 **zed 的目录布局**，而本地该 crate 在 `packages/aa/grammars/src` ——
+层级不对应。当前未触发（`crate_relative = "src/"` 是对的），但 dev 构建若走到
+`root_relative` 会失配。新增/修改 `fs_embed!` 调用点时顺手核对这一项。
