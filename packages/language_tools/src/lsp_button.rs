@@ -508,20 +508,32 @@ impl LanguageServerState {
                     let workspace = self.workspace.clone();
                     let lsp_store = self.lsp_store.clone();
                     let state = cx.entity().downgrade();
-                    let can_stop = submenu_server_info.can_stop();
-                    // 两个条件都要保留：`BinaryStatus::Stopped` 并不只由「移除」产生
-                    // （上游本来就存在该状态并有灰色标识，例如 Stop All 等路径也会置为此状态）；
-                    // `stopped_server_worktrees` 则覆盖本面板主动「停止」的那些。
-                    let can_start = submenu_server_info
-                        .binary_status
-                        .as_ref()
-                        .is_some_and(|binary_status| {
-                            matches!(binary_status.status, BinaryStatus::Stopped)
-                        })
-                        || self
-                            .language_servers
-                            .stopped_server_worktrees
-                            .contains_key(&submenu_server_id);
+                    // 按钮判据同样必须是**实例级**的：`binary_statuses` 按 name 存（见字段注释），
+                    // 别的同名实例停下来会让本实例的 `binary_status` 变成 `Stopped`。
+                    // 若照它判，正在运行的同名实例会「没有 Stop/Remove 按钮、反而有 Start」。
+                    // 因此：本面板主动停的（按 id）才不可停；有 health 说明本实例在跑，应可停；
+                    // 只有两者都没有时，才退回 `binary_status` 的原上游判据。
+                    let can_stop = if is_manually_stopped {
+                        false
+                    } else if submenu_server_info.health.is_some() {
+                        true
+                    } else {
+                        submenu_server_info.can_stop()
+                    };
+                    // 能 Start 的前提是本实例没在跑：有 health 就不该给 Start
+                    // （否则正在运行的同名实例会因 name-keyed 的 Stopped 而多个 Start 按钮）。
+                    let can_start = !is_manually_stopped
+                        && submenu_server_info.health.is_none()
+                        && (submenu_server_info
+                            .binary_status
+                            .as_ref()
+                            .is_some_and(|binary_status| {
+                                matches!(binary_status.status, BinaryStatus::Stopped)
+                            })
+                            || self
+                                .language_servers
+                                .stopped_server_worktrees
+                                .contains_key(&submenu_server_id));
                     let process_memory_cache = process_memory_cache.clone();
 
                     move |menu, _window, _cx| {

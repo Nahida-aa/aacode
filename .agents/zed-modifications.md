@@ -401,6 +401,19 @@ server id」，并在事件里塞了假 id `LanguageServerId(0)`。因为 `Check
 （方案 B「让 stop 走 id-scoped 事件、`binary_statuses` 只管下载状态」更彻底，但需动
 lsp_store + proto，rev 同步成本更高，暂不做。）
 
+**只修标签不够，按钮判据必须一起改**（2026-10-12 补）：`can_stop` / `can_start` 原先也读
+name-keyed 的 `binary_status`，于是 B（正在运行）会「**没有 Stop/Remove 按钮、反而多个
+Start Server**」—— 标签对了但按钮仍把它当停止。现在三处判据统一为实例级：
+
+| 判据 | 规则 |
+|---|---|
+| 状态标签 | `stopped_server_worktrees`(按id) > `health` > `binary_statuses` |
+| `can_stop` | 主动停过(按id)→不可停；有 `health`→可停；否则退回上游 `can_stop()` 判据 |
+| `can_start` | 必须 `health` 为 None 且未主动停过，再按 `binary_status==Stopped` 或按 id 命中 |
+
+原则：**只要该实例自己有 `health`，就忽略 name-keyed 的 `Stopping`/`Stopped`** ——
+那一定是别的同名实例造成的。
+
 ### 状态矩阵（改动后）
 
 | server 状态       | 可用动作                                         |
