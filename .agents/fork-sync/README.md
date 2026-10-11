@@ -61,5 +61,25 @@ just fork-sync list                         # 看有哪些同步、什么状态
 - `CLAUDE.local.md` —— 策略层：为什么这么跟、什么时候触发
 ## 原则更新（rev→rev 同步改进）
 
+- **清单反推原则**：进度表的 crate 清单**不许凭印象列举**，必须从上游客观反推 ——
+  `git diff --stat <OLD>..<NEW> -- crates/` 聚合出全部 crate（cherry-pick 还要单独
+  `git show --stat <sha>`），再逐个映射到 aacode 路径。
+  2026-10 `afecd6d→c019950` 就因清单漏了 `edit_prediction_ui`，使 `bee7a3f7fe`
+  的 8 处改动（4 处菜单文案 + 4 处逻辑）全部未落地，而进度表上 `edit_prediction`
+  仍标 ✅，从表面完全看不出漏了。
+- **按实际路径映射，不要按功能名猜**：一个功能常跨多个 crate。当时把
+  `edit_prediction_ui/.../edit_prediction_button.rs`（状态栏按钮 + 点击后菜单）
+  记成了 `packages/edit_prediction`，于是照着错误路径核对，自然"看起来没问题"。
+- **消费方验收**：上游在 A crate 新增 API、在 B crate 调用它时，**只同步 A 是典型的
+  静默漏同步**（编译照过）。收尾时机械检查：新增 API 在 aacode 里若**有定义却无任何
+  调用方**，就是消费方漏了。
+  ```bash
+  grep -rn "<new_api>" packages/                    # 定义在哪
+  grep -rn "<new_api>" packages/<consumer_crate>/   # 消费方有没有用
+  ```
+  实例：`excluded_from_plan` 在 `packages/edit_prediction` 与 `packages/client`
+  都在 ✅，但消费它的 `packages/edit_prediction_ui` 一处都没用 ❌。
+- **依赖已同步 ≠ 消费方已同步**：与上一条配套，验收时不要因为"底层函数都在"就认为完事。
+
 - **可见性归一化（L1 判定优化）**：在归一化比对时，将 `pub(crate)`、`pub(super)`、`pub(in ...)` 等可见性修饰视为等价（不计入未解释差异），因为模块拆分时这类变化是机械的。仅当语义（签名/类型/行为）真正变化时才算未解释差异。
 - **全量对比原则**：单纯看 git 变更文件不足以覆盖 copy-fork 的同步。建议按 crate 做全量对比（遍历 fork crate 的所有目标文件），而不是只处理区间内变更的文件，尤其是 `project` 等主干 crate 存在大量本地改动时更为重要。可按批次逐 crate 执行，全量扫描的结果应记录到同步计划。

@@ -133,10 +133,55 @@ zed 参照仓库在 `~/repos/ide_ls/learn_ls/zed`，单文件 crate 拆分后的
 **正确流程**：
 
 1. 读 `.agents/zed-modifications.md` 第 1 节 + 第 2 节
-2. 对每个要同步的 crate，先 `grep '<crate>' packages/<path>/Cargo.toml` 验证依赖名
-3. cp 上游 diff，按第 1 节映射表改 crate 名、按第 2 节改模块路径
-4. 每个 crate 同步完跑 `cargo check -p <crate>`，不过不进下一个
-5. 最后 `cargo check --workspace` exit=0 才算完成
+2. **清单必须从上游客观反推，不许靠记忆列举**（见下）
+3. 对每个要同步的 crate，先 `grep '<crate>' packages/<path>/Cargo.toml` 验证依赖名
+4. cp 上游 diff，按第 1 节映射表改 crate 名、按第 2 节改模块路径
+5. 每个 crate 同步完跑 `cargo check -p <crate>`，不过不进下一个
+6. **收尾做「消费方验收」**（见下）
+7. 最后 `cargo check --workspace` exit=0 才算完成
+
+### 清单反推原则（第 2 步）
+
+**不要凭印象列"这次要同步哪些 crate"** —— 2026-10 的 `afecd6d→c019950`
+就因为清单里漏了 `edit_prediction_ui`，导致 commit `bee7a3f7fe` 的 8 处改动
+（4 处菜单文案 + 4 处逻辑）**一项都没落地**，且进度表上 `edit_prediction`
+还标着 ✅，看不出来漏了。
+
+先从上游客观拿到完整文件清单，再逐个映射：
+
+```bash
+# 区间内所有改动文件（按 crate 聚合）
+git -C ~/repos/ide_ls/learn_ls/zed diff --stat <OLD>..<NEW> -- crates/
+
+# 单个提交（cherry-pick 尤其要看，容易被"已处理过"的印象跳过）
+git -C ~/repos/ide_ls/learn_ls/zed show --stat <sha>
+```
+
+两个要点：
+- **一个功能常跨多个 crate**。不要按功能名猜归属，按**实际文件路径**映射。
+  当时的错误就是把 `edit_prediction_ui/.../edit_prediction_button.rs`（状态栏按钮
+  和点击后的菜单）记成了 `packages/edit_prediction`，于是跟着错误的路径去核对，
+  自然"看起来没问题"。
+- **依赖 crate 已同步 ≠ 消费 crate 已同步**。
+
+### 消费方验收（第 6 步）
+
+上游若在 crate A 新增了 API，通常会在 crate B 调用它。**只把 A 同步了、B 没同步
+是典型的静默漏同步** —— 编译照过、运行时看不出，只有对照上游才发现。
+
+机械可查：上游新增/改动的公开函数，在 aacode 里若**存在定义却没有任何调用方**，
+基本就是消费方漏了。
+
+```bash
+# 例：上游 commit 新增 zed_edit_predictions_excluded_from_plan
+grep -rn "zed_edit_predictions_excluded_from_plan" packages/   # 定义在哪
+grep -rn "excluded_from_plan" packages/edit_prediction_ui/     # 消费方有没有用
+```
+
+2026-10 的实例：`packages/edit_prediction` 和 `packages/client` 里的
+`excluded_from_plan` 相关函数**都在** ✅，但消费它们的
+`packages/edit_prediction_ui/src/edit_prediction_button.rs` **一处都没用** ❌。
+按上面两条 grep 当场就能发现。
 
 ## 查上游版本/release：优先用 `tools/gh-releases.ts`
 
