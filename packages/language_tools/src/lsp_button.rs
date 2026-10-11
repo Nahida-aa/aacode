@@ -613,14 +613,33 @@ impl LanguageServerState {
                             });
                         }
 
-                        let state_for_restart = state.clone();
-                        let workspace_for_restart = workspace.clone();
-                        let lsp_store_for_restart = lsp_store.clone();
-                        let server_name_for_restart = submenu_server_name.clone();
-                        submenu = submenu.entry("Restart Server", None, move |_window, cx| {
-                            let Some(workspace) = workspace_for_restart.upgrade() else {
-                                return;
-                            };
+                        // 「Restart」只对**仍在运行**的实例有意义。主动停止的条目若也显示它，
+                        // 点击后会命中下面 buffer 收集的「按 name 过滤不到 → 退回全部 buffers」
+                        // 兜底，把 server 真的重启起来（显示 Running），却又不清理
+                        // `stopped_server_worktrees` 里的旧条目 → 同一项目出现
+                        // 「一条 Running + 一条 Stopped」。所以停止态只给 Start Server。
+                        if !is_manually_stopped {
+                            let state_for_restart = state.clone();
+                            let workspace_for_restart = workspace.clone();
+                            let lsp_store_for_restart = lsp_store.clone();
+                            let server_name_for_restart = submenu_server_name.clone();
+                            let server_id_for_restart = submenu_server_id;
+                            submenu = submenu.entry("Restart Server", None, move |_window, cx| {
+                                // 防御：万一条目仍在停止记录里（例如经 binary 分支渲染、id 与 map
+                                // key 不一致），一并清掉，避免重启后残留一条 Stopped。
+                                let state_for_cleanup = state_for_restart.clone();
+                                state_for_cleanup
+                                    .update(cx, |state, _| {
+                                        state
+                                            .language_servers
+                                            .stopped_server_worktrees
+                                            .remove(&server_id_for_restart);
+                                    })
+                                    .ok();
+
+                                let Some(workspace) = workspace_for_restart.upgrade() else {
+                                    return;
+                                };
 
                             let project = workspace.read(cx).project().clone();
                             let path_style = project.read(cx).path_style(cx);
@@ -701,7 +720,8 @@ impl LanguageServerState {
                                     })
                                     .ok();
                             }
-                        });
+                            });
+                        }
 
                         // 两个语义不同的动作（上游只有一个 "Stop Server"，且其行为实为移除）：
                         // - "Stop Server"：停掉 server，但**条目保留**（归属记入

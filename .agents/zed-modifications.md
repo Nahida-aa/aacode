@@ -418,6 +418,28 @@ Start Server**」—— 标签对了但按钮仍把它当停止。现在三处�
 `is_manually_stopped` 本身就是 `map.contains_key(id)`，这样写会让后半支**永远不可达**，
 主动停止的条目反而没有 Start 按钮（2026-10-12 踩过，修了好几轮才定位到）。
 
+### `Restart Server` 必须对停止态隐藏，且要清理停止记录（2026-10-12 修）
+
+**症状**：停止后点 `Restart Server`，同一项目出现「一条 Running + 一条 Stopped」。
+
+**根因（三点叠加）**：
+
+1. `Restart Server` 原本**没有门控**，停止态的条目也显示它 —— 语义上也不对
+   （停止的 server 该 `Start` 而不是 `Restart`）。
+2. 它的 buffer 收集有个**兜底**：按 server name 从 `servers_per_buffer_abs_path`
+   过滤不到时，退回**所有 buffers**。停止后该 name 的记录已被 `remove_server` 清空
+   → 命中兜底 → restart 真的执行，新 server 起来（Running）。
+3. 而 `Restart Server` 的 handler **从不清理 `stopped_server_worktrees`**
+   → 旧 id 那条 Stopped 残留在 map 里，第三来源继续渲染。
+
+**修法**：
+- `Restart Server` 加 `if !is_manually_stopped` 门控 —— 停止态只给 `Start Server`
+- handler 里**防御性**清理一次 `stopped_server_worktrees.remove(id)`
+  （防的是经 binary 分支渲染、id 与 map key 不一致而漏删的情况）
+
+**教训**：新增「可恢复停止」这类状态时，**所有既有入口都要过一遍**——
+`Restart Server` 是上游就有的，当时没意识到它也会被点在停止态条目上。
+
 ### 状态矩阵（改动后）
 
 | server 状态       | 可用动作                                         |
