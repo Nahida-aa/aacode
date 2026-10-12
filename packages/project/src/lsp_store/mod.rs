@@ -13087,6 +13087,64 @@ impl LspStore {
         }
     }
 
+    /// 启动（恢复）指定 worktree 下、名字匹配的 language server。
+    ///
+    /// 与 `restart_language_servers_for_buffers` 的关键区别：**不会停止任何已在运行的实例**。
+    /// 后者在 selector 非空时会先以**空 buffers** 调 `stop_local_language_servers_for_buffers`，
+    /// 而 `Name` selector 在那里会展开成**所有 worktree** 的同名 server id（见
+    /// `stop_local_language_servers_for_buffers` 里的 name 展开循环）——多项目工作区下会
+    /// 误停其它项目仍在运行的同名实例，再把所有 buffers 重新注册一遍。
+    ///
+    /// 本方法只做两件事：
+    /// 1. 把对应名字从 `stopped_language_servers` 移除（该集合按 name 记、没有 worktree
+    ///    维度，不移除的话 `register_buffer_with_language_servers` 会直接跳过该 server）；
+    /// 2. 只给目标 worktree 的 buffers 注册，避免把同名 server 在其它项目里也拉起来。
+    pub fn start_language_servers_for_worktree(
+        &mut self,
+        worktree_id: WorktreeId,
+        server_names: HashSet<LanguageServerName>,
+        cx: &mut Context<Self>,
+    ) {
+        let selectors = server_names
+            .into_iter()
+            .map(LanguageServerSelector::Name)
+            .collect::<HashSet<_>>();
+        if self.as_local().is_none() {
+            // 远程/协作项目：本地没有 lsp_tree 可注册，退回上游的重启语义
+            // （经 proto 交给上游处理，粒度限制同上）。
+            let buffers = self.buffer_store.read(cx).buffers().collect();
+            self.restart_language_servers_for_buffers(buffers, selectors, true, cx);
+            return;
+        }
+
+        if let Some(local) = self.as_local_mut() {
+            for selector in &selectors {
+                if let LanguageServerSelector::Name(name) = selector {
+                    local.stopped_language_servers.remove(name);
+                }
+            }
+        }
+
+        let buffers = self
+            .buffer_store
+            .read(cx)
+            .buffers()
+            .filter(|buffer| {
+                buffer
+                    .read(cx)
+                    .file()
+                    .map(|file| file.worktree_id(cx))
+                    == Some(worktree_id)
+            })
+            .collect::<Vec<_>>();
+        for buffer in &buffers {
+            // `ignore_refcounts = true`：这些 buffer 已在编辑器中打开（refcount ≥ 1），
+            // 传 false 会因 `*refcount == 1` 不成立而跳过注册。与
+            // `restart_language_servers_for_buffers` 的用法一致。
+            self.register_buffer_with_language_servers(buffer, selectors.clone(), true, cx);
+        }
+    }
+
     pub fn stop_language_servers_for_buffers(
         &mut self,
         buffers: Vec<Entity<Buffer>>,

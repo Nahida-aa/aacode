@@ -825,32 +825,60 @@ impl LanguageServerState {
                             let server_id_for_start = submenu_server_id;
 
                             submenu = submenu.entry("Start Server", None, move |_window, cx| {
-                                state_for_start
+                                // 先取回停止时记录的 worktree（把恢复范围限制在该项目内），
+                                // 再移除展示归属。
+                                let stopped_worktree = state_for_start
                                     .update(cx, |state, _| {
+                                        let worktree = state
+                                            .language_servers
+                                            .stopped_server_worktrees
+                                            .get(&server_id_for_start)
+                                            .and_then(|(_, worktree)| worktree.upgrade());
                                         state
                                             .language_servers
                                             .stopped_server_worktrees
                                             .remove(&server_id_for_start);
+                                        worktree
                                     })
-                                    .ok();
+                                    .ok()
+                                    .flatten();
 
                                 lsp_store_for_start
                                     .update(cx, |lsp_store, cx| {
-                                        // 停止后 servers_per_buffer_abs_path 已空，必须传全部 buffers，
-                                        // 否则 restart 因 `!buffers.is_empty()` 不成立而静默 no-op。
-                                        let buffers = lsp_store
-                                            .buffer_store()
-                                            .read(cx)
-                                            .buffers()
-                                            .collect::<Vec<_>>();
-                                        lsp_store.restart_language_servers_for_buffers(
-                                            buffers,
-                                            HashSet::from_iter([LanguageServerSelector::Name(
-                                                server_name_for_start.clone(),
-                                            )]),
-                                            true,
-                                            cx,
-                                        );
+                                        if let Some(worktree) = stopped_worktree {
+                                            // 只恢复这个 server 所在项目的实例。
+                                            // 不能走 `restart_language_servers_for_buffers`：
+                                            // 它以空 buffers + Name selector 停止时，name 会展开成
+                                            // 所有 worktree 的同名 id，把其它项目仍在运行的同名
+                                            // server 一起停掉再重启；且传全部 buffers 会把同名
+                                            // server 在其它项目里也拉起来（出现一条 Running 之外
+                                            // 还多出实例，或让别的项目从停止态被拉起）。
+                                            lsp_store.start_language_servers_for_worktree(
+                                                worktree.read(cx).id(),
+                                                HashSet::from_iter([
+                                                    server_name_for_start.clone(),
+                                                ]),
+                                                cx,
+                                            );
+                                        } else {
+                                            // 没有记录归属（例如条目来自 binary 分支）：
+                                            // 退回上游的全局重启行为。
+                                            let buffers = lsp_store
+                                                .buffer_store()
+                                                .read(cx)
+                                                .buffers()
+                                                .collect::<Vec<_>>();
+                                            lsp_store.restart_language_servers_for_buffers(
+                                                buffers,
+                                                HashSet::from_iter([
+                                                    LanguageServerSelector::Name(
+                                                        server_name_for_start.clone(),
+                                                    ),
+                                                ]),
+                                                true,
+                                                cx,
+                                            );
+                                        }
                                     })
                                     .ok();
                             });

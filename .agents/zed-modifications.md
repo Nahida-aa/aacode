@@ -467,9 +467,42 @@ Start Server**」—— 标签对了但按钮仍把它当停止。现在三处�
 
 - `can_start` 用**双条件或**：`BinaryStatus::Stopped` **或** name 在
   `stopped_server_worktrees` 中。前者不能省 —— `Stopped` 状态并不只由「移除」产生，
-  上游本来就存在该状态且有灰色标识（例如 Stop All 等路径也会置为该状态）。
+  上游本来就存在该状态并有灰色标识（例如 Stop All 等路径也会置为该状态）。
 - 运行中的 server 会同时出现 `Restart Server` + `Stop Server` + `Remove Server` 三项，
   `Stop` 与 `Remove` 的差异已在代码注释中说明（暂未做 tooltip）。
+
+### `Start Server` 必须按 worktree 收窄，不能走 restart（2026-10-12 修）
+
+**症状**：多项目工作区下，对某项目已停止的 server 点 `Start Server`，**另一个项目
+仍在运行（或已停止）的同名 server 也被拉起/重启**，该项目出现「一条 Running +
+一条灰色 Stopped」。
+
+**根因（两点叠加）**：
+
+1. `Start` 原先走 `restart_language_servers_for_buffers(全部 buffers, {Name}, true)`。
+   该方法在 selector 非空时会先以**空 buffers** 调 `stop_local_language_servers_for_buffers`，
+   而 `Name` selector 在那里会展开成**所有 worktree** 的同名 server id
+   （`lsp_store/mod.rs` 的 name 展开循环）→ **其它项目仍在运行的同名实例被误停**；
+   随后传全部 buffers 重新注册，又把同名 server 在**所有**项目里拉起来。
+2. `Start` 只从 `stopped_server_worktrees` 移除**点击的那一个 id**。若停止记录里
+   还有其它同名实例（例如之前点过 `Stop All Servers`，它会把所有实例都记进去），
+   这些条目不会消失 → 该项目同时显示新拉起的 Running 和残留的灰色 Stopped。
+
+**修法**：
+
+- `packages/project/src/lsp_store/mod.rs` **新增** `start_language_servers_for_worktree`
+  （aacode 自有 API，上游没有）：只做两件事 —— 把对应名字从 `stopped_language_servers`
+  移除（该集合按 name 记、无 worktree 维度，不移除则注册被 3200 行附近的守卫跳过），
+  然后**只给目标 worktree 的 buffers** 注册。不停止任何已在运行的实例。
+  - 注意 `register_buffer_with_language_servers` 的 `ignore_refcounts` 必须传 `true`：
+    buffer 已在编辑器中打开（refcount ≥ 1），传 `false` 会因 `*refcount == 1` 不成立
+    而跳过注册。与 `restart_language_servers_for_buffers` 的用法一致。
+  - 远程/协作项目（`as_local()` 为 None）退回上游重启语义（经 proto，粒度限制同上）。
+- 面板 `Start Server`：先取回停止时记录的 worktree，再调上述 API；没有记录归属时
+  （例如条目来自 binary 分支）才退回旧的全局重启。
+
+**已知保留的上游行为**：per-item `Restart Server`（对**运行中**的实例）仍是上游语义 ——
+workspace 级按 name 停/重启。要收窄它属于另一个改动，本次未做。
 
 ### rev→rev 同步注意
 
@@ -477,6 +510,12 @@ Start Server**」—— 标签对了但按钮仍把它当停止。现在三处�
 `remove_server`（781-788）、item 构造（约 1210-1400）、per-item 子菜单（约 415-715）、
 全局按钮分支（约 303-340）。合并后请确认 `stopped_server_worktrees` 的三处引用
 （写入 / 移除 / 清空）仍然完整。
+
+**`packages/project/src/lsp_store/mod.rs` 现有 aacode 新增方法**
+`start_language_servers_for_worktree`（在 `restart_language_servers_for_buffers` 之后）。
+上游若改动 `restart_language_servers_for_buffers` /
+`stop_local_language_servers_for_buffers` / `register_buffer_with_language_servers`
+的签名或 name 展开逻辑，需人工合并而非直接覆盖。
 
 ## Settings → AI：新增「试听」按钮（aacode 独有，非移植）
 
