@@ -73,8 +73,9 @@ icons:
 # - 身份/图标/依赖来自 Cargo.toml 的 [package.metadata.bundle-stable]
 # - 卸载变成 pacman -R aacode，不再需要 script/uninstall.sh
 #
-# 安装前确保 aa-bundle 可用：
-#   cargo install --path ~/repos/ide_ls/gpui_learn/packages/apps/aa-bundle
+# 安装前确保 aa-bundle 可用（gpui_learn 侧改过 aa-bundle 后要重跑才生效，
+# 因为 cargo install 是快照式的）：
+#   just -C ~/repos/ide_ls/gpui_learn install-cli
 install:
     #!/usr/bin/env bash
     set -euo pipefail
