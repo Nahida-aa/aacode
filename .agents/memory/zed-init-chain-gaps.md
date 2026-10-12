@@ -30,7 +30,7 @@ language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx
 两个关键点：
 
 1. **`language_model::init` ≠ `language_models::init`**
-   - `language_model`（`packages/language_model`）= 核心 trait / 类型 crate，只负责建 `LanguageModelRegistry` 这个**容器**
+   - `language_model`（gpui_learn 的 `aa_gpui_kit_language_model`，aacode 侧用 `package =` 别名仍写作 `language_model`）= 核心 trait / 类型 crate，只负责建 `LanguageModelRegistry` 这个**容器**
    - `language_models`（`packages/language_models`）= 内部调 `register_language_model_providers(...)` 把各 provider **塞进 registry**
    - 看到 `language_model::init` 就以为"初始化过了"是最常见的误判
 

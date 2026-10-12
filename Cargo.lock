@@ -361,6 +361,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_gpui_kit_language_model"
+version = "0.1.0"
+dependencies = [
+ "aa_icons",
+ "aa_language_model_core",
+ "anyhow",
+ "base64 0.22.1",
+ "collections",
+ "credentials_provider",
+ "env_var",
+ "futures 0.3.34",
+ "gpui",
+ "gpui_shared_string",
+ "gpui_util",
+ "http_client",
+ "image",
+ "log",
+ "parking_lot",
+ "serde_json",
+ "thiserror 2.0.21",
+]
+
+[[package]]
 name = "aa_gpui_kit_rope"
 version = "0.1.0"
 dependencies = [
@@ -590,6 +613,7 @@ dependencies = [
  "aa_gpui_kit_assets",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -668,7 +692,6 @@ dependencies = [
  "keymap_editor",
  "language",
  "language_extension",
- "language_model",
  "language_models",
  "language_selector",
  "language_tools",
@@ -868,6 +891,7 @@ dependencies = [
 name = "acp_thread"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
  "aa_gpui_kit_ui",
  "aa_util",
@@ -891,7 +915,6 @@ dependencies = [
  "indoc",
  "itertools 0.14.0",
  "language",
- "language_model",
  "libc",
  "log",
  "markdown",
@@ -1047,6 +1070,7 @@ dependencies = [
  "aa_env_vars",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
@@ -1083,7 +1107,6 @@ dependencies = [
  "indoc",
  "itertools 0.14.0",
  "language",
- "language_model",
  "language_models",
  "log",
  "lsp",
@@ -1176,6 +1199,7 @@ name = "agent_servers"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_util",
@@ -1197,7 +1221,6 @@ dependencies = [
  "gpui_tokio",
  "http_client",
  "indoc",
- "language_model",
  "log",
  "project",
  "remote",
@@ -1218,13 +1241,13 @@ name = "agent_settings"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
+ "aa_gpui_kit_language_model",
  "aa_util",
  "anyhow",
  "collections",
  "convert_case 0.11.0",
  "futures 0.3.34",
  "gpui",
- "language_model",
  "log",
  "project",
  "regex",
@@ -1262,6 +1285,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
  "aa_gpui_kit_theme",
@@ -1310,7 +1334,6 @@ dependencies = [
  "itertools 0.14.0",
  "jsonschema",
  "language",
- "language_model",
  "language_models",
  "languages",
  "log",
@@ -1388,12 +1411,12 @@ name = "ai_onboarding"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_ui",
  "aacode_actions",
  "client",
  "cloud_api_types",
  "gpui",
- "language_model",
  "smallvec",
  "telemetry",
 ]
@@ -3900,6 +3923,7 @@ dependencies = [
 name = "codestral"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
  "aa_icons",
  "ad_credentials_provider",
@@ -3910,7 +3934,6 @@ dependencies = [
  "gpui",
  "http_client",
  "language",
- "language_model",
  "log",
  "serde",
  "serde_json",
@@ -4246,6 +4269,7 @@ dependencies = [
 name = "copilot_chat"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_language_model",
  "aa_util",
  "anthropic",
  "anyhow",
@@ -4254,7 +4278,6 @@ dependencies = [
  "futures 0.3.34",
  "gpui",
  "http_client",
- "language_model",
  "log",
  "serde",
  "serde_json",
@@ -5877,6 +5900,7 @@ dependencies = [
  "aa_cloud_llm_client",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -5906,7 +5930,6 @@ dependencies = [
  "indoc",
  "itertools 0.14.0",
  "language",
- "language_model",
  "languages",
  "log",
  "lsp",
@@ -7342,6 +7365,7 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -7369,7 +7393,6 @@ dependencies = [
  "indoc",
  "itertools 0.14.0",
  "language",
- "language_model",
  "log",
  "markdown",
  "menu",
@@ -9655,28 +9678,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "language_model"
-version = "0.1.0"
-dependencies = [
- "aa_icons",
- "aa_language_model_core",
- "anyhow",
- "base64 0.22.1",
- "collections",
- "credentials_provider",
- "env_var",
- "futures 0.3.34",
- "gpui",
- "gpui_util",
- "http_client",
- "image",
- "log",
- "parking_lot",
- "serde_json",
- "thiserror 2.0.21",
-]
-
-[[package]]
 name = "language_models"
 version = "0.1.0"
 dependencies = [
@@ -9684,6 +9685,7 @@ dependencies = [
  "aa_cloud_llm_client",
  "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
@@ -9717,7 +9719,6 @@ dependencies = [
  "gpui_tokio",
  "http_client",
  "language",
- "language_model",
  "language_models_cloud",
  "llama_cpp",
  "lmstudio",
@@ -9748,6 +9749,7 @@ name = "language_models_cloud"
 version = "0.1.0"
 dependencies = [
  "aa_cloud_llm_client",
+ "aa_gpui_kit_language_model",
  "anthropic",
  "anyhow",
  "cloud_api_client",
@@ -9755,7 +9757,6 @@ dependencies = [
  "google_ai",
  "gpui",
  "http_client",
- "language_model",
  "log",
  "open_ai",
  "schemars 1.2.2",
@@ -12294,6 +12295,7 @@ dependencies = [
 name = "openai_subscribed"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_language_model",
  "aa_util",
  "anyhow",
  "base64 0.22.1",
@@ -12301,7 +12303,6 @@ dependencies = [
  "futures 0.3.34",
  "gpui",
  "http_client",
- "language_model",
  "log",
  "oauth_callback_server",
  "open_ai",
@@ -14981,6 +14982,7 @@ dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_theme",
  "aa_release_channel",
  "aa_util",
@@ -15012,7 +15014,6 @@ dependencies = [
  "json_schema_store",
  "language",
  "language_extension",
- "language_model",
  "languages",
  "log",
  "lsp",
@@ -16103,6 +16104,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
@@ -16138,7 +16140,6 @@ dependencies = [
  "http_proxy",
  "itertools 0.14.0",
  "language",
- "language_model",
  "language_models",
  "log",
  "menu",
@@ -16263,6 +16264,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
+ "aa_gpui_kit_language_model",
  "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
@@ -16287,7 +16289,6 @@ dependencies = [
  "http_client",
  "itertools 0.14.0",
  "language",
- "language_model",
  "log",
  "menu",
  "node_runtime",
@@ -20118,6 +20119,7 @@ name = "web_search_providers"
 version = "0.1.0"
 dependencies = [
  "aa_cloud_llm_client",
+ "aa_gpui_kit_language_model",
  "anyhow",
  "client",
  "cloud_api_client",
@@ -20125,7 +20127,6 @@ dependencies = [
  "futures 0.3.34",
  "gpui",
  "http_client",
- "language_model",
  "serde_json",
  "web_search",
 ]
@@ -21646,6 +21647,7 @@ dependencies = [
 name = "x_ai_subscribed"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_language_model",
  "aa_util",
  "anyhow",
  "base64 0.22.1",
@@ -21653,7 +21655,6 @@ dependencies = [
  "futures 0.3.34",
  "gpui",
  "http_client",
- "language_model",
  "log",
  "oauth_callback_server",
  "open_ai",
