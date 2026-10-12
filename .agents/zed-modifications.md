@@ -282,6 +282,10 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 
 ### 改动（7 项）
 
+> 以下是**最初**的改动集。2026-10-12 又修了五轮（多项目去重、状态污染、
+> `Restart` 门控、`Start` 收窄、`Remove` 刷新 + 顺序），其中**第 2/4/6 项的局部结论
+> 已被后续小节取代** —— 读到那时请以对应小节为准。
+
 1. **改名**
    - per-item：`Stop Server` → `Remove Server`（逻辑一字未动）
    - 全局：`Stop All Servers` → `Remove All Servers`（与 `Restart All Servers` 平行）
@@ -295,7 +299,9 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
         运行中真正注销；已停止时该 id 已不在 `language_server_ids`，整条链路是
         **静默 no-op**（`stopped_names` 为空、`stop_local_language_server` 取不到 name 直接返回），
         不会 panic 也不会报错
-     2. `stopped_server_worktrees.remove(name)` —— 丢弃展示归属，条目消失
+     2. `stopped_server_worktrees.remove(server_id)` —— 丢弃展示归属，条目消失。
+        （按 **id** 而非 name，见「多项目工作区」小节；且**必须配 `cx.notify()`**，
+        否则菜单不重建、表现为「点了没效果」，见「停止态 Remove 点了没效果」小节）
    - 已停止时 `stopped_language_servers` 里的抑制**保留**，所以不会自己复活
 
 3. **新增真正的 `Stop Server`**（可恢复）
@@ -304,13 +310,19 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
      完全相同的 `stop_language_servers_for_buffers(Vec::new(), {Id}, cx)`
 
 4. **新增 `Start Server`**（仅停止态显示）
-   - **必须传全部 buffers**（`lsp_store.buffer_store().read(cx).buffers()`）。
+
+   > ⚠️ 本节是**最初实现**，已被下方「`Start Server` 必须按 worktree 收窄」小节取代：
+   > 现在走 `start_language_servers_for_worktree`，只注册目标 worktree 的 buffers。
+   > 保留原文只为记录踩坑过程。
+
+   - ~~**必须传全部 buffers**~~（旧实现）：`lsp_store.buffer_store().read(cx).buffers()`。
      理由：现有 per-item `Restart Server`（497-581）用的是
      `servers_per_buffer_abs_path` 收集的 buffers，停止后该列表为空 →
      `if !buffers.is_empty()` 不成立 → **静默 no-op**。这是最容易踩的坑。
-   - `clear_stopped` 必须传 `true`：`stopped_language_servers` 会拦注册
+   - ~~`clear_stopped` 必须传 `true`~~（旧实现）：`stopped_language_servers` 会拦注册
      （`lsp_store/mod.rs:3200-3204`），只有 `clear_stopped=true` 才会先移除该
      name（`lsp_store/mod.rs:13065-13072`），server 才能起来。
+     现在由 `start_language_servers_for_worktree` 内部完成这一步。
 
 5. **新增 `stopped_server_worktrees` 字段**（`lsp_button.rs` 的 `LanguageServers`）
 
@@ -330,8 +342,9 @@ aacode 1539 包 / zed 1595 包，**同名版本不一致 485 个**（绝大多�
 
 6. **item 构造新增第三来源**
    - 位置紧跟 `binary_statuses` 循环之后，遍历 `stopped_server_worktrees`，
-     用 `emitted_server_names` 去重，从 `binary_statuses` 取 `Stopped` 状态
-   - 渲染结果：灰色 + `Stopped`（`lsp_button.rs:367-369` 已处理该状态的配色文案）
+     **只按 id 去重**（`emitted_server_ids`，不用 name —— 见「多项目工作区」小节），
+     从 `binary_statuses` 取 `Stopped` 状态
+   - 渲染结果：灰色 + `Stopped`（`lsp_button.rs` 中该状态的配色文案）
 
 7. **新增全局 `Stop All Servers`**
    - 上游全局只有 `ToggleServersButton { restart: bool }` 二选一，aacode 改为
@@ -465,11 +478,18 @@ Start Server**」—— 标签对了但按钮仍把它当停止。现在三处�
 
 ### 保留的两个细节（有意为之）
 
-- `can_start` 用**双条件或**：`BinaryStatus::Stopped` **或** name 在
-  `stopped_server_worktrees` 中。前者不能省 —— `Stopped` 状态并不只由「移除」产生，
-  上游本来就存在该状态并有灰色标识（例如 Stop All 等路径也会置为该状态）。
+- `can_start` 现行形式是 `health.is_none() && (is_manually_stopped || binary_status == Stopped)`：
+  - `health.is_none()` 不能省 —— 否则**正在运行**的同名实例会因 name-keyed 的
+    `Stopped` 而多出一个 Start 按钮（2026-10-12 踩过）。
+  - `binary_status == Stopped` 不能省 —— `Stopped` 状态并不只由「移除」产生，
+    上游本来就存在该状态且有灰色标识（例如 Stop All 等路径也会置为该状态）。
+  - ⚠️ 别写成 `!is_manually_stopped && (… || map.contains_key(id))`：
+    `is_manually_stopped` 本身就是 `map.contains_key(id)`，这样写后半支**永远不可达**，
+    主动停止的条目会没有 Start 按钮（同样踩过）。
 - 运行中的 server 会同时出现 `Restart Server` + `Stop Server` + `Remove Server` 三项，
   `Stop` 与 `Remove` 的差异已在代码注释中说明（暂未做 tooltip）。
+- **菜单顺序**：运行态 `Restart → Stop → Remove`；停止态 `Start → Remove`
+  （恢复是主路径、移除是终态操作，2026-10-12 调过）。
 
 ### `Start Server` 必须按 worktree 收窄，不能走 restart（2026-10-12 修）
 
@@ -530,10 +550,10 @@ no-op（id 已不在 `language_server_ids`，`stop_local_language_server` 直接
 
 ### rev→rev 同步注意
 
-上游若改动以下任一项，需人工合并而非直接覆盖：
-`remove_server`（781-788）、item 构造（约 1210-1400）、per-item 子菜单（约 415-715）、
-全局按钮分支（约 303-340）。合并后请确认 `stopped_server_worktrees` 的三处引用
-（写入 / 移除 / 清空）仍然完整。
+上游若改动以下任一项，需人工合并而非直接覆盖（行号为 2026-10-12 时值，仅作定位参考）：
+`remove_server`（1077）、item 构造 `regenerate_items`（1395）、per-item 子菜单
+（约 590-890）、全局按钮分支（约 313-410）。合并后请确认 `stopped_server_worktrees`
+的引用点（写入 / 移除 / 清空 / 查询）仍然完整。
 
 **`packages/project/src/lsp_store/mod.rs` 现有 aacode 新增方法**
 `start_language_servers_for_worktree`（在 `restart_language_servers_for_buffers` 之后）。
