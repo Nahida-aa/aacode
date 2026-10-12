@@ -11,7 +11,7 @@ members = [
     "packages/apps/cli",
     "packages/server",
     "packages/session",
-    "packages/apps/aacode", "packages/ui", "packages/workspace", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/breadcrumbs", "packages/language", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/agent/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/google_ai", "packages/language_models", "packages/ai_onboarding", "packages/bedrock", "packages/copilot_chat", "packages/copilot_ui", "packages/deepseek", "packages/extension_host", "packages/llama_cpp", "packages/lmstudio", "packages/mistral", "packages/ollama", "packages/language_models/open_ai", "packages/language_models/anthropic", "packages/openai_subscribed", "packages/opencode", "packages/open_router", "packages/x_ai", "packages/x_ai_subscribed", "packages/aws_http_client", "packages/language_models/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/apps/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/ac_util", "packages/etw_tracing", "packages/ac_constant", "packages/apps/aa_term", "packages/apps/aa_editor",
+    "packages/apps/aacode", "packages/ui", "packages/workspace", "packages/sidebar", "packages/aacode_actions", "packages/terminal", "packages/terminal_view", "packages/task", "packages/theme_settings", "packages/title_bar", "packages/agent_ui", "packages/audio", "packages/project", "packages/worktree", "packages/breadcrumbs", "packages/language", "packages/editor", "packages/multi_buffer", "packages/client", "packages/markdown", "packages/remote", "packages/db", "packages/mermaid_render", "packages/ad_credentials_provider", "packages/rpc", "packages/lsp", "packages/buffer_diff", "packages/context_server", "packages/dap", "packages/extension", "packages/git_hosting_providers", "packages/node_runtime", "packages/prettier", "packages/snippet_provider",  "packages/cloud_api_client", "packages/cloud_api_types", "packages/feature_flags", "packages/language_detection", "packages/aa_env_vars", "packages/env_var", "packages/feature_flags_macros", "packages/file_icons", "packages/vim_mode_setting", "packages/json_schema_store", "packages/edit_prediction_types", "packages/platform_title_bar", "packages/action_log", "packages/agent_settings", "packages/agent/acp_thread", "packages/agent", "packages/agent_servers", "packages/agent_skills", "packages/remote_connection", "packages/language_model", "packages/auto_update", "packages/languages", "tools/outline-cli", "packages/http_proxy", "packages/sandbox", "packages/reqwest_client", "packages/language_models", "packages/ai_onboarding", "packages/copilot_ui", "packages/extension_host", "packages/language_models/open_ai", "packages/language_models/bedrock", "packages/language_models/deepseek", "packages/language_models/copilot_chat", "packages/language_models/google_ai", "packages/language_models/llama_cpp", "packages/language_models/lmstudio", "packages/language_models/mistral", "packages/language_models/ollama", "packages/language_models/open_router", "packages/language_models/openai_subscribed", "packages/language_models/opencode", "packages/language_models/x_ai", "packages/language_models/x_ai_subscribed", "packages/language_models/anthropic", "packages/aws_http_client", "packages/language_models/language_models_cloud", "packages/copilot", "packages/language_extension", "packages/theme_extension", "packages/command_palette_hooks", "packages/call", "packages/channel", "packages/git_ui_core", "packages/livekit_client", "packages/recent_projects", "packages/dev_container", "packages/open_path_prompt", "packages/picker", "packages/apps/remote_server", "packages/livekit_api", "packages/notifications", "packages/dap_adapters", "packages/debug_adapter_extension", "packages/web_search", "packages/prompt_store", "packages/streaming_diff", "packages/assets", "packages/extension_api", "packages/search", "packages/vim", "packages/picker_preview", "packages/command_palette", "packages/git_ui", "packages/markdown_preview", "packages/outline_panel", "packages/project_panel", "packages/settings_ui", "packages/outline", "packages/codestral", "packages/edit_prediction", "packages/activity_indicator", "packages/acp_tools", "packages/image_viewer", "packages/repl", "packages/collab_ui", "packages/debugger_tools", "packages/debugger_ui", "packages/tasks_ui", "packages/theme_selector", "packages/which_key", "packages/language_selector", "packages/svg_preview", "packages/keymap_editor", "packages/windows_resources", "packages/lsp_command_selector", "packages/lsp_locations", "packages/miniprofiler_ui", "packages/diagnostics", "packages/encoding_selector", "packages/toolchain_selector", "packages/language_tools", "packages/line_ending_selector", "packages/ui_prompt", "packages/project_symbols", "packages/feedback", "packages/install_cli", "packages/auto_update_ui", "packages/system_specs", "packages/tab_switcher", "packages/onboarding", "packages/tabular_data_preview", "packages/inspector_ui", "packages/web_search_providers", "packages/file_finder", "packages/call_hierarchy", "packages/journal", "packages/extensions_ui", "packages/extension_suggest", "packages/ac_util", "packages/etw_tracing", "packages/ac_constant", "packages/apps/aa_term", "packages/apps/aa_editor",
 ]
 
 [workspace.package]
@@ -56,7 +56,7 @@ assets = { path = "packages/assets" }
 audio = { path = "packages/audio" }
 auto_update = { path = "packages/auto_update" }
 aws_http_client = { path = "packages/aws_http_client" }
-bedrock = { path = "packages/bedrock" }
+bedrock = { path = "packages/language_models/bedrock" }
 breadcrumbs = { path = "packages/breadcrumbs" }
 buffer_diff = { path = "packages/buffer_diff" }
 call = { path = "packages/call" }
@@ -68,7 +68,7 @@ command_palette = { path = "packages/command_palette" }
 command_palette_hooks = { path = "packages/command_palette_hooks" }
 context_server = { path = "packages/context_server" }
 copilot = { path = "packages/copilot" }
-copilot_chat = { path = "packages/copilot_chat" }
+copilot_chat = { path = "packages/language_models/copilot_chat" }
 copilot_ui = { path = "packages/copilot_ui" }
 client = { path = "packages/client" }
 cloud_api_client = { path = "packages/cloud_api_client" }
@@ -85,7 +85,7 @@ db = { path = "packages/db" }
 debug_adapter_extension = { path = "packages/debug_adapter_extension"}
 debugger_tools = { path = "packages/debugger_tools" }
 debugger_ui = { path = "packages/debugger_ui" }
-deepseek = { path = "packages/deepseek" }
+deepseek = { path = "packages/language_models/deepseek" }
 dev_container = { path = "packages/dev_container" }
 diagnostics = { path = "packages/diagnostics" }
 encoding_selector = { path = "packages/encoding_selector" }
@@ -115,7 +115,7 @@ git_hosting_providers = { path = "packages/git_hosting_providers" }
 git_ui = { path = "packages/git_ui" }
 git_ui_core = { path = "packages/git_ui_core" }
 go_to_line = { path = "packages/go_to_line" }
-google_ai = { path = "packages/google_ai" }
+google_ai = { path = "packages/language_models/google_ai" }
 http_proxy = { path = "packages/http_proxy" }
 image_viewer = { path = "packages/image_viewer" }
 inspector_ui = { path = "packages/inspector_ui" }
@@ -137,24 +137,24 @@ languages = { path = "packages/languages" }
 line_ending_selector = { path = "packages/line_ending_selector" }
 livekit_api = { path = "packages/livekit_api" }
 livekit_client = { path = "packages/livekit_client" }
-llama_cpp = { path = "packages/llama_cpp" }
-lmstudio = { path = "packages/lmstudio" }
+llama_cpp = { path = "packages/language_models/llama_cpp" }
+lmstudio = { path = "packages/language_models/lmstudio" }
 lsp = { path = "packages/lsp" }
 markdown = { path = "packages/markdown" }
 markdown_preview = { path = "packages/markdown_preview" }
 mermaid_render = { path = "packages/mermaid_render" }
 migrator = { package = "zed_migrator", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
 miniprofiler_ui = { path = "packages/miniprofiler_ui" }
-mistral = { path = "packages/mistral" }
+mistral = { path = "packages/language_models/mistral" }
 multi_buffer = { path = "packages/multi_buffer" }
 node_runtime = { path = "packages/node_runtime" }
 notifications = { path = "packages/notifications" }
-ollama = { path = "packages/ollama" }
+ollama = { path = "packages/language_models/ollama" }
 open_ai = { path = "packages/language_models/open_ai" }
 open_path_prompt = { path = "packages/open_path_prompt" }
-open_router = { path = "packages/open_router" }
-openai_subscribed = { path = "packages/openai_subscribed" }
-opencode = { path = "packages/opencode" }
+open_router = { path = "packages/language_models/open_router" }
+openai_subscribed = { path = "packages/language_models/openai_subscribed" }
+opencode = { path = "packages/language_models/opencode" }
 outline = { path = "packages/outline" }
 outline_panel = { path = "packages/outline_panel" }
 paths = { package = "zed_paths", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5" }
@@ -224,8 +224,8 @@ project_symbols = { path = "packages/project_symbols" }
 auto_update_ui = { path = "packages/auto_update_ui" }
 worktree = { path = "packages/worktree" }
 windows_resources = { path = "packages/windows_resources" }
-x_ai = { path = "packages/x_ai" }
-x_ai_subscribed = { path = "packages/x_ai_subscribed" }
+x_ai = { path = "packages/language_models/x_ai" }
+x_ai_subscribed = { path = "packages/language_models/x_ai_subscribed" }
 
 agent-client-protocol = { version = "=2.2.0", features = ["unstable", "unstable_protocol_v2"] }
 aho-corasick = "1.1"
