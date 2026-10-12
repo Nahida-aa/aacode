@@ -504,6 +504,30 @@ Start Server**」—— 标签对了但按钮仍把它当停止。现在三处�
 **已知保留的上游行为**：per-item `Restart Server`（对**运行中**的实例）仍是上游语义 ——
 workspace 级按 name 停/重启。要收窄它属于另一个改动，本次未做。
 
+### 停止态 `Remove Server` 点了没效果 + 菜单顺序（2026-10-12 修）
+
+**症状一**：停止状态下点 `Remove Server`，条目不消失（重开菜单还在）。
+
+**根因**：该 handler 只改 `stopped_server_worktrees`；停止态下 lsp_store 那步是
+no-op（id 已不在 `language_server_ids`，`stop_local_language_server` 直接
+`Task::ready(())`、**不发任何事件**），而菜单是从缓存的 `state.items` 渲染的 ——
+没有事件就没有 `regenerate_items`，条目残留。运行态 Remove 之所以正常，是因为
+真有停止事件触发刷新。
+
+**修法**：
+
+- `LspButton::new` 增加 `cx.observe_in(&server_state, …)` → `refresh_lsp_menu(false, …)`，
+  作为「条目集合变化但没有 lsp_store 事件」的刷新通道（代价是一次 30ms 防抖重建）。
+- 三处 map 变更补 `cx.notify()`：`Remove Server` handler、`Remove All`/`Restart All`
+  分支的 `clear()`。（`Stop All` 的 `extend` 原本就有 notify，但当时没有 observer，
+  实际是空转；现在接上后才真正生效。）
+- 排查时确认过无 notify 循环：`refresh_lsp_menu` → `regenerate_items` 只写
+  `state.items`、不 notify server_state。
+
+**症状二（顺序）**：停止态菜单原先是 `Remove Server` 在上、`Start Server` 在下。
+改为 **`Start Server` 在前、`Remove Server` 在后** —— 恢复是主路径，移除是终态操作。
+运行态顺序不变：`Restart Server` → `Stop Server` → `Remove Server`。
+
 ### rev→rev 同步注意
 
 上游若改动以下任一项，需人工合并而非直接覆盖：

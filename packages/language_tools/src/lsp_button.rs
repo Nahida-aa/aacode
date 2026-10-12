@@ -390,8 +390,11 @@ impl LanguageServerState {
                             _ => {
                                 // Remove All / Restart All 都是全局动作，
                                 // 结束后不该再保留单条展示归属。
-                                state.update(cx, |state, _| {
+                                // notify：若此时已无运行中的 server（lsp_store 不产生事件），
+                                // 靠它触发菜单重建，否则旧条目会残留。
+                                state.update(cx, |state, cx| {
                                     state.language_servers.stopped_server_worktrees.clear();
+                                    cx.notify();
                                 });
                                 lsp_store
                                     .update(cx, |lsp_store, cx| match action {
@@ -783,41 +786,8 @@ impl LanguageServerState {
 
                         }
 
-                        // "Remove Server"：彻底注销，条目消失，**两种状态都提供**。
-                        // - 运行中：走 lsp_store 的注销（清诊断、抑制自动启动），条目随之消失。
-                        // - 已停止：该 id 已不在 lsp_store 中，上面那步是 no-op；靠丢弃
-                        //   `stopped_server_worktrees` 里的展示归属让条目消失。
-                        //   若不提供，Stop 之后就再也没法把这个条目清掉了（只能 Restart All 顺带清）。
-                        let lsp_store_for_remove = lsp_store.clone();
-                        let server_selector_for_remove = server_selector.clone();
-                        let state_for_remove = state.clone();
-                        let server_id_for_remove = submenu_server_id;
-
-                        submenu = submenu.entry("Remove Server", None, move |_window, cx| {
-                            state_for_remove
-                                .update(cx, |state, _| {
-                                    state
-                                        .language_servers
-                                        .stopped_server_worktrees
-                                        .remove(&server_id_for_remove);
-                                })
-                                .ok();
-
-                            lsp_store_for_remove
-                                .update(cx, |lsp_store, cx| {
-                                    lsp_store
-                                        .stop_language_servers_for_buffers(
-                                            Vec::new(),
-                                            HashSet::from_iter([
-                                                server_selector_for_remove.clone()
-                                            ]),
-                                            cx,
-                                        )
-                                        .detach_and_log_err(cx);
-                                })
-                                .ok();
-                        });
-
+                        // 顺序：运行态 Restart → Stop → Remove；停止态 Start → Remove。
+                        // 停止态把 Start 放前面：恢复是主路径，移除是终态操作。
                         if can_start {
                             let lsp_store_for_start = lsp_store.clone();
                             let state_for_start = state.clone();
@@ -883,6 +853,45 @@ impl LanguageServerState {
                                     .ok();
                             });
                         }
+
+                        // "Remove Server"：彻底注销，条目消失，**两种状态都提供**。
+                        // - 运行中：走 lsp_store 的注销（清诊断、抑制自动启动），条目随之消失。
+                        // - 已停止：该 id 已不在 lsp_store 中，上面那步是 no-op；靠丢弃
+                        //   `stopped_server_worktrees` 里的展示归属让条目消失。
+                        //   若不提供，Stop 之后就再也没法把这个条目清掉了（只能 Restart All 顺带清）。
+                        let lsp_store_for_remove = lsp_store.clone();
+                        let server_selector_for_remove = server_selector.clone();
+                        let state_for_remove = state.clone();
+                        let server_id_for_remove = submenu_server_id;
+
+                        submenu = submenu.entry("Remove Server", None, move |_window, cx| {
+                            state_for_remove
+                                .update(cx, |state, cx| {
+                                    state
+                                        .language_servers
+                                        .stopped_server_worktrees
+                                        .remove(&server_id_for_remove);
+                                    // 必须 notify：停止态下 lsp_store 那步是 no-op、不产生
+                                    // 任何事件，菜单不会自动重建，重开看到的还是旧条目
+                                    // （曾表现为「停止状态下无法移除」）。
+                                    cx.notify();
+                                })
+                                .ok();
+
+                            lsp_store_for_remove
+                                .update(cx, |lsp_store, cx| {
+                                    lsp_store
+                                        .stop_language_servers_for_buffers(
+                                            Vec::new(),
+                                            HashSet::from_iter([
+                                                server_selector_for_remove.clone()
+                                            ]),
+                                            cx,
+                                        )
+                                        .detach_and_log_err(cx);
+                                })
+                                .ok();
+                        });
 
                         submenu = submenu.separator().custom_row({
                             let binary_display_path = binary_display_path.clone();
@@ -1228,12 +1237,25 @@ impl LspButton {
             process_memory_cache: Rc::new(RefCell::new(ProcessMemoryCache::new())),
         });
 
+        // 「条目集合变化但没有 lsp_store 事件」时的刷新通道。典型场景：停止态下点
+        // "Remove Server" —— 只改 `stopped_server_worktrees`，lsp_store 侧是 no-op、
+        // 不产生任何事件，若不靠 notify 触发重建，重开菜单看到的还是旧条目。
+        // 代价仅是一次 30ms 防抖的 regenerate + 菜单重建，可忽略。
+        let server_state_observer =
+            cx.observe_in(&server_state, window, |lsp_button, _, window, cx| {
+                lsp_button.refresh_lsp_menu(false, window, cx);
+            });
+
         let mut lsp_button = Self {
             server_state,
             popover_menu_handle,
             lsp_menu: None,
             lsp_menu_refresh: Task::ready(()),
-            _subscriptions: vec![settings_subscription, lsp_store_subscription],
+            _subscriptions: vec![
+                settings_subscription,
+                lsp_store_subscription,
+                server_state_observer,
+            ],
         };
         let is_restricted = TrustedWorktrees::has_restricted_worktrees(
             &workspace.project().read(cx).worktree_store(),
