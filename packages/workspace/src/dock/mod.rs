@@ -5,6 +5,8 @@ mod entity;
 pub mod panel;
 mod position;
 mod size;
+#[cfg(any(test, feature = "test-support"))]
+pub mod test;
 
 pub use buttons::PanelButtons;
 pub use entity::Dock;

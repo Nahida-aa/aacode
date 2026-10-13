@@ -27,6 +27,9 @@ pub mod workspace;
 pub mod workspace_error;
 mod workspace_settings;
 
+#[cfg(test)]
+mod tests;
+
 pub use dock::{Panel, PanelEvent, PanelHandle, DockPosition};
 pub use multi_workspace::{
     ProjectGroupKey,

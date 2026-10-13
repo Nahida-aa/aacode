@@ -17,6 +17,8 @@ mod serializable;
 pub mod settings;
 pub mod tab;
 mod traits;
+#[cfg(any(test, feature = "test-support"))]
+pub mod test;
 pub mod weak_handle;
 
 pub use events::*;
