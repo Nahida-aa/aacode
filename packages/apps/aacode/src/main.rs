@@ -24,10 +24,13 @@ use util::ResultExt as _;
 
 /// 启动参数。对齐 Zed `crates/zed/src/main.rs` 的 `Args`（L190-291）。
 ///
-/// Zed 的原始结构有 18 个字段，其中 etw_*（Windows ETW 追踪）、crash_handler、
-/// askpass 这几项与 aacode 无关，未搬。`foreground` 与 `dock_action` 是 Windows-only
+/// Zed 的原始结构有 18 个字段，其中 etw_*（Windows ETW 追踪）、crash_handler
+/// 这几项与 aacode 无关，未搬。`foreground` 与 `dock_action` 是 Windows-only
 /// 但仍保留 —— windows_only_instance.rs 的 handle_single_instance 要用它们转发请求。
 /// `printenv` 用 clap 字段替代了原先手写的 `args().any(...)` 扫描。
+///
+/// `askpass` 曾被误判为「与 aacode 无关」而漏搬，实际是 git push/fetch 认证的
+/// 必经之路，详见该字段的注释。
 #[derive(Parser, Debug)]
 #[command(name = "aacode", disable_version_flag = true, max_term_width = 100)]
 struct Args {
@@ -83,6 +86,20 @@ struct Args {
     /// 来拿子进程的 env vars（Zed main.rs L251-255）。
     #[arg(long)]
     printenv: bool,
+
+    /// Used for SSH/Git password authentication, to remove the need for netcat as a
+    /// dependency, by having aacode act like netcat communicating over a Unix socket。
+    ///
+    /// 别删。askpass crate 在 Linux 上把 askpass 程序取为 `current_exe()`（zed
+    /// 只在 `#[cfg(target_os = "windows")]` 下调 `set_askpass_program`），生成的
+    /// 脚本内容是 `printf '%s\0' "$@" | <current_exe> --askpass=<socket>`。而
+    /// git crate 的 run_git_command 对**每条** git 命令都注入 GIT_ASKPASS/
+    /// SSH_ASKPASS 指向该脚本（与被操作的仓库无关）。所以在 aacode 的 git
+    /// 面板里 push/fetch 时，脚本会回调 `aacode --askpass=…`；少了这个字段，
+    /// clap 报未知参数、进程静默退出、stdout 无输出，git 侧就报
+    /// 「unable to read askpass response」。终端里 push 不受影响（不走这条链）。
+    #[arg(long, hide = true)]
+    askpass: Option<String>,
 }
 
 /// 进程启动时刻，供 miniprofiler_ui 计算「启动到首次交互」的耗时。
@@ -95,6 +112,14 @@ fn main() {
 
     // 启动参数。对齐 Zed main.rs L213 `let args = Args::parse();`。
     let args = Args::parse();
+
+    // `--askpass` 让本进程退化成 Unix socket 上的 netcat。必须早于一切其他
+    // 初始化：askpass::main 接管进程后阻塞在 socket 上，直到密码取完才返回，
+    // 后面任何 app / window 初始化都不该发生。对齐 zed cli main.rs L515-518。
+    if let Some(socket) = &args.askpass {
+        askpass::main(socket);
+        return;
+    }
 
     // 版本号。对齐 Zed main.rs L305-308。
     //
