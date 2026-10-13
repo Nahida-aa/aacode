@@ -70,6 +70,9 @@ pub fn refine_theme_family(theme_family_content: ThemeFamilyContent) -> ThemeFam
         name,
         author,
         themes,
+        // 与 zed `theme_settings.rs:289` 同款：从 JSON refine 出的家族也带一份
+        // 默认色阶（JSON 没有 scales 概念，填默认值即可）。
+        scales: theme::default_color_scales(),
     }
 }
 

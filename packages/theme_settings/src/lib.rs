@@ -53,7 +53,10 @@ use std::sync::Arc;
 
 use theme::ActiveTheme;
 use theme::registry::ThemeRegistry;
-use theme::{GlobalTheme, SystemAppearance, default_colors::catppuccin_macchiato};
+use theme::{GlobalTheme, SystemAppearance};
+// 终极兜底（注册表连兜底家族都取不到时）用 gpui_learn 的 ctp_default_dark，
+// 它就是兜底家族里的 Macchiato，与 DEFAULT_DARK_THEME 同色。
+use theme::fallback_themes::ctp_default_dark;
 use theme::{IconTheme, LoadThemes, Theme};
 use gpui::{App, Font, Window};
 use gpui::colors::DefaultColors;
@@ -196,7 +199,7 @@ fn configured_theme(cx: &mut App) -> Arc<Theme> {
     // 因为 theme_settings::init 时 GlobalTheme 可能还不存在。
     let theme_name = theme_settings.theme.name(SystemAppearance::global(cx).0);
 
-    match registry.get(theme_name.0.as_ref()) {
+    let theme = match registry.get(theme_name.0.as_ref()) {
         Ok(theme) => theme,
         Err(_) => {
             // Fallback 链：Aa Macchiato → Catppuccin Macchiato（内置兜底）
@@ -210,10 +213,16 @@ fn configured_theme(cx: &mut App) -> Arc<Theme> {
                 .or_else(|_| registry.get("Catppuccin Macchiato"))
                 .or_else(|_| registry.get("Catppuccin Mocha"))
                 .or_else(|_| registry.get("ui-gpui Dark"))
-                .unwrap_or_else(|_| Arc::new(catppuccin_macchiato()));
+                .unwrap_or_else(|_| Arc::new(ctp_default_dark()));
             fallback
         }
-    }
+    };
+
+    // 最后叠用户 settings.json 的主题覆盖（对齐 zed theme_settings.rs L182）。
+    // 必须在这里而不是 refine_theme 内部 —— 前者是「主题 JSON 定义主题」，
+    // 这里是「用户只写要改的字段」，语义不同（语法色要走 SyntaxTheme::merge
+    // 做部分覆盖，用户没提到的 capture 必须保留原值）。
+    theme_settings.apply_theme_overrides(theme)
 }
 
 fn configured_icon_theme(cx: &mut App) -> Arc<IconTheme> {

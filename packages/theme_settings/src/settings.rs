@@ -8,11 +8,13 @@ use std::sync::Arc;
 
 use theme::{
     Appearance, BufferLineHeight, DEFAULT_ICON_THEME_NAME, DEFAULT_LIGHT_ICON_THEME_NAME,
+    Theme,
 };
 use gpui::{
     App, Context, Font, FontFeatures, FontStyle, Global, Pixels, SharedString, Subscription,
     Window, px,
 };
+use refineable::Refineable as _;
 use serde::{Deserialize, Serialize};
 use settings::{IntoGpui as _, Settings as _};
 use settings_macros::RegisterSetting;
@@ -430,6 +432,54 @@ impl ThemeSettings {
     pub fn buffer_line_height_value(&self) -> f32 {
         self.buffer_line_height.value()
     }
+
+    /// 应用 settings.json 里的主题覆盖（对齐 zed `crates/theme_settings/src/settings.rs`
+    /// L525-538）。`experimental_theme_overrides` 对所有主题生效，
+    /// `theme_overrides` 只对同名主题生效，后者优先。
+    pub fn apply_theme_overrides(&self, mut theme: Arc<theme::Theme>) -> Arc<theme::Theme> {
+        if let Some(overrides) = &self.experimental_theme_overrides {
+            let mut t = (*theme).clone();
+            Self::modify_theme(&mut t, overrides);
+            theme = Arc::new(t);
+        }
+
+        if let Some(overrides) = self.theme_overrides.get(theme.name.as_ref()) {
+            let mut t = (*theme).clone();
+            Self::modify_theme(&mut t, overrides);
+            theme = Arc::new(t);
+        }
+
+        theme
+    }
+
+    /// 把覆盖叠到**已有**主题上（对齐 zed 同名函数 L541-561）。
+    ///
+    /// 与 `refine_theme` 的区别：refine_theme 是「主题 JSON → Theme」，语法色直接
+    /// `SyntaxTheme::new`；这里是「用户只写要改的字段 → 叠加」，语法色必须走
+    /// `SyntaxTheme::merge` —— 它是逐字段 `new.or(old)` 的部分覆盖，且保持
+    /// capture 名到索引的映射稳定（新增的 capture 追加在末尾，不会打乱已有索引）。
+    /// 用 `new` 重建会把用户没提到的 capture 全清空。
+    fn modify_theme(theme: &mut theme::Theme, overrides: &settings_content::ThemeStyleContent) {
+        if let Some(wba) = overrides.window_background_appearance {
+            theme.styles.window_background_appearance = wba.into_gpui();
+        }
+
+        let status_refinement =
+            crate::schema::status_colors_refinement(&overrides.status);
+        let colors_refinement = crate::schema::theme_colors_refinement(
+            &overrides.colors,
+            &status_refinement,
+            theme.appearance.is_light(),
+        );
+        theme.styles.colors.refine(&colors_refinement);
+        theme.styles.status.refine(&status_refinement);
+        crate::bundled_themes::merge_player_colors(&mut theme.styles.players, &overrides.players);
+        crate::bundled_themes::merge_accent_colors(&mut theme.styles.accents, &overrides.accents);
+        theme.styles.syntax = theme::SyntaxTheme::merge(
+            theme.styles.syntax.clone(),
+            crate::schema::syntax_overrides(overrides),
+        );
+    }
 }
 
 // ---------- 调整字号的全局函数 ----------
@@ -808,5 +858,131 @@ pub fn set_icon_theme(
         *icon_theme_to_update = icon_theme_name;
     } else {
         current.theme.icon_theme = Some(IconThemeSelection::Static(icon_theme_name));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// base_theme 只定义 keyword 一项，用户覆盖只给 variable 一项 ——
+    /// 叠加后两者都该在，且用户给的颜色要生效。
+    fn theme_with_base_syntax() -> Theme {
+        Theme {
+            id: "base".into(),
+            name: "Test Theme".into(),
+            appearance: Appearance::Dark,
+            styles: theme::ThemeStyles {
+                window_background_appearance: Default::default(),
+                colors: theme::ThemeColors::dark(),
+                status: theme::StatusColors::dark(),
+                accents: theme::AccentColors::dark(),
+                system: theme::SystemColors::default(),
+                players: theme::PlayerColors::dark(),
+                syntax: Arc::new(theme::SyntaxTheme::new([(
+                    "keyword".to_string(),
+                    gpui::HighlightStyle {
+                        color: Some(theme::try_parse_color("#ff0000").unwrap()),
+                        ..Default::default()
+                    },
+                )])),
+            },
+        }
+    }
+
+    fn overrides_with_syntax_variable() -> settings_content::ThemeStyleContent {
+        let mut content = settings_content::ThemeStyleContent::default();
+        content.syntax.insert(
+            "variable".to_string(),
+            settings_content::theme::theme_style::HighlightStyleContent {
+                color: Some("#00ff00".into()),
+                ..Default::default()
+            },
+        );
+        content
+    }
+
+    #[test]
+    fn modify_theme_merges_syntax_without_dropping_base_captures() {
+        let mut theme = theme_with_base_syntax();
+        ThemeSettings::modify_theme(&mut theme, &overrides_with_syntax_variable());
+
+        let syntax = theme.styles.syntax.clone();
+        // 用户新加的 capture 生效
+        assert_eq!(
+            syntax.style_for_name("variable").and_then(|s| s.color),
+            Some(theme::try_parse_color("#00ff00").unwrap())
+        );
+        // 基色里原有、用户没提到的 capture **必须还在**。
+        // 若这里换成 SyntaxTheme::new(...) 重建，这条会失败。
+        assert_eq!(
+            syntax.style_for_name("keyword").and_then(|s| s.color),
+            Some(theme::try_parse_color("#ff0000").unwrap()),
+            "用户覆盖不应清掉基色主题里没提到的 capture"
+        );
+    }
+
+    #[test]
+    fn modify_theme_partial_override_keeps_unspecified_fields() {
+        let mut theme = theme_with_base_syntax();
+        // 覆盖里只给 color，font_weight / background_color 留空
+        let mut content = overrides_with_syntax_variable();
+        content.syntax.get_mut("variable").unwrap().font_weight = None;
+        ThemeSettings::modify_theme(&mut theme, &content);
+
+        let style = theme
+            .styles
+            .syntax
+            .style_for_name("variable")
+            .expect("variable 应存在");
+        assert_eq!(style.color, Some(theme::try_parse_color("#00ff00").unwrap()));
+        // merge 是逐字段 or()，未指定的字段保持 None 而非被填成默认值
+        assert_eq!(style.font_weight, None);
+        assert_eq!(style.background_color, None);
+    }
+
+    #[test]
+    fn apply_theme_overrides_prefers_per_theme_overrides() {
+        let mut global = settings_content::ThemeStyleContent::default();
+        global.syntax.insert(
+            "variable".to_string(),
+            settings_content::theme::theme_style::HighlightStyleContent {
+                color: Some("#0000ff".into()),
+                ..Default::default()
+            },
+        );
+        let mut per_theme = overrides_with_syntax_variable(); // 绿色
+
+        let mut s = ThemeSettings {
+            experimental_theme_overrides: Some(global),
+            theme_overrides: Default::default(),
+            ..ThemeSettings::default()
+        };
+        // 先验证只有 experimental 时生效
+        let theme = s.apply_theme_overrides(Arc::new(theme_with_base_syntax()));
+        assert_eq!(
+            theme.styles.syntax.style_for_name("variable").and_then(|s| s.color),
+            Some(theme::try_parse_color("#0000ff").unwrap())
+        );
+
+        // 同名主题的 theme_overrides 排在后面，应当覆盖 experimental 的结果
+        s.theme_overrides.insert("Test Theme".to_string(), per_theme.clone());
+        let theme = s.apply_theme_overrides(Arc::new(theme_with_base_syntax()));
+        assert_eq!(
+            theme.styles.syntax.style_for_name("variable").and_then(|s| s.color),
+            Some(theme::try_parse_color("#00ff00").unwrap()),
+            "同名主题的 theme_overrides 应后应用、优先级更高"
+        );
+    }
+
+    #[test]
+    fn apply_theme_overrides_no_op_without_overrides() {
+        let s = ThemeSettings::default();
+        let theme = s.apply_theme_overrides(Arc::new(theme_with_base_syntax()));
+        // 没有覆盖时不应新建 theme（否则白白 clone 一遍）
+        assert_eq!(
+            theme.styles.syntax.style_for_name("keyword").and_then(|s| s.color),
+            Some(theme::try_parse_color("#ff0000").unwrap())
+        );
     }
 }
