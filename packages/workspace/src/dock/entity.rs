@@ -575,13 +575,56 @@ impl Dock {
                 active_panel.panel.set_active(false, window, cx);
             }
 
+            // `share_panel_size_in_dock` 打开时，把切出面板的尺寸复制给切入面板，
+            // 于是同一 dock 内来回切换不会出现宽度跳动。取值放在
+            // set_active(false) 之后、改 active_panel_index 之前 —— 此时
+            // active_panel_entry() 仍指向旧面板。
+            //
+            // 选择逐面板复制、而不是改持久化 key，是为了让用户关掉该设置后，
+            // 每个面板仍保有自己上次的宽度（改 key 会作废全部历史值）。
+            let inherited = self
+                .should_share_panel_size(cx)
+                .then(|| self.active_panel_entry().map(|entry| entry.size_state))
+                .flatten();
+
             self.active_panel_index = Some(panel_ix);
             if let Some(active_panel) = self.active_panel_entry() {
                 active_panel.panel.set_active(true, window, cx);
             }
 
+            // 先收集再落盘：cx.defer 需要 &mut App，不能在还持有 entry 的可变借用
+            // 时调用（与 resize_all_panels 末尾的处理方式一致）。
+            let mut to_persist = None;
+            if let Some(size_state) = inherited
+                && let Some(entry) = self.active_panel_entry_mut()
+            {
+                entry.size_state = size_state;
+                entry.panel.size_state_changed(window, cx);
+                to_persist = Some((entry.panel.panel_key(), entry.size_state));
+            }
+
+            if let Some((panel_key, size_state)) = to_persist {
+                let workspace = self.workspace.clone();
+                cx.defer(move |cx| {
+                    if let Some(workspace) = workspace.upgrade() {
+                        workspace.update(cx, |workspace, cx| {
+                            workspace.persist_panel_size_state(panel_key, size_state, cx);
+                        });
+                    }
+                });
+            }
+
             cx.notify();
         }
+    }
+
+    /// 该 dock 是否配置了「切换面板时共享宽度」。仅水平 dock 有效 —— 底部 dock 的
+    /// 高度不共享，判定与 `panel_uses_flexible_width` 的轴向条件保持一致。
+    fn should_share_panel_size(&self, cx: &App) -> bool {
+        self.position().axis() == Axis::Horizontal
+            && WorkspaceSettings::get_global(cx)
+                .share_panel_size_in_dock
+                .contains(&self.position())
     }
 
     pub fn visible_panel(&self) -> Option<&Arc<dyn PanelHandle>> {
