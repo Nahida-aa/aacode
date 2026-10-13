@@ -106,7 +106,7 @@ install:
 
     out="packages/apps/aacode/target/aa-bundle/pkgbuild"
     rm -rf "$out"
-    aa-bundle pkgbuild -p packages/apps/aacode \
+    aa-bundle --format pkgbuild -p packages/apps/aacode \
       --bundle-meta "Cargo.toml#[package, metadata, bundle-stable]" \
       --out "$out"
     # strip 由 PKGBUILD 的 options=(strip)（Arch 默认）负责，与旧实现一致
