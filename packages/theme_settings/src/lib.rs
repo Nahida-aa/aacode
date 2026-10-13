@@ -199,10 +199,15 @@ fn configured_theme(cx: &mut App) -> Arc<Theme> {
     match registry.get(theme_name.0.as_ref()) {
         Ok(theme) => theme,
         Err(_) => {
-            // Fallback 链：Macchiato → Mocha → 硬编码构造。
+            // Fallback 链：Aa Macchiato → Catppuccin Macchiato（内置兜底）
+            // → Mocha → 硬编码构造。
+            // 首选 Aa 是 fork 的品牌（assets/themes/aa 里的 JSON 家族），
+            // Catppuccin 是同配色的上游品牌家族，两者都在注册表里。
             // 注意主题名要和 gpui_learn default_colors.rs 里的 name 字段一致。
             let fallback = registry
-                .get("Catppuccin Macchiato")
+                .get("Aa Macchiato")
+                .or_else(|_| registry.get("Aa Latte"))
+                .or_else(|_| registry.get("Catppuccin Macchiato"))
                 .or_else(|_| registry.get("Catppuccin Mocha"))
                 .or_else(|_| registry.get("ui-gpui Dark"))
                 .unwrap_or_else(|_| Arc::new(catppuccin_macchiato()));

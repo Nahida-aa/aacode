@@ -8,8 +8,8 @@
   // - "dark": Use the theme indicated by the "dark" field
   "theme": {
     "mode": "system",
-    "light": "Catppuccin Latte",
-    "dark": "Catppuccin Macchiato",
+    "light": "Aa Latte",
+    "dark": "Aa Macchiato",
   },
   "icon_theme": {
     "mode": "system",
