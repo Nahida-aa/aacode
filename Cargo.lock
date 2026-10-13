@@ -239,7 +239,7 @@ dependencies = [
 name = "aa_gpui_kit_component"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
+ "aa_theme_gpui",
  "gpui",
  "inventory",
  "parking_lot",
@@ -463,34 +463,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa_gpui_kit_theme"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "gpui",
- "palette",
- "parking_lot",
- "refineable",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "strum 0.27.2",
- "syntax_theme",
- "thiserror 2.0.21",
- "tracing",
- "uuid",
-]
-
-[[package]]
 name = "aa_gpui_kit_ui"
 version = "0.1.0"
 dependencies = [
  "aa_assets_gpui",
  "aa_gpui_base",
  "aa_gpui_kit_component",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui_macros",
  "aa_icons",
+ "aa_theme_gpui",
  "documented",
  "gpui",
  "gpui_macros",
@@ -596,8 +577,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_syntax_theme_gpui"
+version = "0.1.0"
+dependencies = [
+ "gpui",
+]
+
+[[package]]
 name = "aa_term"
 version = "0.1.0"
+
+[[package]]
+name = "aa_theme_gpui"
+version = "0.1.0"
+dependencies = [
+ "aa_syntax_theme_gpui",
+ "anyhow",
+ "gpui",
+ "palette",
+ "parking_lot",
+ "refineable",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "strum 0.27.2",
+ "thiserror 2.0.21",
+ "tracing",
+ "uuid",
+]
 
 [[package]]
 name = "aa_util"
@@ -651,10 +658,10 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_rope",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_web_search",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -1108,10 +1115,10 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_web_search",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "acp_thread",
  "action_log",
@@ -1324,9 +1331,9 @@ dependencies = [
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -3291,8 +3298,8 @@ dependencies = [
 name = "call_hierarchy"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "editor",
@@ -3912,9 +3919,9 @@ dependencies = [
 name = "collab_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -3992,8 +3999,8 @@ name = "command_palette"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -4203,8 +4210,8 @@ name = "copilot"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_icons",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "collections",
@@ -5234,9 +5241,9 @@ name = "debugger_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -5439,8 +5446,8 @@ name = "diagnostics"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "agent_settings",
@@ -5881,10 +5888,10 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "aho-corasick",
@@ -6357,8 +6364,8 @@ name = "extension_host"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "async-compression",
@@ -6563,8 +6570,8 @@ name = "file_finder"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -6596,7 +6603,7 @@ name = "file_icons"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_settings_content",
- "aa_gpui_kit_theme",
+ "aa_theme_gpui",
  "aa_util",
  "gpui",
 ]
@@ -7183,10 +7190,10 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -7250,8 +7257,8 @@ dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -7399,8 +7406,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "editor",
  "gpui",
@@ -8556,8 +8563,8 @@ name = "image_viewer"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "db",
@@ -8701,8 +8708,8 @@ name = "inspector_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -9127,7 +9134,7 @@ name = "json_schema_store"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "collections",
@@ -9267,9 +9274,9 @@ name = "keymap_editor"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -9394,7 +9401,7 @@ dependencies = [
  "aa_gpui_kit_language_core",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "async-trait",
@@ -9598,9 +9605,9 @@ dependencies = [
 name = "language_tools"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -9636,7 +9643,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_grammars",
  "aa_gpui_kit_rope",
- "aa_gpui_kit_theme",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "async-compression",
@@ -10449,8 +10456,8 @@ name = "markdown"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_mermaid_render",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "base64 0.22.1",
@@ -10476,8 +10483,8 @@ name = "markdown_preview"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -10933,7 +10940,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "buffer_diff",
@@ -11927,8 +11934,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -12039,8 +12046,8 @@ dependencies = [
 name = "open_path_prompt"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "editor",
  "file_icons",
@@ -12205,8 +12212,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_rope",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "editor",
@@ -12243,8 +12250,8 @@ name = "outline_panel"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_git",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -13141,9 +13148,9 @@ dependencies = [
 name = "picker"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -13263,8 +13270,8 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 name = "platform_title_bar"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aacode_actions",
  "gpui",
  "project",
@@ -13719,8 +13726,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -13760,8 +13767,8 @@ name = "project_symbols"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_theme",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "anyhow",
  "editor",
@@ -14713,10 +14720,10 @@ name = "remote_connection"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_askpass",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
+ "aa_theme_gpui",
  "anyhow",
  "auto_update",
  "editor",
@@ -14741,8 +14748,8 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_theme",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "ac_util",
  "acp_thread",
@@ -14819,8 +14826,8 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 name = "repl"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -15524,8 +15531,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "any_vec",
@@ -15863,10 +15870,10 @@ dependencies = [
  "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -16023,9 +16030,9 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "acp_thread",
@@ -16904,14 +16911,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "syntax_theme"
-version = "0.1.0"
-source = "git+https://github.com/zed-industries/zed?rev=c0199504b9cce79bc27524950022ed701bc3ebd5#c0199504b9cce79bc27524950022ed701bc3ebd5"
-dependencies = [
- "gpui",
-]
-
-[[package]]
 name = "sys-locale"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16982,8 +16981,8 @@ name = "tab_switcher"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "collections",
  "ctor",
@@ -17191,9 +17190,9 @@ name = "terminal"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_settings_content",
- "aa_gpui_kit_theme",
  "aa_release_channel",
  "aa_settings_macros",
+ "aa_theme_gpui",
  "aa_util",
  "alacritty_terminal",
  "anyhow",
@@ -17237,9 +17236,9 @@ dependencies = [
 name = "terminal_view"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -17345,8 +17344,8 @@ name = "theme_selector"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "editor",
@@ -17368,8 +17367,8 @@ version = "0.1.0"
 dependencies = [
  "aa_assets_gpui",
  "aa_gpui_kit_settings_content",
- "aa_gpui_kit_theme",
  "aa_settings_macros",
+ "aa_theme_gpui",
  "anyhow",
  "collections",
  "gpui",
@@ -17569,9 +17568,9 @@ name = "title_bar"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_icons",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "agent_settings",
@@ -18366,8 +18365,8 @@ version = "0.1.0"
 name = "ui_prompt"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "gpui",
  "markdown",
  "menu",
@@ -18768,9 +18767,9 @@ name = "vim"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -19894,8 +19893,8 @@ dependencies = [
 name = "which_key"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "collections",
@@ -20858,10 +20857,10 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_settings_content",
- "aa_gpui_kit_theme",
  "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
+ "aa_theme_gpui",
  "aa_util",
  "aacode_actions",
  "ac_constant",

@@ -1423,7 +1423,7 @@ impl BufferSnapshot {
                     .syntax_highlight_id
                     .zip(theme)
                     .and_then(|(highlight, theme)| {
-                        theme.highlight(usize::from(highlight)).cloned()
+                        theme.get(usize::from(highlight)).cloned()
                     });
 
                 if let Some(style) = style {

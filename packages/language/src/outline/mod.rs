@@ -274,7 +274,7 @@ pub fn highlight_ranges_from_text(
     runs.into_iter()
         .filter_map(|(range, id)| {
             syntax_theme
-                .highlight(usize::from(id))
+                .get(usize::from(id))
                 .cloned()
                 .map(|style| (range, style))
         })

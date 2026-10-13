@@ -34,15 +34,15 @@ aa_gpui_kit_ui.workspace = true
 util.workspace = true
 
 [dev-dependencies]
-# assets.workspace = true
-# env_logger.workspace = true
-# fs = {workspace = true, features = ["test-support"]}
-# gpui = { workspace = true, features = ["test-support"] }
-# gpui_platform = { workspace = true, features = ["wayland", "x11"] }
-# image.workspace = true
-# indoc.workspace = true
-# language = { workspace = true, features = ["test-support"] }
-# languages = { workspace = true, features = ["load-grammars"] }
-# node_runtime.workspace = true
-# settings = { workspace = true, features = ["test-support"] }
-# util = { workspace = true, features = ["test-support"] }
+assets.workspace = true
+env_logger.workspace = true
+fs = {workspace = true, features = ["test-support"]}
+gpui = { workspace = true, features = ["test-support"] }
+gpui_platform = { workspace = true, features = ["wayland", "x11"] }
+image.workspace = true
+indoc.workspace = true
+language = { workspace = true, features = ["test-support"] }
+languages = { workspace = true, features = ["load-grammars"] }
+node_runtime.workspace = true
+settings = { workspace = true, features = ["test-support"] }
+util = { workspace = true, features = ["test-support"] }

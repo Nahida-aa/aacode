@@ -348,7 +348,7 @@ impl MarkdownElementBuilder {
                 let run_len = run_range.len();
                 let highlight = self
                     .syntax_theme
-                    .highlight(usize::from(*highlight_id))
+                    .get(usize::from(*highlight_id))
                     .cloned();
                 if let Some(highlight) = highlight {
                     self.pending_line

@@ -603,15 +603,15 @@ aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24
 fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_assets_core = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_assets_gpui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
-aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
+aa_theme_gpui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 # zed 里这两个控件包就叫 `ui` / `ui_input`，同样用别名对齐，
 # 让照搬的 zed 代码（`ui::Button`、`ui_input::InputField`）零改动。
 ui = { package = "aa_gpui_kit_ui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 # zed 里这个包叫 `theme`，别名让照搬的 zed 代码（`theme::SyntaxTheme` 等）原样可用。
-# 与 `aa_gpui_kit_theme` 指向同一个包；**每个包只能选其中一个名字声明**，
+# 与 `aa_theme_gpui` 指向同一个包；**每个包只能选其中一个名字声明**，
 # 否则会报 "depends on crate ... multiple times with different names"。
-theme = { package = "aa_gpui_kit_theme", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
+theme = { package = "aa_theme_gpui", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 # 图标枚举（gpui_learn packages/icons）在 zed 里叫 `icons`，同样用别名对齐。
 icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
@@ -805,7 +805,7 @@ system_specs = { path = "/home/aa/repos/ai_ls/AAgent/packages/system_specs" }
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
 aa_assets_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_assets/aa_assets_core" }
 aa_assets_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_assets/aa_assets_gpui" }
-aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
+aa_theme_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_theme/aa_theme_gpui" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
 # clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样走本地。
