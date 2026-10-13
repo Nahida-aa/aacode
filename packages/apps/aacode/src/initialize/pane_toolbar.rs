@@ -15,8 +15,8 @@
 //! Zed 两者只差一个 s，本 fork 拆成文件后特意把本文件命名为 `pane_toolbar`
 //! 以免与 `panels.rs` 混淆。
 
-use breadcrumbs::Breadcrumbs;
 use crate::core::MigrationBanner;
+use breadcrumbs::Breadcrumbs;
 use diagnostics::ToolbarControls as DiagnosticEditorControls;
 // `AppContext` 必须引入：`cx.new()` 是它的方法，漏掉会报
 // 「no method named `new` found for Context<Toolbar>」—— 与 zed.rs:43 的 import 对齐。
@@ -73,13 +73,11 @@ fn initialize_pane(
         pane.toolbar().update(cx, |toolbar, cx| {
             let multibuffer_hint = cx.new(|_| MultibufferHint::new());
             toolbar.add_item(multibuffer_hint, window, cx);
-            let solo_diff_style_toolbar = cx.new(|cx| {
-                git_ui::solo_diff_view::SoloDiffStyleToolbar::new(cx)
-            });
+            let solo_diff_style_toolbar =
+                cx.new(|cx| git_ui::solo_diff_view::SoloDiffStyleToolbar::new(cx));
             toolbar.add_item(solo_diff_style_toolbar, window, cx);
-            let file_diff_style_toolbar = cx.new(|cx| {
-                git_ui_core::file_diff_view::FileDiffStyleToolbar::new(cx)
-            });
+            let file_diff_style_toolbar =
+                cx.new(|cx| git_ui_core::file_diff_view::FileDiffStyleToolbar::new(cx));
             toolbar.add_item(file_diff_style_toolbar, window, cx);
             // 路径导航栏 —— 用户报「tab 下方不显示路径」就是缺这一项。
             let breadcrumbs = cx.new(|_| Breadcrumbs::new());
@@ -116,11 +114,14 @@ fn initialize_pane(
             toolbar.add_item(migration_banner, window, cx);
             let highlights_tree_item = cx.new(|_| HighlightsTreeToolbarItemView::new());
             toolbar.add_item(highlights_tree_item, window, cx);
-            let project_diff_toolbar = cx.new(|cx| git_ui::project_diff::ProjectDiffToolbar::new(workspace, cx));
+            let project_diff_toolbar =
+                cx.new(|cx| git_ui::project_diff::ProjectDiffToolbar::new(workspace, cx));
             toolbar.add_item(project_diff_toolbar, window, cx);
-            let staged_diff_toolbar = cx.new(|cx| git_ui::staged_diff::StagedDiffToolbar::new(workspace, cx));
+            let staged_diff_toolbar =
+                cx.new(|cx| git_ui::staged_diff::StagedDiffToolbar::new(workspace, cx));
             toolbar.add_item(staged_diff_toolbar, window, cx);
-            let unstaged_diff_toolbar = cx.new(|cx| git_ui::unstaged_diff::UnstagedDiffToolbar::new(workspace, cx));
+            let unstaged_diff_toolbar =
+                cx.new(|cx| git_ui::unstaged_diff::UnstagedDiffToolbar::new(workspace, cx));
             toolbar.add_item(unstaged_diff_toolbar, window, cx);
             let branch_diff_toolbar = cx.new(git_ui::branch_diff::BranchDiffToolbar::new);
             toolbar.add_item(branch_diff_toolbar, window, cx);

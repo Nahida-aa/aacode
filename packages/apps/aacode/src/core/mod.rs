@@ -68,10 +68,8 @@ pub fn handle_open_request(request: OpenRequest, app_state: Arc<AppState>, cx: &
                 .detach();
             }
             OpenRequestKind::FocusApp => {
-                cx.spawn(async move |cx| {
-                    restore_or_create_workspace(app_state, cx).await
-                })
-                .detach_and_log_err(cx);
+                cx.spawn(async move |cx| restore_or_create_workspace(app_state, cx).await)
+                    .detach_and_log_err(cx);
             }
             OpenRequestKind::Extension { extension_id } => {
                 log::warn!("Extension({extension_id}) 暂未支持");
@@ -223,13 +221,9 @@ pub async fn restore_or_create_workspace(
         for multi_workspace in multi_workspaces {
             let result = match &multi_workspace.active_workspace.location {
                 SerializedWorkspaceLocation::Local => {
-                    workspace::restore_multiworkspace(
-                        multi_workspace,
-                        app_state.clone(),
-                        cx,
-                    )
-                    .await
-                    .map(|_| ())
+                    workspace::restore_multiworkspace(multi_workspace, app_state.clone(), cx)
+                        .await
+                        .map(|_| ())
                 }
                 SerializedWorkspaceLocation::Remote(_) => {
                     // aacode 暂不支持 remote workspace 恢复，见上方文档注释。
@@ -276,9 +270,7 @@ pub async fn restore_or_create_workspace(
 
             // 没有成功打开任何窗口 → 开一个空 workspace 并在那里显示 toast
             if !toast_shown {
-                log::error!(
-                    "All workspace restorations failed. Opening fallback empty workspace."
-                );
+                log::error!("All workspace restorations failed. Opening fallback empty workspace.");
                 cx.update(|cx| {
                     workspace::open_new(
                         Default::default(),
@@ -306,7 +298,8 @@ pub async fn restore_or_create_workspace(
                     app_state.clone(),
                     cx,
                     |workspace, window, cx| {
-                        let restore_on_startup = WorkspaceSettings::get_global(cx).restore_on_startup;
+                        let restore_on_startup =
+                            WorkspaceSettings::get_global(cx).restore_on_startup;
                         match restore_on_startup {
                             RestoreOnStartupBehavior::Launchpad => {}
                             _ => {

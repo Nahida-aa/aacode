@@ -44,7 +44,11 @@ impl AboutWindow {
         let full_version: SharedString = AppVersion::global(cx).to_string().into();
         let version = env!("CARGO_PKG_VERSION");
 
-        let debug = if cfg!(debug_assertions) { "(debug)" } else { "" };
+        let debug = if cfg!(debug_assertions) {
+            "(debug)"
+        } else {
+            ""
+        };
         let message: SharedString = format!("{release_channel_name} {version} {debug}").into();
         let commit = AppCommitSha::try_global(cx)
             .map(|sha| sha.full())
@@ -65,7 +69,10 @@ impl AboutWindow {
     fn copy_details(&self, window: &mut Window, cx: &mut Context<Self>) {
         let content = match self.commit.as_ref() {
             Some(commit) => {
-                format!("{}\nCommit: {}\nVersion: {}", self.message, commit, self.full_version)
+                format!(
+                    "{}\nCommit: {}\nVersion: {}",
+                    self.message, commit, self.full_version
+                )
             }
             None => format!("{}\nVersion: {}", self.message, self.full_version),
         };
@@ -104,12 +111,16 @@ impl Render for AboutWindow {
                         .child(Headline::new(self.message.clone()))
                         .when_some(self.commit.clone(), |this, commit| {
                             this.child(
-                                Label::new("Commit").color(Color::Muted).size(LabelSize::XSmall),
+                                Label::new("Commit")
+                                    .color(Color::Muted)
+                                    .size(LabelSize::XSmall),
                             )
                             .child(Label::new(commit).size(LabelSize::Small))
                         })
                         .child(
-                            Label::new("Version").color(Color::Muted).size(LabelSize::XSmall),
+                            Label::new("Version")
+                                .color(Color::Muted)
+                                .size(LabelSize::XSmall),
                         )
                         .child(Label::new(self.full_version.clone()).size(LabelSize::Small)),
                 )
@@ -162,9 +173,7 @@ impl Render for AboutWindow {
 }
 
 impl Focusable for AboutWindow {
-    fn focus_handle(&self, _cx: &App) -> FocusHandle {
-        self.ok_entry.focus_handle.clone()
-    }
+    fn focus_handle(&self, _cx: &App) -> FocusHandle { self.ok_entry.focus_handle.clone() }
 }
 
 /// 打开（或激活已存在的）About 窗口。
@@ -194,7 +203,7 @@ pub fn open_about_window(cx: &mut App) {
     cx.open_window(
         WindowOptions {
             titlebar: Some(gpui::TitlebarOptions {
-                title: Some("About aacode".into()),
+                title: Some("About AaCode".into()),
                 appears_transparent: true,
                 traffic_light_position: Some(point(px(12.), px(12.))),
             }),

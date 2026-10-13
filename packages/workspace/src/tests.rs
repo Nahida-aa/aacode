@@ -154,3 +154,24 @@ async fn test_share_panel_size_in_dock_is_per_position(cx: &mut TestAppContext) 
 
     set_share_panel_size_in_dock(cx, vec![]);
 }
+/// 端到端确认设置真的从内嵌的 default.json 进了 SettingsContent。
+/// 只在单测里 `update_user_settings` 的话，这条链路（内嵌资产 → 反序列化）
+/// 完全没被覆盖，配置写错位置或键名不对都会静默失效。
+#[test]
+fn test_default_json_provides_share_panel_size_in_dock() {
+    let raw = settings::default_settings();
+    assert!(
+        raw.contains("share_panel_size_in_dock"),
+        "default.json 缺少 share_panel_size_in_dock"
+    );
+
+    // default.json 是 JSONC（带注释），必须走带注释的解析器。
+    let content: settings::SettingsContent =
+        settings::parse_json_with_comments(&raw).expect("default.json 解析失败");
+    let value = content.workspace.share_panel_size_in_dock;
+    assert!(
+        value.is_some(),
+        "default.json 里的 share_panel_size_in_dock 没有解析进 SettingsContent"
+    );
+    println!("share_panel_size_in_dock = {value:?}");
+}

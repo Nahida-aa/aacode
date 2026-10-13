@@ -11,16 +11,19 @@ use workspace::{Panel, Workspace};
 use agent_ui::AgentPanel;
 use collab_ui::collab_panel::CollabPanel;
 use debugger_ui::debugger_panel::DebugPanel;
-use project_panel::ProjectPanel;
-use outline_panel::OutlinePanel;
 use git_ui::git_panel::GitPanel;
+use outline_panel::OutlinePanel;
+use project_panel::ProjectPanel;
 use terminal_view::TerminalPanel;
 
 /// 在 Workspace observe_new 回调里被调用，负责把各 Panel entity 注入 Dock。
 ///
 /// 对齐 Zed `initialize_panels`（crates/zed/src/zed.rs L777）：
 /// 返回 `Task<anyhow::Result<()>>`，调用方通过 `workspace.set_panels_task(task)` 保存。
-pub fn initialize_panels(window: &mut Window, cx: &mut Context<Workspace>) -> Task<anyhow::Result<()>> {
+pub fn initialize_panels(
+    window: &mut Window,
+    cx: &mut Context<Workspace>,
+) -> Task<anyhow::Result<()>> {
     cx.spawn_in(window, async move |workspace_handle, cx| {
         let project_panel = ProjectPanel::load(workspace_handle.clone(), cx.clone());
         let outline_panel = OutlinePanel::load(workspace_handle.clone(), cx.clone());

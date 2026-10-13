@@ -1,4 +1,3 @@
-#![allow(clippy::disallowed_methods, reason = "build scripts are exempt")]
 //! 对齐 Zed `crates/zed/build.rs` 的 `prepare_app_icon_x11`（L242-269）与
 //! `icon_path`（L221-240）。
 //!
@@ -39,7 +38,7 @@ fn prepare_app_icon_x11() {
     // 的那份，两者恰好同源，但 option_env! 更直白地表明「这是编译期决策」。
     // 注意 aacode 已不再有 RELEASE_CHANNEL 文件（改由 lib.rs 里的 "dev" 兜底），
     // 图标与实际频道必须同源，否则会出现「显示 dev 图标却是 stable 行为」的不一致。
-    let channel = option_env!("ZED_RELEASE_CHANNEL")
+    let channel = option_env!("RELEASE_CHANNEL")
         .unwrap_or("dev")
         .trim()
         .to_string();

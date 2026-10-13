@@ -1,6 +1,9 @@
 mod preview;
 mod repl_menu;
 
+use aacode_actions::{
+    agent::AddSelectionToThread, assistant::InlineAssist, outline::ToggleOutline,
+};
 use agent_settings::AgentSettings;
 use editor::actions::{
     AddSelectionAbove, AddSelectionBelow, CodeActionSource, DuplicateLineDown, GoToDiagnostic,
@@ -30,7 +33,6 @@ use workspace::item::ItemBufferKind;
 use workspace::{
     ToolbarItemEvent, ToolbarItemLocation, ToolbarItemView, Workspace, item::ItemHandle,
 };
-use aacode_actions::{agent::AddSelectionToThread, assistant::InlineAssist, outline::ToggleOutline};
 
 const MAX_CODE_ACTION_MENU_LINES: u32 = 16;
 

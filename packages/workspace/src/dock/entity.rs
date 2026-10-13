@@ -594,10 +594,18 @@ impl Dock {
 
             // 先收集再落盘：cx.defer 需要 &mut App，不能在还持有 entry 的可变借用
             // 时调用（与 resize_all_panels 末尾的处理方式一致）。
+            // 先取出 position：下面 active_panel_entry_mut() 借用了整个 self。
+            let position = self.position;
             let mut to_persist = None;
             if let Some(size_state) = inherited
                 && let Some(entry) = self.active_panel_entry_mut()
             {
+                tracing::info!(
+                    ?position,
+                    to_panel = entry.panel.panel_key(),
+                    ?size_state,
+                    "share_panel_size_in_dock: 继承尺寸"
+                );
                 entry.size_state = size_state;
                 entry.panel.size_state_changed(window, cx);
                 to_persist = Some((entry.panel.panel_key(), entry.size_state));
@@ -621,10 +629,17 @@ impl Dock {
     /// 该 dock 是否配置了「切换面板时共享宽度」。仅水平 dock 有效 —— 底部 dock 的
     /// 高度不共享，判定与 `panel_uses_flexible_width` 的轴向条件保持一致。
     fn should_share_panel_size(&self, cx: &App) -> bool {
-        self.position().axis() == Axis::Horizontal
-            && WorkspaceSettings::get_global(cx)
-                .share_panel_size_in_dock
-                .contains(&self.position())
+        let configured = WorkspaceSettings::get_global(cx).share_panel_size_in_dock.clone();
+        let axis_ok = self.position().axis() == Axis::Horizontal;
+        let enabled = axis_ok && configured.contains(&self.position());
+        tracing::info!(
+            position = ?self.position,
+            ?configured,
+            axis_ok,
+            enabled,
+            "should_share_panel_size"
+        );
+        enabled
     }
 
     pub fn visible_panel(&self) -> Option<&Arc<dyn PanelHandle>> {

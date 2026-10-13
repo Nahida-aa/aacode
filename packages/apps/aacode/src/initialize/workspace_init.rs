@@ -16,27 +16,29 @@ pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
     super::pane_toolbar::subscribe_pane_toolbars(cx);
 
     // —— MultiWorkspace observe_new → Sidebar ——
-    cx.observe_new(|multi_workspace: &mut workspace::MultiWorkspace, window, cx| {
-        let Some(window) = window else {
-            return;
-        };
+    cx.observe_new(
+        |multi_workspace: &mut workspace::MultiWorkspace, window, cx| {
+            let Some(window) = window else {
+                return;
+            };
 
-        let window_handle = window.window_handle();
-        let multi_workspace_handle = cx.entity();
+            let window_handle = window.window_handle();
+            let multi_workspace_handle = cx.entity();
 
-        cx.defer(move |cx| {
-            window_handle
-                .update(cx, |_, window, cx| {
-                    let sidebar = cx.new(|cx| {
-                        sidebar::Sidebar::new(multi_workspace_handle.clone(), window, cx)
-                    });
-                    multi_workspace_handle.update(cx, |mw, cx| {
-                        mw.register_sidebar(sidebar, cx);
-                    });
-                })
-                .ok();
-        });
-    })
+            cx.defer(move |cx| {
+                window_handle
+                    .update(cx, |_, window, cx| {
+                        let sidebar = cx.new(|cx| {
+                            sidebar::Sidebar::new(multi_workspace_handle.clone(), window, cx)
+                        });
+                        multi_workspace_handle.update(cx, |mw, cx| {
+                            mw.register_sidebar(sidebar, cx);
+                        });
+                    })
+                    .ok();
+            });
+        },
+    )
     .detach();
 
     // —— Workspace observe_new → StatusBar 按钮 + Dock Panels ——
@@ -91,16 +93,16 @@ pub fn initialize_workspace(app_state: Arc<workspace::AppState>, cx: &mut App) {
                 lsp_button_menu_handle.clone(),
             );
 
-        // 对齐 Zed `crates/zed/src/zed.rs L901-L906` — 注册 AgentPanel 相关 action。
-        // 放在主应用层而不是 agent_ui crate 的 init 里，避免重复注册。
-        workspace
-            .register_action(agent_ui::AgentPanel::toggle_focus)
-            .register_action(agent_ui::AgentPanel::focus)
-            .register_action(agent_ui::AgentPanel::toggle);
+            // 对齐 Zed `crates/zed/src/zed.rs L901-L906` — 注册 AgentPanel 相关 action。
+            // 放在主应用层而不是 agent_ui crate 的 init 里，避免重复注册。
+            workspace
+                .register_action(agent_ui::AgentPanel::toggle_focus)
+                .register_action(agent_ui::AgentPanel::focus)
+                .register_action(agent_ui::AgentPanel::toggle);
 
-        let panels_task = panels::initialize_panels(window, cx);
-        workspace.set_panels_task(panels_task);
-    }
+            let panels_task = panels::initialize_panels(window, cx);
+            workspace.set_panels_task(panels_task);
+        }
     })
     .detach();
 }
@@ -130,11 +132,9 @@ fn register_status_bar_items(
     let diagnostic_summary =
         cx.new(|cx| diagnostics::items::DiagnosticIndicator::new(workspace, cx));
     let active_file_name = cx.new(|_| workspace::active_file_name::ActiveFileName::new());
-    let activity_indicator =
-        activity_indicator::ActivityIndicator::new(workspace, window, cx);
+    let activity_indicator = activity_indicator::ActivityIndicator::new(workspace, window, cx);
     let git_blame_status = cx.new(|_| git_ui::GitBlameStatus::default());
-    let merge_conflict_indicator =
-        cx.new(|cx| git_ui::MergeConflictIndicator::new(workspace, cx));
+    let merge_conflict_indicator = cx.new(|cx| git_ui::MergeConflictIndicator::new(workspace, cx));
 
     // —— Right side ——
     let edit_prediction_ui = cx.new(|cx| {
@@ -152,10 +152,8 @@ fn register_status_bar_items(
         cx.new(|_| language_selector::ActiveBufferLanguage::new(workspace));
     let active_toolchain_language =
         cx.new(|cx| toolchain_selector::ActiveToolchain::new(workspace, window, cx));
-    let line_ending_indicator =
-        cx.new(|_| line_ending_selector::LineEndingIndicator::default());
-    let cursor_position =
-        cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
+    let line_ending_indicator = cx.new(|_| line_ending_selector::LineEndingIndicator::default());
+    let cursor_position = cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
     let image_info = cx.new(|_cx| image_viewer::ImageInfo::new(workspace));
     let vim_mode_indicator = cx.new(|cx| vim::ModeIndicator::new(window, cx));
     let pending_keystrokes_indicator =

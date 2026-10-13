@@ -85,10 +85,7 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
         MenuItem::action("Outline Panel", outline_panel::ToggleFocus),
         MenuItem::action("Collab Panel", collab_ui::collab_panel::ToggleFocus),
         MenuItem::action("Terminal Panel", terminal_view::panel::Toggle),
-        MenuItem::action(
-            "Debugger Panel",
-            aacode_actions::debug_panel::ToggleFocus,
-        ),
+        MenuItem::action("Debugger Panel", aacode_actions::debug_panel::ToggleFocus),
     ];
 
     if !project::DisableAiSettings::get_global(cx).disable_ai {
@@ -105,8 +102,7 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
         MenuItem::separator(),
     ]);
 
-    if release_channel::ReleaseChannel::try_global(cx)
-        == Some(release_channel::ReleaseChannel::Dev)
+    if release_channel::ReleaseChannel::try_global(cx) == Some(release_channel::ReleaseChannel::Dev)
     {
         view_items.push(MenuItem::action(
             "Toggle GPUI Inspector",
@@ -117,19 +113,16 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
 
     vec![
         Menu {
-            name: "aacode".into(),
+            name: "AaCode".into(),
             disabled: false,
             items: vec![
-                MenuItem::action("About aacode", aacode_actions::About),
+                MenuItem::action("About AaCode", aacode_actions::About),
                 MenuItem::action("Check for Updates", auto_update::Check),
                 MenuItem::separator(),
                 MenuItem::submenu(Menu::new("Settings").items([
                     MenuItem::action("Open Settings", aacode_actions::OpenSettings),
                     MenuItem::action("Open Settings File", aacode_actions::OpenSettingsFile),
-                    MenuItem::action(
-                        "Open Project Settings",
-                        aacode_actions::OpenProjectSettings,
-                    ),
+                    MenuItem::action("Open Project Settings", aacode_actions::OpenProjectSettings),
                     // TODO(aacode): Zed 另有 "Open Project Settings File" 与
                     // "Open Default Settings" 两项；aacode 目前没有对应 action，
                     // 等补上后替换下面的占位。
@@ -161,13 +154,13 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                 MenuItem::action("Install CLI", install_cli::InstallCliBinary),
                 MenuItem::separator(),
                 #[cfg(target_os = "macos")]
-                MenuItem::action("Hide aacode", Hide),
+                MenuItem::action("Hide AaCode", Hide),
                 #[cfg(target_os = "macos")]
                 MenuItem::action("Hide Others", HideOthers),
                 #[cfg(target_os = "macos")]
                 MenuItem::action("Show All", ShowAll),
                 MenuItem::separator(),
-                MenuItem::action("Quit aacode", aacode_actions::Quit),
+                MenuItem::action("Quit AaCode", aacode_actions::Quit),
             ],
         },
         Menu {
@@ -321,14 +314,8 @@ pub fn app_menus(cx: &mut App) -> Vec<Menu> {
                     editor::actions::FindAllReferences::default(),
                 ),
                 // aacode 没有 call_hierarchy crate；同名 action 在 aacode_actions 里。
-                MenuItem::action(
-                    "Show Incoming Calls",
-                    aacode_actions::ShowIncomingCalls,
-                ),
-                MenuItem::action(
-                    "Show Outgoing Calls",
-                    aacode_actions::ShowOutgoingCalls,
-                ),
+                MenuItem::action("Show Incoming Calls", aacode_actions::ShowIncomingCalls),
+                MenuItem::action("Show Outgoing Calls", aacode_actions::ShowOutgoingCalls),
                 MenuItem::separator(),
                 MenuItem::action("Next Problem", editor::actions::GoToDiagnostic::default()),
                 MenuItem::action(

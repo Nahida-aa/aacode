@@ -1129,8 +1129,8 @@ pub async fn derive_paths_with_position(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::open_local_workspace;
+    use super::*;
     use cli::CliResponse;
     use editor::Editor;
     use futures::poll;
@@ -1199,7 +1199,7 @@ mod tests {
                 app_state.fs.clone(),
                 prompt_builder,
                 app_state.languages.clone(),
-                true, // is_new_install
+                true,  // is_new_install
                 false, // is_eval
                 cx,
             );
@@ -1238,9 +1238,7 @@ mod tests {
     struct DiscardResponseSink;
 
     impl CliResponseSink for DiscardResponseSink {
-        fn send(&self, _response: CliResponse) -> anyhow::Result<()> {
-            Ok(())
-        }
+        fn send(&self, _response: CliResponse) -> anyhow::Result<()> { Ok(()) }
     }
 
     struct SyncResponseSender(std::sync::mpsc::Sender<CliResponse>);

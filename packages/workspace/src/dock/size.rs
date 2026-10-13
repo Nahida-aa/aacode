@@ -46,5 +46,13 @@ pub(super) fn resize_panel_entry(
         entry.size_state.size = size;
     }
     entry.panel.size_state_changed(window, cx);
+    // debug!：拖拽把手每帧都会走到这里，info 级别会刷屏。
+    tracing::debug!(
+        position = ?position,
+        panel = entry.panel.panel_key(),
+        ?entry.size_state,
+        uses_flexible_width,
+        "resize_panel_entry"
+    );
     (entry.panel.panel_key(), entry.size_state)
 }

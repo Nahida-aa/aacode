@@ -6,7 +6,6 @@ license.workspace = true
 
 [features]
 test-support = [
-
     "editor/test-support",
     "gpui/test-support",
     "workspace/test-support",

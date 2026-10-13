@@ -7,20 +7,20 @@
 //! 之所以要在 `cx.defer` 里创建，是因为 MultiWorkspace::new / Workspace::new 的订阅
 //! 链需要先建立好，再注入子 entity（Sidebar 等）。
 
-use gpui::{App, AppContext, Context, KeyBinding, PromptLevel, Window, TaskExt as _};
+use gpui::{App, AppContext, Context, KeyBinding, PromptLevel, TaskExt as _, Window};
 use gpui_util::ResultExt as _;
-use util::asset_str;
-use workspace::with_active_or_new_workspace;
 use std::borrow::Cow;
 use std::path::Path;
+use util::asset_str;
+use workspace::with_active_or_new_workspace;
 
 use language::Capability;
 use settings::Settings as _;
 use vim_mode_setting::HelixModeSetting;
 use workspace::{MultiWorkspace, Workspace};
 
-pub mod panels;
 pub mod pane_toolbar;
+pub mod panels;
 pub mod workspace_init;
 
 pub use workspace_init::initialize_workspace;
@@ -193,7 +193,9 @@ fn quit(_: &aacode_actions::Quit, cx: &mut App) {
             }
         }
 
-        if !workspace::workspace::core::lifecycle::prepare_windows_to_quit(&workspace_windows, cx).await {
+        if !workspace::workspace::core::lifecycle::prepare_windows_to_quit(&workspace_windows, cx)
+            .await
+        {
             return anyhow::Ok(());
         }
         cx.update(|cx| cx.quit());
@@ -344,7 +346,10 @@ pub fn load_default_keymap(cx: &mut App) {
         cx,
     )
     .unwrap_or_else(|e| {
-        panic!("failed to load built-in keymap {}: {e}", settings::DEFAULT_KEYMAP_PATH)
+        panic!(
+            "failed to load built-in keymap {}: {e}",
+            settings::DEFAULT_KEYMAP_PATH
+        )
     });
     cx.bind_keys(filter_disabled_ai_bindings(default, cx));
 
@@ -365,7 +370,10 @@ pub fn load_default_keymap(cx: &mut App) {
             cx,
         )
         .unwrap_or_else(|e| {
-            panic!("failed to load built-in keymap {}: {e}", settings::VIM_KEYMAP_PATH)
+            panic!(
+                "failed to load built-in keymap {}: {e}",
+                settings::VIM_KEYMAP_PATH
+            )
         });
         cx.bind_keys(filter_disabled_ai_bindings(vim, cx));
     }

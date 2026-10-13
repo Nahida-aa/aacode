@@ -27,12 +27,12 @@ pre-commit:
     #   run: cargo fmt --all
     #   stage_fixed: true
 
-    - name: oxfmt
-      glob: "**/*.{ts,tsx,js,jsx,json,jsonc}"
-      exclude:
-        - "submodule/**"
-      run: bunx oxfmt --write {staged_files}
-      stage_fixed: true
+    # - name: oxfmt
+    #   glob: "**/*.{ts,tsx,js,jsx,json,jsonc}"
+    #   exclude:
+    #     - "submodule/**"
+    #   run: bunx oxfmt --write {staged_files}
+    #   stage_fixed: true
 
 #     - run: yarn eslint {staged_files}
 #       glob: "*.{js,ts,jsx,tsx}"

@@ -255,17 +255,17 @@ export APP_CLI="aacode"
 export APP_ICON="aacode"
 export APP_ARGS="%U"
 if [[ "$channel" == "preview" ]]; then
-  export APP_NAME="AACode Preview"
-  APP_ID="dev.aacode.AACode-Preview"
+  export APP_NAME="AaCode Preview"
+  APP_ID="dev.aa.AaCode-Preview"
 elif [[ "$channel" == "nightly" ]]; then
-  export APP_NAME="AACode Nightly"
-  APP_ID="dev.aacode.AACode-Nightly"
+  export APP_NAME="AaCode Nightly"
+  APP_ID="dev.aa.AaCode-Nightly"
 elif [[ "$channel" == "dev" ]]; then
-  export APP_NAME="AACode Dev"
-  APP_ID="dev.aacode.AACode-Dev"
+  export APP_NAME="AaCode Dev"
+  APP_ID="dev.aa.AaCode-Dev"
 else
-  export APP_NAME="AACode"
-  APP_ID="dev.aacode.AACode"
+  export APP_NAME="AaCode"
+  APP_ID="dev.aa.AaCode"
 fi
 
 mkdir -p "${zed_dir}/share/applications"

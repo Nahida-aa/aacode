@@ -56,9 +56,7 @@ fn address() -> SocketAddr {
 }
 
 #[cfg(unix)]
-fn get_uid_as_u32(uid: &sysinfo::Uid) -> u32 {
-    *uid.clone()
-}
+fn get_uid_as_u32(uid: &sysinfo::Uid) -> u32 { *uid.clone() }
 
 #[cfg(windows)]
 fn get_uid_as_u32(uid: &sysinfo::Uid) -> u32 {

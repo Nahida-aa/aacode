@@ -10,14 +10,12 @@
 //! - Sidebar / TitleBar / Panels 全由 `observe_new` 自动注入。
 
 use clap::Parser;
-use std::io;
 use futures::{FutureExt as _, StreamExt as _, channel::oneshot};
-use gpui::{
-    App, AppContext, SharedString, Task, WindowDecorations, px, size,
-};
-use gpui_platform::application;
 use git::GitHostingProviderRegistry;
+use gpui::{App, AppContext, SharedString, Task, WindowDecorations, px, size};
+use gpui_platform::application;
 use settings::Settings as _;
+use std::io;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 use std::time::Instant;
@@ -111,8 +109,8 @@ fn main() {
     // 通过 `cargo:rustc-env` 注入（对齐 zed crates/zed/build.rs L70-73）；
     // GITHUB_RUN_NUMBER 只有 CI 才有，本地不注入，故本地版本号不含 build id。
     let build_id = option_env!("ZED_BUILD_ID");
-    let app_commit_sha =
-        option_env!("ZED_COMMIT_SHA").map(|sha| release_channel::AppCommitSha::new(sha.to_string()));
+    let app_commit_sha = option_env!("ZED_COMMIT_SHA")
+        .map(|sha| release_channel::AppCommitSha::new(sha.to_string()));
     let app_version = release_channel::AppVersion::load(
         env!("CARGO_PKG_VERSION"),
         build_id,
@@ -145,8 +143,7 @@ fn main() {
 
     // git_hosting_providers::init 会读 GlobalGitHostingProviderRegistry 全局，
     // 必须在 app.run 之前把 registry 造好。对齐 Zed main.rs L423。
-    let git_hosting_provider_registry =
-        Arc::new(GitHostingProviderRegistry::new());
+    let git_hosting_provider_registry = Arc::new(GitHostingProviderRegistry::new());
 
     // —— app.run 外层：db / fs / session（不依赖 gpui App）——
     let app = application()
@@ -166,8 +163,7 @@ fn main() {
     // 无它则 `--new` / desktop 的 [Desktop Action NewWorkspace] 全部无效
     // （open_listener 里 listen_for_cli_connections / handle_cli_connection 此前
     // 都只有定义、没有调用点）。
-    let (open_listener, mut open_rx) =
-        aacode::core::open_listener::OpenListener::new();
+    let (open_listener, mut open_rx) = aacode::core::open_listener::OpenListener::new();
 
     // single-instance 检查：listen 失败说明已有实例占着 socket。对齐 Zed L360-368。
     // windows/macos 的 handle_single_instance 依赖各自平台模块，aacode 未移植，
@@ -179,10 +175,7 @@ fn main() {
     } else {
         #[cfg(any(target_os = "linux", target_os = "freebsd"))]
         {
-            aacode::core::open_listener::listen_for_cli_connections(
-                open_listener.clone(),
-            )
-            .is_err()
+            aacode::core::open_listener::listen_for_cli_connections(open_listener.clone()).is_err()
         }
         #[cfg(target_os = "windows")]
         {
@@ -474,7 +467,7 @@ fn main() {
                     window_background: cx.theme().window_background_appearance(),
                     titlebar: Some(gpui::TitlebarOptions {
                         appears_transparent: true,
-                        title: Some(SharedString::from("aacode")),
+                        title: Some(SharedString::from("AaCode")),
                         ..Default::default()
                     }),
                     // Linux/FreeBSD 下设置 X11 窗口图标（_NET_WM_ICON）。由 build.rs 的
@@ -515,11 +508,7 @@ fn main() {
         // 整页空白（settings_ui/src/pages/llm_providers_page.rs:31），且不报错。
         // 依赖 app_state 已构造完成：user_store / client 都取自 app_state，与 Zed
         // 的 `app_state.user_store.clone()` / `app_state.client.clone()` 一致。
-        language_models::init(
-            app_state.user_store.clone(),
-            app_state.client.clone(),
-            cx,
-        );
+        language_models::init(app_state.user_store.clone(), app_state.client.clone(), cx);
         // copilot_ui 注册 Copilot 面板与相关 action。对齐 Zed main.rs L693。
         // copilot_chat 必须排在 copilot_ui 之前：后者要读 GlobalCopilotChat 全局。
         // 对齐 Zed main.rs L678-L691。credentials_provider 在 aacode 对应
@@ -670,18 +659,13 @@ fn main() {
         // 结果每次启动都是全新空窗口、上次的项目与窗口布局全丢。
         // Zed 是三分支：启动参数里有 focus-only 请求 → 恢复；带其他请求 → 交
         // handle_open_request；没有请求 → 恢复。
-        let restore_task = match open_rx
-            .try_recv()
-            .ok()
-            .and_then(|request| {
-                aacode::core::open_listener::OpenRequest::parse(request, cx).log_err()
-            }) {
+        let restore_task = match open_rx.try_recv().ok().and_then(|request| {
+            aacode::core::open_listener::OpenRequest::parse(request, cx).log_err()
+        }) {
             Some(request) if request.is_focus_app_only() => cx.spawn({
                 let app_state = app_state.clone();
                 async move |cx| {
-                    if let Err(e) = aacode::core::restore_or_create_workspace(app_state, cx)
-                        .await
-                    {
+                    if let Err(e) = aacode::core::restore_or_create_workspace(app_state, cx).await {
                         aacode::core::fail_to_open_window_async(e, cx);
                     }
                 }
@@ -693,9 +677,7 @@ fn main() {
             None => cx.spawn({
                 let app_state = app_state.clone();
                 async move |cx| {
-                    if let Err(e) = aacode::core::restore_or_create_workspace(app_state, cx)
-                        .await
-                    {
+                    if let Err(e) = aacode::core::restore_or_create_workspace(app_state, cx).await {
                         aacode::core::fail_to_open_window_async(e, cx);
                     }
                 }
@@ -707,11 +689,12 @@ fn main() {
         // macOS 冷启动的 `aacode <path>` 会因看不到已恢复的窗口而多开一个（zed#61346）。
         let (first_window_tx, first_window_rx) = oneshot::channel::<()>();
         let first_window_tx = std::rc::Rc::new(std::cell::RefCell::new(Some(first_window_tx)));
-        let _first_window_subscription = cx.observe_new::<workspace::MultiWorkspace>(move |_, _, _| {
-            if let Some(tx) = first_window_tx.borrow_mut().take() {
-                tx.send(()).ok();
-            }
-        });
+        let _first_window_subscription =
+            cx.observe_new::<workspace::MultiWorkspace>(move |_, _, _| {
+                if let Some(tx) = first_window_tx.borrow_mut().take() {
+                    tx.send(()).ok();
+                }
+            });
         let restore_finished = cx.background_spawn(restore_task).shared();
         cx.spawn({
             let restore_finished = restore_finished.clone();
@@ -764,7 +747,11 @@ fn main() {
                 tracing::info!("active_window: {}", cx.active_window().is_some());
                 for (i, window) in cx.windows().iter().enumerate() {
                     let downcast = window.downcast::<workspace::MultiWorkspace>();
-                    tracing::info!("  window[{}] downcast:<MultiWorkspace>={}", i, downcast.is_some());
+                    tracing::info!(
+                        "  window[{}] downcast:<MultiWorkspace>={}",
+                        i,
+                        downcast.is_some()
+                    );
                     if let Some(handle) = downcast {
                         let read_result = handle.read(cx);
                         tracing::info!("  window[{}] .read() is_ok={}", i, read_result.is_ok());
@@ -779,7 +766,11 @@ fn main() {
                 tracing::info!("active_window: {}", cx.active_window().is_some());
                 for (i, window) in cx.windows().iter().enumerate() {
                     let downcast = window.downcast::<workspace::MultiWorkspace>();
-                    tracing::info!("  window[{}] downcast:<MultiWorkspace>={}", i, downcast.is_some());
+                    tracing::info!(
+                        "  window[{}] downcast:<MultiWorkspace>={}",
+                        i,
+                        downcast.is_some()
+                    );
                     if let Some(handle) = downcast {
                         let read_result = handle.read(cx);
                         tracing::info!("  window[{}] .read() is_ok={}", i, read_result.is_ok());

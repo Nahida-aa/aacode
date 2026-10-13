@@ -48,7 +48,7 @@ pub use submission::*;
 use task::{Shell, ShellBuilder};
 pub use terminal::*;
 use text::Bias;
-use ui::App;
+use gpui::App;
 use util::markdown::{MarkdownCodeBlock, MarkdownEscaped};
 use util::path_list::PathList;
 use util::{
