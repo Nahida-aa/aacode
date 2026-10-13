@@ -181,7 +181,7 @@ mod tests {
     use super::*;
 
     fn registry_with_bundled() -> ThemeRegistry {
-        let registry = ThemeRegistry::new(Box::new(aa_gpui_kit_assets::Assets));
+        let registry = ThemeRegistry::new(Box::new(aa_assets_gpui::GpuiAssets));
         load_bundled_themes(&registry);
         registry
     }

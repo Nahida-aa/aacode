@@ -601,7 +601,8 @@ aa_gpui_fuzzy = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24
 # match_strings_async / StringMatch.string: SharedString）。成员包二选一，
 # 不能同时写 aa_gpui_fuzzy 和 fuzzy_nucleo（同一 crate 两个名字 → Cargo 报错）。
 fuzzy_nucleo = { package = "aa_gpui_fuzzy", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
-aa_gpui_kit_assets = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
+aa_assets_core = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
+aa_assets_gpui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_gpui_kit_theme = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_gpui_kit_ui = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 # zed 里这两个控件包就叫 `ui` / `ui_input`，同样用别名对齐，
@@ -802,7 +803,8 @@ system_specs = { path = "/home/aa/repos/ai_ls/AAgent/packages/system_specs" }
 # 「找不到刚加的符号」（如 `unresolved import theme::ClientDecorationsExt`），
 # 症状很像代码没写。同源要求见下面 ui_input 那条注释。
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
-aa_gpui_kit_assets = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/assets" }
+aa_assets_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_assets/aa_assets_core" }
+aa_assets_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_assets/aa_assets_gpui" }
 aa_gpui_kit_theme = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/theme" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
@@ -829,10 +831,10 @@ aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_set
 #   · dev（root_relative = "assets"）→ 从 git 根找 → 命中 ✅ 所以 cargo run 一直正常
 #   · release（crate_relative = "../../assets"）→ 相对 crate 的 Cargo.toml 目录解析，
 #     该 crate 在 packages/zed/zed_settings/，两级只回到 packages/，指向
-#     packages/assets —— 那是 aa_gpui_kit_assets 的 crate 目录（只有 src/ 和
-#     Cargo.toml，没有任何 settings 文件）→ 内嵌了空目录 → asset_str 拿不到文件。
-# 对照：aa_gpui_kit_assets 在 packages/assets/，两级正好落到仓库根 assets/，所以
-# 它用 "../../assets" 是对的 —— 不能照抄，得按各 crate 的实际层级数。
+#     packages/ 下的某个 crate 目录（只有 src/ 和 Cargo.toml，没有任何 settings
+#     文件）→ 内嵌了空目录 → asset_str 拿不到文件。
+# 不能照抄别的 crate 的层级数：资源 crate 现在在
+# packages/aa/aa_assets/aa_assets_core/，要四级才回到仓库根。
 # 本地版已改为 ../../../assets。
 zed_settings = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_settings" }
 aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/settings_content" }

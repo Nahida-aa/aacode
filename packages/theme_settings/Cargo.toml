@@ -31,4 +31,4 @@ tracing.workspace = true
 gpui = { workspace = true, features = ["test-support"] }
 settings = { workspace = true, features = ["test-support"] }
 # 测试里用真实资产源装载内嵌的主题 JSON。
-aa_gpui_kit_assets = { workspace = true }
+aa_assets_gpui = { workspace = true }

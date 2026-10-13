@@ -79,7 +79,11 @@ agent_ui = { workspace = true, features = ["audio"] }
 anyhow.workspace = true
 askpass.workspace = true
 assets.workspace = true
-aa_gpui_kit_assets.workspace = true # 与 assets 不同, 遇到相关问题 需要讨论
+# gpui 的 AssetSource 视图（newtype，见 aa_assets_gpui 头部注释）。
+aa_assets_gpui.workspace = true
+# asset_str! 只能作用在 RustEmbed 派生的类型上，也就是 core 那一层，
+# 所以 licenses.md 这类直接取内嵌文件的调用需要单独依赖它。
+aa_assets_core.workspace = true
 audio.workspace = true
 auto_update.workspace = true
 breadcrumbs.workspace = true

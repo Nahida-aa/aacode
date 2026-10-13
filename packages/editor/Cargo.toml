@@ -25,7 +25,7 @@ test-support = [
 [dependencies]
 aho-corasick.workspace = true
 anyhow.workspace = true
-aa_gpui_kit_assets.workspace = true
+aa_assets_gpui.workspace = true
 base64.workspace = true
 breadcrumbs.workspace = true
 client.workspace = true

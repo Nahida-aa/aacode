@@ -54,7 +54,7 @@ impl EditorLspTestContext {
         let app_state = cx.update(AppState::test);
 
         cx.update(|cx| {
-            aa_gpui_kit_assets::Assets.load_test_fonts(cx);
+            aa_assets_gpui::GpuiAssets.load_test_fonts(cx);
             crate::init(cx);
             workspace::init(app_state.clone(), cx);
         });

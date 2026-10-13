@@ -147,7 +147,7 @@ fn main() {
 
     // —— app.run 外层：db / fs / session（不依赖 gpui App）——
     let app = application()
-        .with_assets(aa_gpui_kit_assets::Assets)
+        .with_assets(aa_assets_gpui::GpuiAssets)
         .with_restart_arguments(restart_arguments);
     let app_db = db::AppDatabase::new();
     let fs = fs::RealFs::new(None, app.background_executor());
@@ -203,7 +203,7 @@ fn main() {
     app.run(move |cx: &mut App| {
         cx.set_global(app_db);
 
-        aa_gpui_kit_assets::Assets
+        aa_assets_gpui::GpuiAssets
             .load_fonts(cx)
             .expect("failed to load embedded fonts");
 
@@ -231,7 +231,7 @@ fn main() {
         // 传资产源：theme_settings 据此装载内嵌的 `themes/**/*.json`
         // （内置 Catppuccin 主题 —— 语法高亮的 102 个 capture 都来自那份 JSON）。
         theme_settings::init(
-            theme::LoadThemes::All(Box::new(aa_gpui_kit_assets::Assets)),
+            theme::LoadThemes::All(Box::new(aa_assets_gpui::GpuiAssets)),
             cx,
         );
         editor::init(cx);

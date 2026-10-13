@@ -91,7 +91,7 @@ pub fn init(cx: &mut App) {
         with_active_or_new_workspace(cx, |workspace, window, cx| {
             open_bundled_file(
                 workspace,
-                asset_str::<aa_gpui_kit_assets::Assets>("licenses.md"),
+                asset_str::<aa_assets_core::Assets>("licenses.md"),
                 "Open Source License Attribution",
                 "Markdown",
                 window,
