@@ -803,9 +803,9 @@ system_specs = { path = "/home/aa/repos/ai_ls/AAgent/packages/system_specs" }
 # 「找不到刚加的符号」（如 `unresolved import theme::ClientDecorationsExt`），
 # 症状很像代码没写。同源要求见下面 ui_input 那条注释。
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
-aa_assets_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_assets/aa_assets_core" }
-aa_assets_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_assets/aa_assets_gpui" }
-aa_theme_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_theme/aa_theme_gpui" }
+aa_assets_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/assets/aa_assets_core" }
+aa_assets_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/assets/aa_assets_gpui" }
+aa_theme_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/theme/aa_theme_gpui" }
 aa_gpui_kit_ui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui" }
 aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
 # clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样走本地。

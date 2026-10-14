@@ -10455,20 +10455,28 @@ dependencies = [
 name = "markdown"
 version = "0.1.0"
 dependencies = [
+ "aa_gpui_kit_fs",
  "aa_gpui_kit_mermaid_render",
  "aa_gpui_kit_ui",
  "aa_theme_gpui",
  "aa_util",
  "anyhow",
+ "assets",
  "base64 0.22.1",
  "collections",
+ "env_logger 0.11.11",
  "gpui",
+ "gpui_platform",
  "gpui_util",
  "html5ever",
+ "image",
+ "indoc",
  "language",
+ "languages",
  "linkify",
  "log",
  "markup5ever_rcdom",
+ "node_runtime",
  "pulldown-cmark",
  "refineable",
  "smallvec",
@@ -17379,6 +17387,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
+ "uuid",
  "zed_settings",
 ]
 

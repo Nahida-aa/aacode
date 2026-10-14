@@ -593,7 +593,10 @@ mod tests {
     fn register_test_themes(cx: &mut TestAppContext) {
         cx.update(|cx| {
             let registry = ThemeRegistry::global(cx);
-            let base_theme = registry.get("One Dark").unwrap();
+            // JustBase 下注册表只有兜底家族（Catppuccin Macchiato / Latte），
+            // 没有 "One Dark"——那要 LoadThemes::All 装资产 JSON 才有。
+            // 这里取深色兜底当克隆基底。
+            let base_theme = registry.get("Catppuccin Macchiato").unwrap();
 
             let mut test_light = (*base_theme).clone();
             test_light.id = "test-light".to_string();
