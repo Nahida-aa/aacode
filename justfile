@@ -104,7 +104,9 @@ install:
     export ZED_RELEASE_CHANNEL="{{_channel}}" CARGO_BUILD_WARNINGS=allow
     export RUSTFLAGS="-C link-arg=-fuse-ld=lld"
 
-    out="packages/apps/aacode/target/aa-bundle/pkgbuild"
+    # 输出在 workspace 根的 target/ 下（workspace 成员的 target 由根决定，
+    # crate 目录下的 target/ cargo 不用），按 bin 名分目录
+    out="target/aa-bundle/pkgbuild/aacode"
     rm -rf "$out"
     aa-bundle --format pkgbuild -p packages/apps/aacode \
       --bundle-meta "Cargo.toml#[package, metadata, bundle-stable]" \
