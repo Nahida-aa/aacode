@@ -106,6 +106,17 @@ impl fmt::Debug for TerminalBackendEvent {
         }
     }
 }
+
+/// 终端输出后端与前台 [`Terminal`] 之间通道上的消息类型：上游 zed #57483
+/// 把这些 backend-neutral 的事件类型从 alacritty 里拆了出来。
+///
+/// 刻意的单变体 enum：将来要加新消息种类，加变体即可，通道签名不用动。
+///
+/// `u64` 是事件产生时的输出代（upstream #64976 “authoritative terminal display
+/// updates”）。[`Terminal::process_pty_event`] 会丢弃 generation 与终端当前
+/// `output_generation` 不一致的事件——防止在整体替换显示输出
+/// （[`Terminal::replace_display_output`]，ACP 驱动的终端用）之前
+/// 已在通道里积压的陈旧事件污染新画面。本地 pty 后端永远发 generation 0。
 pub enum PtyEvent {
     Event(TerminalBackendEvent, u64),
 }
