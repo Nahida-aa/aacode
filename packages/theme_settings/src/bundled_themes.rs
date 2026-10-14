@@ -66,7 +66,8 @@ pub fn refine_theme_family(theme_family_content: ThemeFamilyContent) -> ThemeFam
     let themes = theme_family_content.themes.iter().map(refine_theme).collect();
 
     ThemeFamily {
-        id: name.clone(),
+        // 对齐 zed `theme_settings.rs:274`。
+        id: uuid::Uuid::new_v4().to_string(),
         name,
         author,
         themes,
@@ -124,7 +125,8 @@ pub fn refine_theme(theme: &ThemeContent) -> Theme {
     let syntax = Arc::new(SyntaxTheme::new(syntax_overrides(&theme.style)));
 
     Theme {
-        id: theme.name.clone(),
+        // 对齐 zed `theme_settings.rs:358`：id 是随机 uuid，不是主题名。
+        id: uuid::Uuid::new_v4().to_string(),
         name: theme.name.clone().into(),
         appearance,
         styles: ThemeStyles {
@@ -187,6 +189,40 @@ mod tests {
         let registry = ThemeRegistry::new(Box::new(aa_assets_gpui::GpuiAssets));
         load_bundled_themes(&registry);
         registry
+    }
+
+    /// id 必须是随机 uuid 而非主题名（对齐 zed theme_settings.rs:274/358）。
+    /// 若改回用名字，同名的两个主题就会拿到同一个 id，等于按名字静默去重。
+    #[test]
+    fn theme_ids_are_unique_uuids_not_names() {
+        let theme = ThemeContent {
+            name: "Same Name".to_string(),
+            appearance: theme::AppearanceContent::Dark,
+            style: Default::default(),
+        };
+        let a = refine_theme(&theme);
+        let b = refine_theme(&theme);
+        assert_ne!(a.id, b.id, "id 应每次随机，不能等于主题名");
+        assert_ne!(a.id, "Same Name");
+
+        let family = refine_theme_family(ThemeFamilyContent {
+            name: "Fam".to_string(),
+            author: "author".to_string(),
+            themes: vec![theme],
+        });
+        assert_ne!(family.id, "Fam");
+    }
+
+    /// name 才是 theme_overrides 的查找键（apply_theme_overrides 用
+    /// `theme_overrides.get(theme.name)`），必须仍是 ThemeContent.name。
+    #[test]
+    fn theme_name_stays_the_content_name() {
+        let theme = refine_theme(&ThemeContent {
+            name: "Aa Macchiato".to_string(),
+            appearance: theme::AppearanceContent::Dark,
+            style: Default::default(),
+        });
+        assert_eq!(theme.name.as_ref(), "Aa Macchiato");
     }
 
     #[test]
