@@ -13,7 +13,10 @@ use crate::{PtyEvent, TerminalBounds, alacritty::pty::window_size_from_terminal_
 use super::AlacrittyTermLock;
 
 #[derive(Clone)]
-pub(crate) struct ZedListener(pub(crate) UnboundedSender<PtyEvent>);
+pub(crate) struct ZedListener {
+    pub(super) sender: UnboundedSender<PtyEvent>,
+    pub(super) generation: u64,
+}
 
 #[derive(Clone, Debug)]
 pub(crate) struct AlacrittySearch {
