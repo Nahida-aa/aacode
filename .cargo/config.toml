@@ -28,3 +28,10 @@ ar = "/home/aa/Android/Sdk/ndk/29.0.13846066/toolchains/llvm/prebuilt/linux-x86_
 rustflags = [
   "-C", "link-arg=-fuse-ld=lld",
 ]
+
+# native Linux 也用 lld 链接（与 .cargo/bundle-config.toml 的 cfg(target_os="linux")
+# 段同键：bundle 时后者覆盖本段并额外带上 rpath，属预期）。
+# 背景：release 产物 target/release/aacode 达 4.5 GB（debuginfo 未用 split-debuginfo
+# 分离），GNU ld 链接又慢又吃内存；lld 明显更快、更省内存。
+[target.'cfg(target_os = "linux")']
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]

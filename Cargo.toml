@@ -1029,3 +1029,13 @@ inherits = "release"
 debug = "full"
 lto = false
 codegen-units = 16
+
+# 【新增】本地日用的快速 release：opt-level 仍为 3（继承 release），但关掉 debuginfo、
+# 放开 codegen-units。release 的 cgu=1 对全 workspace 生效，是构建慢的主因；这里用
+# 产物质量换构建速度，本地自用无感，打包分发仍走 [profile.release] 不动。
+# 用法：cargo build -p aacode --profile release-quick（产物在 target/release-quick/）
+[profile.release-quick]
+inherits = "release"
+debug = false
+lto = false
+codegen-units = 16
