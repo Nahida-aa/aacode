@@ -48,9 +48,7 @@ impl From<(String, bool, Match)> for HyperlinkMatch {
 }
 
 impl Default for RegexSearches {
-    fn default() -> Self {
-        Self::new(Vec::<String>::new(), Duration::ZERO)
-    }
+    fn default() -> Self { Self::new(Vec::<String>::new(), Duration::ZERO) }
 }
 
 impl RegexSearches {
@@ -1393,7 +1391,7 @@ mod tests {
         /// (defaults to `3, longest_line_cells / 2, longest_line_cells + 1;`)
         ///
         macro_rules! test_file_iri {
-            ($file_iri:literal) => { { test_hyperlink!(concat!("‹«👉", $file_iri, "»›"); FileIri) } };
+            ($file_iri:literal) => {{ test_hyperlink!(concat!("‹«👉", $file_iri, "»›"); FileIri) }};
         }
 
         #[cfg(not(target_os = "windows"))]
@@ -1458,7 +1456,7 @@ mod tests {
         /// (defaults to `3, longest_line_cells / 2, longest_line_cells + 1;`)
         ///
         macro_rules! test_iri {
-            ($iri:literal) => { { test_hyperlink!(concat!("‹«👉", $iri, "»›"); Iri) } };
+            ($iri:literal) => {{ test_hyperlink!(concat!("‹«👉", $iri, "»›"); Iri) }};
         }
 
         #[test]

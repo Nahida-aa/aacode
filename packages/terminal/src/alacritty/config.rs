@@ -4,7 +4,7 @@ use alacritty_terminal::{
     vte::ansi::{CursorShape as AlacCursorShape, CursorStyle as AlacCursorStyle},
 };
 
-use super::AlacrittyTermConfig;
+use super::{AlacrittyTermConfig, AlacrittyTermLock};
 
 pub(crate) fn display_only_term_config(
     scrolling_history: usize,
@@ -36,6 +36,10 @@ pub(crate) fn set_default_cursor_style(
     cursor_shape: SettingsCursorShape,
 ) {
     config.default_cursor_style = alacritty_cursor_style(cursor_shape);
+}
+
+pub(crate) fn apply_config(term: &AlacrittyTermLock, config: &AlacrittyTermConfig) {
+    term.lock().set_options(config.clone());
 }
 
 fn alacritty_cursor_style(cursor_shape: SettingsCursorShape) -> AlacCursorStyle {

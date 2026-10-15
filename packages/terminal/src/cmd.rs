@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::path::PathBuf;
 
 pub(super) fn normalize_path_command_name(command: &str) -> Option<String> {
     const MAX_COMMAND_NAME_LENGTH: usize = 64;

@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use std::{fmt::Display, path::PathBuf};
 use thiserror::Error;
+
 #[derive(Error, Debug)]
 pub struct TerminalError {
     pub directory: Option<PathBuf>,

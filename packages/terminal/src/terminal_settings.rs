@@ -7,13 +7,13 @@ use collections::HashMap;
 use gpui::{FontFallbacks, FontFeatures, FontWeight, Pixels};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
-use settings::{IntoGpui as _};
+use settings::IntoGpui as _;
 pub use settings_content::AlternateScroll;
-pub use settings_content::{PathHyperlinkRegex,
-    FontFamilyName, ShowScrollbar, TerminalBell, TerminalBlink, TerminalDockPosition,
-    TerminalLineHeight, VenvSettings, WorkingDirectory,
-};
 use settings_content::MergeFrom as _;
+pub use settings_content::{
+    FontFamilyName, PathHyperlinkRegex, ShowScrollbar, TerminalBell, TerminalBlink,
+    TerminalDockPosition, TerminalLineHeight, VenvSettings, WorkingDirectory,
+};
 use settings_macros::RegisterSetting;
 use util::shell::Shell;
 

@@ -7,15 +7,15 @@ use std::{
 
 use crate::{
     alacritty::HyperlinkMatch,
-    bounds::TerminalBounds,
-    cursor::Point,
-    selection::{Scroll, Selection, ViMotion},
+    types::bounds::TerminalBounds,
+    types::point::Point,
+    types::scroll::{Scroll, ViMotion},
+    types::selection::Selection,
 };
 use alacritty_terminal::vte::ansi::Rgb;
 use gpui::{
-    App, AppContext as _, BackgroundExecutor, Bounds, ClipboardItem, Context, EventEmitter, Hsla,
-    Keystroke, Modifiers, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels,
-    Point as GpuiPoint, Rgba, ScrollWheelEvent, Size, Task, TouchPhase, Window, actions, black, px,
+    AppContext as _, EventEmitter, Pixels,
+    Point as GpuiPoint,
 };
 
 ///Upward flowing events, for changing the title and such

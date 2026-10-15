@@ -1,18 +1,13 @@
 use alacritty_terminal::{
-    grid::{Dimensions as _, Grid, Row, Scroll as AlacScroll},
-    index::{Column, Line, Point as AlacPoint},
-    term::{
-        Term,
-        cell::{Cell as AlacCell, Flags},
-    },
+    grid::{Dimensions as _, Grid},
+    index::{Column, Point as AlacPoint},
+    term::{Term, cell::Cell as AlacCell},
 };
 
-use crate::{
-    Content, GridLinesChange, HoveredWord, Point, Range, cell::IndexedCell, cursor::Cursor,
-};
+use crate::{Content, Cursor, GridLinesChange, HoveredWord, IndexedCell, Point, Range};
 
-use super::conversions::*;
-use super::types::ZedListener;
+use super::convert::*;
+use super::event::ZedListener;
 
 pub(crate) fn make_content(term: &Term<ZedListener>, last_content: &Content) -> Content {
     let content = term.renderable_content();
@@ -121,4 +116,19 @@ fn adjusted_last_hovered_word(
     };
 
     (hovered_word, grid_lines_change)
+}
+
+pub(crate) fn content_text(term: &Term<ZedListener>) -> String {
+    let start = AlacPoint::new(term.topmost_line(), Column(0));
+    let end = AlacPoint::new(term.bottommost_line(), term.last_column());
+    term.bounds_to_string(start, end)
+}
+
+pub(crate) fn total_lines(term: &Term<ZedListener>) -> usize { term.total_lines() }
+
+pub(crate) fn screen_lines(term: &Term<ZedListener>) -> usize { term.screen_lines() }
+pub(crate) fn full_content_range(term: &Term<ZedListener>) -> Range {
+    let start = AlacPoint::new(term.topmost_line(), Column(0));
+    let end = AlacPoint::new(term.bottommost_line(), term.last_column());
+    Range::from_alacritty(start..=end)
 }
