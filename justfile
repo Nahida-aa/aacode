@@ -70,7 +70,8 @@ icons:
 # 二进制/图标 + envsubst 渲染 .desktop + 刷桌面数据库）。现在这些全在
 # aa-bundle 里（packages/apps/aa-bundle，装在 ~/.cargo/bin/aa-bundle）：
 # - .desktop 由 aa-bundle 按 cargo-bundle 的方式自动生成，不需模板
-# - 身份/图标/依赖来自 Cargo.toml 的 [package.metadata.bundle-stable]
+# - 身份/图标/依赖来自 Cargo.toml 的 [package.metadata.bundle-shared]（各 channel
+#   共享）+ [package.metadata.bundle-stable]（本 channel 差异），两层分层合并
 # - 卸载变成 pacman -R aacode，不再需要 script/uninstall.sh
 #
 # 安装前确保 aa-bundle 可用（gpui_learn 侧改过 aa-bundle 后要重跑才生效，
@@ -109,6 +110,7 @@ install:
     out="target/aa-bundle/pkgbuild/aacode"
     rm -rf "$out"
     aa-bundle --format pkgbuild -p packages/apps/aacode \
+      --bundle-meta "Cargo.toml#[package, metadata, bundle-shared]" \
       --bundle-meta "Cargo.toml#[package, metadata, bundle-stable]" \
       --out "$out"
     # strip 由 PKGBUILD 的 options=(strip)（Arch 默认）负责，与旧实现一致

@@ -300,53 +300,39 @@ search = { workspace = true, features = ["test-support"] }
 repl = { workspace = true, features = ["test-support"] }
 
 
+# 各 channel 共享的 bundle 设置：只写一份。channel 表（下）只留自己的差异，
+# 打包时两个引用分层合并（后者覆盖前者）——见 aa-bundle 的 --bundle-meta。
+[package.metadata.bundle-shared]
+category = "Developer Tool"
+
+[package.metadata.bundle-shared.linux]
+mime_types = ["text/plain", "application/x-zerosize", "x-scheme-handler/aacode"]
+
+[package.metadata.bundle-shared.osx]
+minimum_system_version = "10.15.7"
+info_plist_exts = ["resources/info/*"]
+url_schemes = ["aacode"]
+
 [package.metadata.bundle-dev]
 icon = ["resources/app-icon-dev@2x.png", "resources/app-icon-dev.png"]
 identifier = "dev.aa.AaCode-Dev"
 name = "AaCode Dev"
-category = "Developer Tool"
-
-[package.metadata.bundle-dev.osx]
-minimum_system_version = "10.15.7"
-info_plist_exts = ["resources/info/*"]
-url_schemes = ["aacode"]
 
 [package.metadata.bundle-nightly]
 icon = ["resources/app-icon-nightly@2x.png", "resources/app-icon-nightly.png"]
 identifier = "dev.aa.AaCode-Nightly"
 name = "AaCode Nightly"
-category = "Developer Tool"
-
-[package.metadata.bundle-nightly.osx]
-minimum_system_version = "10.15.7"
-info_plist_exts = ["resources/info/*"]
-url_schemes = ["aacode"]
 
 [package.metadata.bundle-preview]
 icon = ["resources/app-icon-preview@2x.png", "resources/app-icon-preview.png"]
 identifier = "dev.aa.AaCode-Preview"
 name = "AaCode Preview"
-category = "Developer Tool"
-
-[package.metadata.bundle-preview.osx]
-minimum_system_version = "10.15.7"
-info_plist_exts = ["resources/info/*"]
-url_schemes = ["aacode"]
 
 [package.metadata.bundle-stable]
 icon = ["resources/app-icon@2x.png", "resources/app-icon.png"]
 identifier = "dev.aa.AaCode"
 name = "AaCode"
-category = "Developer Tool"
 desktop_template = "./resources/aacode.desktop.in"
-
-[package.metadata.bundle-stable.linux]
-mime_types = ["text/plain", "application/x-zerosize", "x-scheme-handler/aacode"]
-
-[package.metadata.bundle-stable.osx]
-minimum_system_version = "10.15.7"
-info_plist_exts = ["resources/info/*"]
-url_schemes = ["aacode"]
 
 [package.metadata.cargo-shear]
 ignored = ["profiling", "tracing"]
