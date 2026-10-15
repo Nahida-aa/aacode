@@ -9,10 +9,10 @@ StartupNotify=$DO_STARTUP_NOTIFY
 Exec=$APP_CLI $APP_ARGS
 Icon=$APP_ICON
 Categories=Utility;TextEditor;Development;IDE;
-Keywords=aacode;editor;code;ide;
+Keywords=agent;editor;code;ide;
 # 刻意不加 inode/directory：Arch 上有报告加了会被系统当成默认文件浏览器
 # （zed#39076）。要「以本应用打开目录」时手动加。
-MimeType=text/plain;application/x-zerosize;
+MimeType=text/plain;application/x-zerosize;x-scheme-handler/aacode;
 Actions=NewWorkspace;
 
 [Desktop Action NewWorkspace]
