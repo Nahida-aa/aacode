@@ -14,6 +14,10 @@ pub(crate) struct ZedListener {
     pub(super) generation: u64,
 }
 
+// Alacritty's `Term` holds this listener (its `event_proxy` field) and calls
+// `send_event` on it whenever something happens in the emulator — the method
+// name is from the sender's (Term's) perspective; the listener itself is a
+// passive sink, mirroring `vte::ansi::Handler::input`.
 impl EventListener for ZedListener {
     fn send_event(&self, event: AlacTermEvent) {
         self.sender

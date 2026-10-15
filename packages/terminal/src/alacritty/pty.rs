@@ -1,4 +1,4 @@
-use super::event::ZedListener;
+use super::listener::ZedListener;
 use super::geometry;
 use super::{AlacrittyPty, AlacrittyTermLock};
 use crate::{PtyEvent, TerminalBounds};

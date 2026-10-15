@@ -7,7 +7,7 @@ use alacritty_terminal::{
     },
 };
 
-use super::event::ZedListener;
+use super::listener::ZedListener;
 
 pub(crate) fn last_non_empty_lines(term: &Term<ZedListener>, line_count: usize) -> Vec<String> {
     let grid = term.grid();

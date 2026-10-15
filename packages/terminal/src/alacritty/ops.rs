@@ -17,7 +17,7 @@ use crate::{
 };
 
 use super::convert::*;
-use super::event::ZedListener;
+use super::listener::ZedListener;
 use super::types::{AlacrittyTermConfig, AlacrittyTermLock};
 use crate::{PtyEvent, TerminalBounds};
 

@@ -11,7 +11,7 @@ use util::paths::PathStyle;
 use crate::{Point, Range, Search};
 
 use super::AlacrittyTerm;
-use super::event::ZedListener;
+use super::listener::ZedListener;
 use super::hyperlinks::{HyperlinkMatch, RegexSearches};
 
 #[derive(Clone, Debug)]

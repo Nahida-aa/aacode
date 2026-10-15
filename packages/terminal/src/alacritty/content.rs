@@ -7,7 +7,7 @@ use alacritty_terminal::{
 use crate::{Content, Cursor, GridLinesChange, HoveredWord, IndexedCell, Point, Range};
 
 use super::convert::*;
-use super::event::ZedListener;
+use super::listener::ZedListener;
 
 pub(crate) fn make_content(term: &Term<ZedListener>, last_content: &Content) -> Content {
     let content = term.renderable_content();

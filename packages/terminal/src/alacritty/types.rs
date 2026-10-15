@@ -8,7 +8,7 @@ use alacritty_terminal::{
     tty,
 };
 
-use super::event::ZedListener;
+use super::listener::ZedListener;
 
 pub(crate) type AlacrittyPty = tty::Pty;
 pub(crate) type AlacrittyTerm = Term<ZedListener>;
