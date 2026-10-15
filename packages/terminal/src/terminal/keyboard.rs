@@ -5,9 +5,7 @@ use crate::{
     types::scroll::{Scroll, ViMotion},
     types::selection::{Selection, SelectionSide, SelectionType},
 };
-use gpui::{
-    Context, Keystroke, Modifiers, Point as GpuiPoint, Window,
-};
+use gpui::{Context, Keystroke, Modifiers, Point as GpuiPoint, Window};
 use std::borrow::Cow;
 
 use super::Terminal;

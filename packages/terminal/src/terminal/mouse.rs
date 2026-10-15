@@ -1,4 +1,3 @@
-
 use crate::constants::SELECTION_DRAG_THRESHOLD;
 use crate::{
     MouseInputMode, TerminalBounds,

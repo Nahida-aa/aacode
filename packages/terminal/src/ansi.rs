@@ -116,7 +116,6 @@ impl Handler for PlainAnsiTextHandler {
     }
 }
 
-
 pub type AnsiSpans = Vec<(StdRange<usize>, Option<Color>)>;
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]

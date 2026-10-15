@@ -5,7 +5,6 @@ use crate::alacritty::{AlacrittyCell, AlacrittyGridIterator, AlacrittyHyperlink}
 
 use super::point::Point;
 
-
 #[derive(Default, Debug, Clone, Eq, PartialEq)]
 pub struct Cell {
     pub(crate) cell: AlacrittyCell,

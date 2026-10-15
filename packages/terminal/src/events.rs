@@ -13,10 +13,7 @@ use crate::{
     types::selection::Selection,
 };
 use alacritty_terminal::vte::ansi::Rgb;
-use gpui::{
-    AppContext as _, EventEmitter, Pixels,
-    Point as GpuiPoint,
-};
+use gpui::{AppContext as _, EventEmitter, Pixels, Point as GpuiPoint};
 
 ///Upward flowing events, for changing the title and such
 #[derive(Clone, Debug, PartialEq, Eq)]

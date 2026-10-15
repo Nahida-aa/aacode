@@ -57,7 +57,6 @@ pub enum GridLinesChange {
     Changed,
 }
 
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct HoveredWord {
     pub word: String,

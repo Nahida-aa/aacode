@@ -1,27 +1,25 @@
+use crate::CopyTemplate;
+use crate::MAX_SCROLL_HISTORY_LINES;
+use crate::TerminalBounds;
+use crate::TerminalError;
+use crate::alacritty::RegexSearches;
 #[cfg(not(windows))]
 use crate::alacritty::{
     current_child_signal_mask, display_only_term_config, new_term, open_pty, pty_options,
     pty_term_config, spawn_event_loop,
 };
-use crate::types::bounds::normalize_terminal_bounds;
-use crate::types::content::Content;
+use crate::constants::DEFAULT_SCROLL_HISTORY_LINES;
 use crate::events::TerminalBackendEvent;
 use crate::headless::HeadlessTerminal;
-use crate::terminal::task::{TerminalMode, TerminalModeKind};
 use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
-use crate::types::selection::SelectionPhase;
-use crate::terminal::subprocess::spawn_task_subprocess;
-use crate::terminal_settings::{
-    AlternateScroll, CursorShape as SettingsCursorShape,
-};
-use crate::alacritty::RegexSearches;
 use crate::terminal::cwd::CwdHistoryEntry;
 use crate::terminal::pty::{PtyResources, TerminalType};
-use crate::CopyTemplate;
-use crate::MAX_SCROLL_HISTORY_LINES;
-use crate::constants::DEFAULT_SCROLL_HISTORY_LINES;
-use crate::TerminalBounds;
-use crate::TerminalError;
+use crate::terminal::subprocess::spawn_task_subprocess;
+use crate::terminal::task::{TerminalMode, TerminalModeKind};
+use crate::terminal_settings::{AlternateScroll, CursorShape as SettingsCursorShape};
+use crate::types::bounds::normalize_terminal_bounds;
+use crate::types::content::Content;
+use crate::types::selection::SelectionPhase;
 use crate::{Terminal, events::PtyEvent};
 use anyhow::{Context as _, Result, bail};
 use collections::{HashMap, VecDeque};
@@ -41,9 +39,6 @@ pub struct TerminalBuilder {
     terminal: Terminal,
     events_rx: UnboundedReceiver<PtyEvent>,
 }
-
-
-
 
 impl TerminalBuilder {
     pub fn new_display_only(

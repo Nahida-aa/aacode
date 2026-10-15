@@ -1,27 +1,18 @@
 use std::time::Instant;
 
-
 use crate::alacritty::HyperlinkMatch;
 use crate::constants::{FIND_HYPERLINK_THROTTLE, FIND_HYPERLINK_THROTTLE_PX};
 use crate::{
-    events::{
-        Event, InternalEvent, MaybeNavigationTarget, PathLikeTarget,
-    },
+    events::{Event, InternalEvent, MaybeNavigationTarget, PathLikeTarget},
     types::content::HoveredWord,
     types::point::{Point, Range},
     types::selection::SelectionPhase,
 };
-use gpui::{
-    Context, Modifiers, Pixels, Point as GpuiPoint,
-    Window,
-}; // 如果 process_hyperlink 在另一个文件
-
+use gpui::{Context, Modifiers, Pixels, Point as GpuiPoint, Window}; // 如果 process_hyperlink 在另一个文件
 
 use super::Terminal;
 
-
 use crate::alacritty::find_from_terminal_point;
-
 
 impl Terminal {
     pub(crate) fn process_hyperlink(

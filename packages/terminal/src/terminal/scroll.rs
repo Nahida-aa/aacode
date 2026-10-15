@@ -1,11 +1,6 @@
-
 use crate::alacritty::shrink_to_used;
 use crate::types::bounds::normalize_terminal_bounds;
-use crate::{
-    TerminalBounds,
-    events::InternalEvent,
-    types::scroll::Scroll,
-};
+use crate::{TerminalBounds, events::InternalEvent, types::scroll::Scroll};
 
 use super::Terminal;
 

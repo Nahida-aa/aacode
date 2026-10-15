@@ -1,5 +1,3 @@
-
-
 #[derive(Clone, Copy, Debug)]
 pub enum Scroll {
     Delta(i32),

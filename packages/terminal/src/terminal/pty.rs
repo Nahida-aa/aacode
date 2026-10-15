@@ -1,19 +1,15 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use crate::alacritty::{apply_config, set_default_cursor_style, PtySender};
+use crate::alacritty::{PtySender, apply_config, set_default_cursor_style};
 use crate::cmd::foreground_process_command_from_argv;
 use crate::pty_info::PtyProcessInfo;
 use crate::terminal_settings::CursorShape as SettingsCursorShape;
 
 use crate::pty_info::ProcessIdGetter;
- // 如果 process_hyperlink 在另一个文件
+// 如果 process_hyperlink 在另一个文件
 
-
-use super::{ Terminal, }; // task_summary 在 task.rs
-
-
-
+use super::Terminal; // task_summary 在 task.rs
 
 /// Separates retained PTY process metadata from resources needed only while
 /// the terminal is live.
@@ -29,7 +25,6 @@ pub(crate) enum TerminalType {
     },
     DisplayOnly,
 }
-
 
 impl Terminal {
     pub fn is_pty(&self) -> bool { matches!(self.terminal_type, TerminalType::Pty { .. }) }

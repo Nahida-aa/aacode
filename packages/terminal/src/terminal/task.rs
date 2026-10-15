@@ -3,20 +3,14 @@ use async_channel::{Receiver, Sender};
 use std::os::unix::process::ExitStatusExt;
 use std::process::ExitStatus;
 
-
 use crate::events::Event;
-use gpui::{
-    App, Context,
-    Task,
-};
+use gpui::{App, Context, Task};
 use task::{HideStrategy, SpawnInTerminal};
-
 
 use super::Terminal;
 use super::pty::TerminalType;
 
 use crate::alacritty::append_text_to_term;
-
 
 pub enum TerminalModeKind {
     Interactive,

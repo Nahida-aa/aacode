@@ -2,7 +2,6 @@ use crate::alacritty::AlacrittySearch;
 
 use super::point::{Point, Range};
 
-
 #[derive(Clone, Debug)]
 pub struct Search {
     pub(crate) search: AlacrittySearch,

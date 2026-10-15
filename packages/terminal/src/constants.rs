@@ -1,5 +1,5 @@
 use gpui::{Pixels, px};
-use std::time::{Duration, };
+use std::time::Duration;
 
 pub(crate) const DEBUG_TERMINAL_WIDTH: Pixels = px(500.);
 pub(crate) const DEBUG_TERMINAL_HEIGHT: Pixels = px(30.);

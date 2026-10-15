@@ -1,21 +1,14 @@
-
 use alacritty_terminal::grid::Dimensions as _;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 
-use crate::alacritty::{new_term, RegexSearches};
+use crate::alacritty::{RegexSearches, new_term};
 use crate::events::{Event, InternalEvent};
 use crate::terminal::pty::{PtyResources, TerminalType};
 use crate::terminal::subprocess::convert_lf_to_crlf;
-use crate::types::{
-    content::Content,
-    scroll::Scroll,
-    selection::SelectionPhase,
-};
-use vte::ansi::{Processor, StdSyncHandler};
-use gpui::{
-    px, Context,
-};
+use crate::types::{content::Content, scroll::Scroll, selection::SelectionPhase};
+use gpui::{Context, px};
 use std::borrow::Cow;
+use vte::ansi::{Processor, StdSyncHandler};
 
 use super::Terminal;
 
