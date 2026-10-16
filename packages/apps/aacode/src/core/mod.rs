@@ -37,9 +37,14 @@ use std::sync::Arc;
 use anyhow::Result;
 use db::kvp::KeyValueStore;
 use editor::Editor;
-use gpui::{App, AsyncApp, TaskExt};
+use gpui::{Action as _, App, AppContext as _, AsyncApp, DismissEvent, TaskExt, UpdateGlobal as _};
+use migrate::{MigrationEvent, MigrationNotification, MigrationType};
 use onboarding::{FIRST_OPEN, show_onboarding_view};
 use settings::Settings as _;
+use settings::{InvalidSettingsError, MigrationStatus, SettingsFile, SettingsStore};
+use ui::IconName;
+use workspace::notifications::simple_message_notification::MessageNotification;
+use workspace::notifications::{dismiss_app_notification, show_app_notification};
 use workspace::{
     AppState, RestoreOnStartupBehavior, SerializedWorkspaceLocation, SessionWorkspace, Toast,
     WorkspaceSettings, notifications::NotificationId,
@@ -443,4 +448,110 @@ pub fn parse_url_arg(arg: &str, cx: &App) -> String {
             }
         }
     }
+}
+
+// ---------------------------------------------------------------------------
+// 设置文件加载 / 监听。对齐 Zed `crates/zed/src/zed.rs:1916`（notify_settings_errors）、
+// `crates/zed/src/zed.rs:2110`（watch_settings_files）。
+// ---------------------------------------------------------------------------
+
+/// 解析 / 迁移设置文件失败时弹出通知。对齐 Zed `crates/zed/src/zed.rs:1916`。
+fn notify_settings_errors(result: settings::SettingsParseResult, is_user: bool, cx: &mut App) {
+    if let settings::ParseStatus::Failed { error: err } = &result.parse_status {
+        let settings_type = if is_user { "user" } else { "global" };
+        log::error!("Failed to load {} settings: {err}", settings_type);
+    }
+
+    let error = match result.parse_status {
+        settings::ParseStatus::Failed { error } => Some(anyhow::format_err!(error)),
+        settings::ParseStatus::Success => None,
+        settings::ParseStatus::Unchanged => return,
+    };
+    let id = NotificationId::Named(format!("failed-to-parse-settings-{is_user}").into());
+
+    let showed_parse_error = match error {
+        Some(error) => {
+            if let Some(InvalidSettingsError::LocalSettings { .. }) =
+                error.downcast_ref::<InvalidSettingsError>()
+            {
+                false
+                // Local settings errors are displayed by the projects
+            } else {
+                show_app_notification(id, cx, move |cx| {
+                    cx.new(|cx| {
+                        MessageNotification::new(format!("Invalid user settings file\n{error}"), cx)
+                            .primary_message("Open Settings File")
+                            .primary_icon(IconName::Settings)
+                            .primary_on_click(|window, cx| {
+                                window.dispatch_action(
+                                    aacode_actions::OpenSettingsFile.boxed_clone(),
+                                    cx,
+                                );
+                                cx.emit(DismissEvent);
+                            })
+                    })
+                });
+                true
+            }
+        }
+        None => {
+            dismiss_app_notification(&id, cx);
+            false
+        }
+    };
+    let id = NotificationId::Named(format!("failed-to-migrate-settings-{is_user}").into());
+
+    match result.migration_status {
+        settings::MigrationStatus::Succeeded | settings::MigrationStatus::NotNeeded => {
+            dismiss_app_notification(&id, cx);
+        }
+        settings::MigrationStatus::Failed { error: err } => {
+            if !showed_parse_error {
+                show_app_notification(id, cx, move |cx| {
+                    cx.new(|cx| {
+                        MessageNotification::new(format!("Failed to migrate settings\n{err}"), cx)
+                            .primary_message("Open Settings File")
+                            .primary_icon(IconName::Settings)
+                            .primary_on_click(|window, cx| {
+                                window.dispatch_action(
+                                    aacode_actions::OpenSettingsFile.boxed_clone(),
+                                    cx,
+                                );
+                                cx.emit(DismissEvent);
+                            })
+                    })
+                });
+            }
+        }
+    };
+}
+
+/// 读入并持续监听用户 / 全局设置文件。对齐 Zed `crates/zed/src/zed.rs:2110`。
+///
+/// 这是设置文件真正被**读进内存**的唯一入口:调用 `SettingsStore::watch_settings_files`,
+/// 后者同步读一遍 `paths::settings_file()`(`~/.config/zed/settings.json`)与
+/// `paths::global_settings_file()`,再交给后台任务监听后续变更。
+///
+/// 缺了这一步,`settings::init` 只注册设置类型、不加载任何用户设置,于是
+/// `~/.config/zed/settings.json` 里的内容(auto_update、theme、proxy 等)全部
+/// 失效、一律回落到内建默认值 —— 例如 `auto_update` 默认 `true`,用户写 `false`
+/// 也照样自动更新。见 .agents/zed-modifications.md。
+pub fn watch_settings_files(fs: Arc<dyn fs::Fs>, cx: &mut App) {
+    MigrationNotification::set_global(cx.new(|_| MigrationNotification), cx);
+
+    SettingsStore::update_global(cx, move |store, cx| {
+        store.watch_settings_files(fs, cx, |settings_file, result, cx| {
+            let is_user = matches!(settings_file, SettingsFile::User);
+            let migrating_in_memory = matches!(&result.migration_status, MigrationStatus::Succeeded);
+            notify_settings_errors(result, is_user, cx);
+            if let Some(notifier) = MigrationNotification::try_global(cx) {
+                notifier.update(cx, |_, cx| {
+                    cx.emit(MigrationEvent::ContentChanged {
+                        migration_type: MigrationType::Settings,
+                        migrating_in_memory,
+                    });
+                });
+            }
+        });
+    });
 }

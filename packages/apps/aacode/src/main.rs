@@ -248,6 +248,11 @@ fn main() {
             release_channel::AppCommitSha::set_global(app_commit_sha, cx);
         }
         settings::init(cx);
+        // 读入并监听用户/全局设置文件（~/.config/zed/settings.json + global_settings.json）。
+        // 对齐 Zed main.rs L499 的 `zed::watch_settings_files(fs.clone(), cx)`。
+        // 缺这一步，settings::init 之后没有任何人加载用户设置文件 —— auto_update、
+        // theme、proxy 等全部静默回落到内建默认值。
+        aacode::core::watch_settings_files(fs.clone(), cx);
         // 绑定内置默认快捷键（default-<os>.json + base_keymap + vim）。
         // 必须在 settings::init 之后——它要读 BaseKeymap 全局。
         // 缺这步的话应用里一个默认快捷键都没有：backspace / ctrl-a / ctrl-s
