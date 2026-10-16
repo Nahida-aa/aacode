@@ -118,6 +118,38 @@ install:
     command -v kbuildsycoca6 >/dev/null && kbuildsycoca6 || true
     echo "已通过 pacman 安装 aacode（查询：pacman -Ql aacode）"
 
+# 安装**已编好**的 release-quick 产物，不重编 release（省掉 cgu=1 的整轮编译）。
+#
+# 与 install 的唯一区别：给 aa-bundle 传 `--profile release-quick` —— 生成的
+# PKGBUILD 里 build() 变成 `cargo build --profile release-quick -p aacode`，
+# package() 取 target/release-quick/aacode。build() 命中增量缓存时等于只打包安装。
+#
+# 注意：ZED_RELEASE_CHANNEL=stable 与裸 `cargo build`（dev channel）不同指纹，
+# 所以第一次 install-quick 会重编 release_channel 及其下游（依赖本身仍有缓存），
+# 之后同参数即命中。想要第一次就全命中，可先
+#   ZED_RELEASE_CHANNEL=stable cargo build -p aacode --profile release-quick
+#
+# 依赖支持 --profile 的 aa-bundle（改过后要 `just -C ~/repos/ide_ls/gpui_learn install-cli`）。
+install-quick:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # 与 install 相同的构建环境（万一 build() 真需要重编，得用对配置）。
+    # 不再 export RUSTFLAGS=-fuse-ld=lld —— native Linux 的 lld 已在
+    # .cargo/config.toml 里，且这样与裸 release-quick 构建的同参数缓存一致。
+    export LK_CUSTOM_WEBRTC="$HOME/.cache/aacode/webrtc/webrtc-0001d84-4-linux-x64-release"
+    export ZED_RELEASE_CHANNEL="{{_channel}}" CARGO_BUILD_WARNINGS=allow
+
+    out="target/aa-bundle/pkgbuild/aacode"
+    rm -rf "$out"
+    aa-bundle --format pkgbuild -p packages/apps/aacode \
+      --profile release-quick \
+      --bundle-meta "Cargo.toml#[package, metadata, bundle-shared]" \
+      --bundle-meta "Cargo.toml#[package, metadata, bundle-stable]" \
+      --out "$out"
+    (cd "$out" && makepkg -sif --noconfirm)
+    command -v kbuildsycoca6 >/dev/null && kbuildsycoca6 || true
+    echo "已通过 pacman 安装 aacode（release-quick 产物）（查询：pacman -Ql aacode）"
+
 # 卸载：交给 pacman。包内文件（二进制/图标/.desktop）由包管理器记录，
 # 不再需要手写 rm + 刷桌面数据库——那套 script/uninstall.sh 可以删了。
 # 数据目录 ~/.local/share/... 不在包里，pacman 不会动它（与旧实现一致）。
