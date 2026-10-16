@@ -18,7 +18,7 @@ use std::{io, path::PathBuf};
 #[cfg(target_os = "windows")]
 use windows::Win32::{Foundation::HANDLE, System::Threading::GetProcessId};
 
-use crate::pty_info::ProcessIdGetter;
+use crate::pty::info::ProcessIdGetter;
 
 pub(crate) struct PtySender {
     pub(super) notifier: Notifier,

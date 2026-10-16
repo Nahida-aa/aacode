@@ -3,14 +3,16 @@ use anyhow::{Result, bail};
 
 use crate::alacritty::{RegexSearches, new_term};
 use crate::events::{Event, InternalEvent};
-use crate::terminal::pty::{PtyResources, TerminalType};
-use crate::terminal::subprocess::convert_lf_to_crlf;
-use crate::types::{content::Content, scroll::Scroll, selection::SelectionPhase};
+use crate::grid::content::content::Content;
+use crate::input::scroll::Scroll;
+use crate::input::selection::SelectionPhase;
+use crate::pty::ops::{PtyResources, TerminalType};
+use crate::pty::process::subprocess::convert_lf_to_crlf;
 use gpui::{Context, px};
 use std::borrow::Cow;
 use vte::ansi::{Processor, StdSyncHandler};
 
-use super::Terminal;
+use crate::pty::Terminal;
 
 impl Terminal {
     pub fn input(&mut self, input: impl Into<Cow<'static, [u8]>>) {

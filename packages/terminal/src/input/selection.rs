@@ -1,9 +1,56 @@
 use crate::alacritty::full_content_range;
 use crate::events::InternalEvent;
-use crate::types::point::Range;
-use crate::types::selection::Selection;
+use crate::grid::geometry::point::{Point, Range};
+use crate::pty::Terminal;
 
-use super::Terminal;
+#[derive(Clone, Debug)]
+pub struct Selection {
+    pub(crate) ty: SelectionType,
+    pub(crate) start: SelectionAnchor,
+    pub(crate) end: SelectionAnchor,
+    pub(crate) head: Point,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct SelectionAnchor {
+    pub(crate) point: Point,
+    pub(crate) side: SelectionSide,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SelectionSide {
+    Left,
+    Right,
+}
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum SelectionType {
+    Simple,
+    Semantic,
+    Lines,
+}
+
+impl Selection {
+    pub(crate) fn new(selection_type: SelectionType, point: Point, side: SelectionSide) -> Self {
+        let anchor = SelectionAnchor { point, side };
+        Self {
+            ty: selection_type,
+            start: anchor,
+            end: anchor,
+            head: point,
+        }
+    }
+
+    pub(crate) fn simple_range(range: Range) -> Self {
+        let mut selection = Self::new(SelectionType::Simple, range.start(), SelectionSide::Left);
+        selection.update(range.end(), SelectionSide::Right);
+        selection
+    }
+
+    fn update(&mut self, point: Point, side: SelectionSide) {
+        self.end = SelectionAnchor { point, side };
+        self.head = point;
+    }
+}
 
 impl Terminal {
     pub fn activate_match(&mut self, index: usize) {
@@ -46,4 +93,10 @@ impl Terminal {
     pub fn copy(&mut self, keep_selection: Option<bool>) {
         self.events.push_back(InternalEvent::Copy(keep_selection));
     }
+}
+
+#[derive(PartialEq, Eq)]
+pub enum SelectionPhase {
+    Selecting,
+    Ended,
 }

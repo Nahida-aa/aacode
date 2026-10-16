@@ -13,11 +13,11 @@ use crate::alacritty::{
 use crate::events::{Event, InternalEvent, PtyEvent, TerminalBackendEvent};
 use crate::mappings::colors::to_vte_rgb;
 use crate::mappings::mouse::{grid_point, grid_point_and_side};
-use crate::terminal::Terminal;
-use crate::terminal::colors::get_color_at_index;
-use crate::terminal::pty::{PtyResources, TerminalType};
+use crate::pty::Terminal;
+use crate::grid::colors::get_color_at_index;
+use crate::pty::ops::{PtyResources, TerminalType};
 use crate::terminal_settings::TerminalSettings;
-use crate::types::bounds::normalize_terminal_bounds;
+use crate::grid::geometry::bounds::normalize_terminal_bounds;
 
 impl Terminal {
     pub(crate) fn process_pty_event(&mut self, event: PtyEvent, cx: &mut Context<Self>) {

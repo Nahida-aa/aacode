@@ -1,39 +1,42 @@
 pub mod builder;
-pub mod colors;
 pub mod content;
 pub mod cwd;
-pub mod hyperlink;
-pub mod init_command;
-pub mod input;
-pub mod keyboard;
-pub mod mouse;
+pub mod info;
+pub mod ops;
 pub mod process;
-pub mod process_name;
-pub mod pty;
-pub mod scroll;
-pub mod selection;
-pub mod subprocess;
 pub mod task;
-pub mod title;
 
 use async_channel::Sender;
 use gpui::{BackgroundExecutor, Pixels, Point as GpuiPoint, Task};
-use std::{collections::VecDeque, process::ExitStatus, sync::Arc, time::Instant};
+use std::{collections::VecDeque, process::ExitStatus, sync::Arc, time::{Duration, Instant}};
+use util::shell::Shell;
 use vte::ansi::{Processor, StdSyncHandler};
 
 use crate::alacritty::{AlacrittyTermConfig, AlacrittyTermLock, HyperlinkMatch, RegexSearches};
 use crate::events::{InternalEvent, PtyEvent};
-use crate::types::{
-    content::Content,
-    point::{Point, Range},
-    selection::{SelectionPhase, SelectionSide},
-};
-use crate::{CopyTemplate, terminal::task::TaskState};
+use crate::grid::content::content::Content;
+use crate::grid::geometry::point::{Point, Range};
+use crate::input::selection::{SelectionPhase, SelectionSide};
+use crate::pty::task::TaskState;
+use crate::terminal_settings::{AlternateScroll, CursorShape as SettingsCursorShape};
+use collections::HashMap;
 use util::paths::PathStyle;
 
 use cwd::CwdHistoryEntry;
-use pty::TerminalType;
-use subprocess::SubprocessHandle;
+use ops::TerminalType;
+use process::subprocess::SubprocessHandle;
+
+/// Everything needed to spawn a fresh terminal with the same configuration.
+pub(crate) struct CopyTemplate {
+    pub(crate) shell: Shell,
+    pub(crate) env: HashMap<String, String>,
+    pub(crate) cursor_shape: SettingsCursorShape,
+    pub(crate) alternate_scroll: AlternateScroll,
+    pub(crate) max_scroll_history_lines: Option<usize>,
+    pub(crate) path_hyperlink_regexes: Vec<String>,
+    pub(crate) path_hyperlink_timeout: Duration,
+    pub(crate) window_id: u64,
+}
 
 pub struct Terminal {
     pub(crate) terminal_type: TerminalType,

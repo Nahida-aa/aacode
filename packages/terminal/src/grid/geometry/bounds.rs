@@ -1,11 +1,7 @@
-use std::cmp;
+use std::cmp::{self, min};
 
-use gpui::{Bounds, Pixels, Size};
+use gpui::{Bounds, Pixels, Point as GpuiPoint, Size, px};
 use serde::{Deserialize, Serialize};
-
-use crate::constants::{
-    DEBUG_CELL_WIDTH, DEBUG_LINE_HEIGHT, DEBUG_TERMINAL_HEIGHT, DEBUG_TERMINAL_WIDTH,
-};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TerminalBounds {
@@ -66,3 +62,19 @@ pub(crate) fn normalize_terminal_bounds(mut bounds: TerminalBounds) -> TerminalB
     bounds.bounds.size.width = cmp::max(bounds.cell_width, bounds.width());
     bounds
 }
+
+pub(crate) fn content_index_for_mouse(
+    pos: GpuiPoint<Pixels>,
+    terminal_bounds: &TerminalBounds,
+) -> usize {
+    let col = (pos.x / terminal_bounds.cell_width()).round() as usize;
+    let clamped_col = min(col, terminal_bounds.num_columns().saturating_sub(1));
+    let row = (pos.y / terminal_bounds.line_height()).round() as usize;
+    let clamped_row = min(row, terminal_bounds.num_lines().saturating_sub(1));
+    clamped_row * terminal_bounds.num_columns() + clamped_col
+}
+
+pub(crate) const DEBUG_TERMINAL_WIDTH: Pixels = px(500.);
+pub(crate) const DEBUG_TERMINAL_HEIGHT: Pixels = px(30.);
+pub(crate) const DEBUG_CELL_WIDTH: Pixels = px(5.);
+pub(crate) const DEBUG_LINE_HEIGHT: Pixels = px(5.);

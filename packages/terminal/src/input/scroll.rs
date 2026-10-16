@@ -1,54 +1,105 @@
-use crate::mappings::keys::to_esc_str;
-use crate::{
-    events::InternalEvent,
-    types::modes::Modes,
-    types::scroll::{Scroll, ViMotion},
-    types::selection::{Selection, SelectionSide, SelectionType},
-};
-use gpui::{Context, Keystroke, Modifiers, Point as GpuiPoint, Window};
 use std::borrow::Cow;
 
-use super::Terminal;
+use crate::alacritty::shrink_to_used;
+use crate::grid::geometry::bounds::normalize_terminal_bounds;
+use crate::input::selection::{Selection, SelectionSide, SelectionType};
+use crate::pty::Terminal;
+use crate::{TerminalBounds, events::InternalEvent};
+use gpui::{Keystroke, Point as GpuiPoint};
+
+#[derive(Clone, Copy, Debug)]
+pub enum Scroll {
+    Delta(i32),
+    PageUp,
+    PageDown,
+    Top,
+    Bottom,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ViMotion {
+    Up,
+    Down,
+    Left,
+    Right,
+    First,
+    Last,
+    FirstOccupied,
+    High,
+    Middle,
+    Low,
+    WordLeft,
+    WordRight,
+    WordRightEnd,
+    Bracket,
+    ParagraphUp,
+    ParagraphDown,
+}
 
 impl Terminal {
-    pub fn try_keystroke(&mut self, keystroke: &Keystroke, option_as_meta: bool) -> bool {
-        if self.vi_mode_enabled {
-            self.vi_motion(keystroke);
-            return true;
+    pub fn scroll_line_up(&mut self) {
+        self.events
+            .push_back(InternalEvent::Scroll(Scroll::Delta(1)));
+    }
+
+    pub fn scroll_up_by(&mut self, lines: usize) {
+        self.events
+            .push_back(InternalEvent::Scroll(Scroll::Delta(lines as i32)));
+    }
+
+    pub fn scroll_line_down(&mut self) {
+        self.events
+            .push_back(InternalEvent::Scroll(Scroll::Delta(-1)));
+    }
+
+    pub fn scroll_down_by(&mut self, lines: usize) {
+        self.events
+            .push_back(InternalEvent::Scroll(Scroll::Delta(-(lines as i32))));
+    }
+
+    pub fn scroll_page_up(&mut self) {
+        self.events.push_back(InternalEvent::Scroll(Scroll::PageUp));
+    }
+
+    pub fn scroll_page_down(&mut self) {
+        self.events
+            .push_back(InternalEvent::Scroll(Scroll::PageDown));
+    }
+
+    pub fn scroll_to_top(&mut self) { self.events.push_back(InternalEvent::Scroll(Scroll::Top)); }
+
+    pub fn scroll_to_bottom(&mut self) {
+        self.events.push_back(InternalEvent::Scroll(Scroll::Bottom));
+    }
+    ///Resize the terminal and the PTY.
+    pub fn set_size(&mut self, new_bounds: TerminalBounds) {
+        let new_bounds = normalize_terminal_bounds(new_bounds);
+
+        let old_bounds = self.last_content.terminal_bounds;
+        self.last_content.terminal_bounds = new_bounds;
+
+        // Avoid spamming PTY resizes on pixel-level size changes (e.g. while dragging edges),
+        // since those can generate excessive SIGWINCH/reflows and cause visible flicker.
+        let requires_resize = old_bounds.num_lines() != new_bounds.num_lines()
+            || old_bounds.num_columns() != new_bounds.num_columns()
+            || old_bounds.cell_width != new_bounds.cell_width
+            || old_bounds.line_height != new_bounds.line_height;
+
+        if !requires_resize {
+            return;
         }
 
-        // Keep default terminal behavior
-        let esc = to_esc_str(keystroke, self.last_content.mode, option_as_meta);
-        if let Some(esc) = esc {
-            match esc {
-                Cow::Borrowed(string) => self.input(string.as_bytes()),
-                Cow::Owned(string) => self.input(string.into_bytes()),
-            };
-            true
-        } else {
-            false
+        match self.events.back_mut() {
+            Some(InternalEvent::Resize(pending_bounds)) => *pending_bounds = new_bounds,
+            _ => self.events.push_back(InternalEvent::Resize(new_bounds)),
         }
     }
+    pub fn scrolled_to_top(&self) -> bool { self.last_content.scrolled_to_top }
+    pub fn scrolled_to_bottom(&self) -> bool { self.last_content.scrolled_to_bottom }
 
-    pub fn try_modifiers_change(
-        &mut self,
-        modifiers: &Modifiers,
-        window: &Window,
-        cx: &mut Context<Self>,
-    ) {
-        self.schedule_find_hyperlink(*modifiers, window.mouse_position(), cx);
-    }
+    pub fn clear(&mut self) { self.events.push_back(InternalEvent::Clear) }
 
-    ///Paste text into the terminal
-    pub fn paste(&mut self, text: &str) {
-        let paste_text = if self.last_content.mode.contains(Modes::BRACKETED_PASTE) {
-            format!("{}{}{}", "\x1b[200~", text.replace('\x1b', ""), "\x1b[201~")
-        } else {
-            text.replace("\r\n", "\r").replace('\n', "\r")
-        };
-
-        self.input(paste_text.into_bytes());
-    }
+    pub fn shrink_to_used(&mut self) { shrink_to_used(&mut self.term.lock()); }
 
     pub fn vi_mode_enabled(&self) -> bool { self.vi_mode_enabled }
 
@@ -150,18 +201,6 @@ impl Terminal {
                 self.toggle_vi_mode();
             }
             _ => {}
-        }
-    }
-
-    pub fn focus_in(&self) {
-        if self.last_content.mode.contains(Modes::FOCUS_IN_OUT) {
-            self.write_to_pty("\x1b[I".as_bytes());
-        }
-    }
-
-    pub fn focus_out(&mut self) {
-        if self.last_content.mode.contains(Modes::FOCUS_IN_OUT) {
-            self.write_to_pty("\x1b[O".as_bytes());
         }
     }
 }

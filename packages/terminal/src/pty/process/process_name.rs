@@ -33,7 +33,7 @@ pub(super) fn normalize_path_command_name(command: &str) -> Option<String> {
     Some(command)
 }
 
-pub(super) fn foreground_process_command_from_argv(argv: &[String]) -> Option<String> {
+pub(crate) fn foreground_process_command_from_argv(argv: &[String]) -> Option<String> {
     let command = argv
         .first()
         .and_then(|command| normalize_path_command_name(command));

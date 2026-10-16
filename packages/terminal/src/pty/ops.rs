@@ -1,15 +1,11 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use crate::alacritty::{PtySender, apply_config, set_default_cursor_style};
-use crate::cmd::foreground_process_command_from_argv;
-use crate::pty_info::PtyProcessInfo;
-use crate::terminal_settings::CursorShape as SettingsCursorShape;
+use crate::alacritty::PtySender;
+use crate::pty::info::{ProcessIdGetter, PtyProcessInfo};
+use crate::pty::process::process_name::foreground_process_command_from_argv;
 
-use crate::pty_info::ProcessIdGetter;
-// 如果 process_hyperlink 在另一个文件
-
-use super::Terminal; // task_summary 在 task.rs
+use super::Terminal;
 
 /// Separates retained PTY process metadata from resources needed only while
 /// the terminal is live.
@@ -89,10 +85,5 @@ impl Terminal {
                 .and_then(|process| foreground_process_command_from_argv(&process.argv)),
             TerminalType::DisplayOnly => None,
         }
-    }
-
-    pub fn set_cursor_shape(&mut self, cursor_shape: SettingsCursorShape) {
-        set_default_cursor_style(&mut self.term_config, cursor_shape);
-        apply_config(&self.term, &self.term_config);
     }
 }

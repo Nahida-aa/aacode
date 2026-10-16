@@ -1,38 +1,10 @@
 use alacritty_terminal::{
     grid::{Dimensions as _, Grid, Row},
     index::{Column, Line},
-    term::{
-        Term,
-        cell::{Cell as AlacCell, Flags},
-    },
+    term::cell::{Cell as AlacCell, Flags},
 };
 
-use super::listener::ZedListener;
-
-pub(crate) fn last_non_empty_lines(term: &Term<ZedListener>, line_count: usize) -> Vec<String> {
-    let grid = term.grid();
-    let mut lines = Vec::new();
-
-    let mut current_line = grid.bottommost_line().0;
-    let topmost_line = grid.topmost_line().0;
-
-    while current_line >= topmost_line && lines.len() < line_count {
-        let (logical_line_start, logical_line) =
-            logical_line_for_row(grid, current_line, topmost_line);
-
-        if let Some(line) = process_line(logical_line) {
-            lines.push(line);
-        }
-
-        current_line = logical_line_start - 1;
-    }
-
-    lines.reverse();
-    lines
-}
-
-// 私有 helpers
-fn logical_line_for_row(grid: &Grid<AlacCell>, current: i32, topmost: i32) -> (i32, String) {
+pub(crate) fn logical_line_for_row(grid: &Grid<AlacCell>, current: i32, topmost: i32) -> (i32, String) {
     let start = find_logical_line_start(grid, current, topmost);
     let mut line = String::new();
     for row in start..=current {
@@ -59,7 +31,7 @@ fn row_to_string(row: &Row<AlacCell>) -> String {
         .collect::<String>()
 }
 
-fn process_line(line: String) -> Option<String> {
+pub(crate) fn process_line(line: String) -> Option<String> {
     let trimmed = line.trim_end().to_string();
     if !trimmed.is_empty() {
         Some(trimmed)

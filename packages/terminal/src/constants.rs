@@ -1,10 +1,7 @@
 use gpui::{Pixels, px};
 use std::time::Duration;
 
-pub(crate) const DEBUG_TERMINAL_WIDTH: Pixels = px(500.);
-pub(crate) const DEBUG_TERMINAL_HEIGHT: Pixels = px(30.);
-pub(crate) const DEBUG_CELL_WIDTH: Pixels = px(5.);
-pub(crate) const DEBUG_LINE_HEIGHT: Pixels = px(5.);
+
 
 // https://github.com/alacritty/alacritty/blob/cb3a79dbf6472740daca8440d5166c1d4af5029e/extra/man/alacritty.5.scd?plain=1#L207-L213
 pub(crate) const DEFAULT_SCROLL_HISTORY_LINES: usize = 10_000;

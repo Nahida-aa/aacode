@@ -1,25 +1,30 @@
 use crate::constants::SELECTION_DRAG_THRESHOLD;
+use crate::grid::geometry::bounds::content_index_for_mouse;
 use crate::{
-    MouseInputMode, TerminalBounds,
     events::InternalEvent,
     mappings::mouse::{
         alt_scroll, grid_point, grid_point_and_side, mouse_button_report, mouse_moved_report,
         scroll_report,
     },
     terminal_settings::TerminalSettings,
-    types::modes::Modes,
-    types::point::Point,
-    types::scroll::Scroll,
-    types::selection::{Selection, SelectionPhase, SelectionSide, SelectionType},
+    grid::geometry::modes::Modes,
+    grid::geometry::point::Point,
+    input::scroll::Scroll,
+    input::selection::{Selection, SelectionPhase, SelectionSide, SelectionType},
 };
 use gpui::{
     Bounds, Context, MouseButton, MouseDownEvent, MouseMoveEvent, MouseUpEvent, Pixels,
-    Point as GpuiPoint, ScrollWheelEvent, TouchPhase, px,
+    ScrollWheelEvent, TouchPhase, px,
 };
 use settings::Settings as _;
-use std::cmp::min;
 
-use super::Terminal;
+use crate::pty::Terminal;
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MouseInputMode {
+    ReportToTerminal,
+    LocalSelection,
+}
 
 impl Terminal {
     fn mouse_changed(&mut self, point: Point, side: SelectionSide) -> bool {
@@ -385,12 +390,4 @@ impl Terminal {
         }
     }
     pub fn selection_started(&self) -> bool { self.selection_phase == SelectionPhase::Selecting }
-}
-
-fn content_index_for_mouse(pos: GpuiPoint<Pixels>, terminal_bounds: &TerminalBounds) -> usize {
-    let col = (pos.x / terminal_bounds.cell_width()).round() as usize;
-    let clamped_col = min(col, terminal_bounds.num_columns().saturating_sub(1));
-    let row = (pos.y / terminal_bounds.line_height()).round() as usize;
-    let clamped_row = min(row, terminal_bounds.num_lines().saturating_sub(1));
-    clamped_row * terminal_bounds.num_columns() + clamped_col
 }

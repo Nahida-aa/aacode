@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::terminal::pty::TerminalType;
+use crate::pty::ops::TerminalType;
 use alacritty_terminal::grid::Dimensions as _;
 
 use super::Terminal;

@@ -8,7 +8,7 @@ use gpui::{App, Context, Task};
 use task::{HideStrategy, SpawnInTerminal};
 
 use super::Terminal;
-use super::pty::TerminalType;
+use crate::pty::ops::TerminalType;
 
 use crate::alacritty::append_text_to_term;
 
@@ -44,12 +44,6 @@ impl TerminalMode {
             completion_tx,
         })
     }
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum MouseInputMode {
-    ReportToTerminal,
-    LocalSelection,
 }
 
 /// Runtime state for a task-backed terminal.

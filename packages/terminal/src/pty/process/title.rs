@@ -1,7 +1,7 @@
 use util::truncate_and_trailoff;
 
-use super::Terminal;
-use super::pty::TerminalType;
+use crate::pty::Terminal;
+use crate::pty::ops::TerminalType;
 
 impl Terminal {
     pub fn title(&self, truncate: bool) -> String {

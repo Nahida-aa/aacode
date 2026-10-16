@@ -1,4 +1,4 @@
-use crate::CopyTemplate;
+use super::CopyTemplate;
 use crate::MAX_SCROLL_HISTORY_LINES;
 use crate::TerminalBounds;
 use crate::TerminalError;
@@ -10,16 +10,15 @@ use crate::alacritty::{
 };
 use crate::constants::DEFAULT_SCROLL_HISTORY_LINES;
 use crate::events::TerminalBackendEvent;
-use crate::headless::HeadlessTerminal;
-use crate::pty_info::{ProcessIdGetter, PtyProcessInfo};
-use crate::terminal::cwd::CwdHistoryEntry;
-use crate::terminal::pty::{PtyResources, TerminalType};
-use crate::terminal::subprocess::spawn_task_subprocess;
-use crate::terminal::task::{TerminalMode, TerminalModeKind};
+use crate::grid::content::content::Content;
+use crate::grid::geometry::bounds::normalize_terminal_bounds;
+use crate::input::selection::SelectionPhase;
+use crate::pty::cwd::CwdHistoryEntry;
+use crate::pty::info::{ProcessIdGetter, PtyProcessInfo};
+use crate::pty::ops::{PtyResources, TerminalType};
+use crate::pty::process::subprocess::{HeadlessTerminal, spawn_task_subprocess};
+use crate::pty::task::{TerminalMode, TerminalModeKind};
 use crate::terminal_settings::{AlternateScroll, CursorShape as SettingsCursorShape};
-use crate::types::bounds::normalize_terminal_bounds;
-use crate::types::content::Content;
-use crate::types::selection::SelectionPhase;
 use crate::{Terminal, events::PtyEvent};
 use anyhow::{Context as _, Result, bail};
 use collections::{HashMap, VecDeque};
@@ -597,22 +596,4 @@ pub fn insert_zed_terminal_env(
     env.insert("TERM".to_string(), "xterm-256color".to_string());
     env.insert("COLORTERM".to_string(), "truecolor".to_string());
     env.insert("TERM_PROGRAM_VERSION".to_string(), version.to_string());
-}
-
-#[derive(Default)]
-struct ShellParams {
-    program: String,
-    args: Option<Vec<String>>,
-    title_override: Option<String>,
-}
-
-impl ShellParams {
-    fn new(program: String, args: Option<Vec<String>>, title_override: Option<String>) -> Self {
-        log::debug!("Using {program} as shell");
-        Self {
-            program,
-            args,
-            title_override,
-        }
-    }
 }

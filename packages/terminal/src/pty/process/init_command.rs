@@ -8,7 +8,7 @@ use util::shell::ShellKind;
 use crate::alacritty::{clear_saved_screen, last_non_empty_lines, make_content};
 use crate::events::Event;
 
-use super::Terminal;
+use crate::pty::Terminal;
 
 impl Terminal {
     /// Write a programmatically-generated command to the PTY as if it had been
