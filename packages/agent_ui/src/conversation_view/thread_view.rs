@@ -2210,6 +2210,9 @@ impl ThreadView {
                 ThreadError::ProviderRejection { message } => {
                     ("provider_rejection", None, message.clone())
                 }
+                ThreadError::InvalidProviderOutput { message } => {
+                    ("invalid_provider_output", None, message.clone())
+                }
                 ThreadError::MaxOutputTokens => (
                     "max_output_tokens",
                     None,
@@ -11524,6 +11527,13 @@ impl ThreadView {
             ThreadError::ProviderRejection { message } => {
                 self.render_error_callout("Request Failed", message.clone(), true, false, cx)
             }
+            ThreadError::InvalidProviderOutput { message } => self.render_error_callout(
+                "Invalid Provider Response",
+                message.clone(),
+                true,
+                true,
+                cx,
+            ),
             ThreadError::MaxOutputTokens => self.render_error_callout(
                 "Output Limit Reached",
                 "The model stopped because it reached its maximum output length. \

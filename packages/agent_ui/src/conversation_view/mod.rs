@@ -151,6 +151,9 @@ pub(crate) enum ThreadError {
     ProviderRejection {
         message: SharedString,
     },
+    InvalidProviderOutput {
+        message: SharedString,
+    },
     MaxOutputTokens,
     NoModelSelected,
     ApiError {
@@ -224,6 +227,9 @@ impl From<anyhow::Error> for ThreadError {
                     provider: provider.to_string().into(),
                 },
                 DataRetentionConsentRequired { .. } => Self::DataRetentionConsentRequired,
+                InvalidProviderOutput { message } => Self::InvalidProviderOutput {
+                    message: message.clone().into(),
+                },
                 _ => {
                     let message: SharedString = format!("{:#}", error).into();
                     Self::Other {
@@ -3878,6 +3884,25 @@ pub(crate) mod tests {
             ThreadError::ProviderRejection { message }
                 if message == "This content was flagged as potentially violating our terms of use."
         ));
+    }
+
+    #[test]
+    fn test_invalid_provider_output_maps_to_dedicated_error() {
+        let provider_error = LanguageModelCompletionError::InvalidProviderOutput {
+            message: "The provider returned a tool call with no id, so it cannot be replayed."
+                .to_string(),
+        };
+
+        let error = ThreadError::from(anyhow!(provider_error));
+
+        assert!(
+            matches!(
+                &error,
+                ThreadError::InvalidProviderOutput { message }
+                    if message == "The provider returned a tool call with no id, so it cannot be replayed."
+            ),
+            "expected ThreadError::InvalidProviderOutput, got: {error:?}"
+        );
     }
 
     #[test]
