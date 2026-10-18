@@ -814,7 +814,7 @@ aa_assets_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/assets/a
 aa_assets_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/assets/aa_assets_gpui" }
 aa_theme_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/theme/aa_theme_gpui" }
 aa_ui_zed = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ui/aa_ui_zed" }
-aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/icons" }
+aa_icons = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ui/icons" }
 # clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样走本地。
 aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
 # aa_gpui_fuzzy 的路径类型从 std::path::Path 换成了 zed 的 `path::RelPath`，
