@@ -893,7 +893,7 @@ ztracing_macro = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ztracing
 # cargo 默认值。
 #
 # crate 名做过映射：zed_actions → aacode_actions、ui_input / ui_macros →
-# aa_gpui_kit_ui_input / aa_gpui_kit_ui_macros、util_macros 的 aacode 侧那份是
+# aa_gpui_kit_ui_input / aa_ui_macros_zed、util_macros 的 aacode 侧那份是
 # aa_gpui_kit_util_macros。zed 有而 aacode 没有的（snippets_ui 等）不列。
 # 列的每一条都核对过确实在 aacode 的依赖图里（cargo metadata）。
 
@@ -933,7 +933,7 @@ derive_refineable = { opt-level = 3 }
 feature_flags_macros = { opt-level = 3 }
 settings_macros = { opt-level = 3 }
 sqlez_macros = { opt-level = 3, codegen-units = 1 }
-aa_gpui_kit_ui_macros = { opt-level = 3 }
+aa_ui_macros_zed = { opt-level = 3 }
 util_macros = { opt-level = 3 }
 quote = { opt-level = 3 }
 syn = { opt-level = 3 }
