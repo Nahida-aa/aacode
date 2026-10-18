@@ -178,7 +178,9 @@ reqwest_client = { path = "packages/reqwest_client" }
 
 sandbox = { path = "packages/sandbox" }
 search = { path = "packages/search" }
-settings = { package = "zed_settings", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5" }
+# 设置系统：2026-10-19 从 gpui_learn 的 packages/zed/zed_settings 搬入本仓库
+# （包名随之 zed_settings → settings；依赖名 settings 不变，使用方零改动）。
+settings = { path = "packages/setting/settings" }
 settings_content = { package = "aa_gpui_kit_settings_content", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
 settings_macros = { package = "aa_settings_macros", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
 settings_ui = { path = "packages/setting/settings_ui" }
@@ -830,18 +832,13 @@ aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/comp
 aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_language_model_core" }
 aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_macros" }
 aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_json" }
-# zed_settings 必须走本地，否则 release 构建启动即 panic：
-#   panics at gpui_learn/packages/aa/util/src/embed.rs:9: settings/default.json
-# 原因是 fs_embed! 的两条路径在 git rev 24001e5 里层级错位：
-#   · dev（root_relative = "assets"）→ 从 git 根找 → 命中 ✅ 所以 cargo run 一直正常
-#   · release（crate_relative = "../../assets"）→ 相对 crate 的 Cargo.toml 目录解析，
-#     该 crate 在 packages/zed/zed_settings/，两级只回到 packages/，指向
-#     packages/ 下的某个 crate 目录（只有 src/ 和 Cargo.toml，没有任何 settings
-#     文件）→ 内嵌了空目录 → asset_str 拿不到文件。
-# 不能照抄别的 crate 的层级数：资源 crate 现在在
-# packages/aa/aa_assets/aa_assets_core/，要四级才回到仓库根。
-# 本地版已改为 ../../../assets。
-zed_settings = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_settings" }
+# settings（原 zed_settings）2026-10-19 已搬入本仓库 packages/setting/settings，
+# workspace.dependencies 直接走 path，无需再 patch。
+# 历史备忘：它当初必须 patch 到本地，是因为 git rev 24001e5 里 fs_embed! 的
+# release 路径层级错位（crate_relative 少一级 ../）→ 内嵌出空目录 → 启动即
+# panic；修正后的层级（../../../assets）已随包搬迁带过来，新位置
+# packages/setting/settings 与原 packages/zed/zed_settings 同为两级深度，
+# 层级数不变（该包 lib.rs 的 fs_embed! 注释有完整记述）。
 aa_gpui_kit_settings_content = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/settings_content" }
 
 # util / util_macros 同样必须走本地，否则图里会同时存在两份：
