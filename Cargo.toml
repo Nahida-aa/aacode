@@ -623,8 +623,8 @@ theme = { package = "aa_theme_gpui", git = "https://github.com/Nahida-aa/gpui_le
 icons = { package = "aa_icons", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 aa_gpui_kit_ui_input = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
 ui_input = { package = "aa_gpui_kit_ui_input", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
-component = { package = "aa_gpui_kit_component", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
-aa_gpui_kit_component = { git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "24001e5" }
+component = { package = "aa_component_zed", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "e4704af" }
+aa_gpui_kit_component = { package = "aa_component_zed", git = "https://github.com/Nahida-aa/gpui_learn.git", rev = "e4704af" }
 # grammars 指向 gpui_learn（crate 名 aa_gpui_kit_grammars），用 package= 改名，
 # 使全仓 `grammars::` 的调用点无需改动。
 #
@@ -821,14 +821,14 @@ aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
 # 与 zed crates/fuzzy_nucleo 对齐；project 因此不再需要手写 PathStyle 转换。
 aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui/gpui_fuzzy" }
 # ui / ui_input / component 必须同源：若 ui_input 与 ui 停在不同 rev，
-# 两者会各拖一份 aa_gpui_kit_component，于是出现两个不同的 `Component` trait，
+# 两者会各拖一份 aa_component_zed，于是出现两个不同的 `Component` trait，
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
 aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
 aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_cloud_llm_client" }
 zed_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_cloud_llm_client" }
 zed_migrator = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_migrator" }
 aa_release_channel = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_release_channel" }
-aa_gpui_kit_component = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/component" }
+aa_component_zed = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ui/aa_ui_zed/aa_component_zed" }
 aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_language_model_core" }
 aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_macros" }
 aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_json" }
