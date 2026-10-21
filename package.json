@@ -12,8 +12,7 @@
     "dev:app": "cargo run -p aacode",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "stats": "scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf",
-    "prepare": "bunx lefthook install"
+    "stats": "scc . --exclude-dir node_modules,dist,build,target,venv,.venv,__pycache__,.git,vendor,out,cmake-build-debug,CMakeFiles --exclude-ext lock,json,md,yaml,yml,toml,ini,conf"
   },
   "devDependencies": {
     "oxfmt": "^0.61.0",
