@@ -73,7 +73,7 @@ copilot_ui = { path = "packages/copilot_ui" }
 client = { path = "packages/client" }
 cloud_api_client = { path = "packages/cloud_api_client" }
 cloud_api_types = { path = "packages/cloud_api_types" }
-aa_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
+aa_cloud_llm_client = { path = "/home/aa/repos/lib_ls/aa-stack/packages/ai/aa_cloud_llm_client" }
 zed_cloud_llm_client = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
 # zeta_prompt 从 path → zed git（用户删了 packages/zeta_prompt/）。
 # rev 必须与 gpui_learn workspace 里的 zeta_prompt 一致（afecd6d7），
@@ -128,7 +128,7 @@ language_extension = { path = "packages/language_extension" }
 lsp_command_selector = { path = "packages/lsp_command_selector" }
 lsp_locations = { path = "packages/lsp_locations" }
 language_model = { package = "aa_gpui_kit_language_model", path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_language_model" }
-language_model_core = { package = "aa_language_model_core", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
+language_model_core = { package = "aa_language_model_core", path = "/home/aa/repos/lib_ls/aa-stack/packages/ai/aa_language_model_core" }
 language_models = { path = "packages/language_models" }
 language_models_cloud = { path = "packages/language_models/language_models_cloud" }
 language_tools = { path = "packages/language_tools" }
@@ -773,9 +773,9 @@ util_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util_macros
 # http_client 同理指向 gpui_learn 的本地 fork（源已逐字同步到同一个 rev
 # c0199504，见 gpui_learn a1d9f84）。它是 aacode 依赖最多的 crate 之一
 # （20+ crate，gpui 自身也依赖它），此前是「gpui_learn 全部走本地」原则下
-# 唯一还留在 zed git 上的常用 crate。改名之前无法 patch：gpui_learn 那份叫
-# zed_http_client，而 cargo 的 [patch] 要求被 patch 的包同名同版本。
-http_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/http_client" }
+# 单一事实源在 aa-stack（与 language_model_core / aa_cloud_llm_client 同源）：
+# zed c019950 的 http_client 逐字搬运版，gpui_learn 本地副本已不再参与构建。
+http_client = { path = "/home/aa/repos/lib_ls/aa-stack/packages/util/http_client" }
 # zlog / ztracing / ztracing_macro 此前在依赖图里各有两份：
 #   一份来自 gpui_learn（本 patch 段指向本地），一份来自 zed git。
 # 后者是 zed 的 `sum_tree` 传递引入的 —— sum_tree 本身走 zed git 且 gpui_learn
@@ -824,12 +824,12 @@ aa_gpui_fuzzy = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui/gpui
 # 两者会各拖一份 aa_component_zed，于是出现两个不同的 `Component` trait，
 # 报 `InputField: Component is not satisfied`（E0277 + 「multiple different versions」）。
 aa_gpui_kit_ui_input = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/ui_input" }
-aa_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_cloud_llm_client" }
+aa_cloud_llm_client = { path = "/home/aa/repos/lib_ls/aa-stack/packages/ai/aa_cloud_llm_client" }
 zed_cloud_llm_client = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_cloud_llm_client" }
 zed_migrator = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/zed/zed_migrator" }
 aa_release_channel = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_release_channel" }
 aa_component_zed = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ui/aa_ui_zed/aa_component_zed" }
-aa_language_model_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_language_model_core" }
+aa_language_model_core = { path = "/home/aa/repos/lib_ls/aa-stack/packages/ai/aa_language_model_core" }
 aa_settings_macros = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_macros" }
 aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_settings_json" }
 # settings（原 zed_settings）2026-10-19 已搬入本仓库 packages/setting/settings，

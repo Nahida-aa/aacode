@@ -128,13 +128,13 @@ dependencies = [
  "nix 0.29.0",
  "serde",
  "serde_json",
+ "settings",
  "tokio",
  "tower-http",
  "tracing",
  "tracing-subscriber",
  "utoipa",
  "uuid",
- "zed_settings",
 ]
 
 [[package]]
@@ -154,6 +154,7 @@ dependencies = [
 name = "aa_assets_core"
 version = "0.1.0"
 dependencies = [
+ "aa_shared_string",
  "anyhow",
  "rust-embed",
 ]
@@ -185,8 +186,19 @@ dependencies = [
  "anyhow",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "uuid",
+]
+
+[[package]]
+name = "aa_component_zed"
+version = "0.1.0"
+dependencies = [
+ "aa_theme_gpui",
+ "gpui",
+ "inventory",
+ "parking_lot",
+ "strum",
 ]
 
 [[package]]
@@ -198,13 +210,6 @@ name = "aa_env_vars"
 version = "0.1.0"
 dependencies = [
  "env_var",
-]
-
-[[package]]
-name = "aa_gpui_base"
-version = "0.1.0"
-dependencies = [
- "gpui",
 ]
 
 [[package]]
@@ -233,17 +238,6 @@ dependencies = [
  "which",
  "windows 0.58.0",
  "zeroize",
-]
-
-[[package]]
-name = "aa_gpui_kit_component"
-version = "0.1.0"
-dependencies = [
- "aa_theme_gpui",
- "gpui",
- "inventory",
- "parking_lot",
- "strum 0.28.0",
 ]
 
 [[package]]
@@ -365,7 +359,7 @@ dependencies = [
  "serde",
  "serde_json",
  "smallvec",
- "strum 0.28.0",
+ "strum",
  "toml 0.8.23",
  "tree-sitter",
 ]
@@ -440,7 +434,7 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "serde_path_to_error",
- "strum 0.28.0",
+ "strum",
  "tempfile",
 ]
 
@@ -463,48 +457,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa_gpui_kit_ui"
-version = "0.1.0"
-dependencies = [
- "aa_assets_gpui",
- "aa_gpui_base",
- "aa_gpui_kit_component",
- "aa_gpui_kit_ui_macros",
- "aa_icons",
- "aa_theme_gpui",
- "documented",
- "gpui",
- "gpui_macros",
- "gpui_util",
- "itertools 0.14.0",
- "log",
- "menu",
- "num-format",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "smallvec",
- "strum 0.28.0",
- "tracing",
- "unicode-segmentation",
-]
-
-[[package]]
 name = "aa_gpui_kit_ui_input"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_component",
- "aa_gpui_kit_ui",
+ "aa_component_zed",
+ "aa_ui_zed",
  "gpui",
-]
-
-[[package]]
-name = "aa_gpui_kit_ui_macros"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
 ]
 
 [[package]]
@@ -523,7 +481,7 @@ name = "aa_icons"
 version = "0.1.0"
 dependencies = [
  "serde",
- "strum 0.28.0",
+ "strum",
 ]
 
 [[package]]
@@ -542,7 +500,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "thiserror 2.0.21",
 ]
 
@@ -577,6 +535,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_shared_string"
+version = "0.1.0"
+dependencies = [
+ "schemars 1.2.2",
+ "serde",
+ "smol_str",
+]
+
+[[package]]
 name = "aa_syntax_theme_gpui"
 version = "0.1.0"
 dependencies = [
@@ -600,10 +567,45 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.27.2",
+ "strum",
  "thiserror 2.0.21",
  "tracing",
  "uuid",
+]
+
+[[package]]
+name = "aa_ui_macros_zed"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "aa_ui_zed"
+version = "0.1.0"
+dependencies = [
+ "aa_assets_gpui",
+ "aa_component_zed",
+ "aa_icons",
+ "aa_theme_gpui",
+ "aa_ui_macros_zed",
+ "documented",
+ "gpui",
+ "gpui_macros",
+ "gpui_util",
+ "itertools 0.14.0",
+ "log",
+ "menu",
+ "num-format",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "strum",
+ "tracing",
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -646,6 +648,43 @@ dependencies = [
 ]
 
 [[package]]
+name = "aa_util_gpui"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-fs",
+ "async_zip",
+ "collections",
+ "command-fds",
+ "dirs",
+ "futures 0.3.34",
+ "futures-lite 2.6.1",
+ "globset",
+ "gpui_util",
+ "itertools 0.14.0",
+ "libc",
+ "log",
+ "mach2 0.5.0",
+ "nix 0.30.1",
+ "path",
+ "percent-encoding",
+ "regex",
+ "rust-embed",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "shlex 1.3.0",
+ "smol",
+ "take-until",
+ "tempfile",
+ "unicase",
+ "url",
+ "walkdir",
+ "which",
+]
+
+[[package]]
 name = "aacode"
 version = "1.23.2"
 dependencies = [
@@ -658,10 +697,10 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_rope",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_web_search",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -774,6 +813,7 @@ dependencies = [
  "serde",
  "serde_json",
  "session",
+ "settings",
  "settings_ui",
  "shellexpand",
  "sidebar",
@@ -809,7 +849,6 @@ dependencies = [
  "workspace",
  "zed_migrator",
  "zed_paths",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -936,7 +975,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "action_log",
  "agent-client-protocol",
@@ -970,6 +1009,7 @@ dependencies = [
  "sandbox",
  "serde",
  "serde_json",
+ "settings",
  "task",
  "telemetry",
  "tempfile",
@@ -978,14 +1018,13 @@ dependencies = [
  "urlencoding",
  "uuid",
  "watch",
- "zed_settings",
 ]
 
 [[package]]
 name = "acp_tools"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "agent-client-protocol",
  "agent_servers",
@@ -996,9 +1035,9 @@ dependencies = [
  "markdown",
  "project",
  "serde_json",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -1023,9 +1062,9 @@ dependencies = [
  "project",
  "rand 0.9.5",
  "serde_json",
+ "settings",
  "telemetry",
  "watch",
- "zed_settings",
  "zlog",
 ]
 
@@ -1034,7 +1073,7 @@ name = "activity_indicator"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "auto_update",
@@ -1115,10 +1154,10 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_web_search",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "acp_thread",
  "action_log",
@@ -1167,6 +1206,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "shell_command_parser",
  "smallvec",
  "sqlez",
@@ -1182,7 +1222,6 @@ dependencies = [
  "uuid",
  "watch",
  "zed_paths",
- "zed_settings",
  "zlog",
  "zstd 0.11.2+zstd.1.5.2",
 ]
@@ -1233,7 +1272,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "strum 0.28.0",
+ "strum",
  "tracing",
 ]
 
@@ -1243,8 +1282,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "ac_constant",
  "acp_thread",
@@ -1270,13 +1309,13 @@ dependencies = [
  "reqwest_client",
  "serde",
  "serde_json",
+ "settings",
  "task",
  "tempfile",
  "terminal",
  "thiserror 2.0.21",
  "uuid",
  "watch",
- "zed_settings",
 ]
 
 [[package]]
@@ -1298,8 +1337,8 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
+ "settings",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -1324,16 +1363,16 @@ dependencies = [
 name = "agent_ui"
 version = "0.1.0"
 dependencies = [
+ "aa_component_zed",
  "aa_gpui_fuzzy",
- "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -1405,6 +1444,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
+ "settings",
  "shlex 1.3.0",
  "streaming_diff",
  "task",
@@ -1422,7 +1462,6 @@ dependencies = [
  "workspace",
  "zed_paths",
  "zed_proto",
- "zed_settings",
 ]
 
 [[package]]
@@ -1453,9 +1492,9 @@ dependencies = [
 name = "ai_onboarding"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_component",
+ "aa_component_zed",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aacode_actions",
  "client",
  "cloud_api_types",
@@ -1619,7 +1658,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "thiserror 2.0.21",
 ]
 
@@ -2145,8 +2184,8 @@ dependencies = [
  "log",
  "parking_lot",
  "rodio",
+ "settings",
  "thiserror 2.0.21",
- "zed_settings",
 ]
 
 [[package]]
@@ -2181,12 +2220,12 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "smol",
  "tempfile",
  "which",
  "workspace",
  "zed_paths",
- "zed_settings",
  "zlog",
 ]
 
@@ -2194,8 +2233,8 @@ dependencies = [
 name = "auto_update_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -2818,7 +2857,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "thiserror 2.0.21",
 ]
 
@@ -3058,7 +3097,7 @@ dependencies = [
 name = "breadcrumbs"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "gpui",
  "language",
  "workspace",
@@ -3113,10 +3152,10 @@ dependencies = [
  "log",
  "pretty_assertions",
  "rand 0.9.5",
+ "settings",
  "sum_tree",
  "tracing",
  "unindent",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -3289,17 +3328,17 @@ dependencies = [
  "project",
  "serde",
  "serde_json",
+ "settings",
  "telemetry",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
 name = "call_hierarchy"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "editor",
@@ -3313,11 +3352,11 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
+ "settings",
  "theme_settings",
  "tree-sitter-rust",
  "workspace",
  "zed_proto",
- "zed_settings",
 ]
 
 [[package]]
@@ -3508,7 +3547,7 @@ dependencies = [
  "postage",
  "rpc",
  "semver",
- "zed_settings",
+ "settings",
 ]
 
 [[package]]
@@ -3694,6 +3733,7 @@ dependencies = [
  "rayon",
  "serde",
  "serde_json",
+ "settings",
  "tempfile",
  "tokio",
  "tracing",
@@ -3703,7 +3743,6 @@ dependencies = [
  "windows 0.62.2",
  "windows_resources",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -3746,6 +3785,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
+ "settings",
  "sha2 0.10.9",
  "smol",
  "telemetry",
@@ -3761,7 +3801,6 @@ dependencies = [
  "worktree",
  "zed_cloud_llm_client",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -3796,7 +3835,7 @@ dependencies = [
  "pretty_assertions",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "zeta_prompt",
 ]
 
@@ -3919,9 +3958,9 @@ dependencies = [
 name = "collab_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -3943,13 +3982,13 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
+ "settings",
  "smallvec",
  "smol",
  "telemetry",
  "theme_settings",
  "title_bar",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -3999,8 +4038,8 @@ name = "command_palette"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -4017,11 +4056,11 @@ dependencies = [
  "postage",
  "project",
  "serde",
+ "settings",
  "telemetry",
  "theme_settings",
  "time",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -4180,11 +4219,11 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "sha2 0.10.9",
  "slotmap",
  "tempfile",
  "url",
- "zed_settings",
 ]
 
 [[package]]
@@ -4232,11 +4271,11 @@ dependencies = [
  "rpc",
  "serde",
  "serde_json",
+ "settings",
  "sum_tree",
  "theme_settings",
  "workspace",
  "zed_paths",
- "zed_settings",
  "zlog",
 ]
 
@@ -4262,8 +4301,8 @@ dependencies = [
 name = "copilot_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "ac_constant",
  "anyhow",
@@ -4276,8 +4315,8 @@ dependencies = [
  "menu",
  "project",
  "serde_json",
+ "settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -5047,13 +5086,13 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "smallvec",
  "smol",
  "task",
  "telemetry",
  "zed_paths",
  "zed_proto",
- "zed_settings",
  "zlog",
 ]
 
@@ -5086,10 +5125,10 @@ dependencies = [
  "log",
  "node_runtime",
  "serde_json",
+ "settings",
  "smol",
  "task",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -5231,9 +5270,9 @@ dependencies = [
  "gpui",
  "project",
  "serde_json",
+ "settings",
  "smol",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -5241,9 +5280,9 @@ name = "debugger_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -5277,6 +5316,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
+ "settings",
  "sysinfo 0.39.6",
  "task",
  "tasks_ui",
@@ -5287,7 +5327,6 @@ dependencies = [
  "unindent",
  "workspace",
  "zed_paths",
- "zed_settings",
  "zlog",
 ]
 
@@ -5413,7 +5452,7 @@ name = "dev_container"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "async-tar",
@@ -5433,12 +5472,12 @@ dependencies = [
  "serde_json",
  "serde_json_lenient",
  "serde_yaml",
+ "settings",
  "shlex 1.3.0",
  "walkdir",
  "workspace",
  "worktree",
  "yaml-rust2",
- "zed_settings",
 ]
 
 [[package]]
@@ -5446,8 +5485,8 @@ name = "diagnostics"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "agent_settings",
@@ -5467,10 +5506,10 @@ dependencies = [
  "project",
  "rand 0.9.5",
  "serde_json",
+ "settings",
  "theme_settings",
  "unindent",
  "workspace",
- "zed_settings",
  "zlog",
 ]
 
@@ -5622,7 +5661,7 @@ dependencies = [
  "optfield",
  "proc-macro2",
  "quote",
- "strum 0.28.0",
+ "strum",
  "syn 2.0.119",
 ]
 
@@ -5726,8 +5765,8 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ad_credentials_provider",
@@ -5771,7 +5810,8 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "settings",
+ "strum",
  "telemetry",
  "telemetry_events",
  "thiserror 2.0.21",
@@ -5782,7 +5822,6 @@ dependencies = [
  "worktree",
  "zed_cloud_llm_client",
  "zed_paths",
- "zed_settings",
  "zeta_prompt",
  "zlog",
  "zstd 0.11.2+zstd.1.5.2",
@@ -5808,10 +5847,10 @@ dependencies = [
  "pretty_assertions",
  "project",
  "serde_json",
+ "settings",
  "smallvec",
  "telemetry",
  "tree-sitter",
- "zed_settings",
  "zeta_prompt",
 ]
 
@@ -5846,7 +5885,7 @@ dependencies = [
  "aa_cloud_llm_client",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -5870,11 +5909,11 @@ dependencies = [
  "multi_buffer",
  "project",
  "regex",
+ "settings",
  "telemetry",
  "theme_settings",
  "workspace",
  "zed_paths",
- "zed_settings",
  "zeta_prompt",
 ]
 
@@ -5888,10 +5927,10 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "aho-corasick",
@@ -5937,6 +5976,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "smallvec",
  "snippet",
  "sum_tree",
@@ -5961,7 +6001,6 @@ dependencies = [
  "uuid",
  "vim_mode_setting",
  "workspace",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -6040,7 +6079,7 @@ dependencies = [
 name = "encoding_selector"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "editor",
  "encoding_rs",
@@ -6396,6 +6435,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
+ "settings",
  "task",
  "telemetry",
  "tempfile",
@@ -6408,7 +6448,6 @@ dependencies = [
  "wasmtime",
  "wasmtime-wasi",
  "zed_paths",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -6424,11 +6463,11 @@ dependencies = [
 name = "extensions_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_component",
+ "aa_component_zed",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
- "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -6453,13 +6492,13 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "settings",
+ "strum",
  "telemetry",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -6539,7 +6578,7 @@ dependencies = [
  "inventory",
  "schemars 1.2.2",
  "serde_json",
- "zed_settings",
+ "settings",
 ]
 
 [[package]]
@@ -6570,8 +6609,8 @@ name = "file_finder"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -6592,9 +6631,9 @@ dependencies = [
  "pretty_assertions",
  "project",
  "serde_json",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
  "zlog",
 ]
 
@@ -7175,25 +7214,25 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
+ "settings",
  "url",
  "urlencoding",
- "zed_settings",
 ]
 
 [[package]]
 name = "git_ui"
 version = "0.1.0"
 dependencies = [
+ "aa_component_zed",
  "aa_gpui_fuzzy",
  "aa_gpui_kit_askpass",
- "aa_gpui_kit_component",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -7232,8 +7271,9 @@ dependencies = [
  "search",
  "serde",
  "serde_json",
+ "settings",
  "smallvec",
- "strum 0.28.0",
+ "strum",
  "sysinfo 0.39.6",
  "task",
  "telemetry",
@@ -7245,7 +7285,6 @@ dependencies = [
  "unindent",
  "watch",
  "workspace",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -7257,8 +7296,8 @@ dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -7280,6 +7319,7 @@ dependencies = [
  "remote_connection",
  "serde",
  "serde_json",
+ "settings",
  "task",
  "terminal",
  "theme_settings",
@@ -7287,7 +7327,6 @@ dependencies = [
  "watch",
  "workspace",
  "zed_proto",
- "zed_settings",
  "zeroize",
  "zlog",
  "ztracing",
@@ -7406,8 +7445,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "editor",
  "gpui",
@@ -7417,8 +7456,8 @@ dependencies = [
  "multi_buffer",
  "project",
  "serde_json",
+ "settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -7455,7 +7494,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
 ]
 
 [[package]]
@@ -7550,7 +7589,7 @@ dependencies = [
  "smallvec",
  "spin 0.10.1",
  "stacksafe",
- "strum 0.28.0",
+ "strum",
  "sum_tree",
  "taffy",
  "thiserror 2.0.21",
@@ -7618,7 +7657,7 @@ dependencies = [
  "raw-window-handle",
  "smallvec",
  "smol",
- "strum 0.28.0",
+ "strum",
  "url",
  "uuid",
  "wayland-backend",
@@ -7674,7 +7713,7 @@ dependencies = [
  "raw-window-handle",
  "semver",
  "smallvec",
- "strum 0.28.0",
+ "strum",
  "uuid",
  "zed-font-kit",
 ]
@@ -8165,7 +8204,7 @@ checksum = "9171a2ea8a68358193d15dd5d70c1c10a2afc3e7e4c5bc92bc9f025cebd7359c"
 name = "http_client"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-compression",
  "async-fs",
@@ -8563,8 +8602,8 @@ name = "image_viewer"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "db",
@@ -8575,9 +8614,9 @@ dependencies = [
  "log",
  "menu",
  "project",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -8708,8 +8747,8 @@ name = "inspector_ui"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -8722,12 +8761,12 @@ dependencies = [
  "project",
  "serde_json",
  "serde_json_lenient",
+ "settings",
  "snippet_provider",
  "theme_settings",
  "util_macros",
  "workspace",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -9080,9 +9119,9 @@ dependencies = [
  "editor",
  "gpui",
  "log",
+ "settings",
  "shellexpand",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -9147,10 +9186,10 @@ dependencies = [
  "project",
  "schemars 1.2.2",
  "serde_json",
+ "settings",
  "snippet_provider",
  "task",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -9177,7 +9216,7 @@ dependencies = [
  "regex",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "unicode-general-category",
  "uuid-simd",
 ]
@@ -9274,9 +9313,9 @@ name = "keymap_editor"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -9295,6 +9334,7 @@ dependencies = [
  "project",
  "search",
  "serde_json",
+ "settings",
  "telemetry",
  "tempfile",
  "theme_settings",
@@ -9302,7 +9342,6 @@ dependencies = [
  "tree-sitter-rust",
  "workspace",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -9432,6 +9471,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "shellexpand",
  "smallvec",
  "streaming-iterator",
@@ -9456,7 +9496,6 @@ dependencies = [
  "unicase",
  "unindent",
  "watch",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -9497,12 +9536,12 @@ version = "0.1.0"
 dependencies = [
  "aa_clock",
  "aa_cloud_llm_client",
- "aa_gpui_kit_component",
+ "aa_component_zed",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "ai_onboarding",
  "anthropic",
@@ -9549,13 +9588,13 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "sha2 0.10.9",
- "strum 0.28.0",
+ "strum",
  "tokio",
  "x_ai",
  "x_ai_subscribed",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -9585,7 +9624,7 @@ dependencies = [
 name = "language_selector"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "editor",
@@ -9597,17 +9636,17 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
+ "settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
 name = "language_tools"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -9626,13 +9665,13 @@ dependencies = [
  "project",
  "semver",
  "serde_json",
+ "settings",
  "sysinfo 0.39.6",
  "telemetry",
  "theme_settings",
  "tree-sitter",
  "workspace",
  "zed_proto",
- "zed_settings",
  "zlog",
 ]
 
@@ -9677,6 +9716,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
+ "settings",
  "smallvec",
  "smol",
  "snippet",
@@ -9695,7 +9735,6 @@ dependencies = [
  "tree-sitter-typescript",
  "unindent",
  "url",
- "zed_settings",
 ]
 
 [[package]]
@@ -9868,7 +9907,7 @@ dependencies = [
 name = "line_ending_selector"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "editor",
  "gpui",
  "language",
@@ -10029,7 +10068,7 @@ dependencies = [
 name = "livekit_client"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "async-trait",
@@ -10057,12 +10096,12 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
+ "settings",
  "simplelog",
  "smallvec",
  "tokio",
  "webrtc-sys",
  "zed-scap",
- "zed_settings",
 ]
 
 [[package]]
@@ -10295,7 +10334,7 @@ dependencies = [
 name = "lsp_command_selector"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "editor",
@@ -10309,8 +10348,8 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
+ "settings",
  "workspace",
- "zed_settings",
  "zlog",
 ]
 
@@ -10319,7 +10358,7 @@ name = "lsp_locations"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "collections",
@@ -10334,9 +10373,9 @@ dependencies = [
  "picker",
  "picker_preview",
  "project",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -10457,8 +10496,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_mermaid_render",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "assets",
@@ -10479,11 +10518,11 @@ dependencies = [
  "node_runtime",
  "pulldown-cmark",
  "refineable",
+ "settings",
  "smallvec",
  "stacksafe",
  "sum_tree",
  "theme_settings",
- "zed_settings",
 ]
 
 [[package]]
@@ -10491,8 +10530,8 @@ name = "markdown_preview"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -10505,10 +10544,10 @@ dependencies = [
  "markdown",
  "project",
  "serde_json",
+ "settings",
  "theme_settings",
  "urlencoding",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -10845,10 +10884,10 @@ dependencies = [
  "gpui",
  "rpc",
  "serde_json",
+ "settings",
  "smol",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -10902,7 +10941,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
 ]
 
 [[package]]
@@ -10966,12 +11005,12 @@ dependencies = [
  "proptest-derive",
  "rand 0.9.5",
  "serde",
+ "settings",
  "smallvec",
  "sum_tree",
  "tracing",
  "tree-sitter",
  "unicode-segmentation",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -11211,8 +11250,8 @@ checksum = "0676bb32a98c1a483ce53e500a81ad9c3d5b3f7c920c28c24e9cb0980d0b5bc8"
 name = "notifications"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_component",
- "aa_gpui_kit_ui",
+ "aa_component_zed",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -11933,17 +11972,17 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "zed_settings",
+ "settings",
 ]
 
 [[package]]
 name = "onboarding"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_component",
+ "aa_component_zed",
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -11960,11 +11999,11 @@ dependencies = [
  "project",
  "schemars 1.2.2",
  "serde",
+ "settings",
  "telemetry",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
- "zed_settings",
  "zlog",
 ]
 
@@ -12046,7 +12085,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "thiserror 2.0.21",
 ]
 
@@ -12054,8 +12093,8 @@ dependencies = [
 name = "open_path_prompt"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "editor",
  "file_icons",
@@ -12066,9 +12105,9 @@ dependencies = [
  "project",
  "serde",
  "serde_json",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -12083,8 +12122,8 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "thiserror 2.0.21",
- "zed_settings",
 ]
 
 [[package]]
@@ -12123,7 +12162,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
 ]
 
 [[package]]
@@ -12220,8 +12259,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_rope",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "editor",
@@ -12235,8 +12274,8 @@ dependencies = [
  "picker_preview",
  "project",
  "serde_json",
+ "settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -12258,8 +12297,8 @@ name = "outline_panel"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_git",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -12282,11 +12321,11 @@ dependencies = [
  "search",
  "serde",
  "serde_json",
+ "settings",
  "smallvec",
  "theme_settings",
  "workspace",
  "worktree",
- "zed_settings",
 ]
 
 [[package]]
@@ -13156,9 +13195,9 @@ dependencies = [
 name = "picker"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -13171,9 +13210,9 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -13181,7 +13220,7 @@ name = "picker_preview"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_rope",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "editor",
  "gpui",
@@ -13189,7 +13228,7 @@ dependencies = [
  "multi_buffer",
  "picker",
  "project",
- "zed_settings",
+ "settings",
 ]
 
 [[package]]
@@ -13278,16 +13317,16 @@ checksum = "b4596b6d070b27117e987119b4dac604f3c58cfb0b191112e24771b2faeac1a6"
 name = "platform_title_bar"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aacode_actions",
  "gpui",
  "project",
+ "settings",
  "smallvec",
  "theme_settings",
  "windows 0.62.2",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -13703,6 +13742,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "sha2 0.10.9",
  "shellexpand",
  "smallvec",
@@ -13722,7 +13762,6 @@ dependencies = [
  "which",
  "worktree",
  "zed_paths",
- "zed_settings",
  "zeroize",
  "zlog",
  "ztracing",
@@ -13734,8 +13773,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -13761,13 +13800,13 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "smallvec",
  "telemetry",
  "tempfile",
  "theme_settings",
  "workspace",
  "worktree",
- "zed_settings",
 ]
 
 [[package]]
@@ -13791,9 +13830,9 @@ dependencies = [
  "project",
  "semver",
  "serde_json",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -13818,7 +13857,7 @@ dependencies = [
  "parking_lot",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "tempfile",
  "uuid",
  "zed_paths",
@@ -14331,7 +14370,7 @@ dependencies = [
  "lru 0.18.5",
  "palette",
  "serde",
- "strum 0.28.0",
+ "strum",
  "thiserror 2.0.21",
  "unicode-segmentation",
  "unicode-truncate",
@@ -14395,7 +14434,7 @@ dependencies = [
  "line-clipping",
  "ratatui-core",
  "serde",
- "strum 0.28.0",
+ "strum",
  "time",
  "unicode-segmentation",
  "unicode-width 0.2.2",
@@ -14533,8 +14572,8 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_release_channel",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -14561,12 +14600,12 @@ dependencies = [
  "remote_server",
  "semver",
  "serde_json",
+ "settings",
  "telemetry",
  "windows-registry",
  "workspace",
  "worktree",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -14713,6 +14752,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "smol",
  "telemetry",
  "tempfile",
@@ -14720,7 +14760,6 @@ dependencies = [
  "urlencoding",
  "which",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -14728,10 +14767,10 @@ name = "remote_connection"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_askpass",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "anyhow",
  "auto_update",
  "editor",
@@ -14742,9 +14781,9 @@ dependencies = [
  "menu",
  "remote",
  "semver",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -14801,6 +14840,7 @@ dependencies = [
  "rust-embed",
  "semver",
  "serde_json",
+ "settings",
  "shellexpand",
  "smol",
  "sysinfo 0.39.6",
@@ -14820,7 +14860,6 @@ dependencies = [
  "worktree",
  "zed_paths",
  "zed_proto",
- "zed_settings",
  "zlog",
 ]
 
@@ -14834,8 +14873,8 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 name = "repl"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -14871,6 +14910,7 @@ dependencies = [
  "runtimelib",
  "serde",
  "serde_json",
+ "settings",
  "shlex 1.3.0",
  "smol",
  "task",
@@ -14883,7 +14923,6 @@ dependencies = [
  "tree-sitter-typescript",
  "uuid",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -15069,7 +15108,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.10.9",
- "strum 0.28.0",
+ "strum",
  "tracing",
  "zed_proto",
  "zlog",
@@ -15539,8 +15578,8 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "any_vec",
@@ -15564,6 +15603,7 @@ dependencies = [
  "project",
  "regex",
  "serde_json",
+ "settings",
  "smol",
  "theme_settings",
  "tracing",
@@ -15571,7 +15611,6 @@ dependencies = [
  "util_macros",
  "workspace",
  "zed_proto",
- "zed_settings",
  "ztracing",
 ]
 
@@ -15872,16 +15911,52 @@ dependencies = [
 ]
 
 [[package]]
+name = "settings"
+version = "0.1.0"
+dependencies = [
+ "aa_gpui_kit_fs",
+ "aa_gpui_kit_settings_content",
+ "aa_release_channel",
+ "aa_settings_json",
+ "aa_settings_macros",
+ "aa_util",
+ "anyhow",
+ "collections",
+ "ec4rs",
+ "futures 0.3.34",
+ "gpui",
+ "gpui_util",
+ "indoc",
+ "inventory",
+ "json5 0.4.1",
+ "log",
+ "path",
+ "pretty_assertions",
+ "rust-embed",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "smallvec",
+ "strum",
+ "tempfile",
+ "tracing",
+ "unindent",
+ "zed_migrator",
+ "zed_paths",
+]
+
+[[package]]
 name = "settings_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_component",
+ "aa_component_zed",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -15927,14 +16002,14 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_yaml_ng",
+ "settings",
  "shell_command_parser",
- "strum 0.28.0",
+ "strum",
  "telemetry",
  "theme_settings",
  "url",
  "workspace",
  "zed_paths",
- "zed_settings",
 ]
 
 [[package]]
@@ -16038,9 +16113,9 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_language_model",
- "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "acp_thread",
@@ -16077,11 +16152,11 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "telemetry",
  "theme_settings",
  "unicode-segmentation",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -16532,32 +16607,11 @@ checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
 name = "strum"
-version = "0.27.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af23d6f6c1a224baef9d3f61e287d2761385a5b88fdab4eb4c6f11aeb54c4bcf"
-dependencies = [
- "strum_macros 0.27.2",
-]
-
-[[package]]
-name = "strum"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9628de9b8791db39ceda2b119bbe13134770b56c138ec1d3af810d045c04f9bd"
 dependencies = [
- "strum_macros 0.28.0",
-]
-
-[[package]]
-name = "strum_macros"
-version = "0.27.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7695ce3845ea4b33927c055a39dc438a45b059f7c1b3d91d38d10355fb8cbca7"
-dependencies = [
- "heck 0.5.0",
- "proc-macro2",
- "quote",
- "syn 2.0.119",
+ "strum_macros",
 ]
 
 [[package]]
@@ -16679,7 +16733,7 @@ checksum = "0193cc4331cfd2f3d2011ef287590868599a2f33c3e69bc22c1a3d3acf9e02fb"
 name = "svg_preview"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aacode_actions",
  "file_icons",
  "gpui",
@@ -16989,8 +17043,8 @@ name = "tab_switcher"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_fuzzy",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "collections",
  "ctor",
@@ -17002,9 +17056,9 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
  "zlog",
 ]
 
@@ -17013,7 +17067,7 @@ name = "tabular_data_preview"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "editor",
@@ -17097,7 +17151,7 @@ dependencies = [
 name = "tasks_ui"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -17219,6 +17273,7 @@ dependencies = [
  "regex",
  "schemars 1.2.2",
  "serde",
+ "settings",
  "sysinfo 0.39.6",
  "task",
  "thiserror 2.0.21",
@@ -17227,7 +17282,6 @@ dependencies = [
  "util_macros",
  "vte",
  "windows 0.62.2",
- "zed_settings",
 ]
 
 [[package]]
@@ -17244,9 +17298,9 @@ dependencies = [
 name = "terminal_view"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -17271,13 +17325,13 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "shellexpand",
  "shlex 1.3.0",
  "task",
  "terminal",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -17352,8 +17406,8 @@ name = "theme_selector"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "editor",
@@ -17363,10 +17417,10 @@ dependencies = [
  "picker",
  "project",
  "serde_json",
+ "settings",
  "telemetry",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -17386,9 +17440,9 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "serde_json",
+ "settings",
  "tracing",
  "uuid",
- "zed_settings",
 ]
 
 [[package]]
@@ -17577,9 +17631,9 @@ name = "title_bar"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_ui",
  "aa_icons",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "agent_settings",
@@ -17605,11 +17659,11 @@ dependencies = [
  "schemars 1.2.2",
  "semver",
  "serde",
+ "settings",
  "smallvec",
  "telemetry",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -17846,7 +17900,7 @@ checksum = "06bdbd8cfc056b8d2e2e85f29b56a3bdbecb527cef81eb39e3e7b98af4652770"
 name = "toolchain_selector"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
+ "aa_ui_zed",
  "aa_util",
  "anyhow",
  "convert_case 0.11.0",
@@ -18374,14 +18428,14 @@ version = "0.1.0"
 name = "ui_prompt"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "gpui",
  "markdown",
  "menu",
+ "settings",
  "theme_settings",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -18776,9 +18830,9 @@ name = "vim"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
- "aa_gpui_kit_ui",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "anyhow",
@@ -18815,6 +18869,7 @@ dependencies = [
  "semver",
  "serde",
  "serde_json",
+ "settings",
  "settings_ui",
  "task",
  "theme_settings",
@@ -18822,7 +18877,6 @@ dependencies = [
  "util_macros",
  "vim_mode_setting",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -18830,7 +18884,7 @@ name = "vim_mode_setting"
 version = "0.1.0"
 dependencies = [
  "gpui",
- "zed_settings",
+ "settings",
 ]
 
 [[package]]
@@ -19902,17 +19956,17 @@ dependencies = [
 name = "which_key"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_ui",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "collections",
  "command_palette",
  "gpui",
+ "settings",
  "theme_settings",
  "vim_mode_setting",
  "workspace",
- "zed_settings",
 ]
 
 [[package]]
@@ -20862,14 +20916,14 @@ name = "workspace"
 version = "0.1.0"
 dependencies = [
  "aa_clock",
- "aa_gpui_kit_component",
+ "aa_component_zed",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_settings_content",
- "aa_gpui_kit_ui",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
  "aa_theme_gpui",
+ "aa_ui_zed",
  "aa_util",
  "aacode_actions",
  "ac_constant",
@@ -20905,9 +20959,10 @@ dependencies = [
  "serde",
  "serde_json",
  "session",
+ "settings",
  "smallvec",
  "sqlez",
- "strum 0.28.0",
+ "strum",
  "task",
  "telemetry",
  "tempfile",
@@ -20917,7 +20972,6 @@ dependencies = [
  "uuid",
  "worktree",
  "zed_proto",
- "zed_settings",
  "zlog",
 ]
 
@@ -20948,12 +21002,12 @@ dependencies = [
  "rand 0.9.5",
  "rpc",
  "serde_json",
+ "settings",
  "smallvec",
  "sum_tree",
  "tracing",
  "worktree",
  "zed_paths",
- "zed_settings",
  "zlog",
  "ztracing",
 ]
@@ -21018,7 +21072,7 @@ dependencies = [
  "anyhow",
  "schemars 1.2.2",
  "serde",
- "strum 0.28.0",
+ "strum",
 ]
 
 [[package]]
@@ -21406,7 +21460,7 @@ dependencies = [
  "anyhow",
  "serde",
  "serde_json",
- "strum 0.28.0",
+ "strum",
  "uuid",
  "zeta_prompt",
 ]
@@ -21448,38 +21502,6 @@ dependencies = [
  "prost-build",
  "protox",
  "serde",
-]
-
-[[package]]
-name = "zed_settings"
-version = "0.1.0"
-dependencies = [
- "aa_gpui_kit_fs",
- "aa_gpui_kit_settings_content",
- "aa_release_channel",
- "aa_settings_json",
- "aa_settings_macros",
- "aa_util",
- "anyhow",
- "collections",
- "ec4rs",
- "futures 0.3.34",
- "gpui",
- "gpui_util",
- "inventory",
- "json5 0.4.1",
- "log",
- "path",
- "rust-embed",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "smallvec",
- "strum 0.28.0",
- "tracing",
- "zed_migrator",
- "zed_paths",
 ]
 
 [[package]]
@@ -21616,7 +21638,7 @@ dependencies = [
  "anyhow",
  "imara-diff",
  "serde",
- "strum 0.28.0",
+ "strum",
 ]
 
 [[package]]
