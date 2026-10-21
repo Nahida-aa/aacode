@@ -15966,6 +15966,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "settings_content"
+version = "0.1.0"
+dependencies = [
+ "aa_language_model_core",
+ "aa_settings_json",
+ "aa_settings_macros",
+ "aa_util",
+ "anyhow",
+ "collections",
+ "derive_more",
+ "gpui",
+ "gpui_util",
+ "log",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "serde_json_lenient",
+ "serde_path_to_error",
+ "strum",
+ "tempfile",
+]
+
+[[package]]
 name = "settings_ui"
 version = "0.1.0"
 dependencies = [
@@ -21813,7 +21836,3 @@ dependencies = [
  "syn 3.0.6",
  "winnow 1.0.4",
 ]
-
-[[patch.unused]]
-name = "zed_migrator"
-version = "0.1.0"
