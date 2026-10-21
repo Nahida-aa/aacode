@@ -2,7 +2,7 @@
 
 - 目标：`Nahida-aa/zed` 分支 `fix/65655-openai-tool-call-empty-name-or-id`（commit `ac237f81f8`），
   范围 `language_model_core`（mapper + 错误枚举）+ `agent`（重试策略），UI 改动不在本 review 范围。
-- 配套材料：`issues/65655.md`（给上游 PR #65859 的评论草稿，立场一致：fail-fast 是选项之一，不主张合成）。
+- 配套材料：`issues/pr-65859.md`（给上游 PR #65859 的评论草稿 + 丢弃语义分析，立场一致：fail-fast 是选项之一，不主张合成）。
 - review 立场：不采信被审代码自带注释的自证（注释可能有误），逐条对照行为验证。
 
 ## 结论
