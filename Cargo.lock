@@ -420,17 +420,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa_gpui_kit_web_search"
-version = "0.1.0"
-dependencies = [
- "aa_cloud_llm_client",
- "anyhow",
- "collections",
- "gpui",
- "gpui_shared_string",
-]
-
-[[package]]
 name = "aa_icons"
 version = "0.1.0"
 dependencies = [
@@ -673,7 +662,6 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_rope",
- "aa_gpui_kit_web_search",
  "aa_language_model_gpui",
  "aa_release_channel",
  "aa_theme_gpui",
@@ -820,6 +808,7 @@ dependencies = [
  "vim_mode_setting",
  "wasm-bindgen",
  "watch",
+ "web_search_gpui",
  "web_search_providers",
  "which_key",
  "windows 0.62.2",
@@ -1130,7 +1119,6 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_text",
- "aa_gpui_kit_web_search",
  "aa_language_model_gpui",
  "aa_release_channel",
  "aa_theme_gpui",
@@ -1198,6 +1186,7 @@ dependencies = [
  "url",
  "uuid",
  "watch",
+ "web_search_gpui",
  "zed_paths",
  "zlog",
  "zstd 0.11.2+zstd.1.5.2",
@@ -7578,7 +7567,6 @@ dependencies = [
  "waker-fn",
  "web-time",
  "windows 0.62.2",
- "zed-font-kit",
  "zed-scap",
 ]
 
@@ -19645,11 +19633,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "web_search_gpui"
+version = "0.1.0"
+dependencies = [
+ "aa_cloud_llm_client",
+ "anyhow",
+ "collections",
+ "gpui",
+ "gpui_shared_string",
+]
+
+[[package]]
 name = "web_search_providers"
 version = "0.1.0"
 dependencies = [
  "aa_cloud_llm_client",
- "aa_gpui_kit_web_search",
  "aa_language_model_gpui",
  "anyhow",
  "client",
@@ -19659,6 +19657,7 @@ dependencies = [
  "gpui",
  "http_client",
  "serde_json",
+ "web_search_gpui",
 ]
 
 [[package]]

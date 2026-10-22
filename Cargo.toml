@@ -212,7 +212,7 @@ util = { package = "aa_util", git = "https://github.com/Nahida-aa/gpui_learn", r
 util_macros = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
 vim = { path = "packages/vim" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
-web_search = { package = "aa_gpui_kit_web_search", path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa_gpui_kit/aa_gpui_kit_web_search" }
+web_search = { package = "web_search_gpui", path = "/home/aa/repos/lib_ls/aa-stack/packages/ai/web_search_gpui" }
 which_key = { path = "packages/which_key" }
 workspace = { path = "packages/workspace" }
 
@@ -814,7 +814,7 @@ system_specs = { path = "/home/aa/repos/ai_ls/AAgent/packages/system_specs" }
 [patch."https://github.com/Nahida-aa/gpui_learn.git"]
 aa_assets_core = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/assets/aa_assets_core" }
 aa_assets_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/assets/aa_assets_gpui" }
-aa_theme_gpui = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/theme/aa_theme_gpui" }
+aa_theme_gpui = { path = "/home/aa/repos/lib_ls/aa-stack/packages/theme/aa_theme_gpui" }
 aa_ui_zed = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/ui/aa_ui_zed" }
 # clock 补了 utc_now() 别名（让照搬的 zed 代码零改动），同样走本地。
 aa_clock = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/clock" }
