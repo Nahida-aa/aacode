@@ -208,7 +208,7 @@ theme_selector = { path = "packages/theme_selector" }
 toolchain_selector = { path = "packages/status_bar/toolchain_selector" }
 ui_prompt = { path = "packages/ui_prompt" }
 
-util = { package = "aa_util", git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
+util = { package = "aa_util_gpui", path = "/home/aa/repos/lib_ls/aa-stack/packages/util/aa_util_gpui" }
 util_macros = { git = "https://github.com/Nahida-aa/gpui_learn", rev = "24001e5", version = "=0.1.0" }
 vim = { path = "packages/vim" }
 vim_mode_setting = { path = "packages/vim_mode_setting" }
@@ -843,12 +843,13 @@ aa_settings_json = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/aa_set
 # util / util_macros 同样必须走本地，否则图里会同时存在两份：
 #   · aacode 自己的 workspace 声明的是 git rev（workspace.dependencies L203-204）
 #   · 而 gpui_learn 的 grammars / language_core 里的 `util.workspace = true`
-#     是按 **gpui_learn 自己的 workspace** 解析的，落到它的 packages/util（path）
-# 两者 source 不同 ⇒ 编译出两个 crate。util 导出 Range / Cow / HashMap 等类型，
+#     是按 **gpui_learn 自己的 workspace** 解析的，落到它 workspace.dependencies
+#     里的 util 条目（现为 aa-stack 的 aa_util_gpui，package rename 保持键 util）
+# 两者 source 不同 ⇒ 编译出两个 crate。aa_util_gpui 导出 Range / Cow / HashMap 等类型，
 # 一旦跨 crate 混用就是 E0308「multiple different versions」。
 # 与上面 ui / ui_input / component 同理：凡是从 gpui_learn 侧被间接拉进来的 crate，
 # 都要在此声明 path patch 才能与其 workspace 解析结果一致。
-aa_util = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/util" }
+aa_util_gpui = { path = "/home/aa/repos/lib_ls/aa-stack/packages/util/aa_util_gpui" }
 util_macros = { path = "/home/aa/repos/lib_ls/aa-stack/packages/util/util_macros" }
 aa_gpui_kit_grammars = { path = "/home/aa/repos/ide_ls/gpui_learn/packages/aa/grammars" }
 

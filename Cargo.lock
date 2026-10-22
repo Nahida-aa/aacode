@@ -227,7 +227,7 @@ dependencies = [
 name = "aa_gpui_kit_askpass"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "futures 0.3.34",
  "gpui",
@@ -247,7 +247,7 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-channel 2.5.0",
  "async-std",
@@ -286,7 +286,7 @@ dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-channel 2.5.0",
  "async-trait",
@@ -318,7 +318,7 @@ name = "aa_gpui_kit_grammars"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_language_core",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "rust-embed",
  "tree-sitter",
@@ -382,7 +382,7 @@ dependencies = [
 name = "aa_gpui_kit_rope"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "heapless",
  "log",
  "rayon",
@@ -398,7 +398,7 @@ version = "0.1.0"
 dependencies = [
  "aa_clock",
  "aa_gpui_kit_rope",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "log",
@@ -482,7 +482,7 @@ dependencies = [
 name = "aa_settings_json"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "serde",
  "serde_json",
@@ -575,7 +575,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa_util"
+name = "aa_util_gpui"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -614,43 +614,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "aa_util_gpui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-fs",
- "async_zip",
- "collections",
- "command-fds",
- "dirs",
- "futures 0.3.34",
- "futures-lite 2.6.1",
- "globset",
- "gpui_util",
- "itertools 0.14.0",
- "libc",
- "log",
- "mach2 0.5.0",
- "nix 0.30.1",
- "path",
- "percent-encoding",
- "regex",
- "rust-embed",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "shlex 1.3.0",
- "smol",
- "take-until",
- "tempfile",
- "unicase",
- "url",
- "walkdir",
- "which",
-]
-
-[[package]]
 name = "aacode"
 version = "1.23.2"
 dependencies = [
@@ -666,7 +629,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "acp_thread",
@@ -823,7 +786,7 @@ dependencies = [
 name = "aacode_actions"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "gpui",
  "schemars 1.2.2",
  "serde",
@@ -837,7 +800,7 @@ version = "0.1.0"
 name = "ac_util"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-fs",
  "collections",
@@ -942,7 +905,7 @@ dependencies = [
  "aa_gpui_kit_text",
  "aa_language_model_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "action_log",
  "agent-client-protocol",
  "agent_settings",
@@ -991,7 +954,7 @@ name = "acp_tools"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "agent-client-protocol",
  "agent_servers",
  "agent_ui",
@@ -1014,7 +977,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "buffer_diff",
  "collections",
@@ -1040,7 +1003,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "auto_update",
  "editor",
@@ -1123,7 +1086,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "acp_thread",
  "action_log",
  "agent-client-protocol",
@@ -1250,7 +1213,7 @@ dependencies = [
  "aa_language_model_gpui",
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "ac_constant",
  "acp_thread",
  "action_log",
@@ -1290,7 +1253,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_language_model_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "convert_case 0.11.0",
@@ -1312,7 +1275,7 @@ name = "agent_skills"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "base64 0.22.1",
  "const_format",
@@ -1339,7 +1302,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "acp_thread",
@@ -1754,7 +1717,7 @@ dependencies = [
 name = "assets"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "gpui",
 ]
@@ -2140,7 +2103,7 @@ dependencies = [
 name = "audio"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "cpal",
@@ -2172,7 +2135,7 @@ version = "0.1.0"
 dependencies = [
  "aa_clock",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "client",
  "ctor",
@@ -2201,7 +2164,7 @@ version = "0.1.0"
 dependencies = [
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "agent_skills",
@@ -3110,7 +3073,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "ctor",
  "gpui",
  "imara-diff",
@@ -3278,7 +3241,7 @@ name = "call"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "audio",
  "client",
@@ -3305,7 +3268,7 @@ version = "0.1.0"
 dependencies = [
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "editor",
  "futures 0.3.34",
@@ -3501,7 +3464,7 @@ dependencies = [
  "aa_clock",
  "aa_gpui_kit_text",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "client",
  "collections",
@@ -3675,7 +3638,7 @@ dependencies = [
  "aa-session",
  "aa_gpui_kit_askpass",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "ac_util",
  "anyhow",
  "axum",
@@ -3720,7 +3683,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_text",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "ac_constant",
  "ad_credentials_provider",
  "anyhow",
@@ -3927,7 +3890,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "anyhow",
@@ -4006,7 +3969,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "client",
@@ -4166,7 +4129,7 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 name = "context_server"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-channel 2.5.0",
  "async-trait",
@@ -4217,7 +4180,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_icons",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "command_palette_hooks",
@@ -4250,7 +4213,7 @@ name = "copilot_chat"
 version = "0.1.0"
 dependencies = [
  "aa_language_model_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anthropic",
  "anyhow",
  "collections",
@@ -4269,7 +4232,7 @@ version = "0.1.0"
 dependencies = [
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "ac_constant",
  "anyhow",
  "copilot",
@@ -5033,7 +4996,7 @@ name = "dap"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-compression",
  "async-pipe",
@@ -5077,7 +5040,7 @@ name = "dap_adapters"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "collections",
@@ -5196,7 +5159,7 @@ version = "0.1.0"
 dependencies = [
  "aa_env_vars",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "gpui",
  "indoc",
@@ -5213,7 +5176,7 @@ dependencies = [
 name = "debug_adapter_extension"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "collections",
@@ -5228,7 +5191,7 @@ dependencies = [
 name = "debugger_tools"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "dap",
  "editor",
@@ -5249,7 +5212,7 @@ dependencies = [
  "aa_gpui_kit_ui_input",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "bitflags 2.13.2",
@@ -5419,7 +5382,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-tar",
  "async-trait",
@@ -5453,7 +5416,7 @@ dependencies = [
  "aa_gpui_kit_text",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "agent_settings",
  "anyhow",
@@ -5733,7 +5696,7 @@ dependencies = [
  "aa_language_model_gpui",
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ad_credentials_provider",
  "ai_onboarding",
@@ -5799,7 +5762,7 @@ version = "0.1.0"
 dependencies = [
  "aa_clock",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "env_logger 0.11.11",
@@ -5852,7 +5815,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_text",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "buffer_diff",
@@ -5897,7 +5860,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "aho-corasick",
  "anyhow",
@@ -6046,7 +6009,7 @@ name = "encoding_selector"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "editor",
  "encoding_rs",
  "fuzzy",
@@ -6229,7 +6192,7 @@ dependencies = [
 name = "etw_tracing"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "gpui",
  "net",
@@ -6323,7 +6286,7 @@ name = "extension"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "cloud_api_types",
@@ -6371,7 +6334,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_release_channel",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-compression",
  "async-tar",
@@ -6434,7 +6397,7 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "cloud_api_types",
@@ -6560,7 +6523,7 @@ dependencies = [
 name = "feedback"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "client",
  "extension_host",
@@ -6577,7 +6540,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "channel",
@@ -6608,7 +6571,7 @@ name = "file_icons"
 version = "0.1.0"
 dependencies = [
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "gpui",
  "settings_content",
 ]
@@ -7168,7 +7131,7 @@ name = "git_hosting_providers"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_git",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "futures 0.3.34",
@@ -7199,7 +7162,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "agent_settings",
@@ -7264,7 +7227,7 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "buffer_diff",
@@ -7413,7 +7376,7 @@ dependencies = [
  "aa_gpui_kit_text",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "editor",
  "gpui",
  "indoc",
@@ -8570,7 +8533,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "db",
  "editor",
@@ -8715,7 +8678,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "command_palette_hooks",
@@ -8753,7 +8716,7 @@ name = "install_cli"
 version = "0.1.0"
 dependencies = [
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "ac_constant",
  "anyhow",
  "client",
@@ -9140,7 +9103,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "dap",
@@ -9282,7 +9245,7 @@ dependencies = [
  "aa_gpui_kit_ui_input",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "collections",
@@ -9407,7 +9370,7 @@ dependencies = [
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "chardetng",
@@ -9479,7 +9442,7 @@ dependencies = [
 name = "language_extension"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "collections",
@@ -9508,7 +9471,7 @@ dependencies = [
  "aa_language_model_gpui",
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "ai_onboarding",
  "anthropic",
  "anyhow",
@@ -9591,7 +9554,7 @@ name = "language_selector"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "editor",
  "file_icons",
@@ -9613,7 +9576,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "client",
@@ -9649,7 +9612,7 @@ dependencies = [
  "aa_gpui_kit_grammars",
  "aa_gpui_kit_rope",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-compression",
  "async-fs",
@@ -10035,7 +9998,7 @@ name = "livekit_client"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "audio",
@@ -10263,7 +10226,7 @@ name = "lsp"
 version = "0.1.0"
 dependencies = [
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "ac_constant",
  "anyhow",
  "async-channel 2.5.0",
@@ -10301,7 +10264,7 @@ name = "lsp_command_selector"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "editor",
  "futures 0.3.34",
@@ -10325,7 +10288,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "editor",
@@ -10464,7 +10427,7 @@ dependencies = [
  "aa_gpui_kit_mermaid_render",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "assets",
  "base64 0.22.1",
@@ -10498,7 +10461,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "buffer_diff",
@@ -10863,7 +10826,7 @@ checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 name = "miniprofiler_ui"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "command_palette_hooks",
  "gpui",
@@ -10973,7 +10936,7 @@ dependencies = [
  "aa_gpui_kit_rope",
  "aa_gpui_kit_text",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "buffer_diff",
  "collections",
@@ -11186,7 +11149,7 @@ dependencies = [
 name = "node_runtime"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-compression",
  "async-std",
@@ -11237,7 +11200,7 @@ version = "0.1.0"
 dependencies = [
  "aa_component_zed",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "channel",
@@ -11968,7 +11931,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "client",
@@ -12080,7 +12043,7 @@ version = "0.1.0"
 dependencies = [
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "editor",
  "file_icons",
  "futures 0.3.34",
@@ -12116,7 +12079,7 @@ name = "openai_subscribed"
 version = "0.1.0"
 dependencies = [
  "aa_language_model_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "base64 0.22.1",
  "credentials_provider",
@@ -12246,7 +12209,7 @@ dependencies = [
  "aa_gpui_kit_rope",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "editor",
  "futures 0.3.34",
@@ -12284,7 +12247,7 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "async-channel 2.5.0",
@@ -13183,7 +13146,7 @@ dependencies = [
  "aa_gpui_kit_ui_input",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "db",
@@ -13206,7 +13169,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_rope",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "editor",
  "gpui",
  "language",
@@ -13533,7 +13496,7 @@ name = "prettier"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "gpui",
@@ -13681,7 +13644,7 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_gpui_kit_text",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "ac_util",
  "ad_credentials_provider",
  "aho-corasick",
@@ -13760,7 +13723,7 @@ dependencies = [
  "aa_gpui_kit_git",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "client",
@@ -13801,7 +13764,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_release_channel",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "editor",
  "futures 0.3.34",
@@ -13826,7 +13789,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "agent_skills",
  "anyhow",
  "assets",
@@ -14559,7 +14522,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_release_channel",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "chrono",
@@ -14723,7 +14686,7 @@ dependencies = [
  "aa_gpui_kit_askpass",
  "aa_gpui_kit_fs",
  "aa_release_channel",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-trait",
  "base64 0.22.1",
@@ -14782,7 +14745,7 @@ dependencies = [
  "aa_language_model_gpui",
  "aa_release_channel",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "ac_util",
  "acp_thread",
  "action_log",
@@ -14860,7 +14823,7 @@ version = "0.1.0"
 dependencies = [
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "async-dispatcher",
@@ -15080,7 +15043,7 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-tungstenite",
  "base64 0.22.1",
@@ -15565,7 +15528,7 @@ dependencies = [
  "aa_gpui_kit_text",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "any_vec",
  "anyhow",
@@ -15888,7 +15851,7 @@ dependencies = [
 name = "session"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "db",
  "gpui",
  "serde_json",
@@ -15903,7 +15866,7 @@ dependencies = [
  "aa_release_channel",
  "aa_settings_json",
  "aa_settings_macros",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "ec4rs",
@@ -15938,7 +15901,7 @@ dependencies = [
  "aa_language_model_core",
  "aa_settings_json",
  "aa_settings_macros",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "derive_more",
@@ -15965,7 +15928,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "ad_credentials_provider",
@@ -16124,7 +16087,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "acp_thread",
  "action_log",
@@ -16389,7 +16352,7 @@ name = "snippet_provider"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "collections",
  "extension",
@@ -16567,7 +16530,7 @@ name = "streaming_diff"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_rope",
- "aa_util",
+ "aa_util_gpui",
  "criterion",
  "ordered-float 5.5.0",
  "rand 0.9.5",
@@ -17053,7 +17016,7 @@ dependencies = [
  "aa_gpui_fuzzy",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "collections",
  "ctor",
  "editor",
@@ -17076,7 +17039,7 @@ version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_text",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "editor",
  "fuzzy",
@@ -17136,7 +17099,7 @@ checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
 name = "task"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "collections",
@@ -17160,7 +17123,7 @@ name = "tasks_ui"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "collections",
@@ -17262,7 +17225,7 @@ dependencies = [
  "aa_release_channel",
  "aa_settings_macros",
  "aa_theme_gpui",
- "aa_util",
+ "aa_util_gpui",
  "alacritty_terminal",
  "anyhow",
  "async-channel 2.5.0",
@@ -17309,7 +17272,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "async-recursion",
@@ -17416,7 +17379,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "editor",
  "fuzzy",
@@ -17642,7 +17605,7 @@ dependencies = [
  "aa_icons",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "agent_settings",
  "anyhow",
@@ -17909,7 +17872,7 @@ name = "toolchain_selector"
 version = "0.1.0"
 dependencies = [
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "convert_case 0.11.0",
  "editor",
@@ -18841,7 +18804,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "anyhow",
  "async-compat",
@@ -19977,7 +19940,7 @@ version = "0.1.0"
 dependencies = [
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "collections",
  "command_palette",
@@ -20942,7 +20905,7 @@ dependencies = [
  "aa_release_channel",
  "aa_theme_gpui",
  "aa_ui_zed",
- "aa_util",
+ "aa_util_gpui",
  "aacode_actions",
  "ac_constant",
  "agent_settings",
@@ -21002,7 +20965,7 @@ dependencies = [
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
  "aa_gpui_kit_text",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "async-channel 2.5.0",
  "async-lock",
@@ -21099,7 +21062,7 @@ name = "x_ai_subscribed"
 version = "0.1.0"
 dependencies = [
  "aa_language_model_gpui",
- "aa_util",
+ "aa_util_gpui",
  "anyhow",
  "base64 0.22.1",
  "credentials_provider",
@@ -21488,7 +21451,7 @@ dependencies = [
 name = "zed_paths"
 version = "0.1.0"
 dependencies = [
- "aa_util",
+ "aa_util_gpui",
  "const_format",
  "dirs",
  "ignore",
