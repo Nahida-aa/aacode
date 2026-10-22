@@ -238,8 +238,15 @@ mod tests {
                 .get(name)
                 .unwrap_or_else(|_| panic!("内置主题 {name} 应被注册"));
             let syntax = theme.syntax();
+            // 上游 `SyntaxTheme` 没有 names() 这类便利方法，改用
+            // `get_capture_name` 按索引数：capture_name_map 的 value 是从 0
+            // 连续分配的（`new`/`merge` 均如此），数到第一个空洞即总数。
+            let mut capture_count = 0;
+            while syntax.get_capture_name(capture_count).is_some() {
+                capture_count += 1;
+            }
             assert_eq!(
-                syntax.names().count(),
+                capture_count,
                 102,
                 "{name} 的语法 capture 数应与 JSON 一致"
             );
