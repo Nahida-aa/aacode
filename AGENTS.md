@@ -14,6 +14,7 @@ Before editing files for a substantial task:
 
 - 修改代码后, 如果认为适合提交, 就自行提交
 - 禁止删除或手动修改 `Cargo.lock`
+
 ## Debug
 
 - 使用 tracing
@@ -46,7 +47,6 @@ skill for more detailed guidance.
 ---
 
 所有代码统一放在 `packages/` 下，不分 Rust/TS：
-
 
 **非主线（仅参考/历史，不保证编译）：**
 
@@ -162,6 +162,7 @@ git -C ~/repos/ide_ls/learn_ls/zed show --stat <sha>
 ```
 
 两个要点：
+
 - **一个功能常跨多个 crate**。不要按功能名猜归属，按**实际文件路径**映射。
   当时的错误就是把 `edit_prediction_ui/.../edit_prediction_button.rs`（状态栏按钮
   和点击后的菜单）记成了 `packages/edit_prediction`，于是跟着错误的路径去核对，
@@ -207,17 +208,18 @@ bun tools/gh-releases.ts zed-industries/zed --limit 15     # 按时间倒序列�
 
 `.agents/` 是本项目的知识库，按用途分：
 
-| 路径 | 用途 |
-|---|---|
-| `zed-port.md` | **搬 zed 包之前必读**，§1~§15 是坑，§16 是 rev→rev 同步索引 |
-| `zed-modifications.md` | aacode 相对 zed 的**有意改动**（命名映射、结构重组、各 crate 改动） |
-| `CORRECTIONS.md` | 架构纠错记录与技术细节 |
-| `fork-sync/<old7>_<new7>.md` | **每次 rev→rev 同步的计划与记录**，一个批次一个文件 |
-| `memory/` | 排查方法论与项目缺口清单 |
-| `zed/` | zed 相关研究笔记（agent、workspace、gpui action 派发等） |
-| `learn.local.md` | 本地参考项目路径清单 |
-| `skills/` | 自定义 skill 定义（ast-grep / cargo / gpui-test / outline） |
-| `toolcell.md` | 各家 agent 工具对照（opencode / codex / zed / claude code），目前多为待填 |
+| 路径                         | 用途                                                                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `zed-port.md`                | **搬 zed 包之前必读**，§1~§15 是坑，§16 是 rev→rev 同步索引                                                              |
+| `zed-modifications.md`       | aacode 相对 zed 的**有意改动**（命名映射、结构重组、各 crate 改动）                                                      |
+| `CORRECTIONS.md`             | 架构纠错记录与技术细节                                                                                                   |
+| `fork-sync/<old7>_<new7>.md` | **每次 rev→rev 同步的计划与记录**，一个批次一个文件                                                                      |
+| `memory/`                    | 排查方法论与项目缺口清单                                                                                                 |
+| `zed/`                       | zed 相关研究笔记（agent、workspace、gpui action 派发等）                                                                 |
+| `learn.local.md`             | 本地参考项目路径清单                                                                                                     |
+| `skills/`                    | 自定义 skill 定义（ast-grep / cargo / gpui-test / outline）                                                              |
+| `toolcell.md`                | 各家 agent 工具对照（opencode / codex / zed / claude code），目前多为待填                                                |
+| `issues/`                    | 单个问题/PR 记录：上游 zed issue（`pr-*` / `review-*` / `pr-issue-*`）与自研问题（`YYYY-MM-DD-*`，如工具调用流截断排查） |
 
 > 新增 `.agents/` 下的文档时，回来更新这张表，避免内容变成孤儿。
 
