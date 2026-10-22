@@ -118,7 +118,6 @@ dependencies = [
  "aa-kernel",
  "aa-llm",
  "aa-session",
- "aa_gpui_kit_settings_content",
  "anyhow",
  "axum",
  "clap",
@@ -129,6 +128,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
+ "settings_content",
  "tokio",
  "tower-http",
  "tracing",
@@ -413,29 +413,6 @@ dependencies = [
  "tracing",
  "unicode-segmentation",
  "ztracing",
-]
-
-[[package]]
-name = "aa_gpui_kit_settings_content"
-version = "0.1.0"
-dependencies = [
- "aa_language_model_core",
- "aa_settings_json",
- "aa_settings_macros",
- "aa_util",
- "anyhow",
- "collections",
- "derive_more",
- "gpui",
- "gpui_util",
- "log",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "serde_json_lenient",
- "serde_path_to_error",
- "strum",
- "tempfile",
 ]
 
 [[package]]
@@ -3708,7 +3685,6 @@ dependencies = [
  "aa-server",
  "aa-session",
  "aa_gpui_kit_askpass",
- "aa_gpui_kit_settings_content",
  "aa_release_channel",
  "aa_util",
  "ac_util",
@@ -3734,6 +3710,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
+ "settings_content",
  "tempfile",
  "tokio",
  "tracing",
@@ -6641,10 +6618,10 @@ dependencies = [
 name = "file_icons"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_settings_content",
  "aa_theme_gpui",
  "aa_util",
  "gpui",
+ "settings_content",
 ]
 
 [[package]]
@@ -10788,7 +10765,6 @@ dependencies = [
 name = "migrator"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_settings_content",
  "aa_settings_json",
  "anyhow",
  "collections",
@@ -10798,6 +10774,7 @@ dependencies = [
  "pretty_assertions",
  "serde_json",
  "serde_json_lenient",
+ "settings_content",
  "streaming-iterator",
  "tree-sitter",
  "tree-sitter-json",
@@ -15934,7 +15911,6 @@ name = "settings"
 version = "0.1.0"
 dependencies = [
  "aa_gpui_kit_fs",
- "aa_gpui_kit_settings_content",
  "aa_release_channel",
  "aa_settings_json",
  "aa_settings_macros",
@@ -15957,6 +15933,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_json_lenient",
+ "settings_content",
  "smallvec",
  "strum",
  "tempfile",
@@ -17293,7 +17270,6 @@ dependencies = [
 name = "terminal"
 version = "0.1.0"
 dependencies = [
- "aa_gpui_kit_settings_content",
  "aa_release_channel",
  "aa_settings_macros",
  "aa_theme_gpui",
@@ -17316,6 +17292,7 @@ dependencies = [
  "schemars 1.2.2",
  "serde",
  "settings",
+ "settings_content",
  "sysinfo 0.39.6",
  "task",
  "thiserror 2.0.21",
@@ -17470,7 +17447,6 @@ name = "theme_settings"
 version = "0.1.0"
 dependencies = [
  "aa_assets_gpui",
- "aa_gpui_kit_settings_content",
  "aa_settings_macros",
  "aa_theme_gpui",
  "anyhow",
@@ -17483,6 +17459,7 @@ dependencies = [
  "serde",
  "serde_json",
  "settings",
+ "settings_content",
  "tracing",
  "uuid",
 ]
@@ -20961,7 +20938,6 @@ dependencies = [
  "aa_component_zed",
  "aa_gpui_kit_fs",
  "aa_gpui_kit_git",
- "aa_gpui_kit_settings_content",
  "aa_gpui_kit_ui_input",
  "aa_release_channel",
  "aa_theme_gpui",
@@ -21002,6 +20978,7 @@ dependencies = [
  "serde_json",
  "session",
  "settings",
+ "settings_content",
  "smallvec",
  "sqlez",
  "strum",
