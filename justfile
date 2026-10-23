@@ -159,3 +159,35 @@ uninstall:
 # cargo tree -e no-dev -i -p terminal_view    # 谁依赖 terminal_view（反向）
 # cargo tree -e no-dev -p terminal_view       # terminal_view 依赖谁（正向）
 # cargo tree --prefix none -p terminal_view   # 简洁版
+
+# 包外预构建 release-quick 产物（install-quick-prebuilt 的前置，也可单独跑）。
+# 为什么在包外编：makepkg 会往 RUSTFLAGS 追加 DEBUG_RUSTFLAGS="-C debuginfo=2"
+# （/etc/makepkg.conf 的 OPTIONS=(debug)，见 /usr/share/makepkg/buildenv/rust.sh），
+# 且大 crate 的 rustc 峰值内存高（project 5.5G，曾触发 earlyoom）。-j 2 压低
+# 并发峰值。lld 已在 .cargo/config.toml，无需 export RUSTFLAGS。
+build-quick:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export LK_CUSTOM_WEBRTC="$HOME/.cache/aacode/webrtc/webrtc-0001d84-4-linux-x64-release"
+    export ZED_RELEASE_CHANNEL="{{_channel}}" CARGO_BUILD_WARNINGS=allow
+    cargo build -p aacode --profile release-quick -j 2
+
+# 安装**已编好**的 release-quick 产物（先 just build-quick）。与 install-quick
+# 的区别：aa-bundle 加 --prebuilt，生成的 PKGBUILD build() 不编译、只校验
+# target/release-quick/aacode 存在，package() 直接 install 生成期钉死的路径，
+# makedepends 为空。二进制在**包外**编译，因此不受 makepkg 注入的
+# DEBUG_RUSTFLAGS 影响。重新构建后必须重跑本 recipe（路径生成期钉死），
+# 否则装的是旧产物。改过 aa-bundle 先 just -C ~/repos/ide_ls/gpui_learn install-cli。
+install-quick-prebuilt:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    out="target/aa-bundle/pkgbuild/aacode"
+    rm -rf "$out"
+    aa-bundle --format pkgbuild -p packages/apps/aacode \
+      --profile release-quick --prebuilt \
+      --bundle-meta "Cargo.toml#[package, metadata, bundle-shared]" \
+      --bundle-meta "Cargo.toml#[package, metadata, bundle-stable]" \
+      --out "$out"
+    (cd "$out" && makepkg -sif --noconfirm)
+    command -v kbuildsycoca6 >/dev/null && kbuildsycoca6 || true
+    echo "已通过 pacman 安装 aacode（prebuilt release-quick 产物）（查询：pacman -Ql aacode）"
