@@ -1,29 +1,38 @@
-//! 单个 provider 的配置形状 + 解析成库层客户端。
+//! 一个 OpenAI 兼容端点的配置形状 + 解析成库层客户端。
+//!
+//! 字段名对齐 Zed `OpenAiCompatibleSettingsContent` / `OpenAiCompatibleAvailableModel`
+//! （`settings_content/src/language_model.rs:424`）：
+//! - `api_url` / `available_models` / `headers`；
+//! - 模型事实 `context_window`（Zed 叫 `max_tokens`，但那是上下文窗口，不是输出上限）
+//!   与 `max_output_tokens`；
+//! - `capabilities` 的默认值与 Zed 相同（`tools` 开、`images` 关、
+//!   `max_tokens_parameter` 关 → 默认发 `max_completion_tokens`）。
+//!
+//! `auth` 是 aa-ai 的扩展：Zed 把密钥放钥匙串，这里放「变量名」。
 
 use std::collections::BTreeMap;
 
 use aa_ai_openai::OpenAiLanguageModelProvider;
-use aa_language_model::provider::Model;
+use aa_language_model::provider::{Model, ReasoningEffort};
 use serde::Deserialize;
 
 use crate::credentials::Credentials;
 use crate::error::ConfigError;
 
-/// 一个 provider 端点。加提供商 = 加一个 key（对应 opencode 的 `provider.<id>`、
-/// Zed 的 `openai_compatible.<id>`）。
+/// 一个 OpenAI 兼容端点。加提供商 = 加一个 key。
 #[derive(Debug, Clone, Deserialize)]
-pub struct ProviderConfig {
+pub struct OpenAiCompatibleProvider {
     /// 已包含版本段，例如 `https://minekuai.cn/v1`（代码只拼 `/chat/completions`）。
-    pub base_url: String,
+    pub api_url: String,
     /// 鉴权方式；省略等价于 Bearer + `{ID}_API_KEY`。
     #[serde(default)]
     pub auth: AuthConfig,
     /// 额外 header，同名覆盖默认值。
     #[serde(default)]
     pub headers: BTreeMap<String, String>,
-    /// 模型事实表；模型名不必在这里声明也能用（会拿到默认事实）。
+    /// 模型表。顺序保留（以后模型选择器按配置顺序展示）。
     #[serde(default)]
-    pub models: BTreeMap<String, ModelConfig>,
+    pub available_models: Vec<AvailableModel>,
 }
 
 /// 鉴权方式。密钥本身永远不在配置里，只有变量名。
@@ -83,17 +92,17 @@ pub fn derived_env_name(provider: &str) -> String {
     name
 }
 
-impl ProviderConfig {
+impl OpenAiCompatibleProvider {
     /// 解析凭证并构造库层客户端。
     pub fn resolve(
         &self,
         id: &str,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, ConfigError> {
-        if self.base_url.trim().is_empty() {
+        if self.api_url.trim().is_empty() {
             return Err(ConfigError::Provider {
                 provider: id.to_owned(),
-                message: "base_url 不能为空".to_owned(),
+                message: "api_url 不能为空".to_owned(),
             });
         }
 
@@ -118,20 +127,37 @@ impl ProviderConfig {
             }
         };
 
-        let mut client = client.with_base_url(self.base_url.clone());
+        let mut client = client.with_base_url(self.api_url.clone());
         for (name, value) in &self.headers {
             client = client.with_header(name.clone(), value.clone());
         }
 
-        let models = self
-            .models
-            .iter()
-            .map(|(model_id, config)| (model_id.clone(), config.to_model(id, model_id)))
-            .collect();
+        let mut models = BTreeMap::new();
+        for entry in &self.available_models {
+            if !entry.capabilities.chat_completions {
+                return Err(ConfigError::UnsupportedModel {
+                    provider: id.to_owned(),
+                    model: entry.name.clone(),
+                    reason: "capabilities.chat_completions=false（Responses API 尚未支持）"
+                        .to_owned(),
+                });
+            }
+
+            let resolved = ResolvedModel {
+                model: entry.to_model(id),
+                reasoning_effort: entry.reasoning_effort,
+            };
+            if models.insert(entry.name.clone(), resolved).is_some() {
+                return Err(ConfigError::DuplicateModel {
+                    provider: id.to_owned(),
+                    model: entry.name.clone(),
+                });
+            }
+        }
 
         Ok(ResolvedProvider {
             id: id.to_owned(),
-            base_url: self.base_url.clone(),
+            base_url: self.api_url.clone(),
             client,
             models,
         })
@@ -159,13 +185,18 @@ pub struct ResolvedProvider {
     pub id: String,
     pub base_url: String,
     pub client: OpenAiLanguageModelProvider,
-    models: BTreeMap<String, Model>,
+    models: BTreeMap<String, ResolvedModel>,
+}
+
+struct ResolvedModel {
+    model: Model,
+    reasoning_effort: Option<ReasoningEffort>,
 }
 
 impl ResolvedProvider {
     /// 配置里声明的模型（按 id 排序）。
     pub fn models(&self) -> impl Iterator<Item = &Model> {
-        self.models.values()
+        self.models.values().map(|entry| &entry.model)
     }
 
     /// 取模型事实；配置里没声明时返回默认事实，不报错。
@@ -174,8 +205,16 @@ impl ResolvedProvider {
     pub fn model(&self, id: &str) -> Model {
         self.models
             .get(id)
-            .cloned()
+            .map(|entry| entry.model.clone())
             .unwrap_or_else(|| Model::new(self.id.as_str(), id))
+    }
+
+    /// 配置里给这个模型写的默认推理强度。
+    ///
+    /// 这是**每请求选择**（`Request::reasoning_effort`）的默认值，不是模型事实，
+    /// 所以不进 `Model`（见 aa-ai ADR 0006 D4）。
+    pub fn reasoning_effort(&self, id: &str) -> Option<ReasoningEffort> {
+        self.models.get(id).and_then(|entry| entry.reasoning_effort)
     }
 
     /// 配置里是否显式声明了这个模型。
@@ -195,55 +234,84 @@ impl std::fmt::Debug for ResolvedProvider {
     }
 }
 
-/// 一个模型的事实。字段与 `aa_language_model::provider::Model` 对齐；
-/// 省略的字段用 `Model::new` 的默认值。
-#[derive(Debug, Clone, Default, Deserialize)]
-pub struct ModelConfig {
-    /// 上下文窗口（输入 + 输出）。
+/// 一个模型条目。
+#[derive(Debug, Clone, Deserialize)]
+pub struct AvailableModel {
+    /// 端点上的模型 id（wire 的 `model`）。
+    pub name: String,
+    /// 给人看的名字；暂未使用，留给 UI。
+    pub display_name: Option<String>,
+    /// 上下文窗口（输入 + 输出）。Zed 的 `max_tokens` 是同一个意思。
     pub context_window: Option<u64>,
     /// 输出上限。
     pub max_output_tokens: Option<u64>,
-    /// `true` 发 `max_completion_tokens`（o 系列 / GPT-5）。
-    pub uses_max_completion_tokens: Option<bool>,
-    /// `true` 把 `system` 发成 `developer`。
-    pub uses_developer_role: Option<bool>,
-    /// 是否接受 `tools` / `tool_choice`。
-    pub supports_tools: Option<bool>,
-    /// 是否接受 `parallel_tool_calls`。
-    pub supports_parallel_tool_calls: Option<bool>,
-    /// 是否接受图片输入。
-    pub supports_images: Option<bool>,
-    /// 是否接受 `prompt_cache_key`。
-    pub supports_prompt_cache_key: Option<bool>,
+    /// 默认推理强度；发起请求时填进 `Request::reasoning_effort`。
+    pub reasoning_effort: Option<ReasoningEffort>,
+    #[serde(default)]
+    pub capabilities: Capabilities,
 }
 
-impl ModelConfig {
-    pub fn to_model(&self, provider: &str, id: &str) -> Model {
-        let mut model = Model::new(provider, id);
+impl AvailableModel {
+    fn to_model(&self, provider: &str) -> Model {
+        let mut model = Model::new(provider, self.name.as_str());
 
-        if let Some(value) = self.uses_max_completion_tokens {
-            model.uses_max_completion_tokens = value;
-        }
-        if let Some(value) = self.uses_developer_role {
-            model.uses_developer_role = value;
-        }
-        if let Some(value) = self.supports_tools {
-            model.supports_tools = value;
-        }
-        if let Some(value) = self.supports_parallel_tool_calls {
-            model.supports_parallel_tool_calls = value;
-        }
-        if let Some(value) = self.supports_images {
-            model.supports_images = value;
-        }
-        if let Some(value) = self.supports_prompt_cache_key {
-            model.supports_prompt_cache_key = value;
-        }
         model.context_window = self.context_window;
         model.max_output_tokens = self.max_output_tokens;
 
+        model.supports_tools = self.capabilities.tools;
+        model.supports_images = self.capabilities.images;
+        model.supports_parallel_tool_calls = self.capabilities.parallel_tool_calls;
+        model.supports_prompt_cache_key = self.capabilities.prompt_cache_key;
+        // `max_tokens_parameter=true` 表示发 `max_tokens`，所以
+        // `uses_max_completion_tokens` 是它的反。
+        model.uses_max_completion_tokens = !self.capabilities.max_tokens_parameter;
+
         model
     }
+}
+
+/// 模型能力位。默认值与 Zed `OpenAiCompatibleModelCapabilities::default()` 一致。
+#[derive(Debug, Clone, Deserialize)]
+pub struct Capabilities {
+    /// 接受 `tools` / `tool_choice`。
+    #[serde(default = "default_true")]
+    pub tools: bool,
+    /// 接受图片输入。
+    #[serde(default)]
+    pub images: bool,
+    /// 接受 `parallel_tool_calls`。
+    #[serde(default)]
+    pub parallel_tool_calls: bool,
+    /// 接受 `prompt_cache_key`。
+    #[serde(default)]
+    pub prompt_cache_key: bool,
+    /// 端点支持 `/chat/completions`；`false` 表示只有 Responses API（尚未支持）。
+    #[serde(default = "default_true")]
+    pub chat_completions: bool,
+    /// 思考与工具调用交错（决定回放方式；目前只保存在配置里）。
+    #[serde(default)]
+    pub interleaved_reasoning: bool,
+    /// `true` 发 `max_tokens`，`false` 发 `max_completion_tokens`。
+    #[serde(default)]
+    pub max_tokens_parameter: bool,
+}
+
+impl Default for Capabilities {
+    fn default() -> Self {
+        Self {
+            tools: true,
+            images: false,
+            parallel_tool_calls: false,
+            prompt_cache_key: false,
+            chat_completions: true,
+            interleaved_reasoning: false,
+            max_tokens_parameter: false,
+        }
+    }
+}
+
+fn default_true() -> bool {
+    true
 }
 
 #[cfg(test)]

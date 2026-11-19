@@ -1,7 +1,7 @@
 //! aacode CLI：先用多提供商配置把真实 LLM 跑起来。
 //!
 //! 配置与凭证属于应用层（见 aa-ai `docs/design/library-api.md`）：这里读
-//! `providers.jsonc`、解析密钥，再把解好的端点交给库层。
+//! `settings.jsonc`、解析密钥，再把解好的端点交给库层。
 //!
 //! ```bash
 //! aa-agent-cli providers              # 列配置里的端点（不读密钥）
@@ -16,7 +16,7 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 
-use aa_config::{ProvidersConfig, default_path, derived_env_name};
+use aa_config::{Settings, default_path, derived_env_name};
 use aa_language_model::provider::{CompletionEvent, LanguageModelClient, StopReason, TokenUsage};
 use aa_language_model::request::Request;
 use aa_language_model::request::message::{ContentPart, Message, Role};
@@ -30,12 +30,12 @@ aacode — 多提供商 LLM 客户端
   aa-agent-cli [--config <PATH>] chat <provider> <model> [prompt...]
 
 配置:
-  默认 $AACODE_CONFIG，否则 {config_dir}/aacode/providers.jsonc
+  默认 $AACODE_SETTINGS，否则 {config_dir}/aacode/settings.jsonc
   密钥: auth.env 列出的环境变量（省略则 <PROVIDER_ID>_API_KEY）
 ";
 
 struct Args {
-    config: PathBuf,
+    settings: PathBuf,
     command: Command,
 }
 
@@ -77,31 +77,35 @@ async fn main() -> ExitCode {
 
 async fn run(args: Args) -> Result<(), String> {
     // `providers` 只解析配置文本，不触发凭证解析；models/chat 才需要密钥。
-    let config = ProvidersConfig::load(&args.config).map_err(|error| error.to_string())?;
+    let settings = Settings::load(&args.settings).map_err(|error| error.to_string())?;
 
     match args.command {
         Command::Providers => {
-            list_providers(&config);
+            list_providers(&settings);
             Ok(())
         }
-        Command::Models { provider } => list_models(&config, &provider).await,
+        Command::Models { provider } => list_models(&settings, &provider).await,
         Command::Chat {
             provider,
             model,
             prompt,
-        } => chat(&config, &provider, &model, prompt).await,
+        } => chat(&settings, &provider, &model, prompt).await,
     }
 }
 
-fn list_providers(config: &ProvidersConfig) {
-    if config.providers.is_empty() {
-        println!("配置里没有 provider：{}", default_path().display());
+fn list_providers(settings: &Settings) {
+    let providers = &settings.language_models.openai_compatible;
+    if providers.is_empty() {
+        println!(
+            "配置里没有 openai_compatible provider：{}",
+            default_path().display()
+        );
         return;
     }
 
-    for (id, provider) in &config.providers {
+    for (id, provider) in providers {
         println!("{id}");
-        println!("  base_url: {}", provider.base_url);
+        println!("  api_url: {}", provider.api_url);
 
         let auth = match &provider.auth {
             aa_config::AuthConfig::Bearer { env } if env.is_empty() => {
@@ -116,18 +120,21 @@ fn list_providers(config: &ProvidersConfig) {
         };
         println!("  auth: {auth}");
 
-        if provider.models.is_empty() {
+        if provider.available_models.is_empty() {
             println!("  models: （未声明，任意 id 可用默认事实）");
         } else {
-            for model in provider.models.keys() {
-                println!("  model: {model}");
+            for model in &provider.available_models {
+                match &model.display_name {
+                    Some(name) => println!("  model: {} ({name})", model.name),
+                    None => println!("  model: {}", model.name),
+                }
             }
         }
     }
 }
 
-async fn list_models(config: &ProvidersConfig, provider: &str) -> Result<(), String> {
-    let resolved = config
+async fn list_models(settings: &Settings, provider: &str) -> Result<(), String> {
+    let resolved = settings
         .resolve(provider)
         .map_err(|error| error.to_string())?;
 
@@ -154,12 +161,12 @@ async fn list_models(config: &ProvidersConfig, provider: &str) -> Result<(), Str
 }
 
 async fn chat(
-    config: &ProvidersConfig,
+    settings: &Settings,
     provider: &str,
     model_id: &str,
     prompt: String,
 ) -> Result<(), String> {
-    let resolved = config
+    let resolved = settings
         .resolve(provider)
         .map_err(|error| error.to_string())?;
     let model = resolved.model(model_id);
@@ -174,6 +181,8 @@ async fn chat(
             vec![ContentPart::text(prompt)],
         ))],
         stream: true,
+        // 配置里的 reasoning_effort 是每请求选择的默认值，不进 Model。
+        reasoning_effort: resolved.reasoning_effort(model_id),
         ..Request::default()
     };
 
@@ -225,7 +234,7 @@ async fn chat(
 
 /// `Ok(None)` = 打印用法并正常退出。
 fn parse_args(mut raw: Vec<String>) -> Result<Option<Args>, String> {
-    let mut config = None;
+    let mut settings = None;
 
     while let Some(argument) = raw.first() {
         match argument.as_str() {
@@ -235,7 +244,7 @@ fn parse_args(mut raw: Vec<String>) -> Result<Option<Args>, String> {
                 if raw.is_empty() {
                     return Err("--config 需要一个路径".to_owned());
                 }
-                config = Some(PathBuf::from(raw.remove(0)));
+                settings = Some(PathBuf::from(raw.remove(0)));
             }
             _ if argument.starts_with("--config=") => {
                 let path = argument["--config=".len()..].to_owned();
@@ -243,7 +252,7 @@ fn parse_args(mut raw: Vec<String>) -> Result<Option<Args>, String> {
                     return Err("--config= 后面需要一个路径".to_owned());
                 }
                 raw.remove(0);
-                config = Some(PathBuf::from(path));
+                settings = Some(PathBuf::from(path));
             }
             _ => break,
         }
@@ -286,7 +295,7 @@ fn parse_args(mut raw: Vec<String>) -> Result<Option<Args>, String> {
     }
 
     Ok(Some(Args {
-        config: config.unwrap_or_else(default_path),
+        settings: settings.unwrap_or_else(default_path),
         command,
     }))
 }

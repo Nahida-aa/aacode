@@ -20,6 +20,16 @@ pub enum ConfigError {
     #[error("provider `{provider}` 配置有问题：{message}")]
     Provider { provider: String, message: String },
 
+    #[error("provider `{provider}` 里模型 `{model}` 重复声明")]
+    DuplicateModel { provider: String, model: String },
+
+    #[error("provider `{provider}` 的模型 `{model}` 暂不支持：{reason}")]
+    UnsupportedModel {
+        provider: String,
+        model: String,
+        reason: String,
+    },
+
     #[error("provider `{provider}` 缺少凭证：环境变量 {names:?} 都没有值")]
     MissingCredential {
         provider: String,
