@@ -1,2 +1,19 @@
 [workspace]
-members = ["packages/apps/cli", "packages/apps/desktop"]
+resolver = "3"
+members = ["packages/apps/cli", "packages/apps/desktop", "packages/config"]
+
+# aa-ai 目前只在本地：先走 path 依赖。等库发布（或固定到某个 commit 的 git 依赖）
+# 再换；应用只依赖库的公开类型，不反向影响库的形状。
+[workspace.dependencies]
+aa_language_model = { path = "../../lib_ls/aa-ai/packages/aa_language_model" }
+aa_ai_openai = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_openai" }
+
+aa-config = { path = "packages/config" }
+
+dirs = "6"
+futures = "0.3"
+jsonc-parser = { version = "0.33", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

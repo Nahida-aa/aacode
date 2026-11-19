@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+aa-config.workspace = true
+aa_language_model.workspace = true
+futures.workspace = true
+tokio.workspace = true

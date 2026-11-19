@@ -1,0 +1,14 @@
+[package]
+name = "aa-config"
+version = "0.1.0"
+edition = "2024"
+description = "应用层：多提供商配置与凭证解析（库层只接收解好的端点数据）"
+
+[dependencies]
+aa_ai_openai.workspace = true
+aa_language_model.workspace = true
+dirs.workspace = true
+jsonc-parser.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
