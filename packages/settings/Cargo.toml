@@ -1,8 +1,8 @@
 [package]
-name = "aa-config"
+name = "aa-settings"
 version = "0.1.0"
 edition = "2024"
-description = "应用层：多提供商配置与凭证解析（库层只接收解好的端点数据）"
+description = "应用层：多提供商设置与凭证解析（库层只接收解好的端点数据）"
 
 [dependencies]
 aa_ai_openai.workspace = true

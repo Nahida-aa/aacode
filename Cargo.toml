@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["packages/apps/cli", "packages/apps/desktop", "packages/config"]
+members = ["packages/apps/cli", "packages/apps/desktop", "packages/settings"]
 
 # aa-ai 目前只在本地：先走 path 依赖。等库发布（或固定到某个 commit 的 git 依赖）
 # 再换；应用只依赖库的公开类型，不反向影响库的形状。
@@ -8,7 +8,7 @@ members = ["packages/apps/cli", "packages/apps/desktop", "packages/config"]
 aa_language_model = { path = "../../lib_ls/aa-ai/packages/aa_language_model" }
 aa_ai_openai = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_openai" }
 
-aa-config = { path = "packages/config" }
+aa-settings = { path = "packages/settings" }
 
 dirs = "6"
 futures = "0.3"

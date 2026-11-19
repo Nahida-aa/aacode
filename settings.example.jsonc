@@ -20,7 +20,7 @@
     "openai_compatible": {
       // 第三方 OpenAI 兼容网关：自定义 header 鉴权。
       "minekuai": {
-        "api_url": "https://minekuai.cn/v1",
+        "base_url": "https://minekuai.cn/v1",
         "auth": {
           "kind": "header",
           "name": "x-api-key",
@@ -51,7 +51,7 @@
 
       // 标准 Bearer 鉴权。
       "agnes": {
-        "api_url": "https://apihub.agnes-ai.com/v1",
+        "base_url": "https://apihub.agnes-ai.com/v1",
         "auth": { "kind": "bearer", "env": ["AGNES_API_KEY"] },
         "available_models": [
           {

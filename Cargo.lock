@@ -10,14 +10,14 @@ version = "0.1.0"
 name = "aa-agent-cli"
 version = "0.1.0"
 dependencies = [
- "aa-config",
+ "aa-settings",
  "aa_language_model",
  "futures",
  "tokio",
 ]
 
 [[package]]
-name = "aa-config"
+name = "aa-settings"
 version = "0.1.0"
 dependencies = [
  "aa_ai_openai",

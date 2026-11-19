@@ -1,4 +1,4 @@
-//! 应用侧的多提供商配置与凭证解析。
+//! 应用侧的多提供商设置与凭证解析。
 //!
 //! 库层（`aa-ai`）只接收**已经解好的**端点数据；这里负责把用户写的
 //! `settings.jsonc` 变成 `OpenAiLanguageModelProvider` + `Model` 表和密钥。
@@ -33,7 +33,7 @@
 //!   "language_models": {
 //!     "openai_compatible": {
 //!       "minekuai": {
-//!         "api_url": "https://minekuai.cn/v1",
+//!         "base_url": "https://minekuai.cn/v1",
 //!         "auth": { "kind": "header", "name": "x-api-key", "env": ["MINEKUAI_API_KEY"] },
 //!         "headers": { "X-Title": "aacode" },
 //!         "available_models": [
@@ -56,7 +56,7 @@ mod provider;
 mod substitute;
 
 pub use credentials::{Credentials, EnvCredentials};
-pub use error::ConfigError;
+pub use error::SettingsError;
 pub use provider::{
     AuthConfig, AvailableModel, Capabilities, OLLAMA_PROVIDER_ID, OllamaProvider,
     OpenAiCompatibleProvider, ResolvedProvider, derived_env_name,
@@ -97,8 +97,8 @@ impl Settings {
     ///
     /// 只做语法和结构校验，**不读密钥**；密钥在 [`Self::resolve`] 时才解析。
     /// 所以 `aacode providers` 这类只看端点的命令不需要任何 key。
-    pub fn load(path: &Path) -> Result<Self, ConfigError> {
-        let text = std::fs::read_to_string(path).map_err(|source| ConfigError::Read {
+    pub fn load(path: &Path) -> Result<Self, SettingsError> {
+        let text = std::fs::read_to_string(path).map_err(|source| SettingsError::Read {
             path: path.to_path_buf(),
             source,
         })?;
@@ -108,7 +108,7 @@ impl Settings {
     /// 解析内存中的配置文本，**不合并**内置默认值。
     ///
     /// `null` 仍然等价于「没写」：该条目直接不存在。
-    pub fn parse(text: &str, path: &Path) -> Result<Self, ConfigError> {
+    pub fn parse(text: &str, path: &Path) -> Result<Self, SettingsError> {
         Self::load_with_defaults(text, "{}", path)
     }
 
@@ -119,7 +119,7 @@ impl Settings {
         user: &str,
         defaults: &str,
         path: &Path,
-    ) -> Result<Self, ConfigError> {
+    ) -> Result<Self, SettingsError> {
         let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
 
         let mut merged = parse_jsonc(defaults, base_dir, path)?;
@@ -129,9 +129,9 @@ impl Settings {
         merge_non_null(user_value, &mut merged);
 
         let mut settings: Self =
-            serde_json::from_value(merged).map_err(|error| ConfigError::Invalid {
+            serde_json::from_value(merged).map_err(|error| SettingsError::Invalid {
                 path: path.to_path_buf(),
-                message: format!("配置结构错误：{error}"),
+                message: format!("设置结构错误：{error}"),
             })?;
         settings.unsupported = unsupported;
 
@@ -148,7 +148,7 @@ impl Settings {
     }
 
     /// 用环境变量解析某个 provider 的凭证并构造客户端。
-    pub fn resolve(&self, id: &str) -> Result<ResolvedProvider, ConfigError> {
+    pub fn resolve(&self, id: &str) -> Result<ResolvedProvider, SettingsError> {
         self.resolve_with(id, &EnvCredentials)
     }
 
@@ -159,7 +159,7 @@ impl Settings {
         &self,
         id: &str,
         credentials: &dyn Credentials,
-    ) -> Result<ResolvedProvider, ConfigError> {
+    ) -> Result<ResolvedProvider, SettingsError> {
         // 与 Zed 一致：`openai_compatible` 条目优先于内置 section
         // （Zed 的内置 provider 先注册，compatible 后注册并覆盖同名 id）。
         if let Some(provider) = self.language_models.openai_compatible.get(id) {
@@ -174,7 +174,7 @@ impl Settings {
             return provider.resolve(credentials);
         }
 
-        Err(ConfigError::UnknownProvider {
+        Err(SettingsError::UnknownProvider {
             id: id.to_owned(),
             known: self.ids().map(str::to_owned).collect(),
         })
@@ -202,7 +202,7 @@ impl Settings {
     }
 }
 
-/// 默认配置路径：`$AACODE_SETTINGS`，否则 `{config_dir}/aacode/settings.jsonc`。
+/// 默认设置文件路径：`$AACODE_SETTINGS`，否则 `{config_dir}/aacode/settings.jsonc`。
 ///
 /// 与库层不同，**读哪个文件**是应用自己的约定（见 aa-ai
 /// `docs/design/library-api.md`）。
@@ -216,10 +216,14 @@ pub fn default_path() -> PathBuf {
         .join("settings.jsonc")
 }
 
-fn parse_jsonc(text: &str, base_dir: &Path, path: &Path) -> Result<serde_json::Value, ConfigError> {
+fn parse_jsonc(
+    text: &str,
+    base_dir: &Path,
+    path: &Path,
+) -> Result<serde_json::Value, SettingsError> {
     let text = substitute::apply(text, base_dir);
     jsonc_parser::parse_to_serde_value(&text, &Default::default()).map_err(|error| {
-        ConfigError::Invalid {
+        SettingsError::Invalid {
             path: path.to_path_buf(),
             message: format!("JSONC 解析失败：{error}"),
         }
@@ -322,7 +326,7 @@ mod tests {
                 "language_models": {
                     "openai_compatible": {
                         "agnes": {
-                            "api_url": "https://apihub.agnes-ai.com/v1",
+                            "base_url": "https://apihub.agnes-ai.com/v1",
                         },
                     },
                 },
@@ -334,7 +338,7 @@ mod tests {
     #[test]
     fn null_provider_entry_keeps_default() {
         let defaults = r#"{"language_models":{"openai_compatible":{"ollama":{
-            "api_url":"http://localhost:11434/v1","auth":{"kind":"none"}
+            "base_url":"http://localhost:11434/v1","auth":{"kind":"none"}
         }}}}"#;
         let user = r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#;
 
@@ -354,7 +358,7 @@ mod tests {
     fn nested_null_in_new_provider_is_ignored() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"p":{
-                "api_url":"https://example.com/v1",
+                "base_url":"https://example.com/v1",
                 "auth":{"kind":"none"},
                 "headers":null
             }}}}"#,
@@ -366,7 +370,7 @@ mod tests {
     #[test]
     fn user_provider_deep_merges_into_default() {
         let defaults = r#"{"language_models":{"openai_compatible":{"ollama":{
-            "api_url":"http://localhost:11434/v1",
+            "base_url":"http://localhost:11434/v1",
             "auth":{"kind":"none"},
             "headers":{"X-Default":"1"}
         }}}}"#;
@@ -377,7 +381,7 @@ mod tests {
         let config = parse_with_defaults(user, defaults);
         let provider = &config.language_models.openai_compatible["ollama"];
         // 用户没写的字段保留默认值。
-        assert_eq!(provider.api_url, "http://localhost:11434/v1");
+        assert_eq!(provider.base_url, "http://localhost:11434/v1");
         // 对象逐键合并。
         assert_eq!(provider.headers["X-Default"], "1");
         assert_eq!(provider.headers["X-User"], "2");
@@ -386,7 +390,7 @@ mod tests {
     #[test]
     fn user_arrays_replace_defaults() {
         let defaults = r#"{"language_models":{"openai_compatible":{"p":{
-            "api_url":"https://example.com/v1","auth":{"kind":"none"},
+            "base_url":"https://example.com/v1","auth":{"kind":"none"},
             "available_models":[{"name":"a"},{"name":"b"}]
         }}}}"#;
         let user = r#"{"language_models":{"openai_compatible":{"p":{
@@ -423,7 +427,7 @@ mod tests {
     fn ollama_section_resolves_to_openai_v1() {
         let config = parse(
             r#"{"language_models":{"ollama":{
-                "api_url":"http://192.168.1.5:11434"
+                "base_url":"http://192.168.1.5:11434"
             }}}"#,
         );
         assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama"]);
@@ -442,7 +446,7 @@ mod tests {
     #[test]
     fn ollama_v1_is_not_duplicated() {
         let config =
-            parse(r#"{"language_models":{"ollama":{"api_url":"http://localhost:11434/v1/"}}}"#);
+            parse(r#"{"language_models":{"ollama":{"base_url":"http://localhost:11434/v1/"}}}"#);
         let resolved = config.resolve("ollama").unwrap();
         assert_eq!(resolved.base_url, "http://localhost:11434/v1");
     }
@@ -470,9 +474,9 @@ mod tests {
         let config = parse(
             r#"{"language_models":{
                 "openai_compatible":{"ollama":{
-                    "api_url":"http://localhost:11434/v1","auth":{"kind":"none"}
+                    "base_url":"http://localhost:11434/v1","auth":{"kind":"none"}
                 }},
-                "ollama":{"api_url":"http://localhost:11434"}
+                "ollama":{"base_url":"http://localhost:11434"}
             }}"#,
         );
         // id 只出现一次，解析走 compatible 条目（与 Zed 的覆盖顺序一致）。
@@ -487,8 +491,8 @@ mod tests {
     fn unsupported_sections_are_collected_not_fatal() {
         let config = parse(
             r#"{"language_models":{
-                "anthropic":{"api_url":"https://example.com"},
-                "openai_compatible":{"p":{"api_url":"https://example.com/v1"}}
+                "anthropic":{"base_url":"https://example.com"},
+                "openai_compatible":{"p":{"base_url":"https://example.com/v1"}}
             }}"#,
         );
         assert_eq!(
@@ -503,7 +507,7 @@ mod tests {
     fn default_placeholders_are_not_reported_as_unsupported() {
         // 内置默认文件里的 `deepseek` 等占位不该让每次启动都报警。
         let defaults =
-            r#"{"language_models":{"deepseek":{"api_url":"https://api.deepseek.com/v1"}}}"#;
+            r#"{"language_models":{"deepseek":{"base_url":"https://api.deepseek.com/v1"}}}"#;
         let config = parse_with_defaults(r#"{"language_models":{"ollama":null}}"#, defaults);
         assert_eq!(config.unsupported_sections().count(), 0);
     }
@@ -512,7 +516,7 @@ mod tests {
     fn missing_credential_lists_tried_names() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"minekuai":{
-                "api_url":"https://minekuai.cn/v1",
+                "base_url":"https://minekuai.cn/v1",
                 "auth":{"kind":"header","name":"x-api-key"}
             }}}}"#,
         );
@@ -527,7 +531,7 @@ mod tests {
     fn explicit_env_list_wins_over_derived_name() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"agnes":{
-                "api_url":"https://example.com/v1",
+                "base_url":"https://example.com/v1",
                 "auth":{"kind":"bearer","env":["SECOND","FIRST"]}
             }}}}"#,
         );
@@ -542,7 +546,7 @@ mod tests {
     fn no_auth_provider_resolves_without_credentials() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"ollama":{
-                "api_url":"http://localhost:11434/v1","auth":{"kind":"none"}
+                "base_url":"http://localhost:11434/v1","auth":{"kind":"none"}
             }}}}"#,
         );
         config
@@ -554,7 +558,7 @@ mod tests {
     fn model_facts_and_capabilities_are_applied() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"p":{
-                "api_url":"https://example.com/v1",
+                "base_url":"https://example.com/v1",
                 "auth":{"kind":"none"},
                 "available_models":[{
                     "name":"m",
@@ -600,7 +604,7 @@ mod tests {
         // 与 Zed 的 OpenAiCompatibleModelCapabilities 默认值一致。
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"p":{
-                "api_url":"https://example.com/v1","auth":{"kind":"none"},
+                "base_url":"https://example.com/v1","auth":{"kind":"none"},
                 "available_models":[{"name":"m"}]
             }}}}"#,
         );
@@ -615,7 +619,7 @@ mod tests {
     fn duplicate_model_names_are_rejected() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"p":{
-                "api_url":"https://example.com/v1","auth":{"kind":"none"},
+                "base_url":"https://example.com/v1","auth":{"kind":"none"},
                 "available_models":[{"name":"m"},{"name":"m"}]
             }}}}"#,
         );
@@ -627,7 +631,7 @@ mod tests {
     fn responses_only_models_are_rejected_for_now() {
         let config = parse(
             r#"{"language_models":{"openai_compatible":{"p":{
-                "api_url":"https://example.com/v1","auth":{"kind":"none"},
+                "base_url":"https://example.com/v1","auth":{"kind":"none"},
                 "available_models":[{"name":"m","capabilities":{"chat_completions":false}}]
             }}}}"#,
         );
@@ -638,7 +642,7 @@ mod tests {
     #[test]
     fn unknown_provider_lists_known_ids() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"agnes":{"api_url":"https://example.com/v1"}}}}"#,
+            r#"{"language_models":{"openai_compatible":{"agnes":{"base_url":"https://example.com/v1"}}}}"#,
         );
         let error = config
             .resolve_with("nope", &FakeCredentials(HashMap::new()))
@@ -659,7 +663,7 @@ mod tests {
                 "language_models": {{
                     "openai_compatible": {{
                         "p": {{
-                            "api_url": "https://example.com/v1",
+                            "base_url": "https://example.com/v1",
                             "auth": {{"kind":"bearer","env":["FROM_FILE"]}},
                             "headers": {{"X-From-File":"{{file:{} }}"}}
                         }}
@@ -678,7 +682,7 @@ mod tests {
     #[test]
     fn env_substitution_escapes_quotes() {
         let text = r#"{"language_models":{"openai_compatible":{"p":{
-            "api_url":"https://example.com/v1",
+            "base_url":"https://example.com/v1",
             "headers":{"X-Quote":"{env:AACODE_TEST_QUOTE}"}}}}}"#;
         // 不依赖真实进程 env：这里只验证「缺失时替换成空串」，解析仍然成立。
         let config = Settings::parse(text, Path::new("/tmp/p.jsonc")).unwrap();

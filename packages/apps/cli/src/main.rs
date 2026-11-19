@@ -1,10 +1,10 @@
-//! aacode CLI：先用多提供商配置把真实 LLM 跑起来。
+//! aacode CLI：先用多提供商设置把真实 LLM 跑起来。
 //!
-//! 配置与凭证属于应用层（见 aa-ai `docs/design/library-api.md`）：这里读
+//! 设置与凭证属于应用层（见 aa-ai `docs/design/library-api.md`）：这里读
 //! `settings.jsonc`、解析密钥，再把解好的端点交给库层。
 //!
 //! ```bash
-//! aa-agent-cli providers              # 列配置里的端点（不读密钥）
+//! aa-agent-cli providers              # 列设置里的端点（不读密钥）
 //! aa-agent-cli models minekuai        # GET /models（需要密钥）
 //! aa-agent-cli chat agnes agnes-2.0-flash "你好"
 //! ```
@@ -16,10 +16,10 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 
-use aa_config::{Settings, default_path, derived_env_name};
 use aa_language_model::provider::{CompletionEvent, LanguageModelClient, StopReason, TokenUsage};
 use aa_language_model::request::Request;
 use aa_language_model::request::message::{ContentPart, Message, Role};
+use aa_settings::{Settings, default_path, derived_env_name};
 
 const USAGE: &str = "\
 aacode — 多提供商 LLM 客户端
@@ -29,7 +29,7 @@ aacode — 多提供商 LLM 客户端
   aa-agent-cli [--config <PATH>] models <provider>
   aa-agent-cli [--config <PATH>] chat <provider> <model> [prompt...]
 
-配置:
+设置:
   默认 $AACODE_SETTINGS，否则 {config_dir}/aacode/settings.jsonc
   密钥: auth.env 列出的环境变量（省略则 <PROVIDER_ID>_API_KEY）
 ";
@@ -40,7 +40,7 @@ struct Args {
 }
 
 enum Command {
-    /// 列出配置里的端点和模型（不需要密钥）。
+    /// 列出设置里的端点和模型（不需要密钥）。
     Providers,
     /// 调端点的 `GET /models`（需要密钥）。
     Models { provider: String },
@@ -76,7 +76,7 @@ async fn main() -> ExitCode {
 }
 
 async fn run(args: Args) -> Result<(), String> {
-    // `providers` 只解析配置文本，不触发凭证解析；models/chat 才需要密钥。
+    // `providers` 只解析设置文本，不触发凭证解析；models/chat 才需要密钥。
     let settings = Settings::load(&args.settings).map_err(|error| error.to_string())?;
 
     let unsupported = settings.unsupported_sections().collect::<Vec<_>>();
@@ -106,14 +106,14 @@ fn list_providers(settings: &Settings) {
     let language_models = &settings.language_models;
 
     if language_models.openai_compatible.is_empty() && language_models.ollama.is_none() {
-        println!("配置里没有 provider：{}", default_path().display());
+        println!("设置里没有 provider：{}", default_path().display());
         return;
     }
 
     for (id, provider) in &language_models.openai_compatible {
         print_provider(
             id,
-            &provider.api_url,
+            &provider.base_url,
             &provider.auth,
             &provider.available_models,
             None,
@@ -123,14 +123,14 @@ fn list_providers(settings: &Settings) {
     if let Some(provider) = &language_models.ollama {
         let note = if language_models
             .openai_compatible
-            .contains_key(aa_config::OLLAMA_PROVIDER_ID)
+            .contains_key(aa_settings::OLLAMA_PROVIDER_ID)
         {
             "被同名 openai_compatible 条目覆盖"
         } else {
             "过渡实现：走 OpenAI 兼容 /v1"
         };
         print_provider(
-            aa_config::OLLAMA_PROVIDER_ID,
+            aa_settings::OLLAMA_PROVIDER_ID,
             &provider.openai_base_url(),
             &provider.auth,
             &provider.available_models,
@@ -141,27 +141,27 @@ fn list_providers(settings: &Settings) {
 
 fn print_provider(
     id: &str,
-    api_url: &str,
-    auth: &aa_config::AuthConfig,
-    models: &[aa_config::AvailableModel],
+    base_url: &str,
+    auth: &aa_settings::AuthConfig,
+    models: &[aa_settings::AvailableModel],
     note: Option<&str>,
 ) {
     match note {
         Some(note) => println!("{id} （{note}）"),
         None => println!("{id}"),
     }
-    println!("  api_url: {api_url}");
+    println!("  base_url: {base_url}");
 
     let auth = match auth {
-        aa_config::AuthConfig::Bearer { env } if env.is_empty() => {
+        aa_settings::AuthConfig::Bearer { env } if env.is_empty() => {
             format!("bearer {}", derived_env_name(id))
         }
-        aa_config::AuthConfig::Bearer { env } => format!("bearer {}", env.join(" | ")),
-        aa_config::AuthConfig::Header { name, env } if env.is_empty() => {
+        aa_settings::AuthConfig::Bearer { env } => format!("bearer {}", env.join(" | ")),
+        aa_settings::AuthConfig::Header { name, env } if env.is_empty() => {
             format!("{name}: {}", derived_env_name(id))
         }
-        aa_config::AuthConfig::Header { name, env } => format!("{name}: {}", env.join(" | ")),
-        aa_config::AuthConfig::None => "无鉴权".to_owned(),
+        aa_settings::AuthConfig::Header { name, env } => format!("{name}: {}", env.join(" | ")),
+        aa_settings::AuthConfig::None => "无鉴权".to_owned(),
     };
     println!("  auth: {auth}");
 
@@ -200,7 +200,7 @@ async fn list_models(settings: &Settings, provider: &str) -> Result<(), String> 
             None => println!("{mark} {}", model.id),
         }
     }
-    println!("# * = 配置里有模型事实；其余用默认事实也能 chat");
+    println!("# * = 设置里有模型事实；其余用默认事实也能 chat");
     Ok(())
 }
 
@@ -216,7 +216,7 @@ async fn chat(
     let model = resolved.model(model_id);
 
     if !resolved.declares_model(model_id) {
-        eprintln!("# 配置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
+        eprintln!("# 设置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
     }
 
     let request = Request {
@@ -225,7 +225,7 @@ async fn chat(
             vec![ContentPart::text(prompt)],
         ))],
         stream: true,
-        // 配置里的 reasoning_effort 是每请求选择的默认值，不进 Model。
+        // 设置里的 reasoning_effort 是每请求选择的默认值，不进 Model。
         reasoning_effort: resolved.reasoning_effort(model_id),
         ..Request::default()
     };

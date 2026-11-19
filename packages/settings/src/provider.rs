@@ -5,9 +5,11 @@
 //! - [`OllamaProvider`]：`language_models.ollama`，语义上是原生 `/api/chat`，但库层
 //!   还没有原生适配器，所以当前**过渡实现走 OpenAI 兼容 `/v1`**。
 //!
-//! 字段名对齐 Zed `OpenAiCompatibleSettingsContent` / `OpenAiCompatibleAvailableModel`
-//! （`settings_content/src/language_model.rs:424`）：
-//! - `api_url` / `available_models` / `headers`；
+//! 字段名以 Zed 为参照，但端点基址叫 `base_url`（Zed 叫 `api_url`）：
+//! 与库层 `OpenAiLanguageModelProvider::with_base_url`、OpenAI SDK 的
+//! `base_url` 一致，语义也更明确（后面拼的是协议路径）。
+//!
+//! - `base_url` / `available_models` / `headers`；
 //! - 模型事实 `context_window`（Zed 叫 `max_tokens`，但那是上下文窗口，不是输出上限）
 //!   与 `max_output_tokens`；
 //! - `capabilities` 的默认值与 Zed 相同（`tools` 开、`images` 关、
@@ -22,13 +24,13 @@ use aa_language_model::provider::{Model, ReasoningEffort};
 use serde::Deserialize;
 
 use crate::credentials::Credentials;
-use crate::error::ConfigError;
+use crate::error::SettingsError;
 
 /// 一个 OpenAI 兼容端点。加提供商 = 加一个 key。
 #[derive(Debug, Clone, Deserialize)]
 pub struct OpenAiCompatibleProvider {
     /// 已包含版本段，例如 `https://minekuai.cn/v1`（代码只拼 `/chat/completions`）。
-    pub api_url: String,
+    pub base_url: String,
     /// 鉴权方式；省略等价于 Bearer + `{ID}_API_KEY`。
     #[serde(default)]
     pub auth: AuthConfig,
@@ -103,11 +105,11 @@ impl OpenAiCompatibleProvider {
         &self,
         id: &str,
         credentials: &dyn Credentials,
-    ) -> Result<ResolvedProvider, ConfigError> {
+    ) -> Result<ResolvedProvider, SettingsError> {
         build_provider(
             ProviderSpec {
                 id,
-                api_url: &self.api_url,
+                base_url: &self.base_url,
                 auth: &self.auth,
                 headers: &self.headers,
                 available_models: &self.available_models,
@@ -119,8 +121,8 @@ impl OpenAiCompatibleProvider {
 
 /// 原生 Ollama 端点（`language_models.ollama`）。
 ///
-/// 形状对齐 Zed `OllamaSettingsContent`：`api_url` 写**根地址**
-/// （默认 `http://localhost:11434`），不是 `/v1`。
+/// 形状对齐 Zed `OllamaSettingsContent`：`base_url` 写**根地址**
+/// （默认 `http://localhost:11434`），不是 `/v1`。Zed 把这个字段叫 `api_url`。
 ///
 /// 库层还没有原生 `/api/chat` 适配器，所以当前是**过渡实现**：
 /// 解析时把根地址补成 OpenAI 兼容的 `/v1`（已带 `/v1` 不重复追加）。
@@ -128,8 +130,8 @@ impl OpenAiCompatibleProvider {
 #[derive(Debug, Clone, Deserialize)]
 pub struct OllamaProvider {
     /// 根地址，例如 `http://localhost:11434`。
-    #[serde(default = "default_ollama_api_url")]
-    pub api_url: String,
+    #[serde(default = "default_ollama_base_url")]
+    pub base_url: String,
     /// 鉴权方式；默认不发（本地 Ollama）。反向代理后面可以用 bearer/header。
     #[serde(default = "no_auth")]
     pub auth: AuthConfig,
@@ -144,7 +146,7 @@ pub struct OllamaProvider {
 impl Default for OllamaProvider {
     fn default() -> Self {
         Self {
-            api_url: default_ollama_api_url(),
+            base_url: default_ollama_base_url(),
             auth: AuthConfig::None,
             headers: BTreeMap::new(),
             available_models: Vec::new(),
@@ -155,7 +157,7 @@ impl Default for OllamaProvider {
 impl OllamaProvider {
     /// 过渡实现用的 OpenAI 兼容基址：`http://localhost:11434` → `.../v1`。
     pub fn openai_base_url(&self) -> String {
-        let trimmed = self.api_url.trim().trim_end_matches('/');
+        let trimmed = self.base_url.trim().trim_end_matches('/');
         if trimmed.ends_with("/v1") {
             trimmed.to_owned()
         } else {
@@ -164,18 +166,21 @@ impl OllamaProvider {
     }
 
     /// 解析凭证并构造库层客户端（当前走 OpenAI 兼容协议）。
-    pub fn resolve(&self, credentials: &dyn Credentials) -> Result<ResolvedProvider, ConfigError> {
-        if self.api_url.trim().is_empty() {
-            return Err(ConfigError::Provider {
+    pub fn resolve(
+        &self,
+        credentials: &dyn Credentials,
+    ) -> Result<ResolvedProvider, SettingsError> {
+        if self.base_url.trim().is_empty() {
+            return Err(SettingsError::Provider {
                 provider: OLLAMA_PROVIDER_ID.to_owned(),
-                message: "api_url 不能为空".to_owned(),
+                message: "base_url 不能为空".to_owned(),
             });
         }
 
         build_provider(
             ProviderSpec {
                 id: OLLAMA_PROVIDER_ID,
-                api_url: &self.openai_base_url(),
+                base_url: &self.openai_base_url(),
                 auth: &self.auth,
                 headers: &self.headers,
                 available_models: &self.available_models,
@@ -185,7 +190,7 @@ impl OllamaProvider {
     }
 }
 
-fn default_ollama_api_url() -> String {
+fn default_ollama_base_url() -> String {
     "http://localhost:11434".to_owned()
 }
 
@@ -199,7 +204,7 @@ pub const OLLAMA_PROVIDER_ID: &str = "ollama";
 /// 两种 section 解析成客户端时共用的输入。
 struct ProviderSpec<'a> {
     id: &'a str,
-    api_url: &'a str,
+    base_url: &'a str,
     auth: &'a AuthConfig,
     headers: &'a BTreeMap<String, String>,
     available_models: &'a [AvailableModel],
@@ -208,19 +213,19 @@ struct ProviderSpec<'a> {
 fn build_provider(
     spec: ProviderSpec<'_>,
     credentials: &dyn Credentials,
-) -> Result<ResolvedProvider, ConfigError> {
+) -> Result<ResolvedProvider, SettingsError> {
     let ProviderSpec {
         id,
-        api_url,
+        base_url,
         auth,
         headers,
         available_models,
     } = spec;
 
-    if api_url.trim().is_empty() {
-        return Err(ConfigError::Provider {
+    if base_url.trim().is_empty() {
+        return Err(SettingsError::Provider {
             provider: id.to_owned(),
-            message: "api_url 不能为空".to_owned(),
+            message: "base_url 不能为空".to_owned(),
         });
     }
 
@@ -233,7 +238,7 @@ fn build_provider(
         }
         AuthConfig::Header { name, .. } => {
             if name.trim().is_empty() {
-                return Err(ConfigError::Provider {
+                return Err(SettingsError::Provider {
                     provider: id.to_owned(),
                     message: "auth.kind=header 时 name 不能为空".to_owned(),
                 });
@@ -245,7 +250,7 @@ fn build_provider(
         }
     };
 
-    let mut client = client.with_base_url(api_url.to_owned());
+    let mut client = client.with_base_url(base_url.to_owned());
     for (name, value) in headers {
         client = client.with_header(name.clone(), value.clone());
     }
@@ -253,7 +258,7 @@ fn build_provider(
     let mut models = BTreeMap::new();
     for entry in available_models {
         if !entry.capabilities.chat_completions {
-            return Err(ConfigError::UnsupportedModel {
+            return Err(SettingsError::UnsupportedModel {
                 provider: id.to_owned(),
                 model: entry.name.clone(),
                 reason: "capabilities.chat_completions=false（Responses API 尚未支持）".to_owned(),
@@ -265,7 +270,7 @@ fn build_provider(
             reasoning_effort: entry.reasoning_effort,
         };
         if models.insert(entry.name.clone(), resolved).is_some() {
-            return Err(ConfigError::DuplicateModel {
+            return Err(SettingsError::DuplicateModel {
                 provider: id.to_owned(),
                 model: entry.name.clone(),
             });
@@ -274,7 +279,7 @@ fn build_provider(
 
     Ok(ResolvedProvider {
         id: id.to_owned(),
-        base_url: api_url.to_owned(),
+        base_url: base_url.to_owned(),
         client,
         models,
     })
@@ -284,13 +289,13 @@ fn resolve_key(
     provider: &str,
     names: &[String],
     credentials: &dyn Credentials,
-) -> Result<String, ConfigError> {
+) -> Result<String, SettingsError> {
     for name in names {
         if let Some(value) = credentials.get(provider, name) {
             return Ok(value);
         }
     }
-    Err(ConfigError::MissingCredential {
+    Err(SettingsError::MissingCredential {
         provider: provider.to_owned(),
         names: names.to_vec(),
     })
