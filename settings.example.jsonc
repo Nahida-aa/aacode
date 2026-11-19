@@ -5,7 +5,8 @@
 //
 // 规则：
 // - `language_models.<协议>.<id>`：一个 key = 一个端点，想连几个就写几个；
-//   目前只实现 `openai_compatible`（OpenAI 官方、第三方网关、Ollama /v1、vLLM）；
+//   `openai_compatible` 走 `/chat/completions`（OpenAI 官方、第三方网关、Ollama /v1、vLLM）；
+//   `ollama` 是独立的原生 section（语义上是 `/api/chat`，当前过渡实现走 OpenAI 兼容 /v1）；
 // - 密钥不写在这里：`auth.env` 是变量名列表，按顺序取第一个有值的；
 //   省略 `env` 时按 id 推导，例如 `minekuai` → `MINEKUAI_API_KEY`；
 // - `{env:VAR}` / `{file:path}` 在解析前替换（`~` 展开，相对路径相对本文件）；
@@ -71,10 +72,10 @@
           },
         ],
       },
-
-      // 本地端点：没有鉴权。模型名任意，未声明时用默认事实。
-      // null = 不覆盖内置默认（default.jsonc 里已有 ollama 的 /v1 地址）。
-      "ollama": null,
     },
+    // 本地 Ollama：独立 section，语义上是原生 /api/chat；
+    // 当前过渡实现走 OpenAI 兼容 /v1（根地址由 default.jsonc 提供）。
+    // null = 不覆盖内置默认。
+    "ollama": null,
   },
 }

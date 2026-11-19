@@ -5,13 +5,16 @@
 //! 边界见 aa-ai 的 `docs/design/library-api.md`。
 //!
 //! 形状对齐 Zed 的 `language_models` 分组（`settings_content/src/language_model.rs`）：
-//! - `language_models.<协议>.<id>` 是独立端点，加提供商 = 加一个 key；
+//! - section 名代表**协议**，不是厂商：
+//!   `openai_compatible.<id>` 走 `/chat/completions`，
+//!   `ollama` 语义上是原生 `/api/chat`（当前过渡实现走 OpenAI 兼容 `/v1`）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
 //! - 密钥不进配置文件：`auth.env` 列出变量名，缺省按 id 推导 `{ID}_API_KEY`；
 //! - `{env:VAR}` / `{file:path}` 在解析 JSONC **之前**做文本替换（和 opencode 同款）。
 //!
-//! 目前只实现 `openai_compatible` 这一组；其他组（`anthropic` / `google` …）
-//! 等对应 crate 落地后再加，未知组会被忽略。
+//! 目前只有 `openai_compatible` 与 `ollama` 有适配器；其他 section（`deepseek` /
+//! `open_router` …）会被收进 [`Settings::unsupported_sections`]，CLI 会提示
+//! 「已忽略」，避免写了配置却完全没反应。
 //!
 //! # 默认值与合并
 //!
@@ -55,10 +58,11 @@ mod substitute;
 pub use credentials::{Credentials, EnvCredentials};
 pub use error::ConfigError;
 pub use provider::{
-    AuthConfig, Capabilities, OpenAiCompatibleProvider, ResolvedProvider, derived_env_name,
+    AuthConfig, AvailableModel, Capabilities, OLLAMA_PROVIDER_ID, OllamaProvider,
+    OpenAiCompatibleProvider, ResolvedProvider, derived_env_name,
 };
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 /// 内置默认设置（只放不需要密钥的本地端点）。
@@ -71,6 +75,10 @@ const DEFAULT_SETTINGS: &str = include_str!("../../../assets/settings/default.js
 pub struct Settings {
     #[serde(default)]
     pub language_models: LanguageModels,
+    /// 用户文件里出现、但还没有适配器的 section。只用于提示，
+    /// 不影响解析（内置默认文件里也有这类占位）。
+    #[serde(skip)]
+    unsupported: BTreeSet<String>,
 }
 
 /// 按协议分组的 provider 表（对齐 Zed `LanguageModelSettings`）。
@@ -79,6 +87,9 @@ pub struct LanguageModels {
     /// OpenAI 兼容端点：官方 OpenAI、第三方网关、Ollama `/v1`、vLLM 等。
     #[serde(default)]
     pub openai_compatible: BTreeMap<String, OpenAiCompatibleProvider>,
+    /// 原生 Ollama 端点（语义上是 `/api/chat`；当前过渡实现走 `/v1`）。
+    #[serde(default)]
+    pub ollama: Option<OllamaProvider>,
 }
 
 impl Settings {
@@ -113,12 +124,27 @@ impl Settings {
 
         let mut merged = parse_jsonc(defaults, base_dir, path)?;
         let user_value = parse_jsonc(user, base_dir, path)?;
+        // 只把**用户写的**未知 section 记下来；默认文件里的占位不提示。
+        let unsupported = unknown_sections(&user_value);
         merge_non_null(user_value, &mut merged);
 
-        serde_json::from_value(merged).map_err(|error| ConfigError::Invalid {
-            path: path.to_path_buf(),
-            message: format!("配置结构错误：{error}"),
-        })
+        let mut settings: Self =
+            serde_json::from_value(merged).map_err(|error| ConfigError::Invalid {
+                path: path.to_path_buf(),
+                message: format!("配置结构错误：{error}"),
+            })?;
+        settings.unsupported = unsupported;
+
+        Ok(settings)
+    }
+
+    /// 用户配置里出现、但还没有适配器的 section（`deepseek` / `open_router` …）。
+    ///
+    /// 不报错（同一份文件里可能还配着能用的 provider），但调用方应该提示：
+    /// 写进这些 section 的端点**不会生效**；要连同一家请用
+    /// `openai_compatible.<id>`（只要它兼容 OpenAI 协议）。
+    pub fn unsupported_sections(&self) -> impl Iterator<Item = &str> {
+        self.unsupported.iter().map(String::as_str)
     }
 
     /// 用环境变量解析某个 provider 的凭证并构造客户端。
@@ -134,23 +160,45 @@ impl Settings {
         id: &str,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, ConfigError> {
-        let provider = self
+        // 与 Zed 一致：`openai_compatible` 条目优先于内置 section
+        // （Zed 的内置 provider 先注册，compatible 后注册并覆盖同名 id）。
+        if let Some(provider) = self.language_models.openai_compatible.get(id) {
+            return provider.resolve(id, credentials);
+        }
+        if let Some(provider) = self
             .language_models
-            .openai_compatible
-            .get(id)
-            .ok_or_else(|| ConfigError::UnknownProvider {
-                id: id.to_owned(),
-                known: self.ids().map(str::to_owned).collect(),
-            })?;
-        provider.resolve(id, credentials)
+            .ollama
+            .as_ref()
+            .filter(|_| id == OLLAMA_PROVIDER_ID)
+        {
+            return provider.resolve(credentials);
+        }
+
+        Err(ConfigError::UnknownProvider {
+            id: id.to_owned(),
+            known: self.ids().map(str::to_owned).collect(),
+        })
     }
 
-    /// 已声明的 provider id（排好序）。
+    /// 已声明的 provider id（排好序；`ollama` 被同名 compatible 条目覆盖时只出现一次）。
     pub fn ids(&self) -> impl Iterator<Item = &str> {
-        self.language_models
+        let compatible = self
+            .language_models
             .openai_compatible
             .keys()
-            .map(String::as_str)
+            .map(String::as_str);
+        let ollama = self
+            .language_models
+            .ollama
+            .as_ref()
+            .filter(|_| {
+                !self
+                    .language_models
+                    .openai_compatible
+                    .contains_key(OLLAMA_PROVIDER_ID)
+            })
+            .map(|_| OLLAMA_PROVIDER_ID);
+        compatible.chain(ollama)
     }
 }
 
@@ -176,6 +224,23 @@ fn parse_jsonc(text: &str, base_dir: &Path, path: &Path) -> Result<serde_json::V
             message: format!("JSONC 解析失败：{error}"),
         }
     })
+}
+
+/// `language_models` 下尚未实现的 section 名（只看用户写的那一层）。
+fn unknown_sections(value: &serde_json::Value) -> BTreeSet<String> {
+    const KNOWN: [&str; 2] = ["openai_compatible", "ollama"];
+
+    value
+        .get("language_models")
+        .and_then(serde_json::Value::as_object)
+        .map(|object| {
+            object
+                .keys()
+                .filter(|key| !KNOWN.contains(&key.as_str()))
+                .cloned()
+                .collect()
+        })
+        .unwrap_or_default()
 }
 
 /// 把 `source` 深合并进 `target`，规则与 Zed 的 `merge_non_null_json_value_into` 一致：
@@ -343,19 +408,104 @@ mod tests {
         ));
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("settings.jsonc");
-        std::fs::write(
-            &path,
-            r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#,
-        )
-        .unwrap();
+        std::fs::write(&path, r#"{"language_models":{"ollama":null}}"#).unwrap();
 
         let config = Settings::load(&path).unwrap();
         assert!(config.ids().any(|id| id == "ollama"));
         let resolved = config.resolve("ollama").unwrap();
-        // 内置默认必须带 /v1（OpenAI 兼容路径），而不是 Zed 原生的 11434 根路径。
+        // 内置默认写的是根地址（Zed 形状），过渡实现解析成 /v1。
         assert_eq!(resolved.base_url, "http://localhost:11434/v1");
 
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn ollama_section_resolves_to_openai_v1() {
+        let config = parse(
+            r#"{"language_models":{"ollama":{
+                "api_url":"http://192.168.1.5:11434"
+            }}}"#,
+        );
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama"]);
+        let resolved = config.resolve("ollama").unwrap();
+        assert_eq!(resolved.id, "ollama");
+        assert_eq!(resolved.base_url, "http://192.168.1.5:11434/v1");
+    }
+
+    #[test]
+    fn ollama_defaults_to_localhost() {
+        let config = parse(r#"{"language_models":{"ollama":{}}}"#);
+        let resolved = config.resolve("ollama").unwrap();
+        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
+    }
+
+    #[test]
+    fn ollama_v1_is_not_duplicated() {
+        let config =
+            parse(r#"{"language_models":{"ollama":{"api_url":"http://localhost:11434/v1/"}}}"#);
+        let resolved = config.resolve("ollama").unwrap();
+        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
+    }
+
+    #[test]
+    fn ollama_models_are_resolved_like_compatible_models() {
+        let config = parse(
+            r#"{"language_models":{"ollama":{
+                "available_models":[{
+                    "name":"qwen3:8b",
+                    "context_window":32768,
+                    "capabilities":{"tools":true,"images":false}
+                }]
+            }}}"#,
+        );
+        let resolved = config.resolve("ollama").unwrap();
+        let model = resolved.model("qwen3:8b");
+        assert_eq!(model.provider, "ollama");
+        assert_eq!(model.context_window, Some(32_768));
+        assert!(model.supports_tools);
+    }
+
+    #[test]
+    fn compatible_entry_shadows_ollama_section() {
+        let config = parse(
+            r#"{"language_models":{
+                "openai_compatible":{"ollama":{
+                    "api_url":"http://localhost:11434/v1","auth":{"kind":"none"}
+                }},
+                "ollama":{"api_url":"http://localhost:11434"}
+            }}"#,
+        );
+        // id 只出现一次，解析走 compatible 条目（与 Zed 的覆盖顺序一致）。
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama"]);
+        assert_eq!(
+            config.resolve("ollama").unwrap().base_url,
+            "http://localhost:11434/v1"
+        );
+    }
+
+    #[test]
+    fn unsupported_sections_are_collected_not_fatal() {
+        let config = parse(
+            r#"{"language_models":{
+                "anthropic":{"api_url":"https://example.com"},
+                "openai_compatible":{"p":{"api_url":"https://example.com/v1"}}
+            }}"#,
+        );
+        assert_eq!(
+            config.unsupported_sections().collect::<Vec<_>>(),
+            vec!["anthropic"]
+        );
+        // 已实现的 section 照常工作。
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["p"]);
+    }
+
+    #[test]
+    fn default_placeholders_are_not_reported_as_unsupported() {
+        // 内置默认文件里的 `deepseek` 等占位不该让每次启动都报警。
+        let defaults =
+            r#"{"language_models":{"deepseek":{"api_url":"https://api.deepseek.com/v1"}}}"#;
+        let config = parse_with_defaults(r#"{"language_models":{"ollama":null}}"#, defaults);
+        assert_eq!(config.unsupported_sections().count(), 0);
     }
 
     #[test]

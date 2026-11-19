@@ -79,6 +79,15 @@ async fn run(args: Args) -> Result<(), String> {
     // `providers` 只解析配置文本，不触发凭证解析；models/chat 才需要密钥。
     let settings = Settings::load(&args.settings).map_err(|error| error.to_string())?;
 
+    let unsupported = settings.unsupported_sections().collect::<Vec<_>>();
+    if !unsupported.is_empty() {
+        eprintln!(
+            "# 注意：这些 section 还没有适配器，已忽略：{}",
+            unsupported.join("、")
+        );
+        eprintln!("# 要连兼容 OpenAI 协议的端点，请写 openai_compatible.<id>");
+    }
+
     match args.command {
         Command::Providers => {
             list_providers(&settings);
@@ -94,40 +103,75 @@ async fn run(args: Args) -> Result<(), String> {
 }
 
 fn list_providers(settings: &Settings) {
-    let providers = &settings.language_models.openai_compatible;
-    if providers.is_empty() {
-        println!(
-            "配置里没有 openai_compatible provider：{}",
-            default_path().display()
-        );
+    let language_models = &settings.language_models;
+
+    if language_models.openai_compatible.is_empty() && language_models.ollama.is_none() {
+        println!("配置里没有 provider：{}", default_path().display());
         return;
     }
 
-    for (id, provider) in providers {
-        println!("{id}");
-        println!("  api_url: {}", provider.api_url);
+    for (id, provider) in &language_models.openai_compatible {
+        print_provider(
+            id,
+            &provider.api_url,
+            &provider.auth,
+            &provider.available_models,
+            None,
+        );
+    }
 
-        let auth = match &provider.auth {
-            aa_config::AuthConfig::Bearer { env } if env.is_empty() => {
-                format!("bearer {}", derived_env_name(id))
-            }
-            aa_config::AuthConfig::Bearer { env } => format!("bearer {}", env.join(" | ")),
-            aa_config::AuthConfig::Header { name, env } if env.is_empty() => {
-                format!("{name}: {}", derived_env_name(id))
-            }
-            aa_config::AuthConfig::Header { name, env } => format!("{name}: {}", env.join(" | ")),
-            aa_config::AuthConfig::None => "无鉴权".to_owned(),
-        };
-        println!("  auth: {auth}");
-
-        if provider.available_models.is_empty() {
-            println!("  models: （未声明，任意 id 可用默认事实）");
+    if let Some(provider) = &language_models.ollama {
+        let note = if language_models
+            .openai_compatible
+            .contains_key(aa_config::OLLAMA_PROVIDER_ID)
+        {
+            "被同名 openai_compatible 条目覆盖"
         } else {
-            for model in &provider.available_models {
-                match &model.display_name {
-                    Some(name) => println!("  model: {} ({name})", model.name),
-                    None => println!("  model: {}", model.name),
-                }
+            "过渡实现：走 OpenAI 兼容 /v1"
+        };
+        print_provider(
+            aa_config::OLLAMA_PROVIDER_ID,
+            &provider.openai_base_url(),
+            &provider.auth,
+            &provider.available_models,
+            Some(note),
+        );
+    }
+}
+
+fn print_provider(
+    id: &str,
+    api_url: &str,
+    auth: &aa_config::AuthConfig,
+    models: &[aa_config::AvailableModel],
+    note: Option<&str>,
+) {
+    match note {
+        Some(note) => println!("{id} （{note}）"),
+        None => println!("{id}"),
+    }
+    println!("  api_url: {api_url}");
+
+    let auth = match auth {
+        aa_config::AuthConfig::Bearer { env } if env.is_empty() => {
+            format!("bearer {}", derived_env_name(id))
+        }
+        aa_config::AuthConfig::Bearer { env } => format!("bearer {}", env.join(" | ")),
+        aa_config::AuthConfig::Header { name, env } if env.is_empty() => {
+            format!("{name}: {}", derived_env_name(id))
+        }
+        aa_config::AuthConfig::Header { name, env } => format!("{name}: {}", env.join(" | ")),
+        aa_config::AuthConfig::None => "无鉴权".to_owned(),
+    };
+    println!("  auth: {auth}");
+
+    if models.is_empty() {
+        println!("  models: （未声明，任意 id 可用默认事实）");
+    } else {
+        for model in models {
+            match &model.display_name {
+                Some(name) => println!("  model: {} ({name})", model.name),
+                None => println!("  model: {}", model.name),
             }
         }
     }

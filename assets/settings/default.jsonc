@@ -9,12 +9,17 @@
 
 {
   "language_models": {
-    "openai_compatible": {
-      "ollama": {
-        // OpenAI 兼容路径；Zed 的默认值是给原生 /api/chat 用的，这里是 /v1。
-        "api_url": "http://localhost:11434/v1",
-        "auth": { "kind": "none" },
-      },
+    "deepseek": {
+      "api_url": "https://api.deepseek.com/v1",
+    },
+    "open_router": {
+      "api_url": "https://openrouter.ai/api/v1",
+    },
+    "openai_compatible": {},
+    "ollama": {
+      // 根地址（Zed 形状）。语义上是原生 /api/chat；库层还没有原生适配器，
+      // 当前过渡实现会补成 OpenAI 兼容的 /v1。
+      "api_url": "http://localhost:11434",
     },
   },
 }

@@ -1,4 +1,9 @@
-//! 一个 OpenAI 兼容端点的配置形状 + 解析成库层客户端。
+//! 端点配置形状 + 解析成库层客户端。
+//!
+//! 两种 section，名字代表**协议**而不是厂商（对齐 Zed）：
+//! - [`OpenAiCompatibleProvider`]：`language_models.openai_compatible.<id>`，走 `/chat/completions`；
+//! - [`OllamaProvider`]：`language_models.ollama`，语义上是原生 `/api/chat`，但库层
+//!   还没有原生适配器，所以当前**过渡实现走 OpenAI 兼容 `/v1`**。
 //!
 //! 字段名对齐 Zed `OpenAiCompatibleSettingsContent` / `OpenAiCompatibleAvailableModel`
 //! （`settings_content/src/language_model.rs:424`）：
@@ -99,69 +104,180 @@ impl OpenAiCompatibleProvider {
         id: &str,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, ConfigError> {
+        build_provider(
+            ProviderSpec {
+                id,
+                api_url: &self.api_url,
+                auth: &self.auth,
+                headers: &self.headers,
+                available_models: &self.available_models,
+            },
+            credentials,
+        )
+    }
+}
+
+/// 原生 Ollama 端点（`language_models.ollama`）。
+///
+/// 形状对齐 Zed `OllamaSettingsContent`：`api_url` 写**根地址**
+/// （默认 `http://localhost:11434`），不是 `/v1`。
+///
+/// 库层还没有原生 `/api/chat` 适配器，所以当前是**过渡实现**：
+/// 解析时把根地址补成 OpenAI 兼容的 `/v1`（已带 `/v1` 不重复追加）。
+/// 等 `aa_ai_ollama` 落地后，同一份配置会切到原生协议，用户不用改文件。
+#[derive(Debug, Clone, Deserialize)]
+pub struct OllamaProvider {
+    /// 根地址，例如 `http://localhost:11434`。
+    #[serde(default = "default_ollama_api_url")]
+    pub api_url: String,
+    /// 鉴权方式；默认不发（本地 Ollama）。反向代理后面可以用 bearer/header。
+    #[serde(default = "no_auth")]
+    pub auth: AuthConfig,
+    /// 额外 header。Zed 叫 `custom_headers`，两个名字都接受。
+    #[serde(default, alias = "custom_headers")]
+    pub headers: BTreeMap<String, String>,
+    /// 模型表；条目形状与 `openai_compatible` 相同。
+    #[serde(default)]
+    pub available_models: Vec<AvailableModel>,
+}
+
+impl Default for OllamaProvider {
+    fn default() -> Self {
+        Self {
+            api_url: default_ollama_api_url(),
+            auth: AuthConfig::None,
+            headers: BTreeMap::new(),
+            available_models: Vec::new(),
+        }
+    }
+}
+
+impl OllamaProvider {
+    /// 过渡实现用的 OpenAI 兼容基址：`http://localhost:11434` → `.../v1`。
+    pub fn openai_base_url(&self) -> String {
+        let trimmed = self.api_url.trim().trim_end_matches('/');
+        if trimmed.ends_with("/v1") {
+            trimmed.to_owned()
+        } else {
+            format!("{trimmed}/v1")
+        }
+    }
+
+    /// 解析凭证并构造库层客户端（当前走 OpenAI 兼容协议）。
+    pub fn resolve(&self, credentials: &dyn Credentials) -> Result<ResolvedProvider, ConfigError> {
         if self.api_url.trim().is_empty() {
             return Err(ConfigError::Provider {
-                provider: id.to_owned(),
+                provider: OLLAMA_PROVIDER_ID.to_owned(),
                 message: "api_url 不能为空".to_owned(),
             });
         }
 
-        let env_names = self.auth.env_names(id);
-        let client = match &self.auth {
-            AuthConfig::None => OpenAiLanguageModelProvider::without_auth(),
-            AuthConfig::Bearer { .. } => {
-                let key = resolve_key(id, &env_names, credentials)?;
-                OpenAiLanguageModelProvider::new(key)
-            }
-            AuthConfig::Header { name, .. } => {
-                if name.trim().is_empty() {
-                    return Err(ConfigError::Provider {
-                        provider: id.to_owned(),
-                        message: "auth.kind=header 时 name 不能为空".to_owned(),
-                    });
-                }
-                let key = resolve_key(id, &env_names, credentials)?;
-                // header 鉴权不走 Bearer；非法 header 名/值在发请求前会变成
-                // LlmError::Transport，不会 panic。
-                OpenAiLanguageModelProvider::without_auth().with_auth_header(name.clone(), key)
-            }
-        };
-
-        let mut client = client.with_base_url(self.api_url.clone());
-        for (name, value) in &self.headers {
-            client = client.with_header(name.clone(), value.clone());
-        }
-
-        let mut models = BTreeMap::new();
-        for entry in &self.available_models {
-            if !entry.capabilities.chat_completions {
-                return Err(ConfigError::UnsupportedModel {
-                    provider: id.to_owned(),
-                    model: entry.name.clone(),
-                    reason: "capabilities.chat_completions=false（Responses API 尚未支持）"
-                        .to_owned(),
-                });
-            }
-
-            let resolved = ResolvedModel {
-                model: entry.to_model(id),
-                reasoning_effort: entry.reasoning_effort,
-            };
-            if models.insert(entry.name.clone(), resolved).is_some() {
-                return Err(ConfigError::DuplicateModel {
-                    provider: id.to_owned(),
-                    model: entry.name.clone(),
-                });
-            }
-        }
-
-        Ok(ResolvedProvider {
-            id: id.to_owned(),
-            base_url: self.api_url.clone(),
-            client,
-            models,
-        })
+        build_provider(
+            ProviderSpec {
+                id: OLLAMA_PROVIDER_ID,
+                api_url: &self.openai_base_url(),
+                auth: &self.auth,
+                headers: &self.headers,
+                available_models: &self.available_models,
+            },
+            credentials,
+        )
     }
+}
+
+fn default_ollama_api_url() -> String {
+    "http://localhost:11434".to_owned()
+}
+
+fn no_auth() -> AuthConfig {
+    AuthConfig::None
+}
+
+/// `language_models.ollama` 的固定 provider id（section 名就是 id）。
+pub const OLLAMA_PROVIDER_ID: &str = "ollama";
+
+/// 两种 section 解析成客户端时共用的输入。
+struct ProviderSpec<'a> {
+    id: &'a str,
+    api_url: &'a str,
+    auth: &'a AuthConfig,
+    headers: &'a BTreeMap<String, String>,
+    available_models: &'a [AvailableModel],
+}
+
+fn build_provider(
+    spec: ProviderSpec<'_>,
+    credentials: &dyn Credentials,
+) -> Result<ResolvedProvider, ConfigError> {
+    let ProviderSpec {
+        id,
+        api_url,
+        auth,
+        headers,
+        available_models,
+    } = spec;
+
+    if api_url.trim().is_empty() {
+        return Err(ConfigError::Provider {
+            provider: id.to_owned(),
+            message: "api_url 不能为空".to_owned(),
+        });
+    }
+
+    let env_names = auth.env_names(id);
+    let client = match auth {
+        AuthConfig::None => OpenAiLanguageModelProvider::without_auth(),
+        AuthConfig::Bearer { .. } => {
+            let key = resolve_key(id, &env_names, credentials)?;
+            OpenAiLanguageModelProvider::new(key)
+        }
+        AuthConfig::Header { name, .. } => {
+            if name.trim().is_empty() {
+                return Err(ConfigError::Provider {
+                    provider: id.to_owned(),
+                    message: "auth.kind=header 时 name 不能为空".to_owned(),
+                });
+            }
+            let key = resolve_key(id, &env_names, credentials)?;
+            // header 鉴权不走 Bearer；非法 header 名/值在发请求前会变成
+            // LlmError::Transport，不会 panic。
+            OpenAiLanguageModelProvider::without_auth().with_auth_header(name.clone(), key)
+        }
+    };
+
+    let mut client = client.with_base_url(api_url.to_owned());
+    for (name, value) in headers {
+        client = client.with_header(name.clone(), value.clone());
+    }
+
+    let mut models = BTreeMap::new();
+    for entry in available_models {
+        if !entry.capabilities.chat_completions {
+            return Err(ConfigError::UnsupportedModel {
+                provider: id.to_owned(),
+                model: entry.name.clone(),
+                reason: "capabilities.chat_completions=false（Responses API 尚未支持）".to_owned(),
+            });
+        }
+
+        let resolved = ResolvedModel {
+            model: entry.to_model(id),
+            reasoning_effort: entry.reasoning_effort,
+        };
+        if models.insert(entry.name.clone(), resolved).is_some() {
+            return Err(ConfigError::DuplicateModel {
+                provider: id.to_owned(),
+                model: entry.name.clone(),
+            });
+        }
+    }
+
+    Ok(ResolvedProvider {
+        id: id.to_owned(),
+        base_url: api_url.to_owned(),
+        client,
+        models,
+    })
 }
 
 fn resolve_key(
