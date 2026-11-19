@@ -4,9 +4,9 @@
 // （Linux 一般是 `~/.config/aacode/settings.jsonc`）。
 //
 // 规则：
-// - `language_models.<协议>.<id>`：一个 key = 一个端点，想连几个就写几个；
+// - `language_model_providers.<协议>.<id>`：一个 key = 一个端点，想连几个就写几个；
 //   `openai_compatible` 走 `/chat/completions`（OpenAI 官方、第三方网关、Ollama /v1、vLLM）；
-//   `ollama` 是独立的原生 section（语义上是 `/api/chat`，当前过渡实现走 OpenAI 兼容 /v1）；
+//   `ollama` 是独立的原生 section（语义上是 `/api/chat`，适配器尚未实现，暂不可用）；
 // - 密钥不写在这里：`auth.env` 是变量名列表，按顺序取第一个有值的；
 //   省略 `env` 时按 id 推导，例如 `minekuai` → `MINEKUAI_API_KEY`；
 // - `{env:VAR}` / `{file:path}` 在解析前替换（`~` 展开，相对路径相对本文件）；
@@ -16,7 +16,7 @@
 //   没写的字段保留默认值，写 `null` 也等于「没写」（不覆盖默认）。
 
 {
-  "language_models": {
+  "language_model_providers": {
     "openai_compatible": {
       // 第三方 OpenAI 兼容网关：自定义 header 鉴权。
       "minekuai": {
@@ -74,7 +74,7 @@
       },
     },
     // 本地 Ollama：独立 section，语义上是原生 /api/chat；
-    // 当前过渡实现走 OpenAI 兼容 /v1（根地址由 default.jsonc 提供）。
+    // 适配器尚未实现，现在只解析不生效；要连 /v1 请配 openai_compatible.ollama。
     // null = 不覆盖内置默认。
     "ollama": null,
   },

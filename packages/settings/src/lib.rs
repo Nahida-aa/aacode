@@ -4,17 +4,19 @@
 //! `settings.jsonc` 变成 `OpenAiLanguageModelProvider` + `Model` 表和密钥。
 //! 边界见 aa-ai 的 `docs/design/library-api.md`。
 //!
-//! 形状对齐 Zed 的 `language_models` 分组（`settings_content/src/language_model.rs`）：
+//! 形状参考 Zed 的 `language_models` 分组（`settings_content/src/language_model.rs`），
+//! 但 key 叫 `language_model_providers`（这里只放 provider，不放模型选择）：
 //! - section 名代表**协议**，不是厂商：
 //!   `openai_compatible.<id>` 走 `/chat/completions`，
-//!   `ollama` 语义上是原生 `/api/chat`（当前过渡实现走 OpenAI 兼容 `/v1`）；
+//!   `ollama` 语义上是原生 `/api/chat`（适配器尚未实现，见下）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
 //! - 密钥不进配置文件：`auth.env` 列出变量名，缺省按 id 推导 `{ID}_API_KEY`；
 //! - `{env:VAR}` / `{file:path}` 在解析 JSONC **之前**做文本替换（和 opencode 同款）。
 //!
-//! 目前只有 `openai_compatible` 与 `ollama` 有适配器；其他 section（`deepseek` /
-//! `open_router` …）会被收进 [`Settings::unsupported_sections`]，CLI 会提示
-//! 「已忽略」，避免写了配置却完全没反应。
+//! 目前只有 `openai_compatible` 有适配器；`ollama` 能解析、能列出，但 `resolve`
+//! 会明确报「原生 /api/chat 尚未实现」，不会偷偷改走 OpenAI 兼容。其他 section
+//! （`deepseek` / `open_router` …）会被收进 [`Settings::unsupported_sections`]，
+//! CLI 会提示「已忽略」，避免写了设置却完全没反应。
 //!
 //! # 默认值与合并
 //!
@@ -30,7 +32,7 @@
 //!
 //! ```jsonc
 //! {
-//!   "language_models": {
+//!   "language_model_providers": {
 //!     "openai_compatible": {
 //!       "minekuai": {
 //!         "base_url": "https://minekuai.cn/v1",
@@ -74,7 +76,7 @@ const DEFAULT_SETTINGS: &str = include_str!("../../../assets/settings/default.js
 #[derive(Debug, Clone, Default, serde::Deserialize)]
 pub struct Settings {
     #[serde(default)]
-    pub language_models: LanguageModels,
+    pub language_model_providers: LanguageModelProviders,
     /// 用户文件里出现、但还没有适配器的 section。只用于提示，
     /// 不影响解析（内置默认文件里也有这类占位）。
     #[serde(skip)]
@@ -83,11 +85,11 @@ pub struct Settings {
 
 /// 按协议分组的 provider 表（对齐 Zed `LanguageModelSettings`）。
 #[derive(Debug, Clone, Default, serde::Deserialize)]
-pub struct LanguageModels {
+pub struct LanguageModelProviders {
     /// OpenAI 兼容端点：官方 OpenAI、第三方网关、Ollama `/v1`、vLLM 等。
     #[serde(default)]
     pub openai_compatible: BTreeMap<String, OpenAiCompatibleProvider>,
-    /// 原生 Ollama 端点（语义上是 `/api/chat`；当前过渡实现走 `/v1`）。
+    /// 原生 Ollama 端点（语义上是 `/api/chat`；适配器尚未实现）。
     #[serde(default)]
     pub ollama: Option<OllamaProvider>,
 }
@@ -162,16 +164,17 @@ impl Settings {
     ) -> Result<ResolvedProvider, SettingsError> {
         // 与 Zed 一致：`openai_compatible` 条目优先于内置 section
         // （Zed 的内置 provider 先注册，compatible 后注册并覆盖同名 id）。
-        if let Some(provider) = self.language_models.openai_compatible.get(id) {
+        if let Some(provider) = self.language_model_providers.openai_compatible.get(id) {
             return provider.resolve(id, credentials);
         }
-        if let Some(provider) = self
-            .language_models
-            .ollama
-            .as_ref()
-            .filter(|_| id == OLLAMA_PROVIDER_ID)
-        {
-            return provider.resolve(credentials);
+        if id == OLLAMA_PROVIDER_ID && self.language_model_providers.ollama.is_some() {
+            // 不偷偷改走 OpenAI 兼容 `/v1`：那是另一个 section 的语义。
+            return Err(SettingsError::Unimplemented {
+                provider: OLLAMA_PROVIDER_ID.to_owned(),
+                message: "原生 /api/chat 适配器还没落地；\
+                          要连 Ollama 请配 openai_compatible.ollama（OpenAI 兼容 /v1）"
+                    .to_owned(),
+            });
         }
 
         Err(SettingsError::UnknownProvider {
@@ -183,17 +186,17 @@ impl Settings {
     /// 已声明的 provider id（排好序；`ollama` 被同名 compatible 条目覆盖时只出现一次）。
     pub fn ids(&self) -> impl Iterator<Item = &str> {
         let compatible = self
-            .language_models
+            .language_model_providers
             .openai_compatible
             .keys()
             .map(String::as_str);
         let ollama = self
-            .language_models
+            .language_model_providers
             .ollama
             .as_ref()
             .filter(|_| {
                 !self
-                    .language_models
+                    .language_model_providers
                     .openai_compatible
                     .contains_key(OLLAMA_PROVIDER_ID)
             })
@@ -230,12 +233,12 @@ fn parse_jsonc(
     })
 }
 
-/// `language_models` 下尚未实现的 section 名（只看用户写的那一层）。
+/// `language_model_providers` 下尚未实现的 section 名（只看用户写的那一层）。
 fn unknown_sections(value: &serde_json::Value) -> BTreeSet<String> {
     const KNOWN: [&str; 2] = ["openai_compatible", "ollama"];
 
     value
-        .get("language_models")
+        .get("language_model_providers")
         .and_then(serde_json::Value::as_object)
         .map(|object| {
             object
@@ -323,7 +326,7 @@ mod tests {
         let config = parse(
             r#"{
                 // 注释和尾逗号都应该接受
-                "language_models": {
+                "language_model_providers": {
                     "openai_compatible": {
                         "agnes": {
                             "base_url": "https://apihub.agnes-ai.com/v1",
@@ -337,10 +340,10 @@ mod tests {
 
     #[test]
     fn null_provider_entry_keeps_default() {
-        let defaults = r#"{"language_models":{"openai_compatible":{"ollama":{
+        let defaults = r#"{"language_model_providers":{"openai_compatible":{"ollama":{
             "base_url":"http://localhost:11434/v1","auth":{"kind":"none"}
         }}}}"#;
-        let user = r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#;
+        let user = r#"{"language_model_providers":{"openai_compatible":{"ollama":null}}}"#;
 
         let config = parse_with_defaults(user, defaults);
         assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama"]);
@@ -350,36 +353,36 @@ mod tests {
 
     #[test]
     fn null_provider_entry_without_default_is_absent() {
-        let config = parse(r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#);
+        let config = parse(r#"{"language_model_providers":{"openai_compatible":{"ollama":null}}}"#);
         assert_eq!(config.ids().count(), 0);
     }
 
     #[test]
     fn nested_null_in_new_provider_is_ignored() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"p":{
+            r#"{"language_model_providers":{"openai_compatible":{"p":{
                 "base_url":"https://example.com/v1",
                 "auth":{"kind":"none"},
                 "headers":null
             }}}}"#,
         );
-        let provider = &config.language_models.openai_compatible["p"];
+        let provider = &config.language_model_providers.openai_compatible["p"];
         assert!(provider.headers.is_empty());
     }
 
     #[test]
     fn user_provider_deep_merges_into_default() {
-        let defaults = r#"{"language_models":{"openai_compatible":{"ollama":{
+        let defaults = r#"{"language_model_providers":{"openai_compatible":{"ollama":{
             "base_url":"http://localhost:11434/v1",
             "auth":{"kind":"none"},
             "headers":{"X-Default":"1"}
         }}}}"#;
-        let user = r#"{"language_models":{"openai_compatible":{"ollama":{
+        let user = r#"{"language_model_providers":{"openai_compatible":{"ollama":{
             "headers":{"X-User":"2"}
         }}}}"#;
 
         let config = parse_with_defaults(user, defaults);
-        let provider = &config.language_models.openai_compatible["ollama"];
+        let provider = &config.language_model_providers.openai_compatible["ollama"];
         // 用户没写的字段保留默认值。
         assert_eq!(provider.base_url, "http://localhost:11434/v1");
         // 对象逐键合并。
@@ -389,16 +392,16 @@ mod tests {
 
     #[test]
     fn user_arrays_replace_defaults() {
-        let defaults = r#"{"language_models":{"openai_compatible":{"p":{
+        let defaults = r#"{"language_model_providers":{"openai_compatible":{"p":{
             "base_url":"https://example.com/v1","auth":{"kind":"none"},
             "available_models":[{"name":"a"},{"name":"b"}]
         }}}}"#;
-        let user = r#"{"language_models":{"openai_compatible":{"p":{
+        let user = r#"{"language_model_providers":{"openai_compatible":{"p":{
             "available_models":[{"name":"c"}]
         }}}}"#;
 
         let config = parse_with_defaults(user, defaults);
-        let models = &config.language_models.openai_compatible["p"].available_models;
+        let models = &config.language_model_providers.openai_compatible["p"].available_models;
         assert_eq!(models.len(), 1);
         assert_eq!(models[0].name, "c");
     }
@@ -412,67 +415,56 @@ mod tests {
         ));
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("settings.jsonc");
-        std::fs::write(&path, r#"{"language_models":{"ollama":null}}"#).unwrap();
+        std::fs::write(&path, r#"{"language_model_providers":{"ollama":null}}"#).unwrap();
 
         let config = Settings::load(&path).unwrap();
         assert!(config.ids().any(|id| id == "ollama"));
-        let resolved = config.resolve("ollama").unwrap();
-        // 内置默认写的是根地址（Zed 形状），过渡实现解析成 /v1。
-        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
+        // 默认层只有根地址；原生适配器未实现，resolve 必须明确报错，
+        // 而不是偷偷改走 OpenAI 兼容 /v1。
+        let error = config.resolve("ollama").unwrap_err().to_string();
+        assert!(error.contains("尚未实现"), "{error}");
 
         std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]
-    fn ollama_section_resolves_to_openai_v1() {
+    fn ollama_section_is_parsed_but_not_resolvable() {
         let config = parse(
-            r#"{"language_models":{"ollama":{
-                "base_url":"http://192.168.1.5:11434"
+            r#"{"language_model_providers":{"ollama":{
+                "base_url":"http://192.168.1.5:11434",
+                "available_models":[{"name":"qwen3:8b","context_window":32768}]
             }}}"#,
         );
         assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama"]);
-        let resolved = config.resolve("ollama").unwrap();
-        assert_eq!(resolved.id, "ollama");
-        assert_eq!(resolved.base_url, "http://192.168.1.5:11434/v1");
+
+        let provider = config
+            .language_model_providers
+            .ollama
+            .as_ref()
+            .expect("ollama section 应该被解析");
+        assert_eq!(provider.base_url, "http://192.168.1.5:11434");
+        assert_eq!(provider.available_models.len(), 1);
+
+        let error = config.resolve("ollama").unwrap_err().to_string();
+        assert!(error.contains("尚未实现"), "{error}");
+        assert!(error.contains("openai_compatible.ollama"), "{error}");
     }
 
     #[test]
     fn ollama_defaults_to_localhost() {
-        let config = parse(r#"{"language_models":{"ollama":{}}}"#);
-        let resolved = config.resolve("ollama").unwrap();
-        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
-    }
-
-    #[test]
-    fn ollama_v1_is_not_duplicated() {
-        let config =
-            parse(r#"{"language_models":{"ollama":{"base_url":"http://localhost:11434/v1/"}}}"#);
-        let resolved = config.resolve("ollama").unwrap();
-        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
-    }
-
-    #[test]
-    fn ollama_models_are_resolved_like_compatible_models() {
-        let config = parse(
-            r#"{"language_models":{"ollama":{
-                "available_models":[{
-                    "name":"qwen3:8b",
-                    "context_window":32768,
-                    "capabilities":{"tools":true,"images":false}
-                }]
-            }}}"#,
-        );
-        let resolved = config.resolve("ollama").unwrap();
-        let model = resolved.model("qwen3:8b");
-        assert_eq!(model.provider, "ollama");
-        assert_eq!(model.context_window, Some(32_768));
-        assert!(model.supports_tools);
+        let config = parse(r#"{"language_model_providers":{"ollama":{}}}"#);
+        let provider = config
+            .language_model_providers
+            .ollama
+            .as_ref()
+            .expect("空对象也应该解析出默认值");
+        assert_eq!(provider.base_url, "http://localhost:11434");
     }
 
     #[test]
     fn compatible_entry_shadows_ollama_section() {
         let config = parse(
-            r#"{"language_models":{
+            r#"{"language_model_providers":{
                 "openai_compatible":{"ollama":{
                     "base_url":"http://localhost:11434/v1","auth":{"kind":"none"}
                 }},
@@ -490,7 +482,7 @@ mod tests {
     #[test]
     fn unsupported_sections_are_collected_not_fatal() {
         let config = parse(
-            r#"{"language_models":{
+            r#"{"language_model_providers":{
                 "anthropic":{"base_url":"https://example.com"},
                 "openai_compatible":{"p":{"base_url":"https://example.com/v1"}}
             }}"#,
@@ -506,16 +498,16 @@ mod tests {
     #[test]
     fn default_placeholders_are_not_reported_as_unsupported() {
         // 内置默认文件里的 `deepseek` 等占位不该让每次启动都报警。
-        let defaults =
-            r#"{"language_models":{"deepseek":{"base_url":"https://api.deepseek.com/v1"}}}"#;
-        let config = parse_with_defaults(r#"{"language_models":{"ollama":null}}"#, defaults);
+        let defaults = r#"{"language_model_providers":{"deepseek":{"base_url":"https://api.deepseek.com/v1"}}}"#;
+        let config =
+            parse_with_defaults(r#"{"language_model_providers":{"ollama":null}}"#, defaults);
         assert_eq!(config.unsupported_sections().count(), 0);
     }
 
     #[test]
     fn missing_credential_lists_tried_names() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"minekuai":{
+            r#"{"language_model_providers":{"openai_compatible":{"minekuai":{
                 "base_url":"https://minekuai.cn/v1",
                 "auth":{"kind":"header","name":"x-api-key"}
             }}}}"#,
@@ -530,7 +522,7 @@ mod tests {
     #[test]
     fn explicit_env_list_wins_over_derived_name() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"agnes":{
+            r#"{"language_model_providers":{"openai_compatible":{"agnes":{
                 "base_url":"https://example.com/v1",
                 "auth":{"kind":"bearer","env":["SECOND","FIRST"]}
             }}}}"#,
@@ -545,7 +537,7 @@ mod tests {
     #[test]
     fn no_auth_provider_resolves_without_credentials() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"ollama":{
+            r#"{"language_model_providers":{"openai_compatible":{"ollama":{
                 "base_url":"http://localhost:11434/v1","auth":{"kind":"none"}
             }}}}"#,
         );
@@ -557,7 +549,7 @@ mod tests {
     #[test]
     fn model_facts_and_capabilities_are_applied() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"p":{
+            r#"{"language_model_providers":{"openai_compatible":{"p":{
                 "base_url":"https://example.com/v1",
                 "auth":{"kind":"none"},
                 "available_models":[{
@@ -603,7 +595,7 @@ mod tests {
     fn max_tokens_parameter_defaults_to_max_completion_tokens() {
         // 与 Zed 的 OpenAiCompatibleModelCapabilities 默认值一致。
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"p":{
+            r#"{"language_model_providers":{"openai_compatible":{"p":{
                 "base_url":"https://example.com/v1","auth":{"kind":"none"},
                 "available_models":[{"name":"m"}]
             }}}}"#,
@@ -618,7 +610,7 @@ mod tests {
     #[test]
     fn duplicate_model_names_are_rejected() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"p":{
+            r#"{"language_model_providers":{"openai_compatible":{"p":{
                 "base_url":"https://example.com/v1","auth":{"kind":"none"},
                 "available_models":[{"name":"m"},{"name":"m"}]
             }}}}"#,
@@ -630,7 +622,7 @@ mod tests {
     #[test]
     fn responses_only_models_are_rejected_for_now() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"p":{
+            r#"{"language_model_providers":{"openai_compatible":{"p":{
                 "base_url":"https://example.com/v1","auth":{"kind":"none"},
                 "available_models":[{"name":"m","capabilities":{"chat_completions":false}}]
             }}}}"#,
@@ -642,7 +634,7 @@ mod tests {
     #[test]
     fn unknown_provider_lists_known_ids() {
         let config = parse(
-            r#"{"language_models":{"openai_compatible":{"agnes":{"base_url":"https://example.com/v1"}}}}"#,
+            r#"{"language_model_providers":{"openai_compatible":{"agnes":{"base_url":"https://example.com/v1"}}}}"#,
         );
         let error = config
             .resolve_with("nope", &FakeCredentials(HashMap::new()))
@@ -660,7 +652,7 @@ mod tests {
 
         let text = format!(
             r#"{{
-                "language_models": {{
+                "language_model_providers": {{
                     "openai_compatible": {{
                         "p": {{
                             "base_url": "https://example.com/v1",
@@ -673,7 +665,7 @@ mod tests {
             key_file.display()
         );
         let config = Settings::parse(&text, &dir.join("settings.jsonc")).unwrap();
-        let headers = &config.language_models.openai_compatible["p"].headers;
+        let headers = &config.language_model_providers.openai_compatible["p"].headers;
         assert_eq!(headers["X-From-File"], "sk-from-file");
 
         std::fs::remove_dir_all(&dir).ok();
@@ -681,13 +673,13 @@ mod tests {
 
     #[test]
     fn env_substitution_escapes_quotes() {
-        let text = r#"{"language_models":{"openai_compatible":{"p":{
+        let text = r#"{"language_model_providers":{"openai_compatible":{"p":{
             "base_url":"https://example.com/v1",
             "headers":{"X-Quote":"{env:AACODE_TEST_QUOTE}"}}}}}"#;
         // 不依赖真实进程 env：这里只验证「缺失时替换成空串」，解析仍然成立。
         let config = Settings::parse(text, Path::new("/tmp/p.jsonc")).unwrap();
         assert_eq!(
-            config.language_models.openai_compatible["p"].headers["X-Quote"],
+            config.language_model_providers.openai_compatible["p"].headers["X-Quote"],
             ""
         );
     }

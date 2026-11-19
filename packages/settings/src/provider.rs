@@ -1,9 +1,9 @@
 //! 端点配置形状 + 解析成库层客户端。
 //!
 //! 两种 section，名字代表**协议**而不是厂商（对齐 Zed）：
-//! - [`OpenAiCompatibleProvider`]：`language_models.openai_compatible.<id>`，走 `/chat/completions`；
-//! - [`OllamaProvider`]：`language_models.ollama`，语义上是原生 `/api/chat`，但库层
-//!   还没有原生适配器，所以当前**过渡实现走 OpenAI 兼容 `/v1`**。
+//! - [`OpenAiCompatibleProvider`]：`language_model_providers.openai_compatible.<id>`，走 `/chat/completions`；
+//! - [`OllamaProvider`]：`language_model_providers.ollama`，语义上是原生 `/api/chat`；
+//!   适配器尚未实现，配置可以写、`providers` 会列出，但 `resolve` 会明确报错。
 //!
 //! 字段名以 Zed 为参照，但端点基址叫 `base_url`（Zed 叫 `api_url`）：
 //! 与库层 `OpenAiLanguageModelProvider::with_base_url`、OpenAI SDK 的
@@ -119,14 +119,14 @@ impl OpenAiCompatibleProvider {
     }
 }
 
-/// 原生 Ollama 端点（`language_models.ollama`）。
+/// 原生 Ollama 端点（`language_model_providers.ollama`）。
 ///
 /// 形状对齐 Zed `OllamaSettingsContent`：`base_url` 写**根地址**
 /// （默认 `http://localhost:11434`），不是 `/v1`。Zed 把这个字段叫 `api_url`。
 ///
-/// 库层还没有原生 `/api/chat` 适配器，所以当前是**过渡实现**：
-/// 解析时把根地址补成 OpenAI 兼容的 `/v1`（已带 `/v1` 不重复追加）。
-/// 等 `aa_ai_ollama` 落地后，同一份配置会切到原生协议，用户不用改文件。
+/// 库层还没有原生 `/api/chat` 适配器，所以这里**只做配置校验与展示**：
+/// 能解析、能在 `providers` 里看到，但 `resolve` 会明确报错，不会偷偷改走
+/// OpenAI 兼容 `/v1`（那是另一个 section 的语义）。
 #[derive(Debug, Clone, Deserialize)]
 pub struct OllamaProvider {
     /// 根地址，例如 `http://localhost:11434`。
@@ -154,42 +154,6 @@ impl Default for OllamaProvider {
     }
 }
 
-impl OllamaProvider {
-    /// 过渡实现用的 OpenAI 兼容基址：`http://localhost:11434` → `.../v1`。
-    pub fn openai_base_url(&self) -> String {
-        let trimmed = self.base_url.trim().trim_end_matches('/');
-        if trimmed.ends_with("/v1") {
-            trimmed.to_owned()
-        } else {
-            format!("{trimmed}/v1")
-        }
-    }
-
-    /// 解析凭证并构造库层客户端（当前走 OpenAI 兼容协议）。
-    pub fn resolve(
-        &self,
-        credentials: &dyn Credentials,
-    ) -> Result<ResolvedProvider, SettingsError> {
-        if self.base_url.trim().is_empty() {
-            return Err(SettingsError::Provider {
-                provider: OLLAMA_PROVIDER_ID.to_owned(),
-                message: "base_url 不能为空".to_owned(),
-            });
-        }
-
-        build_provider(
-            ProviderSpec {
-                id: OLLAMA_PROVIDER_ID,
-                base_url: &self.openai_base_url(),
-                auth: &self.auth,
-                headers: &self.headers,
-                available_models: &self.available_models,
-            },
-            credentials,
-        )
-    }
-}
-
 fn default_ollama_base_url() -> String {
     "http://localhost:11434".to_owned()
 }
@@ -198,10 +162,10 @@ fn no_auth() -> AuthConfig {
     AuthConfig::None
 }
 
-/// `language_models.ollama` 的固定 provider id（section 名就是 id）。
+/// `language_model_providers.ollama` 的固定 provider id（section 名就是 id）。
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";
 
-/// 两种 section 解析成客户端时共用的输入。
+/// OpenAI 兼容端点解析成客户端时的输入。
 struct ProviderSpec<'a> {
     id: &'a str,
     base_url: &'a str,

@@ -4,9 +4,9 @@
 //! `settings.jsonc`、解析密钥，再把解好的端点交给库层。
 //!
 //! ```bash
-//! aa-agent-cli providers              # 列设置里的端点（不读密钥）
-//! aa-agent-cli models minekuai        # GET /models（需要密钥）
-//! aa-agent-cli chat agnes agnes-2.0-flash "你好"
+//! aacode-cli providers              # 列设置里的端点（不读密钥）
+//! aacode-cli models minekuai        # GET /models（需要密钥）
+//! aacode-cli chat agnes agnes-2.0-flash "你好"
 //! ```
 
 use std::io::Write;
@@ -19,15 +19,15 @@ use futures::StreamExt;
 use aa_language_model::provider::{CompletionEvent, LanguageModelClient, StopReason, TokenUsage};
 use aa_language_model::request::Request;
 use aa_language_model::request::message::{ContentPart, Message, Role};
-use aa_settings::{Settings, default_path, derived_env_name};
+use aacode_settings::{Settings, default_path, derived_env_name};
 
 const USAGE: &str = "\
 aacode — 多提供商 LLM 客户端
 
 用法:
-  aa-agent-cli [--config <PATH>] providers
-  aa-agent-cli [--config <PATH>] models <provider>
-  aa-agent-cli [--config <PATH>] chat <provider> <model> [prompt...]
+  aacode-cli [--config <PATH>] providers
+  aacode-cli [--config <PATH>] models <provider>
+  aacode-cli [--config <PATH>] chat <provider> <model> [prompt...]
 
 设置:
   默认 $AACODE_SETTINGS，否则 {config_dir}/aacode/settings.jsonc
@@ -103,14 +103,16 @@ async fn run(args: Args) -> Result<(), String> {
 }
 
 fn list_providers(settings: &Settings) {
-    let language_models = &settings.language_models;
+    let language_model_providers = &settings.language_model_providers;
 
-    if language_models.openai_compatible.is_empty() && language_models.ollama.is_none() {
+    if language_model_providers.openai_compatible.is_empty()
+        && language_model_providers.ollama.is_none()
+    {
         println!("设置里没有 provider：{}", default_path().display());
         return;
     }
 
-    for (id, provider) in &language_models.openai_compatible {
+    for (id, provider) in &language_model_providers.openai_compatible {
         print_provider(
             id,
             &provider.base_url,
@@ -120,18 +122,18 @@ fn list_providers(settings: &Settings) {
         );
     }
 
-    if let Some(provider) = &language_models.ollama {
-        let note = if language_models
+    if let Some(provider) = &language_model_providers.ollama {
+        let note = if language_model_providers
             .openai_compatible
-            .contains_key(aa_settings::OLLAMA_PROVIDER_ID)
+            .contains_key(aacode_settings::OLLAMA_PROVIDER_ID)
         {
             "被同名 openai_compatible 条目覆盖"
         } else {
-            "过渡实现：走 OpenAI 兼容 /v1"
+            "原生 /api/chat 适配器未实现，暂不可用"
         };
         print_provider(
-            aa_settings::OLLAMA_PROVIDER_ID,
-            &provider.openai_base_url(),
+            aacode_settings::OLLAMA_PROVIDER_ID,
+            &provider.base_url,
             &provider.auth,
             &provider.available_models,
             Some(note),
@@ -142,8 +144,8 @@ fn list_providers(settings: &Settings) {
 fn print_provider(
     id: &str,
     base_url: &str,
-    auth: &aa_settings::AuthConfig,
-    models: &[aa_settings::AvailableModel],
+    auth: &aacode_settings::AuthConfig,
+    models: &[aacode_settings::AvailableModel],
     note: Option<&str>,
 ) {
     match note {
@@ -153,15 +155,15 @@ fn print_provider(
     println!("  base_url: {base_url}");
 
     let auth = match auth {
-        aa_settings::AuthConfig::Bearer { env } if env.is_empty() => {
+        aacode_settings::AuthConfig::Bearer { env } if env.is_empty() => {
             format!("bearer {}", derived_env_name(id))
         }
-        aa_settings::AuthConfig::Bearer { env } => format!("bearer {}", env.join(" | ")),
-        aa_settings::AuthConfig::Header { name, env } if env.is_empty() => {
+        aacode_settings::AuthConfig::Bearer { env } => format!("bearer {}", env.join(" | ")),
+        aacode_settings::AuthConfig::Header { name, env } if env.is_empty() => {
             format!("{name}: {}", derived_env_name(id))
         }
-        aa_settings::AuthConfig::Header { name, env } => format!("{name}: {}", env.join(" | ")),
-        aa_settings::AuthConfig::None => "无鉴权".to_owned(),
+        aacode_settings::AuthConfig::Header { name, env } => format!("{name}: {}", env.join(" | ")),
+        aacode_settings::AuthConfig::None => "无鉴权".to_owned(),
     };
     println!("  auth: {auth}");
 

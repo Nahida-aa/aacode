@@ -1,5 +1,5 @@
 [package]
-name = "aa-settings"
+name = "aacode_settings"
 version = "0.1.0"
 edition = "2024"
 description = "应用层：多提供商设置与凭证解析（库层只接收解好的端点数据）"

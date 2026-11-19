@@ -20,6 +20,9 @@ pub enum SettingsError {
     #[error("provider `{provider}` 设置有问题：{message}")]
     Provider { provider: String, message: String },
 
+    #[error("provider `{provider}` 尚未实现：{message}")]
+    Unimplemented { provider: String, message: String },
+
     #[error("provider `{provider}` 里模型 `{model}` 重复声明")]
     DuplicateModel { provider: String, model: String },
 

@@ -8,7 +8,7 @@
 // 只放不需要密钥、可以无条件存在的端点（本地服务）。
 
 {
-  "language_models": {
+  "language_model_providers": {
     "deepseek": {
       "base_url": "https://api.deepseek.com/v1",
     },
@@ -17,8 +17,8 @@
     },
     "openai_compatible": {},
     "ollama": {
-      // 根地址（Zed 形状）。语义上是原生 /api/chat；库层还没有原生适配器，
-      // 当前过渡实现会补成 OpenAI 兼容的 /v1。
+      // 根地址（Zed 形状）。原生 /api/chat 适配器尚未实现，现在只解析不生效；
+      // 要用本地 Ollama 请配 openai_compatible.ollama（OpenAI 兼容 /v1）。
       "base_url": "http://localhost:11434",
     },
   },

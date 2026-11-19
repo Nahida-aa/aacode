@@ -3,33 +3,6 @@
 version = 4
 
 [[package]]
-name = "aa-agent"
-version = "0.1.0"
-
-[[package]]
-name = "aa-agent-cli"
-version = "0.1.0"
-dependencies = [
- "aa-settings",
- "aa_language_model",
- "futures",
- "tokio",
-]
-
-[[package]]
-name = "aa-settings"
-version = "0.1.0"
-dependencies = [
- "aa_ai_openai",
- "aa_language_model",
- "dirs",
- "jsonc-parser",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
 name = "aa_ai_openai"
 version = "0.1.0"
 dependencies = [
@@ -45,6 +18,33 @@ name = "aa_language_model"
 version = "0.1.0"
 dependencies = [
  "futures",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "aacode-cli"
+version = "0.1.0"
+dependencies = [
+ "aa_language_model",
+ "aacode_settings",
+ "futures",
+ "tokio",
+]
+
+[[package]]
+name = "aacode-desktop"
+version = "0.1.0"
+
+[[package]]
+name = "aacode_settings"
+version = "0.1.0"
+dependencies = [
+ "aa_ai_openai",
+ "aa_language_model",
+ "dirs",
+ "jsonc-parser",
  "serde",
  "serde_json",
  "thiserror",

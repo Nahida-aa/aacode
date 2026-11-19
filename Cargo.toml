@@ -8,7 +8,7 @@ members = ["packages/apps/cli", "packages/apps/desktop", "packages/settings"]
 aa_language_model = { path = "../../lib_ls/aa-ai/packages/aa_language_model" }
 aa_ai_openai = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_openai" }
 
-aa-settings = { path = "packages/settings" }
+aacode_settings = { path = "packages/settings" }
 
 dirs = "6"
 futures = "0.3"
