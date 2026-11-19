@@ -10,7 +10,9 @@
 //   省略 `env` 时按 id 推导，例如 `minekuai` → `MINEKUAI_API_KEY`；
 // - `{env:VAR}` / `{file:path}` 在解析前替换（`~` 展开，相对路径相对本文件）；
 // - `context_window` 是上下文窗口（不是输出上限），`max_output_tokens` 才是输出上限；
-// - `available_models` 里没声明的模型也能用，只是拿默认事实。
+// - `available_models` 里没声明的模型也能用，只是拿默认事实；
+// - 本文件会深合并到内置的 `assets/settings/default.jsonc` 上：
+//   没写的字段保留默认值，写 `null` 也等于「没写」（不覆盖默认）。
 
 {
   "language_models": {
@@ -71,10 +73,8 @@
       },
 
       // 本地端点：没有鉴权。模型名任意，未声明时用默认事实。
-      "ollama": {
-        "api_url": "http://localhost:11434/v1",
-        "auth": { "kind": "none" },
-      },
+      // null = 不覆盖内置默认（default.jsonc 里已有 ollama 的 /v1 地址）。
+      "ollama": null,
     },
   },
 }

@@ -1,0 +1,20 @@
+// aacode 内置默认设置。
+//
+// 用户的 settings.jsonc 会深合并到这里：
+// - 用户没写的字段保留这里的值；
+// - 用户写 null 也视为「没写」（不覆盖默认）；
+// - 数组（如 available_models）整体覆盖，不做逐项合并。
+//
+// 只放不需要密钥、可以无条件存在的端点（本地服务）。
+
+{
+  "language_models": {
+    "openai_compatible": {
+      "ollama": {
+        // OpenAI 兼容路径；Zed 的默认值是给原生 /api/chat 用的，这里是 /v1。
+        "api_url": "http://localhost:11434/v1",
+        "auth": { "kind": "none" },
+      },
+    },
+  },
+}

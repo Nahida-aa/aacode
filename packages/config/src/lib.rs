@@ -13,6 +13,18 @@
 //! 目前只实现 `openai_compatible` 这一组；其他组（`anthropic` / `google` …）
 //! 等对应 crate 落地后再加，未知组会被忽略。
 //!
+//! # 默认值与合并
+//!
+//! [`Settings::load`] 先读内置的 `assets/settings/default.jsonc`，再把用户文件深合并上去
+//! （规则对齐 Zed `merge_from.rs`）：
+//!
+//! - 对象逐键递归合并；
+//! - 用户写 `null` 或省略字段 = 保留默认值；
+//! - 数组整体覆盖，不做逐项合并。
+//!
+//! 所以 `"ollama": null` 是合法的，含义是「不覆盖默认的 ollama」。
+//! 没有默认层时（[`Settings::parse`]）`null` 同样视为「没写」，条目直接不存在。
+//!
 //! ```jsonc
 //! {
 //!   "language_models": {
@@ -49,6 +61,9 @@ pub use provider::{
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
+/// 内置默认设置（只放不需要密钥的本地端点）。
+const DEFAULT_SETTINGS: &str = include_str!("../../../assets/settings/default.jsonc");
+
 /// 整份 `settings.jsonc`。
 ///
 /// 现在只有 LLM 配置；以后的主题、工具白名单等可以并列加在这里。
@@ -67,7 +82,7 @@ pub struct LanguageModels {
 }
 
 impl Settings {
-    /// 读文件 → 替换 `{env:}` / `{file:}` → 解析 JSONC。
+    /// 读用户文件，深合并到内置默认值上。
     ///
     /// 只做语法和结构校验，**不读密钥**；密钥在 [`Self::resolve`] 时才解析。
     /// 所以 `aacode providers` 这类只看端点的命令不需要任何 key。
@@ -76,18 +91,33 @@ impl Settings {
             path: path.to_path_buf(),
             source,
         })?;
-        Self::parse(&text, path)
+        Self::load_with_defaults(&text, DEFAULT_SETTINGS, path)
     }
 
-    /// 解析内存中的配置文本。`path` 只用于 `{file:}` 的相对路径和错误信息。
+    /// 解析内存中的配置文本，**不合并**内置默认值。
+    ///
+    /// `null` 仍然等价于「没写」：该条目直接不存在。
     pub fn parse(text: &str, path: &Path) -> Result<Self, ConfigError> {
+        Self::load_with_defaults(text, "{}", path)
+    }
+
+    /// 解析并合并：`defaults` 作为底，`user` 覆盖上去。
+    ///
+    /// `path` 只用于 `{file:}` 的相对路径和错误信息。
+    pub fn load_with_defaults(
+        user: &str,
+        defaults: &str,
+        path: &Path,
+    ) -> Result<Self, ConfigError> {
         let base_dir = path.parent().unwrap_or_else(|| Path::new("."));
-        let text = substitute::apply(text, base_dir);
-        jsonc_parser::parse_to_serde_value(&text, &Default::default()).map_err(|error| {
-            ConfigError::Invalid {
-                path: path.to_path_buf(),
-                message: format!("JSONC 解析失败：{error}"),
-            }
+
+        let mut merged = parse_jsonc(defaults, base_dir, path)?;
+        let user_value = parse_jsonc(user, base_dir, path)?;
+        merge_non_null(user_value, &mut merged);
+
+        serde_json::from_value(merged).map_err(|error| ConfigError::Invalid {
+            path: path.to_path_buf(),
+            message: format!("配置结构错误：{error}"),
         })
     }
 
@@ -138,6 +168,65 @@ pub fn default_path() -> PathBuf {
         .join("settings.jsonc")
 }
 
+fn parse_jsonc(text: &str, base_dir: &Path, path: &Path) -> Result<serde_json::Value, ConfigError> {
+    let text = substitute::apply(text, base_dir);
+    jsonc_parser::parse_to_serde_value(&text, &Default::default()).map_err(|error| {
+        ConfigError::Invalid {
+            path: path.to_path_buf(),
+            message: format!("JSONC 解析失败：{error}"),
+        }
+    })
+}
+
+/// 把 `source` 深合并进 `target`，规则与 Zed 的 `merge_non_null_json_value_into` 一致：
+///
+/// - 两边都是对象 → 逐键递归；
+/// - `source` 是 `null` → 保留 `target`（等于没写）；
+/// - 其余（数组、标量）→ 整体覆盖。
+fn merge_non_null(source: serde_json::Value, target: &mut serde_json::Value) {
+    if let serde_json::Value::Object(source) = source {
+        let target = match target {
+            serde_json::Value::Object(target) => target,
+            target => {
+                *target = serde_json::Value::Object(Default::default());
+                target.as_object_mut().expect("刚换成对象")
+            }
+        };
+
+        for (key, value) in source {
+            match target.get_mut(&key) {
+                Some(existing) => merge_non_null(value, existing),
+                // 目标里没有这个 key 时整棵子树插入；先把子树里的 null 去掉，
+                // 这样 `"new-provider": { "headers": null }` 也等于「没写」。
+                None => {
+                    if let Some(value) = strip_nulls(value) {
+                        target.insert(key, value);
+                    }
+                }
+            }
+        }
+    } else if !source.is_null() {
+        *target = strip_nulls(source).unwrap_or(serde_json::Value::Null);
+    }
+}
+
+/// 递归去掉对象里的 `null` 值；全空的子树返回 `None`。
+fn strip_nulls(value: serde_json::Value) -> Option<serde_json::Value> {
+    match value {
+        serde_json::Value::Object(object) => {
+            let mut stripped = serde_json::Map::new();
+            for (key, value) in object {
+                if let Some(value) = strip_nulls(value) {
+                    stripped.insert(key, value);
+                }
+            }
+            Some(serde_json::Value::Object(stripped))
+        }
+        serde_json::Value::Null => None,
+        other => Some(other),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -155,6 +244,11 @@ mod tests {
         Settings::parse(text, Path::new("/tmp/aacode/settings.jsonc")).unwrap()
     }
 
+    fn parse_with_defaults(user: &str, defaults: &str) -> Settings {
+        Settings::load_with_defaults(user, defaults, Path::new("/tmp/aacode/settings.jsonc"))
+            .unwrap()
+    }
+
     #[test]
     fn parses_jsonc_with_comments_and_trailing_commas() {
         let config = parse(
@@ -170,6 +264,98 @@ mod tests {
             }"#,
         );
         assert_eq!(config.ids().collect::<Vec<_>>(), vec!["agnes"]);
+    }
+
+    #[test]
+    fn null_provider_entry_keeps_default() {
+        let defaults = r#"{"language_models":{"openai_compatible":{"ollama":{
+            "api_url":"http://localhost:11434/v1","auth":{"kind":"none"}
+        }}}}"#;
+        let user = r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#;
+
+        let config = parse_with_defaults(user, defaults);
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama"]);
+        let resolved = config.resolve("ollama").unwrap();
+        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
+    }
+
+    #[test]
+    fn null_provider_entry_without_default_is_absent() {
+        let config = parse(r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#);
+        assert_eq!(config.ids().count(), 0);
+    }
+
+    #[test]
+    fn nested_null_in_new_provider_is_ignored() {
+        let config = parse(
+            r#"{"language_models":{"openai_compatible":{"p":{
+                "api_url":"https://example.com/v1",
+                "auth":{"kind":"none"},
+                "headers":null
+            }}}}"#,
+        );
+        let provider = &config.language_models.openai_compatible["p"];
+        assert!(provider.headers.is_empty());
+    }
+
+    #[test]
+    fn user_provider_deep_merges_into_default() {
+        let defaults = r#"{"language_models":{"openai_compatible":{"ollama":{
+            "api_url":"http://localhost:11434/v1",
+            "auth":{"kind":"none"},
+            "headers":{"X-Default":"1"}
+        }}}}"#;
+        let user = r#"{"language_models":{"openai_compatible":{"ollama":{
+            "headers":{"X-User":"2"}
+        }}}}"#;
+
+        let config = parse_with_defaults(user, defaults);
+        let provider = &config.language_models.openai_compatible["ollama"];
+        // 用户没写的字段保留默认值。
+        assert_eq!(provider.api_url, "http://localhost:11434/v1");
+        // 对象逐键合并。
+        assert_eq!(provider.headers["X-Default"], "1");
+        assert_eq!(provider.headers["X-User"], "2");
+    }
+
+    #[test]
+    fn user_arrays_replace_defaults() {
+        let defaults = r#"{"language_models":{"openai_compatible":{"p":{
+            "api_url":"https://example.com/v1","auth":{"kind":"none"},
+            "available_models":[{"name":"a"},{"name":"b"}]
+        }}}}"#;
+        let user = r#"{"language_models":{"openai_compatible":{"p":{
+            "available_models":[{"name":"c"}]
+        }}}}"#;
+
+        let config = parse_with_defaults(user, defaults);
+        let models = &config.language_models.openai_compatible["p"].available_models;
+        assert_eq!(models.len(), 1);
+        assert_eq!(models[0].name, "c");
+    }
+
+    #[test]
+    fn builtin_defaults_are_loaded() {
+        let dir = std::env::temp_dir().join(format!(
+            "aacode-defaults-test-{}-{}",
+            std::process::id(),
+            std::thread::current().name().unwrap_or("main")
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("settings.jsonc");
+        std::fs::write(
+            &path,
+            r#"{"language_models":{"openai_compatible":{"ollama":null}}}"#,
+        )
+        .unwrap();
+
+        let config = Settings::load(&path).unwrap();
+        assert!(config.ids().any(|id| id == "ollama"));
+        let resolved = config.resolve("ollama").unwrap();
+        // 内置默认必须带 /v1（OpenAI 兼容路径），而不是 Zed 原生的 11434 根路径。
+        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
+
+        std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]
