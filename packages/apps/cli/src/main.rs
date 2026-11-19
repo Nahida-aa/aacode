@@ -1,12 +1,14 @@
-//! aacode CLI：先用多提供商设置把真实 LLM 跑起来。
+//! aacode CLI：多提供商设置 + 带工具的 agent 循环。
 //!
 //! 设置与凭证属于应用层（见 aa-ai `docs/design/library-api.md`）：这里读
 //! `settings.jsonc`、解析密钥，再把解好的端点交给库层。
 //!
 //! ```bash
-//! aacode-cli providers              # 列设置里的端点（不读密钥）
-//! aacode-cli models minekuai        # GET /models（需要密钥）
-//! aacode-cli chat agnes agnes-2.0-flash "你好"
+//! aacode-cli providers                 # 列设置里的端点（不读密钥）
+//! aacode-cli models minekuai           # GET /models（需要密钥）
+//! aacode-cli chat minekuai deepseek "你好"        # 纯对话，不带工具
+//! aacode-cli run minekuai deepseek "把 src 里的 TODO 汇总"  # agent + 工具（只读）
+//! aacode-cli run --allow-write ...     # 允许 write/edit
 //! ```
 
 use std::io::Write;
@@ -16,26 +18,53 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 
+use aa_agent::AgentLoop;
+use aa_agent::tool::ToolEvents;
 use aa_language_model::provider::{CompletionEvent, LanguageModelClient, StopReason, TokenUsage};
 use aa_language_model::request::Request;
 use aa_language_model::request::message::{ContentPart, Message, Role};
 use aacode_settings::{Settings, default_path, derived_env_name};
 
+mod tools;
+
 const USAGE: &str = "\
-aacode — 多提供商 LLM 客户端
+aacode — 多提供商 LLM 客户端 / coding agent
 
 用法:
-  aacode-cli [--config <PATH>] providers
-  aacode-cli [--config <PATH>] models <provider>
-  aacode-cli [--config <PATH>] chat <provider> <model> [prompt...]
+  aacode-cli [--settings <PATH>] providers
+  aacode-cli [--settings <PATH>] models <provider>
+  aacode-cli [--settings <PATH>] chat <provider> <model> [prompt...]
+  aacode-cli [--settings <PATH>] run [选项] <provider> <model> <prompt...>
+  aacode-cli run --stub [选项] <prompt...>     # 离线冒烟：不连 LLM，用剧本驱动
+
+run 的选项:
+  --dir <PATH>       工作目录（工具只能访问它，默认当前目录）
+  --allow-write      注册 write / edit（默认只读：只有 read / glob）
+  --system <TEXT>    覆盖内置系统提示
+  --stub             用离线 stub 客户端（不读密钥、不连网络），验证 loop + 工具接线
 
 设置:
   默认 $AACODE_SETTINGS，否则 {config_dir}/aacode/settings.jsonc
   密钥: auth.env 列出的环境变量（省略则 <PROVIDER_ID>_API_KEY）
 ";
 
+/// 内置系统提示。工具名和规则都在这里，改工具集时同步改。
+const DEFAULT_SYSTEM: &str = "\
+你是一个在终端里工作的 coding agent。
+
+规则：
+- 先看再改：修改文件前用 read 看过相关代码；
+- 找文件用 glob（只列路径），不要用 read 猜路径；
+- 改已有文件用 edit（old_string 必须精确匹配且唯一），新建文件或整体重写用 write；
+- 所有路径相对工作目录；不要访问工作目录之外的路径；
+- 回答简洁，中文；不要复述文件内容，除非用户要求。";
+
 struct Args {
     settings: PathBuf,
+    dir: PathBuf,
+    allow_write: bool,
+    system: Option<String>,
+    stub: bool,
     command: Command,
 }
 
@@ -44,10 +73,17 @@ enum Command {
     Providers,
     /// 调端点的 `GET /models`（需要密钥）。
     Models { provider: String },
-    /// 跑一次流式对话。
+    /// 跑一次流式对话（不带工具）。
     Chat {
         provider: String,
         model: String,
+        prompt: String,
+    },
+    /// 跑一次带工具的 agent 任务。
+    Run {
+        /// `--stub` 时不需要 provider / model。
+        provider: Option<String>,
+        model: Option<String>,
         prompt: String,
     },
 }
@@ -76,29 +112,61 @@ async fn main() -> ExitCode {
 }
 
 async fn run(args: Args) -> Result<(), String> {
-    // `providers` 只解析设置文本，不触发凭证解析；models/chat 才需要密钥。
-    let settings = Settings::load(&args.settings).map_err(|error| error.to_string())?;
-
-    let unsupported = settings.unsupported_sections().collect::<Vec<_>>();
-    if !unsupported.is_empty() {
-        eprintln!(
-            "# 注意：这些 section 还没有适配器，已忽略：{}",
-            unsupported.join("、")
-        );
-        eprintln!("# 要连兼容 OpenAI 协议的端点，请写 openai_compatible.<id>");
+    // `--stub` 完全不碰磁盘设置：没有 settings.jsonc 也能跑冒烟。
+    if args.stub && !matches!(args.command, Command::Run { .. }) {
+        return Err("--stub 只能和 run 一起用".to_owned());
     }
+
+    let settings = if args.stub {
+        None
+    } else {
+        // `providers` 只解析设置文本，不触发凭证解析；其余命令才需要密钥。
+        let settings = Settings::load(&args.settings).map_err(|error| error.to_string())?;
+
+        let unsupported = settings.unsupported_sections().collect::<Vec<_>>();
+        if !unsupported.is_empty() {
+            eprintln!(
+                "# 注意：这些 section 还没有适配器，已忽略：{}",
+                unsupported.join("、")
+            );
+            eprintln!("# 要连兼容 OpenAI 协议的端点，请写 openai_compatible.<id>");
+        }
+        Some(settings)
+    };
+
+    let settings_ref = || settings.as_ref().expect("非 stub 路径一定加载了设置");
 
     match args.command {
         Command::Providers => {
-            list_providers(&settings);
+            list_providers(settings_ref());
             Ok(())
         }
-        Command::Models { provider } => list_models(&settings, &provider).await,
+        Command::Models { provider } => list_models(settings_ref(), &provider).await,
         Command::Chat {
             provider,
             model,
             prompt,
-        } => chat(&settings, &provider, &model, prompt).await,
+        } => chat(settings_ref(), &provider, &model, prompt).await,
+        Command::Run {
+            provider,
+            model,
+            prompt,
+        } => {
+            let options = RunOptions {
+                dir: args.dir,
+                allow_write: args.allow_write,
+                system: args.system.unwrap_or_else(|| DEFAULT_SYSTEM.to_owned()),
+                stub: args.stub,
+            };
+            agent(
+                settings.as_ref(),
+                provider.as_deref(),
+                model.as_deref(),
+                prompt,
+                options,
+            )
+            .await
+        }
     }
 }
 
@@ -278,70 +346,257 @@ async fn chat(
     Ok(())
 }
 
-/// `Ok(None)` = 打印用法并正常退出。
-fn parse_args(mut raw: Vec<String>) -> Result<Option<Args>, String> {
-    let mut settings = None;
+/// 带工具的 agent 任务。
+/// `run` 的选项（参数太多了，打包成结构免得 clippy 报 8 个参数）。
+struct RunOptions {
+    dir: PathBuf,
+    allow_write: bool,
+    system: String,
+    stub: bool,
+}
 
-    while let Some(argument) = raw.first() {
+async fn agent(
+    settings: Option<&Settings>,
+    provider: Option<&str>,
+    model_id: Option<&str>,
+    prompt: String,
+    options: RunOptions,
+) -> Result<(), String> {
+    let RunOptions {
+        dir,
+        allow_write,
+        system,
+        stub,
+    } = options;
+    let workspace = Arc::new(tools::Workspace::new(dir, allow_write));
+    let registry = tools::registry(workspace.clone());
+
+    eprintln!("# 工作目录: {}", workspace.root().display());
+    eprintln!(
+        "# 工具: {}{}",
+        registry.names().join(", "),
+        if allow_write {
+            ""
+        } else {
+            "（只读；加 --allow-write 启用 write/edit）"
+        }
+    );
+
+    if stub {
+        // 离线冒烟：剧本固定为「先 glob，再回一段话」，用来验证 loop + 工具接线，
+        // 不读设置、不碰网络。真模型的行为不在这里验证。
+        eprintln!("# stub 模式：不连 LLM");
+        let client = aa_language_models::stub::StubClient::with_rounds([
+            vec![
+                aa_language_model::provider::CompletionEvent::ToolUse {
+                    id: "call_1".to_owned(),
+                    name: "glob".to_owned(),
+                    input: serde_json::json!({ "pattern": "**/*.rs", "limit": 3 }),
+                    is_complete: true,
+                },
+                aa_language_model::provider::CompletionEvent::Stop(
+                    aa_language_model::provider::StopReason::ToolUse,
+                ),
+            ],
+            vec![
+                aa_language_model::provider::CompletionEvent::Text(
+                    "（stub）已通过 glob 看过文件列表。".to_owned(),
+                ),
+                aa_language_model::provider::CompletionEvent::Stop(
+                    aa_language_model::provider::StopReason::EndTurn,
+                ),
+            ],
+        ]);
+        let model = aa_language_model::provider::Model::new("stub", "stub");
+        AgentLoop::new(&client, model, registry)
+            .run(&system, &prompt, &CliEvents)
+            .await
+            .map_err(|error| error.to_string())?;
+        println!();
+        return Ok(());
+    }
+
+    let provider = provider.ok_or("run 需要 <provider> <model> <prompt>")?;
+    let model_id = model_id.ok_or("run 需要 <provider> <model> <prompt>")?;
+    let resolved = settings
+        .expect("非 stub 路径一定加载了设置")
+        .resolve(provider)
+        .map_err(|error| error.to_string())?;
+    let model = resolved.model(model_id);
+
+    if !resolved.declares_model(model_id) {
+        eprintln!("# 设置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
+    }
+
+    let agent = AgentLoop::new(&resolved.client, model, registry);
+    agent
+        .run(&system, &prompt, &CliEvents)
+        .await
+        .map_err(|error| error.to_string())?;
+
+    // 文本已经在事件回调里流式打印过，这里只收尾。
+    println!();
+    Ok(())
+}
+
+/// 把 agent 的进度回调转成终端输出。
+///
+/// 库层只有一个「进度字符串」通道：文本增量原样打印；工具/用量这类结构化信息
+/// 带前缀，用暗色单独起一行。
+struct CliEvents;
+
+impl ToolEvents for CliEvents {
+    fn progress(&self, message: &str) {
+        if let Some(rest) = message.strip_prefix("[usage] ") {
+            eprintln!("\n\x1b[2m[usage] {rest}\x1b[0m");
+        } else if message.starts_with("→ tool: ") {
+            // 工具调用单独起一行、暗色，避免和模型正文粘在一起。
+            eprintln!("\n\x1b[2m{message}\x1b[0m");
+        } else {
+            print!("{message}");
+        }
+        let _ = std::io::stdout().flush();
+    }
+
+    fn cancelled(&self) -> bool {
+        false
+    }
+}
+
+/// `Ok(None)` = 打印用法并正常退出。
+///
+/// 选项可以写在命令前也可以写在命令后（`--stub run ...` 与 `run --stub ...` 等价）：
+/// 扫到一个非选项 token 且还没有命令时，它就是命令名；之后的非选项都是位置参数。
+fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
+    let mut settings = None;
+    let mut dir = None;
+    let mut allow_write = false;
+    let mut system = None;
+    let mut stub = false;
+    let mut command_name: Option<String> = None;
+    let mut positional: Vec<String> = Vec::new();
+
+    let mut iter = raw.into_iter();
+    while let Some(argument) = iter.next() {
         match argument.as_str() {
-            "-h" | "--help" | "help" => return Ok(None),
-            "--config" => {
-                raw.remove(0);
-                if raw.is_empty() {
-                    return Err("--config 需要一个路径".to_owned());
+            "-h" | "--help" | "help" if command_name.is_none() => return Ok(None),
+            // `--config` 是旧名，保留但提示；设置文件一直叫 settings.jsonc。
+            "--settings" | "--config" => {
+                let value = iter
+                    .next()
+                    .ok_or_else(|| format!("{argument} 需要一个路径"))?;
+                if argument == "--config" {
+                    eprintln!("# --config 已改名 --settings");
                 }
-                settings = Some(PathBuf::from(raw.remove(0)));
+                settings = Some(PathBuf::from(value));
             }
-            _ if argument.starts_with("--config=") => {
-                let path = argument["--config=".len()..].to_owned();
-                if path.is_empty() {
-                    return Err("--config= 后面需要一个路径".to_owned());
+            "--dir" => {
+                let value = iter.next().ok_or("--dir 需要一个路径")?;
+                dir = Some(PathBuf::from(value));
+            }
+            "--system" => {
+                let value = iter.next().ok_or("--system 需要一段文本")?;
+                system = Some(value);
+            }
+            "--allow-write" => allow_write = true,
+            "--stub" => stub = true,
+            _ if argument.starts_with("--settings=") || argument.starts_with("--config=") => {
+                let (flag, value) = argument.split_once('=').expect("匹配了以 = 开头的分支");
+                if value.is_empty() {
+                    return Err(format!("{flag}= 后面需要一个路径"));
                 }
-                raw.remove(0);
-                settings = Some(PathBuf::from(path));
+                if flag == "--config" {
+                    eprintln!("# --config 已改名 --settings");
+                }
+                settings = Some(PathBuf::from(value));
             }
-            _ => break,
+            _ if argument.starts_with("--dir=") => {
+                let value = &argument["--dir=".len()..];
+                if value.is_empty() {
+                    return Err("--dir= 后面需要一个路径".to_owned());
+                }
+                dir = Some(PathBuf::from(value));
+            }
+            _ if argument.starts_with("--system=") => {
+                system = Some(argument["--system=".len()..].to_owned());
+            }
+            _ if argument.starts_with('-') => {
+                return Err(format!("未知选项 `{argument}`"));
+            }
+            _ if command_name.is_none() => command_name = Some(argument),
+            _ => positional.push(argument),
         }
     }
 
-    let Some(name) = raw.first().cloned() else {
+    let Some(name) = command_name else {
         return Ok(None);
     };
-    raw.remove(0);
 
     let command = match name.as_str() {
-        "providers" => Command::Providers,
+        "providers" => {
+            expect_no_positional(&name, &positional)?;
+            Command::Providers
+        }
         "models" => {
-            let provider = raw
+            let provider = positional
                 .first()
                 .cloned()
                 .ok_or("models 需要 provider id（先用 providers 看有哪些）")?;
-            raw.remove(0);
+            expect_no_positional(&name, &positional[1..])?;
             Command::Models { provider }
         }
-        "chat" => {
-            if raw.len() < 3 {
-                return Err("chat 需要 <provider> <model> <prompt>".to_owned());
-            }
-            let provider = raw.remove(0);
-            let model = raw.remove(0);
-            let prompt = raw.join(" ");
-            raw.clear();
-            Command::Chat {
-                provider,
-                model,
-                prompt,
+        "chat" | "run" => {
+            // `run --stub <prompt>`：不需要 provider / model。
+            if name == "run" && stub {
+                if positional.is_empty() {
+                    return Err("run --stub 需要 <prompt>".to_owned());
+                }
+                Command::Run {
+                    provider: None,
+                    model: None,
+                    prompt: positional.join(" "),
+                }
+            } else {
+                if positional.len() < 3 {
+                    return Err(format!("{name} 需要 <provider> <model> <prompt>"));
+                }
+                let mut rest = positional.into_iter();
+                let provider = rest.next().expect("len >= 3");
+                let model = rest.next().expect("len >= 3");
+                let prompt = rest.collect::<Vec<_>>().join(" ");
+                if name == "chat" {
+                    Command::Chat {
+                        provider,
+                        model,
+                        prompt,
+                    }
+                } else {
+                    Command::Run {
+                        provider: Some(provider),
+                        model: Some(model),
+                        prompt,
+                    }
+                }
             }
         }
         other => return Err(format!("未知命令 `{other}`")),
     };
 
-    if !raw.is_empty() {
-        return Err(format!("多余的参数：{raw:?}"));
-    }
-
     Ok(Some(Args {
         settings: settings.unwrap_or_else(default_path),
+        dir: dir.unwrap_or_else(|| PathBuf::from(".")),
+        allow_write,
+        system,
+        stub,
         command,
     }))
+}
+
+/// 多余的位置参数是笔误，直接报错而不是忽略。
+fn expect_no_positional(command: &str, extra: &[String]) -> Result<(), String> {
+    if extra.is_empty() {
+        Ok(())
+    } else {
+        Err(format!("{command} 不接受多余参数：{extra:?}"))
+    }
 }
