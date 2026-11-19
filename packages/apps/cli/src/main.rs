@@ -12,7 +12,7 @@
 //! ```
 
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::sync::Arc;
 
@@ -46,6 +46,7 @@ run 的选项:
 设置:
   默认 $AACODE_SETTINGS，否则 {config_dir}/aacode/settings.jsonc
   密钥: auth.env 列出的环境变量（省略则 <PROVIDER_ID>_API_KEY）
+  也可以把密钥写进 `.env`（当前目录或设置文件旁；不覆盖已存在的环境变量）
 ";
 
 /// 内置系统提示。工具名和规则都在这里，改工具集时同步改。
@@ -120,6 +121,9 @@ async fn run(args: Args) -> Result<(), String> {
     let settings = if args.stub {
         None
     } else {
+        // 密钥可以不 export：`cargo run` 时的当前目录或设置文件旁的 `.env` 都会读。
+        load_dotenv(&args.settings);
+
         // `providers` 只解析设置文本，不触发凭证解析；其余命令才需要密钥。
         let settings = Settings::load(&args.settings).map_err(|error| error.to_string())?;
 
@@ -167,6 +171,21 @@ async fn run(args: Args) -> Result<(), String> {
             )
             .await
         }
+    }
+}
+
+/// 读 `.env`：应用层的便利，库层不碰环境变量。
+///
+/// 顺序：当前目录 → 设置文件所在目录。已经存在的真实环境变量优先
+/// （dotenvy 不覆盖已有值），所以 `AGNES_API_KEY=... cargo run` 仍然生效。
+/// 没有 `.env` 就静默跳过 —— 凭证缺失的报错留给 `resolve`。
+fn load_dotenv(settings_path: &Path) {
+    let _ = dotenvy::from_filename(".env");
+    if let Some(dir) = settings_path
+        .parent()
+        .filter(|dir| !dir.as_os_str().is_empty())
+    {
+        let _ = dotenvy::from_path(dir.join(".env"));
     }
 }
 

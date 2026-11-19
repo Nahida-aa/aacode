@@ -16,14 +16,16 @@
 //   没写的字段保留默认值，写 `null` 也等于「没写」（不覆盖默认）。
 
 {
+  "proxy": "https://127.0.0.1:8080",
   "language_model_providers": {
     "openai_compatible": {
-      // 第三方 OpenAI 兼容网关：自定义 header 鉴权。
+      // 第三方 OpenAI 兼容网关。鉴权用 Bearer：该网关的 /v1/chat/completions
+      // 只认 `Authorization: Bearer`；`x-api-key` 只在 /v1/models 上被接受
+      // （实测同一个 key：models 200，chat 401 invalid_request_error）。
       "minekuai": {
         "base_url": "https://minekuai.cn/v1",
         "auth": {
-          "kind": "header",
-          "name": "x-api-key",
+          "kind": "bearer",
           "env": ["MINEKUAI_API_KEY"],
         },
         "headers": { "X-Title": "aacode" },
@@ -72,10 +74,25 @@
           },
         ],
       },
+      // 本地 llama.cpp：llama-server 的 /v1 就是 OpenAI 兼容形状，
+      // 不需要单独适配器，也不需要密钥（默认不校验；显式写「无鉴权」）。
+      // 端口：新版本默认 9931，老版本 8080 —— 按 `llama-server --port` 的实际值填。
+      // base_url 必须带 /v1：OpenAI 兼容路由都挂在 /v1 下。
+      "llama.cpp": {
+        "base_url": "http://localhost:9931/v1",
+        "auth": { "kind": "none" },
+      },
+
+      // 本地 Ollama 的 OpenAI 兼容视图（同一台服务器的 /v1，与原生 /api/chat 并存）。
+      // 原生 section 的适配器还没实现，所以本地 Ollama 目前走这条。
+      // 测本地模型挑最小的（先 `ollama pull` 一次）：qwen2.5:0.5b / llama3.2:1b；
+      // 名字带 `:cloud` 的模型现在要付费，不算本地。
+      "ollama": {
+        "base_url": "http://localhost:11434/v1",
+        "auth": { "kind": "none" },
+      },
     },
-    // 本地 Ollama：独立 section，语义上是原生 /api/chat；
-    // 适配器尚未实现，现在只解析不生效；要连 /v1 请配 openai_compatible.ollama。
-    // null = 不覆盖内置默认。
-    "ollama": null,
+    // 本地 Ollama 的原生 section（/api/chat）：适配器尚未实现，只解析不生效。
+    // 走 openai_compatible.ollama 就够了，这里保持内置默认（根地址）。
   },
 }

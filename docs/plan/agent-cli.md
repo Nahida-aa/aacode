@@ -121,3 +121,32 @@ aa-agent/
 │       └── verify.ts            # 通用验证脚本（协议层，后补）
 └── rust/                       # 生产：Rust（后期，核心逻辑重实现 + ACP v2 feature）
 ```
+
+## 6. 现状（2026-11-20）
+
+计划里的 v0 已经落地成 Rust（不走 TS 实验）：`aa_agent::AgentLoop`（库）+ `aacode-cli run`（应用）。
+第 5 节的 TS 目录只当作早期想法，实际代码在 `packages/apps/cli` + `../../lib_ls/aa-ai/packages/aa_agent`。
+
+### 三种跑法
+
+| 目的 | 命令 | 依赖 |
+|---|---|---|
+| 验证 loop / 工具接线 | `aacode-cli run --stub --dir <DIR> "..."` | 无（剧本驱动，不读设置、不连网） |
+| 真实模型 + 工具 | `aacode-cli run --dir <DIR> <provider> <model> "..."` | 设置里有端点 + 密钥 |
+| 纯对话（不带工具） | `aacode-cli chat <provider> <model> "..."` | 同上 |
+
+密钥可以放 `.env`（当前目录或设置文件旁），不用每次 export。
+
+### 测试用哪个端点
+
+- **agnes**（`agnes-3.0-flash`）是首选：工具/图片/并行工具调用都声明支持。
+- **minekuai** 也能跑通（`deepseek-v4.1-flash-1017`，带 `reasoning_content`）。
+  注意它的鉴权：`/v1/chat/completions` **只认** `Authorization: Bearer`，
+  `x-api-key` 只在 `/v1/models` 上被接受（同一个 key：models 200、chat 401）。
+- **本地**：Ollama 的 `:cloud` 模型现在全部收费，不算本地。本地测就挑最小可用的模型
+  （`qwen2.5:0.5b` / `llama3.2:1b`，`ollama pull` 一次），走
+  `openai_compatible.ollama` → `http://localhost:11434/v1`。
+- **llama.cpp 不需要单独适配器**：`llama-server` 的 `/v1` 就是 OpenAI 兼容形状
+  （`/v1/chat/completions`、`/v1/models`、`/v1/responses`、甚至 Anthropic Messages）。
+  配 `openai_compatible.llama.cpp` → `http://localhost:9931/v1`（新版本默认 9931，老版本 8080），
+  `auth: {kind: "none"}`。
