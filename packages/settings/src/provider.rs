@@ -18,6 +18,7 @@
 //! `auth` 是 aa-ai 的扩展：Zed 把密钥放钥匙串，这里放「变量名」。
 
 use std::collections::BTreeMap;
+use std::sync::Arc;
 
 use aa_ai_openai::OpenAiLanguageModelProvider;
 use aa_language_model::provider::{Model, ReasoningEffort};
@@ -102,11 +103,12 @@ pub fn derived_env_name(provider: &str) -> String {
 impl OpenAiCompatibleProvider {
     /// 解析凭证并构造库层客户端。
     ///
-    /// `proxy` 是顶层设置解出来的出站代理（空 = 不显式设置，走环境变量）。
+    /// `transport` 是全进程共享的 HTTP 客户端：代理、超时、连接池都在它身上
+    /// （`aacode_settings::Settings::transport` 构造并缓存）。
     pub fn resolve(
         &self,
         id: &str,
-        proxy: Option<&str>,
+        transport: &Arc<aa_http_client::HttpClient>,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, SettingsError> {
         build_provider(
@@ -117,7 +119,7 @@ impl OpenAiCompatibleProvider {
                 headers: &self.headers,
                 available_models: &self.available_models,
             },
-            proxy,
+            transport,
             credentials,
         )
     }
@@ -180,7 +182,7 @@ struct ProviderSpec<'a> {
 
 fn build_provider(
     spec: ProviderSpec<'_>,
-    proxy: Option<&str>,
+    transport: &Arc<aa_http_client::HttpClient>,
     credentials: &dyn Credentials,
 ) -> Result<ResolvedProvider, SettingsError> {
     let ProviderSpec {
@@ -200,10 +202,10 @@ fn build_provider(
 
     let env_names = auth.env_names(id);
     let client = match auth {
-        AuthConfig::None => OpenAiLanguageModelProvider::without_auth(),
+        AuthConfig::None => OpenAiLanguageModelProvider::without_auth(transport.clone()),
         AuthConfig::Bearer { .. } => {
             let key = resolve_key(id, &env_names, credentials)?;
-            OpenAiLanguageModelProvider::new(key)
+            OpenAiLanguageModelProvider::new(transport.clone(), key)
         }
         AuthConfig::Header { name, .. } => {
             if name.trim().is_empty() {
@@ -215,22 +217,14 @@ fn build_provider(
             let key = resolve_key(id, &env_names, credentials)?;
             // header 鉴权不走 Bearer；非法 header 名/值在发请求前会变成
             // LlmError::Transport，不会 panic。
-            OpenAiLanguageModelProvider::without_auth().with_auth_header(name.clone(), key)
+            OpenAiLanguageModelProvider::without_auth(transport.clone())
+                .with_auth_header(name.clone(), key)
         }
     };
 
     let mut client = client.with_base_url(base_url.to_owned());
     for (name, value) in headers {
         client = client.with_header(name.clone(), value.clone());
-    }
-    if let Some(proxy) = proxy {
-        // 代理是端点之外的运行时配置：库层只收已解好的值（见 library-api.md）。
-        client = client
-            .with_proxy(proxy)
-            .map_err(|error| SettingsError::Provider {
-                provider: id.to_owned(),
-                message: error.to_string(),
-            })?;
     }
 
     let mut models = BTreeMap::new();

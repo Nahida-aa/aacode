@@ -18,12 +18,21 @@ dependencies = [
 name = "aa_ai_openai"
 version = "0.1.0"
 dependencies = [
+ "aa_http_client",
  "aa_language_model",
  "base64 0.22.1",
  "futures",
  "reqwest",
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "aa_http_client"
+version = "0.1.0"
+dependencies = [
+ "reqwest",
+ "thiserror",
 ]
 
 [[package]]
@@ -72,6 +81,7 @@ name = "aacode_settings"
 version = "0.1.0"
 dependencies = [
  "aa_ai_openai",
+ "aa_http_client",
  "aa_language_model",
  "dirs",
  "jsonc-parser",

@@ -68,6 +68,7 @@ pub use provider::{
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
+use std::sync::{Arc, OnceLock};
 
 /// 内置默认设置（只放不需要密钥的本地端点）。
 const DEFAULT_SETTINGS: &str = include_str!("../../../assets/settings/default.jsonc");
@@ -91,6 +92,12 @@ pub struct Settings {
     /// 不影响解析（内置默认文件里也有这类占位）。
     #[serde(skip)]
     unsupported: BTreeSet<String>,
+    /// 全进程共享的 HTTP 传输（一个连接池）。按 `proxy` 首次使用时构造。
+    ///
+    /// 放在设置层是因为「代理怎么走」是应用配置；库层只接收构造好的
+    /// `Arc<aa_http_client::HttpClient>`（见 aa-ai `docs/decisions/0010-transport-object.md`）。
+    #[serde(skip)]
+    transport: OnceLock<Arc<aa_http_client::HttpClient>>,
 }
 
 /// 按协议分组的 provider 表（对齐 Zed `LanguageModelSettings`）。
@@ -147,6 +154,15 @@ impl Settings {
             })?;
         settings.unsupported = unsupported;
         settings.proxy = normalize_proxy(settings.proxy, path)?;
+        // 传输也随之构造一次：代理 URL 的语法错误在**解析期**暴露，
+        // 而不是等第一条命令发请求时才发现（坏代理会让所有 provider 一起失败）。
+        let transport = build_transport(settings.proxy.as_deref()).map_err(|message| {
+            SettingsError::Invalid {
+                path: path.to_path_buf(),
+                message,
+            }
+        })?;
+        let _ = settings.transport.set(transport);
 
         Ok(settings)
     }
@@ -158,6 +174,23 @@ impl Settings {
     /// `openai_compatible.<id>`（只要它兼容 OpenAI 协议）。
     pub fn unsupported_sections(&self) -> impl Iterator<Item = &str> {
         self.unsupported.iter().map(String::as_str)
+    }
+
+    /// 全进程共享的 HTTP 传输（一个连接池，按 `proxy` 首次使用时构造）。
+    ///
+    /// 代理语义在这里落定：显式设置 → `Proxy::explicit`；没写 → 跟随环境变量。
+    /// 库层只接收这个已构造好的 `Arc`，不再自己读配置
+    /// （见 aa-ai `docs/decisions/0010-transport-object.md`）。
+    pub fn transport(&self) -> Result<Arc<aa_http_client::HttpClient>, SettingsError> {
+        if let Some(transport) = self.transport.get() {
+            return Ok(transport.clone());
+        }
+
+        let transport = build_transport(self.proxy.as_deref())
+            .map_err(|message| SettingsError::Transport { message })?;
+        // 并发时可能另一个线程先 set；两边都是同一个配置，丢掉一个即可。
+        let _ = self.transport.set(transport);
+        Ok(self.transport.get().expect("刚刚 set 过").clone())
     }
 
     /// 用环境变量解析某个 provider 的凭证并构造客户端。
@@ -176,7 +209,7 @@ impl Settings {
         // 与 Zed 一致：`openai_compatible` 条目优先于内置 section
         // （Zed 的内置 provider 先注册，compatible 后注册并覆盖同名 id）。
         if let Some(provider) = self.language_model_providers.openai_compatible.get(id) {
-            return provider.resolve(id, self.proxy.as_deref(), credentials);
+            return provider.resolve(id, &self.transport()?, credentials);
         }
         if id == OLLAMA_PROVIDER_ID && self.language_model_providers.ollama.is_some() {
             // 不偷偷改走 OpenAI 兼容 `/v1`：那是另一个 section 的语义。
@@ -273,6 +306,22 @@ fn normalize_proxy(proxy: Option<String>, path: &Path) -> Result<Option<String>,
     }
 
     Ok(Some(proxy.to_owned()))
+}
+
+/// 按顶层 `proxy` 构造共享传输（一个连接池）。
+///
+/// `None` = 跟随环境变量；`Some(url)` = 显式代理（URL 已由 [`normalize_proxy`]
+/// 校过前缀，这里再由 `reqwest::Proxy::all` 做语法解析）。
+fn build_transport(proxy: Option<&str>) -> Result<Arc<aa_http_client::HttpClient>, String> {
+    let proxy = match proxy {
+        Some(url) => aa_http_client::Proxy::explicit(url),
+        None => aa_http_client::Proxy::Environment,
+    };
+    aa_http_client::HttpClient::builder()
+        .proxy(proxy)
+        .build()
+        .map(Arc::new)
+        .map_err(|error| error.to_string())
 }
 
 /// `language_model_providers` 下尚未实现的 section 名（只看用户写的那一层）。
@@ -396,6 +445,19 @@ mod tests {
         )
         .unwrap_err();
         assert!(error.to_string().contains("socks"), "{error}");
+    }
+
+    #[test]
+    fn malformed_proxy_url_fails_at_parse_time() {
+        // 前缀合法但 URL 本身不完整：reqwest 解析失败，应该在加载设置时就报错，
+        // 不是等第一条命令发请求。这是应用层的设置校验，库层只报构造失败。
+        let error = Settings::load_with_defaults(
+            r#"{"proxy": "http://"}"#,
+            "{}",
+            Path::new("/tmp/aacode/settings.jsonc"),
+        )
+        .unwrap_err();
+        assert!(error.to_string().contains("代理"), "{error}");
     }
 
     #[test]

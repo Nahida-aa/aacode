@@ -153,13 +153,19 @@ aa-agent/
 
 ### 代理
 
-顶层 `proxy`（和 Zed 同名）已经接线：`Settings.proxy` → `resolve` → `aa_ai_openai::with_proxy`。
-语义照 Zed：
+顶层 `proxy`（和 Zed 同名）已经接线：`Settings.proxy` → `Settings::transport()`
+（构造一次，`OnceLock` 缓存）→ `build_provider` 把同一个
+`Arc<aa_http_client::HttpClient>` 交给每个 provider。语义照 Zed：
 
 - 空串/缺省 = 不显式设置，reqwest 自己读 `ALL_PROXY` / `HTTPS_PROXY` / `HTTP_PROXY`；
 - 非空 = 覆盖环境变量代理，但 `NO_PROXY` 的直连列表仍然生效；
 - 只接受 `http://` / `https://`；`socks5://` 明确报「需要 reqwest 的 `socks` feature」；
-- 解析期就校验（代理配错会让所有命令一起失败，越早报错越好）。
+- 解析期就构造传输：代理 URL 语法错误在**加载设置**时报，并带上文件路径
+  （代理配错会让所有命令一起失败，越早报错越好）。
+
+传输本身在 `aa-stack/packages/util/aa_http_client`（不在 aa-ai 里）：它不认识任何
+LLM 类型，一个进程一个连接池，所有 provider 共享。见 aa-ai
+`docs/decisions/0010-transport-object.md`。
 
 顺带把 reqwest 从 `rustls-tls` 换成 `rustls-tls-native-roots`：本地 mitmproxy 的 CA
 装在系统信任库里，webpki-roots 不认，换之前走代理会报 `invalid peer certificate: UnknownIssuer`。
@@ -167,7 +173,7 @@ aa-agent/
 
 ### 超时
 
-库层 `aa_ai_openai` 的客户端默认 10s 建连 + 120s per-read idle 超时（其余
+`aa_http_client` 的默认客户端是 10s 建连 + 120s per-read idle 超时（其余
 keep-alive 取值对齐 Zed，见 aa-ai `docs/decisions/0009-http-transport.md`）。
 流式响应连续 120s 收不到任何字节会报
 `读取超时：连续 120 秒没有收到任何数据 ...`，不再无限挂起；健康的长流只要持续

@@ -431,8 +431,8 @@ async fn agent(
             ],
         ]);
         let model = aa_language_model::provider::Model::new("stub", "stub");
-        AgentLoop::new(&client, model, registry)
-            .run(&system, &prompt, &CliEvents)
+        AgentLoop::new(Arc::new(client), registry)
+            .run(&model, &system, &prompt, &CliEvents)
             .await
             .map_err(|error| error.to_string())?;
         println!();
@@ -451,9 +451,9 @@ async fn agent(
         eprintln!("# 设置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
     }
 
-    let agent = AgentLoop::new(&resolved.client, model, registry);
+    let agent = AgentLoop::new(Arc::new(resolved.client), registry);
     agent
-        .run(&system, &prompt, &CliEvents)
+        .run(&model, &system, &prompt, &CliEvents)
         .await
         .map_err(|error| error.to_string())?;
 

@@ -38,4 +38,7 @@ pub enum SettingsError {
         provider: String,
         names: Vec<String>,
     },
+
+    #[error("构造 HTTP 传输失败：{message}")]
+    Transport { message: String },
 }
