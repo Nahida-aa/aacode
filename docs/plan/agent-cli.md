@@ -164,3 +164,11 @@ aa-agent/
 顺带把 reqwest 从 `rustls-tls` 换成 `rustls-tls-native-roots`：本地 mitmproxy 的 CA
 装在系统信任库里，webpki-roots 不认，换之前走代理会报 `invalid peer certificate: UnknownIssuer`。
 实测 `proxy = "https://127.0.0.1:8080"`（mitmweb）时 `models` / `chat` / `run` 三条都通。
+
+### 超时
+
+库层 `aa_ai_openai` 的客户端默认 10s 建连 + 120s per-read idle 超时（其余
+keep-alive 取值对齐 Zed，见 aa-ai `docs/decisions/0009-http-transport.md`）。
+流式响应连续 120s 收不到任何字节会报
+`读取超时：连续 120 秒没有收到任何数据 ...`，不再无限挂起；健康的长流只要持续
+有增量就不会被中断。CLI 暂不暴露这个值。
