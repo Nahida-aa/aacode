@@ -14,8 +14,12 @@
 // - `available_models` 里没声明的模型也能用，只是拿默认事实；
 // - 本文件会深合并到内置的 `assets/settings/default.jsonc` 上：
 //   没写的字段保留默认值，写 `null` 也等于「没写」（不覆盖默认）。
+// - `proxy` 是顶层设置（Zed 同名）：`http://` / `https://` 代理，空串 = 读环境变量；
+//   `NO_PROXY` 的直连列表始终生效。请求走系统信任库，代理自己的 CA 装在系统里即可。
 
 {
+  // 本机 mitmproxy（mitmweb）监听 8080。改成 http:// 也行 —— `https://` 表示
+  // 先用 TLS 连代理本身（mitmproxy 支持，但它的 CA 必须在系统信任库里）。
   "proxy": "https://127.0.0.1:8080",
   "language_model_providers": {
     "openai_compatible": {

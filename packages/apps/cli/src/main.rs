@@ -190,6 +190,10 @@ fn load_dotenv(settings_path: &Path) {
 }
 
 fn list_providers(settings: &Settings) {
+    if let Some(proxy) = &settings.proxy {
+        println!("# proxy: {proxy}");
+    }
+
     let language_model_providers = &settings.language_model_providers;
 
     if language_model_providers.openai_compatible.is_empty()

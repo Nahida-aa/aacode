@@ -8,6 +8,8 @@
 // 只放不需要密钥、可以无条件存在的端点（本地服务）。
 
 {
+  // 出站代理（对齐 Zed 的顶层 `proxy` 设置）：空串 = 不显式设置，
+  // HTTP 客户端自己读 ALL_PROXY / HTTPS_PROXY / HTTP_PROXY；NO_PROXY 的直连列表始终生效。
   "proxy": "",
   "language_model_providers": {
     "deepseek": {

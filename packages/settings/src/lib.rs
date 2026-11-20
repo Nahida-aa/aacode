@@ -11,7 +11,9 @@
 //!   `ollama` 语义上是原生 `/api/chat`（适配器尚未实现，见下）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
 //! - 密钥不进配置文件：`auth.env` 列出变量名，缺省按 id 推导 `{ID}_API_KEY`；
-//! - `{env:VAR}` / `{file:path}` 在解析 JSONC **之前**做文本替换（和 opencode 同款）。
+//! - `{env:VAR}` / `{file:path}` 在解析 JSONC **之前**做文本替换（和 opencode 同款）；
+//! - 顶层 `proxy`（对齐 Zed 同名设置）：http/https 代理，空串 = 读环境变量，
+//!   `NO_PROXY` 的直连列表始终生效；socks 代理需要 reqwest 的 `socks` feature（未启用）。
 //!
 //! 目前只有 `openai_compatible` 有适配器；`ollama` 能解析、能列出，但 `resolve`
 //! 会明确报「原生 /api/chat 尚未实现」，不会偷偷改走 OpenAI 兼容。其他 section
@@ -75,6 +77,14 @@ const DEFAULT_SETTINGS: &str = include_str!("../../../assets/settings/default.js
 /// 现在只有 LLM 配置；以后的主题、工具白名单等可以并列加在这里。
 #[derive(Debug, Clone, Default, serde::Deserialize)]
 pub struct Settings {
+    /// 出站 HTTP/HTTPS 代理。形状与语义对齐 Zed 的顶层 `proxy` 设置：
+    ///
+    /// - 空串或省略 = 不显式设置，交给 HTTP 客户端读环境变量
+    ///   （`ALL_PROXY` / `HTTPS_PROXY` / `HTTP_PROXY`）；
+    /// - 非空 = 覆盖环境变量代理，`NO_PROXY` 的直连列表仍然生效；
+    /// - 只接受 `http://` / `https://`（socks 需要 reqwest 的 `socks` feature，未启用）。
+    #[serde(default)]
+    pub proxy: Option<String>,
     #[serde(default)]
     pub language_model_providers: LanguageModelProviders,
     /// 用户文件里出现、但还没有适配器的 section。只用于提示，
@@ -136,6 +146,7 @@ impl Settings {
                 message: format!("设置结构错误：{error}"),
             })?;
         settings.unsupported = unsupported;
+        settings.proxy = normalize_proxy(settings.proxy, path)?;
 
         Ok(settings)
     }
@@ -165,7 +176,7 @@ impl Settings {
         // 与 Zed 一致：`openai_compatible` 条目优先于内置 section
         // （Zed 的内置 provider 先注册，compatible 后注册并覆盖同名 id）。
         if let Some(provider) = self.language_model_providers.openai_compatible.get(id) {
-            return provider.resolve(id, credentials);
+            return provider.resolve(id, self.proxy.as_deref(), credentials);
         }
         if id == OLLAMA_PROVIDER_ID && self.language_model_providers.ollama.is_some() {
             // 不偷偷改走 OpenAI 兼容 `/v1`：那是另一个 section 的语义。
@@ -231,6 +242,37 @@ fn parse_jsonc(
             message: format!("JSONC 解析失败：{error}"),
         }
     })
+}
+
+/// 规范化顶层 `proxy`：去空白、空串 = 没写、只接受 http/https。
+///
+/// 校验放在解析期而不是第一次发请求时：代理配错会让**所有**命令一起失败，
+/// 越早报错越容易定位。
+fn normalize_proxy(proxy: Option<String>, path: &Path) -> Result<Option<String>, SettingsError> {
+    let Some(proxy) = proxy else {
+        return Ok(None);
+    };
+    let proxy = proxy.trim();
+    if proxy.is_empty() {
+        return Ok(None);
+    }
+
+    if proxy.starts_with("socks") {
+        return Err(SettingsError::Invalid {
+            path: path.to_path_buf(),
+            message: format!(
+                "proxy `{proxy}` 是 socks 代理：需要 reqwest 的 `socks` feature，当前未启用"
+            ),
+        });
+    }
+    if !(proxy.starts_with("http://") || proxy.starts_with("https://")) {
+        return Err(SettingsError::Invalid {
+            path: path.to_path_buf(),
+            message: format!("proxy `{proxy}` 需要以 http:// 或 https:// 开头"),
+        });
+    }
+
+    Ok(Some(proxy.to_owned()))
 }
 
 /// `language_model_providers` 下尚未实现的 section 名（只看用户写的那一层）。
@@ -319,6 +361,60 @@ mod tests {
     fn parse_with_defaults(user: &str, defaults: &str) -> Settings {
         Settings::load_with_defaults(user, defaults, Path::new("/tmp/aacode/settings.jsonc"))
             .unwrap()
+    }
+
+    #[test]
+    fn proxy_is_trimmed_and_empty_means_unset() {
+        // 内置默认里的 `""`（用户没写）等价于「不设代理」。
+        assert_eq!(parse_with_defaults("{}", r#"{"proxy": ""}"#).proxy, None);
+        assert_eq!(parse_with_defaults("{}", "{}").proxy, None);
+
+        let settings = parse_with_defaults(
+            r#"{"proxy": "  http://127.0.0.1:8080  "}"#,
+            r#"{"proxy": ""}"#,
+        );
+        assert_eq!(settings.proxy.as_deref(), Some("http://127.0.0.1:8080"));
+    }
+
+    #[test]
+    fn proxy_requires_http_or_https() {
+        let error = Settings::load_with_defaults(
+            r#"{"proxy": "127.0.0.1:8080"}"#,
+            "{}",
+            Path::new("/tmp/aacode/settings.jsonc"),
+        )
+        .unwrap_err();
+        assert!(error.to_string().contains("http://"), "{error}");
+    }
+
+    #[test]
+    fn socks_proxy_says_why_it_is_not_supported() {
+        let error = Settings::load_with_defaults(
+            r#"{"proxy": "socks5://127.0.0.1:1080"}"#,
+            "{}",
+            Path::new("/tmp/aacode/settings.jsonc"),
+        )
+        .unwrap_err();
+        assert!(error.to_string().contains("socks"), "{error}");
+    }
+
+    #[test]
+    fn resolve_carries_the_top_level_proxy() {
+        // 只验证「代理存在时 resolve 仍然成功」：代理真正生效要发请求才看得见。
+        let settings = parse_with_defaults(
+            r#"{
+                "proxy": "http://127.0.0.1:8080",
+                "language_model_providers": {
+                    "openai_compatible": {
+                        "local": { "base_url": "http://localhost:9/v1", "auth": { "kind": "none" } }
+                    }
+                }
+            }"#,
+            "{}",
+        );
+        let credentials = FakeCredentials(HashMap::new());
+        let resolved = settings.resolve_with("local", &credentials).unwrap();
+        assert_eq!(resolved.base_url, "http://localhost:9/v1");
     }
 
     #[test]

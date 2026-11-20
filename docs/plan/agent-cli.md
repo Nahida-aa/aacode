@@ -150,3 +150,17 @@ aa-agent/
   （`/v1/chat/completions`、`/v1/models`、`/v1/responses`、甚至 Anthropic Messages）。
   配 `openai_compatible.llama.cpp` → `http://localhost:9931/v1`（新版本默认 9931，老版本 8080），
   `auth: {kind: "none"}`。
+
+### 代理
+
+顶层 `proxy`（和 Zed 同名）已经接线：`Settings.proxy` → `resolve` → `aa_ai_openai::with_proxy`。
+语义照 Zed：
+
+- 空串/缺省 = 不显式设置，reqwest 自己读 `ALL_PROXY` / `HTTPS_PROXY` / `HTTP_PROXY`；
+- 非空 = 覆盖环境变量代理，但 `NO_PROXY` 的直连列表仍然生效；
+- 只接受 `http://` / `https://`；`socks5://` 明确报「需要 reqwest 的 `socks` feature」；
+- 解析期就校验（代理配错会让所有命令一起失败，越早报错越好）。
+
+顺带把 reqwest 从 `rustls-tls` 换成 `rustls-tls-native-roots`：本地 mitmproxy 的 CA
+装在系统信任库里，webpki-roots 不认，换之前走代理会报 `invalid peer certificate: UnknownIssuer`。
+实测 `proxy = "https://127.0.0.1:8080"`（mitmweb）时 `models` / `chat` / `run` 三条都通。
