@@ -1,24 +1,24 @@
 //! 应用侧的多提供商设置与凭证解析。
 //!
 //! 库层（`aa-ai`）只接收**已经解好的**端点数据；这里负责把用户写的
-//! `settings.jsonc` 变成 `OpenAiLanguageModelProvider` + `Model` 表和密钥。
+//! `settings.jsonc` 变成 provider 客户端 + `Model` 表和密钥。
 //! 边界见 aa-ai 的 `docs/design/library-api.md`。
 //!
 //! 形状参考 Zed 的 `language_models` 分组（`settings_content/src/language_model.rs`），
 //! 但 key 叫 `language_model_providers`（这里只放 provider，不放模型选择）：
 //! - section 名代表**协议**，不是厂商：
-//!   `openai_compatible.<id>` 走 `/chat/completions`，
-//!   `ollama` 语义上是原生 `/api/chat`（适配器尚未实现，见下）；
+//!   `openai_compatible.<id>` 走 `/chat/completions`（SSE），
+//!   `ollama` 走原生 `/api/chat`（NDJSON，适配器是 `aa_ai_ollama`）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
 //! - 密钥不进配置文件：`auth.env` 列出变量名，缺省按 id 推导 `{ID}_API_KEY`；
 //! - `{env:VAR}` / `{file:path}` 在解析 JSONC **之前**做文本替换（和 opencode 同款）；
 //! - 顶层 `proxy`（对齐 Zed 同名设置）：http/https 代理，空串 = 读环境变量，
 //!   `NO_PROXY` 的直连列表始终生效；socks 代理需要 reqwest 的 `socks` feature（未启用）。
 //!
-//! 目前只有 `openai_compatible` 有适配器；`ollama` 能解析、能列出，但 `resolve`
-//! 会明确报「原生 /api/chat 尚未实现」，不会偷偷改走 OpenAI 兼容。其他 section
-//! （`deepseek` / `open_router` …）会被收进 [`Settings::unsupported_sections`]，
-//! CLI 会提示「已忽略」，避免写了设置却完全没反应。
+//! 两种 section 都有适配器：`openai_compatible`（`/v1`）与 `ollama`（原生
+//! `/api/chat`），同名 id（例如都叫 `ollama`）时**前者覆盖后者**，与 Zed 的注册
+//! 顺序一致。其他 section（`deepseek` / `open_router` …）会被收进
+//! [`Settings::unsupported_sections`]，CLI 会提示「已忽略」，避免写了设置却完全没反应。
 //!
 //! # 默认值与合并
 //!
@@ -106,7 +106,7 @@ pub struct LanguageModelProviders {
     /// OpenAI 兼容端点：官方 OpenAI、第三方网关、Ollama `/v1`、vLLM 等。
     #[serde(default)]
     pub openai_compatible: BTreeMap<String, OpenAiCompatibleProvider>,
-    /// 原生 Ollama 端点（语义上是 `/api/chat`；适配器尚未实现）。
+    /// 原生 Ollama 端点（语义上是 `/api/chat`，由 `aa_ai_ollama` 处理）。
     #[serde(default)]
     pub ollama: Option<OllamaProvider>,
 }
@@ -211,14 +211,11 @@ impl Settings {
         if let Some(provider) = self.language_model_providers.openai_compatible.get(id) {
             return provider.resolve(id, &self.transport()?, credentials);
         }
-        if id == OLLAMA_PROVIDER_ID && self.language_model_providers.ollama.is_some() {
-            // 不偷偷改走 OpenAI 兼容 `/v1`：那是另一个 section 的语义。
-            return Err(SettingsError::Unimplemented {
-                provider: OLLAMA_PROVIDER_ID.to_owned(),
-                message: "原生 /api/chat 适配器还没落地；\
-                          要连 Ollama 请配 openai_compatible.ollama（OpenAI 兼容 /v1）"
-                    .to_owned(),
-            });
+        if id == OLLAMA_PROVIDER_ID
+            && let Some(provider) = &self.language_model_providers.ollama
+        {
+            // 原生 `/api/chat`，不是 OpenAI 兼容 `/v1`（那是另一个 section 的语义）。
+            return provider.resolve(&self.transport()?, credentials);
         }
 
         Err(SettingsError::UnknownProvider {
@@ -577,16 +574,16 @@ mod tests {
 
         let config = Settings::load(&path).unwrap();
         assert!(config.ids().any(|id| id == "ollama"));
-        // 默认层只有根地址；原生适配器未实现，resolve 必须明确报错，
-        // 而不是偷偷改走 OpenAI 兼容 /v1。
-        let error = config.resolve("ollama").unwrap_err().to_string();
-        assert!(error.contains("尚未实现"), "{error}");
+        // 默认层的 ollama 是原生 section：resolve 得到的是 `/api/chat` 客户端，
+        // 不是 OpenAI 兼容 `/v1`。
+        let resolved = config.resolve("ollama").unwrap();
+        assert_eq!(resolved.base_url, "http://localhost:11434");
 
         std::fs::remove_dir_all(&dir).ok();
     }
 
     #[test]
-    fn ollama_section_is_parsed_but_not_resolvable() {
+    fn ollama_section_resolves_to_the_native_protocol() {
         let config = parse(
             r#"{"language_model_providers":{"ollama":{
                 "base_url":"http://192.168.1.5:11434",
@@ -603,9 +600,16 @@ mod tests {
         assert_eq!(provider.base_url, "http://192.168.1.5:11434");
         assert_eq!(provider.available_models.len(), 1);
 
-        let error = config.resolve("ollama").unwrap_err().to_string();
-        assert!(error.contains("尚未实现"), "{error}");
-        assert!(error.contains("openai_compatible.ollama"), "{error}");
+        let resolved = config.resolve("ollama").unwrap();
+        assert_eq!(resolved.base_url, "http://192.168.1.5:11434");
+        // 根地址：库层自己拼 `/api/chat`（不是 `.../v1`）。
+        assert!(
+            matches!(resolved.client, crate::provider::ProviderClient::Ollama(_)),
+            "ollama section 应该用原生协议客户端"
+        );
+        // 模型表照旧生效。
+        assert!(resolved.declares_model("qwen3:8b"));
+        assert_eq!(resolved.model("qwen3:8b").context_window, Some(32768));
     }
 
     #[test]

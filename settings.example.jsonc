@@ -6,7 +6,7 @@
 // 规则：
 // - `language_model_providers.<协议>.<id>`：一个 key = 一个端点，想连几个就写几个；
 //   `openai_compatible` 走 `/chat/completions`（OpenAI 官方、第三方网关、Ollama /v1、vLLM）；
-//   `ollama` 是独立的原生 section（语义上是 `/api/chat`，适配器尚未实现，暂不可用）；
+//   `ollama` 是独立的原生 section（`/api/chat`，NDJSON）；
 // - 密钥不写在这里：`auth.env` 是变量名列表，按顺序取第一个有值的；
 //   省略 `env` 时按 id 推导，例如 `minekuai` → `MINEKUAI_API_KEY`；
 // - `{env:VAR}` / `{file:path}` 在解析前替换（`~` 展开，相对路径相对本文件）；
@@ -88,15 +88,16 @@
       },
 
       // 本地 Ollama 的 OpenAI 兼容视图（同一台服务器的 /v1，与原生 /api/chat 并存）。
-      // 原生 section 的适配器还没实现，所以本地 Ollama 目前走这条。
+      // 注意 section key 就是 provider id：若这里也叫 `ollama`，会覆盖下面那个
+      // 原生 section（同名时 openai_compatible 优先），原生协议就没法选中了。
       // 测本地模型挑最小的（先 `ollama pull` 一次）：qwen2.5:0.5b / llama3.2:1b；
       // 名字带 `:cloud` 的模型现在要付费，不算本地。
-      "ollama": {
+      "ollama_v1": {
         "base_url": "http://localhost:11434/v1",
         "auth": { "kind": "none" },
       },
     },
-    // 本地 Ollama 的原生 section（/api/chat）：适配器尚未实现，只解析不生效。
-    // 走 openai_compatible.ollama 就够了，这里保持内置默认（根地址）。
+    // 本地 Ollama 的原生 section（`/api/chat`，NDJSON）：`aacode chat ollama <model>`。
+    // 和上面的 `/v1` 视图是同一台服务器、两套协议。
   },
 }

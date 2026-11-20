@@ -220,7 +220,7 @@ fn list_providers(settings: &Settings) {
         {
             "被同名 openai_compatible 条目覆盖"
         } else {
-            "原生 /api/chat 适配器未实现，暂不可用"
+            "原生 /api/chat"
         };
         print_provider(
             aacode_settings::OLLAMA_PROVIDER_ID,

@@ -7,6 +7,7 @@ members = ["packages/apps/cli", "packages/apps/desktop", "packages/settings"]
 [workspace.dependencies]
 aa_language_model = { path = "../../lib_ls/aa-ai/packages/aa_language_model" }
 aa_ai_openai = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_openai" }
+aa_ai_ollama = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_ollama" }
 aa_agent = { path = "../../lib_ls/aa-ai/packages/aa_agent" }
 aa_language_models = { path = "../../lib_ls/aa-ai/packages/aa_language_models" }
 # 共享传输在 aa-stack：应用只构造一次，所有 provider 复用同一个连接池。

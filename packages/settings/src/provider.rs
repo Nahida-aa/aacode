@@ -1,9 +1,8 @@
 //! 端点配置形状 + 解析成库层客户端。
 //!
 //! 两种 section，名字代表**协议**而不是厂商（对齐 Zed）：
-//! - [`OpenAiCompatibleProvider`]：`language_model_providers.openai_compatible.<id>`，走 `/chat/completions`；
-//! - [`OllamaProvider`]：`language_model_providers.ollama`，语义上是原生 `/api/chat`；
-//!   适配器尚未实现，配置可以写、`providers` 会列出，但 `resolve` 会明确报错。
+//! - [`OpenAiCompatibleProvider`]：`language_model_providers.openai_compatible.<id>`，走 `/chat/completions`（SSE）；
+//! - [`OllamaProvider`]：`language_model_providers.ollama`，走原生 `/api/chat`（NDJSON）。
 //!
 //! 字段名以 Zed 为参照，但端点基址叫 `base_url`（Zed 叫 `api_url`）：
 //! 与库层 `OpenAiLanguageModelProvider::with_base_url`、OpenAI SDK 的
@@ -18,8 +17,11 @@
 //! `auth` 是 aa-ai 的扩展：Zed 把密钥放钥匙串，这里放「变量名」。
 
 use std::collections::BTreeMap;
+use std::future::Future;
+use std::pin::Pin;
 use std::sync::Arc;
 
+use aa_ai_ollama::OllamaLanguageModelProvider;
 use aa_ai_openai::OpenAiLanguageModelProvider;
 use aa_language_model::provider::{Model, ReasoningEffort};
 use serde::Deserialize;
@@ -130,9 +132,9 @@ impl OpenAiCompatibleProvider {
 /// 形状对齐 Zed `OllamaSettingsContent`：`base_url` 写**根地址**
 /// （默认 `http://localhost:11434`），不是 `/v1`。Zed 把这个字段叫 `api_url`。
 ///
-/// 库层还没有原生 `/api/chat` 适配器，所以这里**只做配置校验与展示**：
-/// 能解析、能在 `providers` 里看到，但 `resolve` 会明确报错，不会偷偷改走
-/// OpenAI 兼容 `/v1`（那是另一个 section 的语义）。
+/// 走的是**原生协议**（`/api/chat`、NDJSON、`thinking` 字段），由
+/// `aa_ai_ollama` 实现；和 `openai_compatible.ollama`（`/v1`）是两回事，
+/// 不会互相顶替。
 #[derive(Debug, Clone, Deserialize)]
 pub struct OllamaProvider {
     /// 根地址，例如 `http://localhost:11434`。
@@ -166,6 +168,19 @@ fn default_ollama_base_url() -> String {
 
 fn no_auth() -> AuthConfig {
     AuthConfig::None
+}
+
+impl OllamaProvider {
+    /// 解析凭证并构造 `aa_ai_ollama` 的客户端。
+    ///
+    /// `base_url` 是根地址；库层自己拼 `/api/chat` 与 `/api/tags`。
+    pub fn resolve(
+        &self,
+        transport: &Arc<aa_http_client::HttpClient>,
+        credentials: &dyn Credentials,
+    ) -> Result<ResolvedProvider, SettingsError> {
+        build_ollama_provider(self, transport, credentials)
+    }
 }
 
 /// `language_model_providers.ollama` 的固定 provider id（section 名就是 id）。
@@ -227,9 +242,82 @@ fn build_provider(
         client = client.with_header(name.clone(), value.clone());
     }
 
+    let models = build_models(id, available_models, true)?;
+
+    Ok(ResolvedProvider {
+        id: id.to_owned(),
+        base_url: base_url.to_owned(),
+        client: ProviderClient::OpenAi(client),
+        models,
+    })
+}
+
+/// 原生 Ollama：根地址 + 可选的鉴权（反向代理后面才需要）+ 模型表。
+fn build_ollama_provider(
+    provider: &OllamaProvider,
+    transport: &Arc<aa_http_client::HttpClient>,
+    credentials: &dyn Credentials,
+) -> Result<ResolvedProvider, SettingsError> {
+    let id = OLLAMA_PROVIDER_ID;
+    let base_url = provider.base_url.trim();
+    if base_url.is_empty() {
+        return Err(SettingsError::Provider {
+            provider: id.to_owned(),
+            message: "base_url 不能为空".to_owned(),
+        });
+    }
+
+    let mut client = match &provider.auth {
+        AuthConfig::None => OllamaLanguageModelProvider::new(transport.clone()),
+        AuthConfig::Bearer { .. } => {
+            let names = provider.auth.env_names(id);
+            // 原生 Ollama 默认无鉴权；写了 bearer 却没有 key 才算配置错误。
+            let token = resolve_key(id, &names, credentials)?;
+            OllamaLanguageModelProvider::new(transport.clone()).with_bearer_token(token)
+        }
+        AuthConfig::Header { name, .. } => {
+            if name.trim().is_empty() {
+                return Err(SettingsError::Provider {
+                    provider: id.to_owned(),
+                    message: "auth.kind=header 时 name 不能为空".to_owned(),
+                });
+            }
+            let names = provider.auth.env_names(id);
+            let value = resolve_key(id, &names, credentials)?;
+            OllamaLanguageModelProvider::new(transport.clone())
+                .with_auth_header(name.clone(), value)
+        }
+    };
+
+    client = client.with_base_url(base_url.to_owned());
+    for (name, value) in &provider.headers {
+        client = client.with_header(name.clone(), value.clone());
+    }
+
+    // `capabilities.chat_completions` 是「这个模型能不能走 OpenAI `/v1`」，
+    // 对原生 section 没有意义，所以不校验。
+    let models = build_models(id, &provider.available_models, false)?;
+
+    Ok(ResolvedProvider {
+        id: id.to_owned(),
+        base_url: base_url.to_owned(),
+        client: ProviderClient::Ollama(client),
+        models,
+    })
+}
+
+/// 模型表：wire 形状无关，两种协议共用。
+///
+/// `require_chat_completions` 只对 OpenAI 兼容 section 有意义（`false` 表示
+/// 「这个模型只能走 Responses API」→ 明确报错，而不是偷偷换协议）。
+fn build_models(
+    id: &str,
+    available_models: &[AvailableModel],
+    require_chat_completions: bool,
+) -> Result<BTreeMap<String, ResolvedModel>, SettingsError> {
     let mut models = BTreeMap::new();
     for entry in available_models {
-        if !entry.capabilities.chat_completions {
+        if require_chat_completions && !entry.capabilities.chat_completions {
             return Err(SettingsError::UnsupportedModel {
                 provider: id.to_owned(),
                 model: entry.name.clone(),
@@ -248,13 +336,7 @@ fn build_provider(
             });
         }
     }
-
-    Ok(ResolvedProvider {
-        id: id.to_owned(),
-        base_url: base_url.to_owned(),
-        client,
-        models,
-    })
+    Ok(models)
 }
 
 fn resolve_key(
@@ -277,8 +359,86 @@ fn resolve_key(
 pub struct ResolvedProvider {
     pub id: String,
     pub base_url: String,
-    pub client: OpenAiLanguageModelProvider,
+    pub client: ProviderClient,
     models: BTreeMap<String, ResolvedModel>,
+}
+
+/// 解析完成的库层客户端：按**协议**分派。
+///
+/// 两种协议的 wire 形状完全不同（SSE vs NDJSON、`reasoning_content` vs
+/// `thinking`、工具参数是字符串 vs 对象），库层因此是两个具体类型。应用的其他
+/// 部分只关心 `LanguageModelClient` 与 `list_models`，所以在这里收成枚举：
+/// 加一种协议 = 加一个变体，调用点不用改。
+pub enum ProviderClient {
+    /// `aa_ai_openai`：`/chat/completions`。
+    OpenAi(OpenAiLanguageModelProvider),
+    /// `aa_ai_ollama`：原生 `/api/chat`。
+    Ollama(OllamaLanguageModelProvider),
+}
+
+/// `list_models` 的归一化结果：两套 wire 形状共有的部分。
+///
+/// OpenAI 是 `{"data":[{"id","owned_by"}]}`，Ollama 是
+/// `{"models":[{"name","details":{"family"}}]}`；这里只留「能填进 `Model::id` 的
+/// 名字」和可选的归属/家族。
+#[derive(Debug, Clone)]
+pub struct ModelSummary {
+    pub id: String,
+    pub owned_by: Option<String>,
+}
+
+impl ProviderClient {
+    /// 列出端点声明的模型。
+    ///
+    /// 这不是 trait 方法：`LanguageModelClient` 只负责「发一次对话请求」，
+    /// 模型目录是端点能力，不是协议语义。
+    pub async fn list_models(
+        &self,
+    ) -> Result<Vec<ModelSummary>, aa_language_model::provider::LlmError> {
+        match self {
+            Self::OpenAi(client) => client.list_models().await.map(|models| {
+                models
+                    .into_iter()
+                    .map(|model| ModelSummary {
+                        id: model.id,
+                        owned_by: model.owned_by,
+                    })
+                    .collect()
+            }),
+            Self::Ollama(client) => client.list_models().await.map(|models| {
+                models
+                    .into_iter()
+                    .map(|model| ModelSummary {
+                        id: model.name,
+                        owned_by: model.details.and_then(|details| details.family),
+                    })
+                    .collect()
+            }),
+        }
+    }
+}
+
+impl aa_language_model::provider::LanguageModelClient for ProviderClient {
+    fn stream_completion(
+        &self,
+        model: &Model,
+        request: &aa_language_model::request::Request,
+    ) -> Pin<
+        Box<
+            dyn Future<
+                    Output = Result<
+                        aa_language_model::provider::EventStream,
+                        aa_language_model::provider::LlmError,
+                    >,
+                > + Send
+                + 'static,
+        >,
+    > {
+        match self {
+            Self::OpenAi(client) => client.stream_completion(model, request),
+            Self::Ollama(client) => client.stream_completion(model, request),
+        }
+    }
 }
 
 struct ResolvedModel {

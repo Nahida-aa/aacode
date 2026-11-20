@@ -6,6 +6,7 @@ description = "应用层：多提供商设置与凭证解析（库层只接收�
 
 [dependencies]
 aa_ai_openai.workspace = true
+aa_ai_ollama.workspace = true
 aa_http_client.workspace = true
 aa_language_model.workspace = true
 dirs.workspace = true

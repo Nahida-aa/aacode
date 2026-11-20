@@ -22,8 +22,9 @@
     // llama.cpp 没有单独 section：llama-server 的 /v1 就是 OpenAI 兼容形状，
     // 归 openai_compatible.<id>（示例见 settings.example.jsonc）。
     "ollama": {
-      // 根地址（Zed 形状）。原生 /api/chat 适配器尚未实现，现在只解析不生效；
-      // 要用本地 Ollama 请配 openai_compatible.ollama（OpenAI 兼容 /v1）。
+      // 根地址（Zed 形状）。原生 /api/chat：NDJSON、`thinking` 字段。
+      // 同一台服务器的 OpenAI 兼容视图另配 openai_compatible.ollama（`/v1`），
+      // 同名时 compatible 条目覆盖本 section。
       "base_url": "http://localhost:11434",
     },
   },
