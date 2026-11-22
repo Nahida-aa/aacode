@@ -6,19 +6,21 @@
 //!
 //! 形状参考 Zed 的 `language_models` 分组（`settings_content/src/language_model.rs`），
 //! 但 key 叫 `language_model_providers`（这里只放 provider，不放模型选择）：
-//! - section 名代表**协议**，不是厂商：
+//! - section 名代表**协议**，或一家差异大到必须单列的厂商：
 //!   `openai_compatible.<id>` 走 `/chat/completions`（SSE），
-//!   `ollama` 走原生 `/api/chat`（NDJSON，适配器是 `aa_ai_ollama`）；
+//!   `ollama` 走原生 `/api/chat`（NDJSON，适配器是 `aa_ai_ollama`），
+//!   `openrouter` 走 OpenRouter 的 `/chat/completions`（适配器是 `aa_ai_openrouter`）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
 //! - 密钥不进配置文件：`auth.env` 列出变量名，缺省按 id 推导 `{ID}_API_KEY`；
 //! - `{env:VAR}` / `{file:path}` 在解析 JSONC **之前**做文本替换（和 opencode 同款）；
 //! - 顶层 `proxy`（对齐 Zed 同名设置）：http/https 代理，空串 = 读环境变量，
 //!   `NO_PROXY` 的直连列表始终生效；socks 代理需要 reqwest 的 `socks` feature（未启用）。
 //!
-//! 两种 section 都有适配器：`openai_compatible`（`/v1`）与 `ollama`（原生
-//! `/api/chat`），同名 id（例如都叫 `ollama`）时**前者覆盖后者**，与 Zed 的注册
-//! 顺序一致。其他 section（`deepseek` / `open_router` …）会被收进
-//! [`Settings::unsupported_sections`]，CLI 会提示「已忽略」，避免写了设置却完全没反应。
+//! 三种 section 都有适配器：`openai_compatible`（`/v1`）、`ollama`（原生
+//! `/api/chat`）与 `openrouter`。同名 id（例如都叫 `ollama`）时
+//! **`openai_compatible` 覆盖内置 section**，与 Zed 的注册顺序一致。
+//! 其他 section（`deepseek` …）会被收进 [`Settings::unsupported_sections`]，
+//! CLI 会提示「已忽略」，避免写了设置却完全没反应。
 //!
 //! # 默认值与合并
 //!
@@ -62,8 +64,9 @@ mod substitute;
 pub use credentials::{Credentials, EnvCredentials};
 pub use error::SettingsError;
 pub use provider::{
-    AuthConfig, AvailableModel, Capabilities, OLLAMA_PROVIDER_ID, OllamaProvider,
-    OpenAiCompatibleProvider, ResolvedProvider, derived_env_name,
+    AuthConfig, AvailableModel, Capabilities, OLLAMA_PROVIDER_ID, OPENROUTER_PROVIDER_ID,
+    OllamaProvider, OpenAiCompatibleProvider, OpenRouterProvider, ResolvedProvider,
+    derived_env_name,
 };
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -109,6 +112,10 @@ pub struct LanguageModelProviders {
     /// 原生 Ollama 端点（语义上是 `/api/chat`，由 `aa_ai_ollama` 处理）。
     #[serde(default)]
     pub ollama: Option<OllamaProvider>,
+    /// OpenRouter（chat completions 同形，但思考回放 / 错误体 / 归因 header 不同，
+    /// 由 `aa_ai_openrouter` 处理）。
+    #[serde(default)]
+    pub openrouter: Option<OpenRouterProvider>,
 }
 
 impl Settings {
@@ -167,7 +174,7 @@ impl Settings {
         Ok(settings)
     }
 
-    /// 用户配置里出现、但还没有适配器的 section（`deepseek` / `open_router` …）。
+    /// 用户配置里出现、但还没有适配器的 section（例如 `deepseek`）。
     ///
     /// 不报错（同一份文件里可能还配着能用的 provider），但调用方应该提示：
     /// 写进这些 section 的端点**不会生效**；要连同一家请用
@@ -211,6 +218,11 @@ impl Settings {
         if let Some(provider) = self.language_model_providers.openai_compatible.get(id) {
             return provider.resolve(id, &self.transport()?, credentials);
         }
+        if id == OPENROUTER_PROVIDER_ID
+            && let Some(provider) = &self.language_model_providers.openrouter
+        {
+            return provider.resolve(&self.transport()?, credentials);
+        }
         if id == OLLAMA_PROVIDER_ID
             && let Some(provider) = &self.language_model_providers.ollama
         {
@@ -224,13 +236,26 @@ impl Settings {
         })
     }
 
-    /// 已声明的 provider id（排好序；`ollama` 被同名 compatible 条目覆盖时只出现一次）。
+    /// 已声明的 provider id（`openai_compatible` 的 key 已排序；内置 section 在后）。
+    ///
+    /// 被同名 `openai_compatible` 条目覆盖的内置 section 只出现一次。
     pub fn ids(&self) -> impl Iterator<Item = &str> {
         let compatible = self
             .language_model_providers
             .openai_compatible
             .keys()
             .map(String::as_str);
+        let openrouter = self
+            .language_model_providers
+            .openrouter
+            .as_ref()
+            .filter(|_| {
+                !self
+                    .language_model_providers
+                    .openai_compatible
+                    .contains_key(OPENROUTER_PROVIDER_ID)
+            })
+            .map(|_| OPENROUTER_PROVIDER_ID);
         let ollama = self
             .language_model_providers
             .ollama
@@ -242,7 +267,7 @@ impl Settings {
                     .contains_key(OLLAMA_PROVIDER_ID)
             })
             .map(|_| OLLAMA_PROVIDER_ID);
-        compatible.chain(ollama)
+        compatible.chain(openrouter).chain(ollama)
     }
 }
 
@@ -323,7 +348,7 @@ fn build_transport(proxy: Option<&str>) -> Result<Arc<aa_http_client::HttpClient
 
 /// `language_model_providers` 下尚未实现的 section 名（只看用户写的那一层）。
 fn unknown_sections(value: &serde_json::Value) -> BTreeSet<String> {
-    const KNOWN: [&str; 2] = ["openai_compatible", "ollama"];
+    const KNOWN: [&str; 3] = ["openai_compatible", "ollama", "openrouter"];
 
     value
         .get("language_model_providers")
@@ -639,6 +664,102 @@ mod tests {
             config.resolve("ollama").unwrap().base_url,
             "http://localhost:11434/v1"
         );
+    }
+
+    #[test]
+    fn openrouter_section_resolves_to_its_own_client() {
+        let config = parse(
+            r#"{"language_model_providers":{"openrouter":{
+                "base_url":"https://openrouter.ai/api/v1",
+                "app_url":"https://aacode.example",
+                "app_title":"aacode",
+                "headers":{"X-Title":"header-title"},
+                "available_models":[{
+                    "name":"google/gemma-4-31b-it:free",
+                    "context_window":262144,
+                    "capabilities":{"tools":true}
+                }]
+            }}}"#,
+        );
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["openrouter"]);
+        // openrouter 是已实现的 section，不该被提示「已忽略」。
+        assert_eq!(config.unsupported_sections().count(), 0);
+
+        let provider = config
+            .language_model_providers
+            .openrouter
+            .as_ref()
+            .expect("openrouter section 应该被解析");
+        assert_eq!(provider.app_title.as_deref(), Some("aacode"));
+        assert_eq!(provider.app_url.as_deref(), Some("https://aacode.example"));
+
+        let credentials = FakeCredentials(HashMap::from([("OPENROUTER_API_KEY", "sk-or-test")]));
+        let resolved = config.resolve_with("openrouter", &credentials).unwrap();
+        assert_eq!(resolved.id, "openrouter");
+        assert_eq!(resolved.base_url, "https://openrouter.ai/api/v1");
+        assert!(
+            matches!(
+                resolved.client,
+                crate::provider::ProviderClient::OpenRouter(_)
+            ),
+            "openrouter section 应该用独立的 OpenRouter 客户端"
+        );
+        assert_eq!(
+            resolved.model("google/gemma-4-31b-it:free").context_window,
+            Some(262_144)
+        );
+    }
+
+    #[test]
+    fn openrouter_defaults_to_official_base_url() {
+        let config = parse(r#"{"language_model_providers":{"openrouter":{}}}"#);
+        let provider = config
+            .language_model_providers
+            .openrouter
+            .as_ref()
+            .expect("空对象也应该解析出默认值");
+        assert_eq!(provider.base_url, "https://openrouter.ai/api/v1");
+        // 默认 Bearer + 由 section 名推导的变量名。
+        let credentials = FakeCredentials(HashMap::from([("OPENROUTER_API_KEY", "sk-or-test")]));
+        config.resolve_with("openrouter", &credentials).unwrap();
+    }
+
+    #[test]
+    fn openrouter_app_name_is_an_alias_for_app_title() {
+        let config =
+            parse(r#"{"language_model_providers":{"openrouter":{"app_name":"alias-title"}}}"#);
+        let provider = config.language_model_providers.openrouter.as_ref().unwrap();
+        assert_eq!(provider.app_title.as_deref(), Some("alias-title"));
+    }
+
+    #[test]
+    fn compatible_entry_shadows_openrouter_section() {
+        let config = parse(
+            r#"{"language_model_providers":{
+                "openai_compatible":{"openrouter":{
+                    "base_url":"https://proxy.example/v1","auth":{"kind":"none"}
+                }},
+                "openrouter":{"base_url":"https://openrouter.ai/api/v1"}
+            }}"#,
+        );
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["openrouter"]);
+        let resolved = config.resolve("openrouter").unwrap();
+        assert_eq!(resolved.base_url, "https://proxy.example/v1");
+        // 同名 compatible 条目优先：拿的是 OpenAI 兼容客户端。
+        assert!(matches!(
+            resolved.client,
+            crate::provider::ProviderClient::OpenAi(_)
+        ));
+    }
+
+    #[test]
+    fn openrouter_missing_credential_lists_default_name() {
+        let config = parse(r#"{"language_model_providers":{"openrouter":{}}}"#);
+        let error = config
+            .resolve_with("openrouter", &FakeCredentials(HashMap::new()))
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains("OPENROUTER_API_KEY"), "{error}");
     }
 
     #[test]

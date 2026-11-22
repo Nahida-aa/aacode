@@ -32,7 +32,7 @@ aacode — 多提供商 LLM 客户端 / coding agent
 
 用法:
   aacode-cli [--settings <PATH>] providers
-  aacode-cli [--settings <PATH>] models <provider>
+  aacode-cli [--settings <PATH>] models <provider> [--free]
   aacode-cli [--settings <PATH>] chat <provider> <model> [prompt...]
   aacode-cli [--settings <PATH>] run [选项] <provider> <model> <prompt...>
   aacode-cli run --stub [选项] <prompt...>     # 离线冒烟：不连 LLM，用剧本驱动
@@ -42,6 +42,9 @@ run 的选项:
   --allow-write      注册 write / edit（默认只读：只有 read / glob）
   --system <TEXT>    覆盖内置系统提示
   --stub             用离线 stub 客户端（不读密钥、不连网络），验证 loop + 工具接线
+
+models 的选项:
+  --free             只列免费模型（按目录里的 pricing 判断；OpenRouter 支持）
 
 设置:
   默认 $AACODE_SETTINGS，否则 {config_dir}/aacode/settings.jsonc
@@ -73,7 +76,7 @@ enum Command {
     /// 列出设置里的端点和模型（不需要密钥）。
     Providers,
     /// 调端点的 `GET /models`（需要密钥）。
-    Models { provider: String },
+    Models { provider: String, free: bool },
     /// 跑一次流式对话（不带工具）。
     Chat {
         provider: String,
@@ -145,7 +148,7 @@ async fn run(args: Args) -> Result<(), String> {
             list_providers(settings_ref());
             Ok(())
         }
-        Command::Models { provider } => list_models(settings_ref(), &provider).await,
+        Command::Models { provider, free } => list_models(settings_ref(), &provider, free).await,
         Command::Chat {
             provider,
             model,
@@ -198,6 +201,7 @@ fn list_providers(settings: &Settings) {
 
     if language_model_providers.openai_compatible.is_empty()
         && language_model_providers.ollama.is_none()
+        && language_model_providers.openrouter.is_none()
     {
         println!("设置里没有 provider：{}", default_path().display());
         return;
@@ -210,6 +214,24 @@ fn list_providers(settings: &Settings) {
             &provider.auth,
             &provider.available_models,
             None,
+        );
+    }
+
+    if let Some(provider) = &language_model_providers.openrouter {
+        let note = if language_model_providers
+            .openai_compatible
+            .contains_key(aacode_settings::OPENROUTER_PROVIDER_ID)
+        {
+            "被同名 openai_compatible 条目覆盖"
+        } else {
+            "OpenRouter /chat/completions"
+        };
+        print_provider(
+            aacode_settings::OPENROUTER_PROVIDER_ID,
+            &provider.base_url,
+            &provider.auth,
+            &provider.available_models,
+            Some(note),
         );
     }
 
@@ -270,7 +292,7 @@ fn print_provider(
     }
 }
 
-async fn list_models(settings: &Settings, provider: &str) -> Result<(), String> {
+async fn list_models(settings: &Settings, provider: &str, free: bool) -> Result<(), String> {
     let resolved = settings
         .resolve(provider)
         .map_err(|error| error.to_string())?;
@@ -282,16 +304,37 @@ async fn list_models(settings: &Settings, provider: &str) -> Result<(), String> 
         .await
         .map_err(|error| error.to_string())?;
 
+    // `--free` 只能筛「目录里带定价」的端点（OpenRouter）；其余端点没有这个信息，
+    // 明确提示而不是列出一份空表让人以为配置错了。
+    if free && models.iter().all(|model| model.free.is_none()) {
+        return Err(format!(
+            "`{provider}` 的模型目录不提供定价，无法判断免费；去掉 --free"
+        ));
+    }
+
+    let mut shown = 0usize;
     for model in models {
+        if free && model.free != Some(true) {
+            continue;
+        }
+        shown += 1;
         let mark = if resolved.declares_model(&model.id) {
             "*"
         } else {
             " "
         };
+        let price = if model.free == Some(true) {
+            "[free] "
+        } else {
+            ""
+        };
         match model.owned_by {
-            Some(owner) => println!("{mark} {}\t{owner}", model.id),
-            None => println!("{mark} {}", model.id),
+            Some(owner) => println!("{mark} {price}{}\t{owner}", model.id),
+            None => println!("{mark} {price}{}", model.id),
         }
+    }
+    if shown == 0 {
+        println!("# 目录里没有免费模型");
     }
     println!("# * = 设置里有模型事实；其余用默认事实也能 chat");
     Ok(())
@@ -496,6 +539,7 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
     let mut allow_write = false;
     let mut system = None;
     let mut stub = false;
+    let mut free = false;
     let mut command_name: Option<String> = None;
     let mut positional: Vec<String> = Vec::new();
 
@@ -523,6 +567,7 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
             }
             "--allow-write" => allow_write = true,
             "--stub" => stub = true,
+            "--free" => free = true,
             _ if argument.starts_with("--settings=") || argument.starts_with("--config=") => {
                 let (flag, value) = argument.split_once('=').expect("匹配了以 = 开头的分支");
                 if value.is_empty() {
@@ -566,7 +611,7 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
                 .cloned()
                 .ok_or("models 需要 provider id（先用 providers 看有哪些）")?;
             expect_no_positional(&name, &positional[1..])?;
-            Command::Models { provider }
+            Command::Models { provider, free }
         }
         "chat" | "run" => {
             // `run --stub <prompt>`：不需要 provider / model。
@@ -604,6 +649,10 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
         }
         other => return Err(format!("未知命令 `{other}`")),
     };
+
+    if free && !matches!(command, Command::Models { .. }) {
+        return Err("--free 只能和 models 一起用".to_owned());
+    }
 
     Ok(Some(Args {
         settings: settings.unwrap_or_else(default_path),

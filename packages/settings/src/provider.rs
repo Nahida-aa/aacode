@@ -1,8 +1,10 @@
 //! 端点配置形状 + 解析成库层客户端。
 //!
-//! 两种 section，名字代表**协议**而不是厂商（对齐 Zed）：
+//! 三种 section，名字代表**协议**（或一家差异大到必须单列的厂商）：
 //! - [`OpenAiCompatibleProvider`]：`language_model_providers.openai_compatible.<id>`，走 `/chat/completions`（SSE）；
-//! - [`OllamaProvider`]：`language_model_providers.ollama`，走原生 `/api/chat`（NDJSON）。
+//! - [`OllamaProvider`]：`language_model_providers.ollama`，走原生 `/api/chat`（NDJSON）；
+//! - [`OpenRouterProvider`]：`language_model_providers.openrouter`，走 OpenRouter 的
+//!   `/chat/completions`（同形协议，但思考回放 / 错误体 / 归因 header 不同）。
 //!
 //! 字段名以 Zed 为参照，但端点基址叫 `base_url`（Zed 叫 `api_url`）：
 //! 与库层 `OpenAiLanguageModelProvider::with_base_url`、OpenAI SDK 的
@@ -23,6 +25,7 @@ use std::sync::Arc;
 
 use aa_ai_ollama::OllamaLanguageModelProvider;
 use aa_ai_openai::OpenAiLanguageModelProvider;
+use aa_ai_openrouter::OpenRouterLanguageModelProvider;
 use aa_language_model::provider::{Model, ReasoningEffort};
 use serde::Deserialize;
 
@@ -186,6 +189,69 @@ impl OllamaProvider {
 /// `language_model_providers.ollama` 的固定 provider id（section 名就是 id）。
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";
 
+/// OpenRouter 端点（`language_model_providers.openrouter`）。
+///
+/// 单独一个 section 而不是 `openai_compatible.openrouter`：协议形状同源，但
+/// 思考回放（`reasoning` / `reasoning_details`）、数字错误码、模型目录里的
+/// `pricing` 只有 `aa_ai_openrouter` 认识（见 aa-ai ADR 0012）。写进
+/// `openai_compatible.openrouter` 仍然有效——同名时兼容条目优先，和 Ollama 一致。
+///
+/// 默认 `base_url` 是官方端点；`app_url` / `app_title` 分别对应 OpenRouter 的
+/// `HTTP-Referer` / `X-Title` 归因 header（可选，不影响请求能否成功）。
+#[derive(Debug, Clone, Deserialize)]
+pub struct OpenRouterProvider {
+    /// 已包含版本段，例如 `https://openrouter.ai/api/v1`。
+    #[serde(default = "default_openrouter_base_url")]
+    pub base_url: String,
+    /// 鉴权方式；省略等价于 Bearer + `OPENROUTER_API_KEY`。
+    #[serde(default)]
+    pub auth: AuthConfig,
+    /// 额外 header，同名覆盖默认值。
+    #[serde(default)]
+    pub headers: BTreeMap<String, String>,
+    /// `HTTP-Referer`：应用主页（OpenRouter 排行榜归因）。
+    pub app_url: Option<String>,
+    /// `X-Title`：应用名。`app_name` 是等价别名。
+    #[serde(default, alias = "app_name")]
+    pub app_title: Option<String>,
+    /// 模型表；条目形状与 `openai_compatible` 相同。
+    #[serde(default)]
+    pub available_models: Vec<AvailableModel>,
+}
+
+impl Default for OpenRouterProvider {
+    fn default() -> Self {
+        Self {
+            base_url: default_openrouter_base_url(),
+            auth: AuthConfig::default(),
+            headers: BTreeMap::new(),
+            app_url: None,
+            app_title: None,
+            available_models: Vec::new(),
+        }
+    }
+}
+
+fn default_openrouter_base_url() -> String {
+    "https://openrouter.ai/api/v1".to_owned()
+}
+
+impl OpenRouterProvider {
+    /// 解析凭证并构造 `aa_ai_openrouter` 的客户端。
+    ///
+    /// `base_url` 已含版本段；库层只拼 `/chat/completions` 与 `/models`。
+    pub fn resolve(
+        &self,
+        transport: &Arc<aa_http_client::HttpClient>,
+        credentials: &dyn Credentials,
+    ) -> Result<ResolvedProvider, SettingsError> {
+        build_openrouter_provider(self, transport, credentials)
+    }
+}
+
+/// `language_model_providers.openrouter` 的固定 provider id。
+pub const OPENROUTER_PROVIDER_ID: &str = "openrouter";
+
 /// OpenAI 兼容端点解析成客户端时的输入。
 struct ProviderSpec<'a> {
     id: &'a str,
@@ -306,6 +372,63 @@ fn build_ollama_provider(
     })
 }
 
+/// OpenRouter：Bearer 鉴权 + 可选归因 header + 模型表。
+fn build_openrouter_provider(
+    provider: &OpenRouterProvider,
+    transport: &Arc<aa_http_client::HttpClient>,
+    credentials: &dyn Credentials,
+) -> Result<ResolvedProvider, SettingsError> {
+    let id = OPENROUTER_PROVIDER_ID;
+    let base_url = provider.base_url.trim();
+    if base_url.is_empty() {
+        return Err(SettingsError::Provider {
+            provider: id.to_owned(),
+            message: "base_url 不能为空".to_owned(),
+        });
+    }
+
+    let mut client = match &provider.auth {
+        AuthConfig::None => OpenRouterLanguageModelProvider::without_auth(transport.clone()),
+        AuthConfig::Bearer { .. } => {
+            let names = provider.auth.env_names(id);
+            let key = resolve_key(id, &names, credentials)?;
+            OpenRouterLanguageModelProvider::new(transport.clone(), key)
+        }
+        AuthConfig::Header { name, .. } => {
+            if name.trim().is_empty() {
+                return Err(SettingsError::Provider {
+                    provider: id.to_owned(),
+                    message: "auth.kind=header 时 name 不能为空".to_owned(),
+                });
+            }
+            let names = provider.auth.env_names(id);
+            let value = resolve_key(id, &names, credentials)?;
+            OpenRouterLanguageModelProvider::without_auth(transport.clone())
+                .with_auth_header(name.clone(), value)
+        }
+    };
+
+    client = client.with_base_url(base_url.to_owned());
+    if let Some(app_url) = &provider.app_url {
+        client = client.with_app_url(app_url.clone());
+    }
+    if let Some(app_title) = &provider.app_title {
+        client = client.with_app_title(app_title.clone());
+    }
+    for (name, value) in &provider.headers {
+        client = client.with_header(name.clone(), value.clone());
+    }
+
+    let models = build_models(id, &provider.available_models, true)?;
+
+    Ok(ResolvedProvider {
+        id: id.to_owned(),
+        base_url: base_url.to_owned(),
+        client: ProviderClient::OpenRouter(client),
+        models,
+    })
+}
+
 /// 模型表：wire 形状无关，两种协议共用。
 ///
 /// `require_chat_completions` 只对 OpenAI 兼容 section 有意义（`false` 表示
@@ -363,10 +486,10 @@ pub struct ResolvedProvider {
     models: BTreeMap<String, ResolvedModel>,
 }
 
-/// 解析完成的库层客户端：按**协议**分派。
+/// 解析完成的库层客户端：按**协议 / 厂商**分派。
 ///
-/// 两种协议的 wire 形状完全不同（SSE vs NDJSON、`reasoning_content` vs
-/// `thinking`、工具参数是字符串 vs 对象），库层因此是两个具体类型。应用的其他
+/// 各家的 wire 形状不同（SSE vs NDJSON、`reasoning_content` vs `thinking`、
+/// OpenRouter 的思考回放与数字错误码），库层因此是多个具体类型。应用的其他
 /// 部分只关心 `LanguageModelClient` 与 `list_models`，所以在这里收成枚举：
 /// 加一种协议 = 加一个变体，调用点不用改。
 pub enum ProviderClient {
@@ -374,17 +497,22 @@ pub enum ProviderClient {
     OpenAi(OpenAiLanguageModelProvider),
     /// `aa_ai_ollama`：原生 `/api/chat`。
     Ollama(OllamaLanguageModelProvider),
+    /// `aa_ai_openrouter`：OpenRouter 的 `/chat/completions`。
+    OpenRouter(OpenRouterLanguageModelProvider),
 }
 
-/// `list_models` 的归一化结果：两套 wire 形状共有的部分。
+/// `list_models` 的归一化结果：各套 wire 形状共有的部分。
 ///
 /// OpenAI 是 `{"data":[{"id","owned_by"}]}`，Ollama 是
-/// `{"models":[{"name","details":{"family"}}]}`；这里只留「能填进 `Model::id` 的
-/// 名字」和可选的归属/家族。
+/// `{"models":[{"name","details":{"family"}}]}`，OpenRouter 是
+/// `{"data":[{"id","pricing","context_length",...}]}`；这里只留「能填进
+/// `Model::id` 的名字」和可选的归属/家族/免费标记。
 #[derive(Debug, Clone)]
 pub struct ModelSummary {
     pub id: String,
     pub owned_by: Option<String>,
+    /// 是否免费。只有目录里带定价的端点（OpenRouter）能填；`None` = 端点没说。
+    pub free: Option<bool>,
 }
 
 impl ProviderClient {
@@ -402,6 +530,7 @@ impl ProviderClient {
                     .map(|model| ModelSummary {
                         id: model.id,
                         owned_by: model.owned_by,
+                        free: None,
                     })
                     .collect()
             }),
@@ -411,6 +540,18 @@ impl ProviderClient {
                     .map(|model| ModelSummary {
                         id: model.name,
                         owned_by: model.details.and_then(|details| details.family),
+                        free: None,
+                    })
+                    .collect()
+            }),
+            Self::OpenRouter(client) => client.list_models().await.map(|models| {
+                models
+                    .into_iter()
+                    .map(|model| ModelSummary {
+                        // `vendor/model` 的 vendor 段就是 OpenRouter 的归属。
+                        owned_by: model.vendor().map(str::to_owned),
+                        free: Some(model.is_free()),
+                        id: model.id,
                     })
                     .collect()
             }),
@@ -437,6 +578,7 @@ impl aa_language_model::provider::LanguageModelClient for ProviderClient {
         match self {
             Self::OpenAi(client) => client.stream_completion(model, request),
             Self::Ollama(client) => client.stream_completion(model, request),
+            Self::OpenRouter(client) => client.stream_completion(model, request),
         }
     }
 }
