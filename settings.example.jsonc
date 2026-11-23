@@ -107,14 +107,16 @@
     // `pricing`。密钥从 `OPENROUTER_API_KEY` 读（也可以写进 .env）。
     // `app_url` / `app_title` 是 OpenRouter 的排行榜归因 header
     // （`HTTP-Referer` / `X-Title`），可选。
-    // 注意：免费模型限流严格（约 20 req/min + 每日上限），429 时看 `X-RateLimit-Reset`。
+    // 注意：具体 `:free` 模型用的是上游共享池，很容易 429
+    // （`metadata.raw` 会写 `upstream_provider_shared_pool`）；`openrouter/free`
+    // 是动态路由，会挑一个当前可用的免费模型，更适合日常试跑。
     "openrouter": {
       "base_url": "https://openrouter.ai/api/v1",
       "auth": { "kind": "bearer", "env": ["OPENROUTER_API_KEY"] },
       "app_url": "https://github.com/aa/aacode",
       "app_title": "aacode",
       // 免费模型不用全写；`models openrouter --free` 看目录，声明的条目只是
-      // 「带上准确的模型事实」。未声明的模型也能用默认事实。
+      // 「带上准确的模型事实」。未声明的模型（例如 `openrouter/free`）也能用默认事实。
       "available_models": [
         {
           "name": "google/gemma-4-31b-it:free",
