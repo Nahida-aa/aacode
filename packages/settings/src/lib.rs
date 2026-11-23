@@ -6,9 +6,11 @@
 //!
 //! 形状参考 Zed 的 `language_models` 分组（`settings_content/src/language_model.rs`），
 //! 但 key 叫 `language_model_providers`（这里只放 provider，不放模型选择）：
-//! - section 名代表**协议**，或一家差异大到必须单列的厂商：
+//! - section 名代表**协议**，或一家/一个本地服务差异大到必须单列的厂商：
 //!   `openai_compatible.<id>` 走 `/chat/completions`（SSE），
 //!   `ollama` 走原生 `/api/chat`（NDJSON，适配器是 `aa_ai_ollama`），
+//!   `llama.cpp` / `ollama_v1` 是独立 section（wire 仍是 OpenAI 兼容 `/v1`，
+//!   但默认地址 / 无鉴权归各自 section），
 //!   `openrouter` 走 OpenRouter 的 `/chat/completions`（适配器是 `aa_ai_openrouter`）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
 //! - 密钥不进配置文件：`auth.env` 列出变量名，缺省按 id 推导 `{ID}_API_KEY`；
@@ -16,8 +18,9 @@
 //! - 顶层 `proxy`（对齐 Zed 同名设置）：http/https 代理，空串 = 读环境变量，
 //!   `NO_PROXY` 的直连列表始终生效；socks 代理需要 reqwest 的 `socks` feature（未启用）。
 //!
-//! 三种 section 都有适配器：`openai_compatible`（`/v1`）、`ollama`（原生
-//! `/api/chat`）与 `openrouter`。同名 id（例如都叫 `ollama`）时
+//! 每个 section 都有适配器：`openai_compatible`（`/v1`）、`ollama`（原生
+//! `/api/chat`）、`llama.cpp` / `ollama_v1`（独立 section，内部仍用 OpenAI 兼容
+//! 客户端）与 `openrouter`。同名 id（例如都叫 `ollama`）时
 //! **`openai_compatible` 覆盖内置 section**，与 Zed 的注册顺序一致。
 //! 其他 section（`deepseek` …）会被收进 [`Settings::unsupported_sections`]，
 //! CLI 会提示「已忽略」，避免写了设置却完全没反应。
@@ -64,9 +67,10 @@ mod substitute;
 pub use credentials::{Credentials, EnvCredentials};
 pub use error::SettingsError;
 pub use provider::{
-    AuthConfig, AvailableModel, Capabilities, OLLAMA_PROVIDER_ID, OPENROUTER_PROVIDER_ID,
-    OllamaProvider, OpenAiCompatibleProvider, OpenRouterProvider, ResolvedProvider,
-    derived_env_name,
+    AuthConfig, AvailableModel, Capabilities, DEFAULT_LLAMA_CPP_BASE_URL,
+    DEFAULT_OLLAMA_V1_BASE_URL, LLAMA_CPP_PROVIDER_ID, LocalOpenAiProvider, OLLAMA_PROVIDER_ID,
+    OLLAMA_V1_PROVIDER_ID, OPENROUTER_PROVIDER_ID, OllamaProvider, OpenAiCompatibleProvider,
+    OpenRouterProvider, ResolvedProvider, derived_env_name,
 };
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -106,9 +110,15 @@ pub struct Settings {
 /// 按协议分组的 provider 表（对齐 Zed `LanguageModelSettings`）。
 #[derive(Debug, Clone, Default, serde::Deserialize)]
 pub struct LanguageModelProviders {
-    /// OpenAI 兼容端点：官方 OpenAI、第三方网关、Ollama `/v1`、vLLM 等。
+    /// OpenAI 兼容端点：官方 OpenAI、第三方网关、vLLM 等。
     #[serde(default)]
     pub openai_compatible: BTreeMap<String, OpenAiCompatibleProvider>,
+    /// 本地 llama.cpp（`llama-server` 的 `/v1`）。独立 section，默认无鉴权。
+    #[serde(default, rename = "llama.cpp")]
+    pub llama_cpp: Option<LocalOpenAiProvider>,
+    /// 本地 Ollama 的 OpenAI 兼容视图（`/v1`），与原生 `ollama` 并列。
+    #[serde(default)]
+    pub ollama_v1: Option<LocalOpenAiProvider>,
     /// 原生 Ollama 端点（语义上是 `/api/chat`，由 `aa_ai_ollama` 处理）。
     #[serde(default)]
     pub ollama: Option<OllamaProvider>,
@@ -218,6 +228,26 @@ impl Settings {
         if let Some(provider) = self.language_model_providers.openai_compatible.get(id) {
             return provider.resolve(id, &self.transport()?, credentials);
         }
+        if id == LLAMA_CPP_PROVIDER_ID
+            && let Some(provider) = &self.language_model_providers.llama_cpp
+        {
+            return provider.resolve(
+                LLAMA_CPP_PROVIDER_ID,
+                DEFAULT_LLAMA_CPP_BASE_URL,
+                &self.transport()?,
+                credentials,
+            );
+        }
+        if id == OLLAMA_V1_PROVIDER_ID
+            && let Some(provider) = &self.language_model_providers.ollama_v1
+        {
+            return provider.resolve(
+                OLLAMA_V1_PROVIDER_ID,
+                DEFAULT_OLLAMA_V1_BASE_URL,
+                &self.transport()?,
+                credentials,
+            );
+        }
         if id == OPENROUTER_PROVIDER_ID
             && let Some(provider) = &self.language_model_providers.openrouter
         {
@@ -240,34 +270,34 @@ impl Settings {
     ///
     /// 被同名 `openai_compatible` 条目覆盖的内置 section 只出现一次。
     pub fn ids(&self) -> impl Iterator<Item = &str> {
-        let compatible = self
-            .language_model_providers
-            .openai_compatible
-            .keys()
-            .map(String::as_str);
-        let openrouter = self
-            .language_model_providers
+        let providers = &self.language_model_providers;
+        let shadowed = |id: &str| providers.openai_compatible.contains_key(id);
+        let compatible = providers.openai_compatible.keys().map(String::as_str);
+        let llama_cpp = providers
+            .llama_cpp
+            .as_ref()
+            .filter(|_| !shadowed(LLAMA_CPP_PROVIDER_ID))
+            .map(|_| LLAMA_CPP_PROVIDER_ID);
+        let ollama_v1 = providers
+            .ollama_v1
+            .as_ref()
+            .filter(|_| !shadowed(OLLAMA_V1_PROVIDER_ID))
+            .map(|_| OLLAMA_V1_PROVIDER_ID);
+        let openrouter = providers
             .openrouter
             .as_ref()
-            .filter(|_| {
-                !self
-                    .language_model_providers
-                    .openai_compatible
-                    .contains_key(OPENROUTER_PROVIDER_ID)
-            })
+            .filter(|_| !shadowed(OPENROUTER_PROVIDER_ID))
             .map(|_| OPENROUTER_PROVIDER_ID);
-        let ollama = self
-            .language_model_providers
+        let ollama = providers
             .ollama
             .as_ref()
-            .filter(|_| {
-                !self
-                    .language_model_providers
-                    .openai_compatible
-                    .contains_key(OLLAMA_PROVIDER_ID)
-            })
+            .filter(|_| !shadowed(OLLAMA_PROVIDER_ID))
             .map(|_| OLLAMA_PROVIDER_ID);
-        compatible.chain(openrouter).chain(ollama)
+        compatible
+            .chain(llama_cpp)
+            .chain(ollama_v1)
+            .chain(openrouter)
+            .chain(ollama)
     }
 }
 
@@ -348,7 +378,13 @@ fn build_transport(proxy: Option<&str>) -> Result<Arc<aa_http_client::HttpClient
 
 /// `language_model_providers` 下尚未实现的 section 名（只看用户写的那一层）。
 fn unknown_sections(value: &serde_json::Value) -> BTreeSet<String> {
-    const KNOWN: [&str; 3] = ["openai_compatible", "ollama", "openrouter"];
+    const KNOWN: [&str; 5] = [
+        "openai_compatible",
+        "ollama",
+        "llama.cpp",
+        "ollama_v1",
+        "openrouter",
+    ];
 
     value
         .get("language_model_providers")
@@ -604,7 +640,96 @@ mod tests {
         let resolved = config.resolve("ollama").unwrap();
         assert_eq!(resolved.base_url, "http://localhost:11434");
 
+        // 本地 llama.cpp / ollama_v1 也是独立 section，默认无鉴权。
+        assert!(config.ids().any(|id| id == "llama.cpp"));
+        let llama = config.resolve("llama.cpp").unwrap();
+        assert_eq!(llama.base_url, "http://localhost:8080/v1");
+        assert!(matches!(
+            llama.client,
+            crate::provider::ProviderClient::OpenAi(_)
+        ));
+        assert!(config.ids().any(|id| id == "ollama_v1"));
+        let ollama_v1 = config.resolve("ollama_v1").unwrap();
+        assert_eq!(ollama_v1.base_url, "http://localhost:11434/v1");
+        assert!(matches!(
+            ollama_v1.client,
+            crate::provider::ProviderClient::OpenAi(_)
+        ));
+
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn llama_cpp_section_is_independent_and_defaults_to_local() {
+        let config = parse(r#"{"language_model_providers":{"llama.cpp":{}}}"#);
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["llama.cpp"]);
+        // 已实现的 section，不该被提示「已忽略」。
+        assert_eq!(config.unsupported_sections().count(), 0);
+
+        let resolved = config
+            .resolve_with("llama.cpp", &FakeCredentials(HashMap::new()))
+            .unwrap();
+        assert_eq!(resolved.id, "llama.cpp");
+        assert_eq!(resolved.base_url, "http://localhost:8080/v1");
+        // wire 仍是 OpenAI 兼容：复用同一个客户端，只是 section 独立。
+        assert!(matches!(
+            resolved.client,
+            crate::provider::ProviderClient::OpenAi(_)
+        ));
+    }
+
+    #[test]
+    fn llama_cpp_accepts_zed_api_url_alias() {
+        let config = parse(
+            r#"{"language_model_providers":{"llama.cpp":{"api_url":"http://localhost:9999/v1"}}}"#,
+        );
+        let resolved = config
+            .resolve_with("llama.cpp", &FakeCredentials(HashMap::new()))
+            .unwrap();
+        assert_eq!(resolved.base_url, "http://localhost:9999/v1");
+    }
+
+    #[test]
+    fn ollama_v1_section_is_independent_and_defaults_to_local() {
+        let config = parse(r#"{"language_model_providers":{"ollama_v1":{}}}"#);
+        assert_eq!(config.ids().collect::<Vec<_>>(), vec!["ollama_v1"]);
+        assert_eq!(config.unsupported_sections().count(), 0);
+
+        let resolved = config
+            .resolve_with("ollama_v1", &FakeCredentials(HashMap::new()))
+            .unwrap();
+        assert_eq!(resolved.id, "ollama_v1");
+        assert_eq!(resolved.base_url, "http://localhost:11434/v1");
+        assert!(matches!(
+            resolved.client,
+            crate::provider::ProviderClient::OpenAi(_)
+        ));
+    }
+
+    #[test]
+    fn compatible_entry_shadows_local_sections() {
+        let config = parse(
+            r#"{"language_model_providers":{
+                "openai_compatible":{
+                    "llama.cpp":{"base_url":"http://proxy.example/v1","auth":{"kind":"none"}},
+                    "ollama_v1":{"base_url":"http://proxy.example/ollama/v1","auth":{"kind":"none"}}
+                },
+                "llama.cpp":{"base_url":"http://localhost:8080/v1"},
+                "ollama_v1":{"base_url":"http://localhost:11434/v1"}
+            }}"#,
+        );
+        assert_eq!(
+            config.ids().collect::<Vec<_>>(),
+            vec!["llama.cpp", "ollama_v1"]
+        );
+        assert_eq!(
+            config.resolve("llama.cpp").unwrap().base_url,
+            "http://proxy.example/v1"
+        );
+        assert_eq!(
+            config.resolve("ollama_v1").unwrap().base_url,
+            "http://proxy.example/ollama/v1"
+        );
     }
 
     #[test]

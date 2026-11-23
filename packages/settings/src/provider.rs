@@ -1,7 +1,9 @@
 //! 端点配置形状 + 解析成库层客户端。
 //!
-//! 三种 section，名字代表**协议**（或一家差异大到必须单列的厂商）：
+//! section 名代表**协议**，或一家/一个本地服务差异大到必须单列的厂商：
 //! - [`OpenAiCompatibleProvider`]：`language_model_providers.openai_compatible.<id>`，走 `/chat/completions`（SSE）；
+//! - [`LocalOpenAiProvider`]：`language_model_providers.llama.cpp` / `.ollama_v1`，独立 section，
+//!   wire 仍是 OpenAI 兼容 `/v1`，但默认地址 / 无鉴权归各自 section；
 //! - [`OllamaProvider`]：`language_model_providers.ollama`，走原生 `/api/chat`（NDJSON）；
 //! - [`OpenRouterProvider`]：`language_model_providers.openrouter`，走 OpenRouter 的
 //!   `/chat/completions`（同形协议，但思考回放 / 错误体 / 归因 header 不同）。
@@ -130,6 +132,56 @@ impl OpenAiCompatibleProvider {
     }
 }
 
+/// 本地 OpenAI 兼容端点：`llama.cpp` 与 Ollama 的 `/v1` 视图。
+///
+/// wire 和 `openai_compatible` 相同，但它们是**独立 provider section**：
+/// 默认地址、默认无鉴权，以及以后可能出现的 auto-discovery / context window
+/// 归各自 section，不和第三方网关混在一个映射里。
+#[derive(Debug, Clone, Deserialize)]
+pub struct LocalOpenAiProvider {
+    /// 已包含版本段；省略时用该 section 的默认本地地址。
+    /// `api_url` 是 Zed 的字段名，保留为别名（直接粘贴 Zed 配置也能用）。
+    #[serde(default, alias = "api_url")]
+    pub base_url: Option<String>,
+    /// 鉴权方式；默认不发（本地服务）。反向代理后面可以写 bearer/header。
+    #[serde(default = "no_auth")]
+    pub auth: AuthConfig,
+    /// 额外 header；Zed 叫 `custom_headers`，两个名字都接受。
+    #[serde(default, alias = "custom_headers")]
+    pub headers: BTreeMap<String, String>,
+    /// 模型表；条目形状与 `openai_compatible` 相同。
+    #[serde(default)]
+    pub available_models: Vec<AvailableModel>,
+}
+
+impl LocalOpenAiProvider {
+    /// 解析成 OpenAI 兼容客户端。`default_base_url` 由 section 决定。
+    pub fn resolve(
+        &self,
+        id: &str,
+        default_base_url: &str,
+        transport: &Arc<aa_http_client::HttpClient>,
+        credentials: &dyn Credentials,
+    ) -> Result<ResolvedProvider, SettingsError> {
+        build_provider(
+            ProviderSpec {
+                id,
+                base_url: self.base_url_or(default_base_url),
+                auth: &self.auth,
+                headers: &self.headers,
+                available_models: &self.available_models,
+            },
+            transport,
+            credentials,
+        )
+    }
+
+    /// 展示用地址：配置值或 section 默认值。
+    pub fn base_url_or<'a>(&'a self, default: &'a str) -> &'a str {
+        self.base_url.as_deref().unwrap_or(default)
+    }
+}
+
 /// 原生 Ollama 端点（`language_model_providers.ollama`）。
 ///
 /// 形状对齐 Zed `OllamaSettingsContent`：`base_url` 写**根地址**
@@ -185,6 +237,21 @@ impl OllamaProvider {
         build_ollama_provider(self, transport, credentials)
     }
 }
+
+/// `language_model_providers.llama.cpp` 的固定 provider id。
+///
+/// 带点是为了和 Zed 的 section 名 / provider id 一致；环境变量按
+/// [`derived_env_name`] 推导为 `LLAMA_CPP_API_KEY`（默认无鉴权，不读）。
+pub const LLAMA_CPP_PROVIDER_ID: &str = "llama.cpp";
+
+/// `llama-server` 的默认端口（Zed 也用 8080）；`base_url` 必须带 `/v1`。
+pub const DEFAULT_LLAMA_CPP_BASE_URL: &str = "http://localhost:8080/v1";
+
+/// `language_model_providers.ollama_v1` 的固定 provider id（Ollama 的 OpenAI 兼容视图）。
+pub const OLLAMA_V1_PROVIDER_ID: &str = "ollama_v1";
+
+/// Ollama 的 `/v1` 视图；和原生 `ollama` section（根地址）是同一台服务器。
+pub const DEFAULT_OLLAMA_V1_BASE_URL: &str = "http://localhost:11434/v1";
 
 /// `language_model_providers.ollama` 的固定 provider id（section 名就是 id）。
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";

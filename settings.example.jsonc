@@ -4,9 +4,10 @@
 // （Linux 一般是 `~/.config/aacode/settings.jsonc`）。
 //
 // 规则：
-// - `language_model_providers.<协议>.<id>`：一个 key = 一个端点，想连几个就写几个；
-//   `openai_compatible` 走 `/chat/completions`（OpenAI 官方、第三方网关、Ollama /v1、vLLM）；
-//   `ollama` 是独立的原生 section（`/api/chat`，NDJSON）；
+// - `language_model_providers.<section>`：一个 key = 一个端点，想连几个就写几个；
+//   `openai_compatible.<id>` 走 `/chat/completions`（OpenAI 官方、第三方网关、vLLM）；
+//   `ollama` 是原生 section（`/api/chat`，NDJSON）；
+//   `llama.cpp` / `ollama_v1` 是独立的本地 provider section（wire 仍是 OpenAI 兼容 `/v1`）；
 //   `openrouter` 是 OpenRouter 专用 section（同形协议 + 思考回放 / 归因 header）；
 // - 密钥不写在这里：`auth.env` 是变量名列表，按顺序取第一个有值的；
 //   省略 `env` 时按 id 推导，例如 `minekuai` → `MINEKUAI_API_KEY`；
@@ -79,24 +80,19 @@
           },
         ],
       },
-      // 本地 llama.cpp：llama-server 的 /v1 就是 OpenAI 兼容形状，
-      // 不需要单独适配器，也不需要密钥（默认不校验；显式写「无鉴权」）。
-      // 端口：新版本默认 9931，老版本 8080 —— 按 `llama-server --port` 的实际值填。
-      // base_url 必须带 /v1：OpenAI 兼容路由都挂在 /v1 下。
-      "llama.cpp": {
-        "base_url": "http://localhost:9931/v1",
-        "auth": { "kind": "none" },
-      },
-
-      // 本地 Ollama 的 OpenAI 兼容视图（同一台服务器的 /v1，与原生 /api/chat 并存）。
-      // 注意 section key 就是 provider id：若这里也叫 `ollama`，会覆盖下面那个
-      // 原生 section（同名时 openai_compatible 优先），原生协议就没法选中了。
-      // 测本地模型挑最小的（先 `ollama pull` 一次）：qwen2.5:0.5b / llama3.2:1b；
-      // 名字带 `:cloud` 的模型现在要付费，不算本地。
-      "ollama_v1": {
-        "base_url": "http://localhost:11434/v1",
-        "auth": { "kind": "none" },
-      },
+    },
+    // 本地 llama.cpp：独立 provider section（wire 仍是 OpenAI 兼容 `/v1`）。
+    // 端口按 `llama-server --port` 的实际值填（Zed 默认 8080）；base_url 必须带 /v1。
+    "llama.cpp": {
+      "base_url": "http://localhost:8080/v1",
+      "auth": { "kind": "none" },
+    },
+    // 本地 Ollama 的 OpenAI 兼容视图：独立 section，和下面的原生 ollama 并存。
+    // 测本地模型挑最小的（先 `ollama pull` 一次）：qwen2.5:0.5b / llama3.2:1b；
+    // 名字带 `:cloud` 的模型现在要付费，不算本地。
+    "ollama_v1": {
+      "base_url": "http://localhost:11434/v1",
+      "auth": { "kind": "none" },
     },
     // 本地 Ollama 的原生 section（`/api/chat`，NDJSON）：`aacode chat ollama <model>`。
     // 和上面的 `/v1` 视图是同一台服务器、两套协议。
