@@ -2,7 +2,7 @@
 //!
 //! section 名代表**协议**，或一家/一个本地服务差异大到必须单列的厂商：
 //! - [`OpenAiCompatibleProvider`]：`language_model_providers.openai_compatible.<id>`，走 `/chat/completions`（SSE）；
-//! - [`LocalOpenAiProvider`]：`language_model_providers.llama.cpp` / `.ollama_v1`，独立 section，
+//! - [`LocalOpenAiProvider`]：`language_model_providers.llama.cpp`，独立 section，
 //!   wire 仍是 OpenAI 兼容 `/v1`，但默认地址 / 无鉴权归各自 section；
 //! - [`OllamaProvider`]：`language_model_providers.ollama`，走原生 `/api/chat`（NDJSON）；
 //! - [`OpenRouterProvider`]：`language_model_providers.openrouter`，走 OpenRouter 的
@@ -132,11 +132,11 @@ impl OpenAiCompatibleProvider {
     }
 }
 
-/// 本地 OpenAI 兼容端点：`llama.cpp` 与 Ollama 的 `/v1` 视图。
+/// 本地 llama.cpp 端点（`language_model_providers.llama.cpp`）。
 ///
-/// wire 和 `openai_compatible` 相同，但它们是**独立 provider section**：
+/// wire 和 `openai_compatible` 相同（`/v1`），但它是**独立 provider section**：
 /// 默认地址、默认无鉴权，以及以后可能出现的 auto-discovery / context window
-/// 归各自 section，不和第三方网关混在一个映射里。
+/// 归这个 section，不和第三方网关混在一个映射里。
 #[derive(Debug, Clone, Deserialize)]
 pub struct LocalOpenAiProvider {
     /// 已包含版本段；省略时用该 section 的默认本地地址。
@@ -246,12 +246,6 @@ pub const LLAMA_CPP_PROVIDER_ID: &str = "llama.cpp";
 
 /// `llama-server` 的默认端口（Zed 也用 8080）；`base_url` 必须带 `/v1`。
 pub const DEFAULT_LLAMA_CPP_BASE_URL: &str = "http://localhost:8080/v1";
-
-/// `language_model_providers.ollama_v1` 的固定 provider id（Ollama 的 OpenAI 兼容视图）。
-pub const OLLAMA_V1_PROVIDER_ID: &str = "ollama_v1";
-
-/// Ollama 的 `/v1` 视图；和原生 `ollama` section（根地址）是同一台服务器。
-pub const DEFAULT_OLLAMA_V1_BASE_URL: &str = "http://localhost:11434/v1";
 
 /// `language_model_providers.ollama` 的固定 provider id（section 名就是 id）。
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";

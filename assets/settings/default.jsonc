@@ -29,9 +29,7 @@
     "llama.cpp": {
       "base_url": "http://localhost:8080/v1",
     },
-    // 本地 Ollama 的 OpenAI 兼容视图（`/v1`）：独立 section，和下面的原生
-    // `ollama`（`/api/chat`）是同一台服务器的两套协议。
-    "ollama_v1": {},
+    // 本地 Ollama：原生 section（`/api/chat`，NDJSON）。provider id 就是 `ollama`。
     "ollama": {
       // 根地址（Zed 形状）。原生 /api/chat：NDJSON、`thinking` 字段。
       "base_url": "http://localhost:11434",

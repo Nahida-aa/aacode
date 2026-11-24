@@ -144,11 +144,10 @@ aa-agent/
   注意它的鉴权：`/v1/chat/completions` **只认** `Authorization: Bearer`，
   `x-api-key` 只在 `/v1/models` 上被接受（同一个 key：models 200、chat 401）。
 - **本地**：Ollama 的 `:cloud` 模型现在全部收费，不算本地。本地测就挑最小可用的模型
-  （`qwen2.5:0.5b` / `llama3.2:1b`，`ollama pull` 一次）。两种连法：
-  - 原生 `ollama` section（`/api/chat`，NDJSON）→ `aacode chat ollama qwen2.5:0.5b "..."`；
-    能拿到官方 `thinking` 字段，`models ollama` 走 `/api/tags`；
-  - OpenAI 兼容 `ollama_v1` section（`/v1`）→ 同一台服务器的另一套接口。
-  两个 section 现在各自独立，不再需要靠 key 名区分。
+  （`qwen2.5:0.5b` / `llama3.2:1b`，`ollama pull` 一次）。provider 就是 `ollama`
+  section（`/api/chat`，NDJSON）→ `aacode chat ollama qwen2.5:0.5b "..."`；
+  能拿到官方 `thinking` 字段，`models ollama` 走 `/api/tags`。
+  想走 OpenAI 兼容的 `/v1` 就写 `openai_compatible.ollama`（同名时兼容条目优先）。
 - **llama.cpp 是独立 section**：wire 仍是 OpenAI 兼容形状
   （`/v1/chat/completions`、`/v1/models`、`/v1/responses`、甚至 Anthropic Messages），
   但设置放在 `language_model_providers.llama.cpp`，默认无鉴权；

@@ -201,7 +201,6 @@ fn list_providers(settings: &Settings) {
 
     if language_model_providers.openai_compatible.is_empty()
         && language_model_providers.llama_cpp.is_none()
-        && language_model_providers.ollama_v1.is_none()
         && language_model_providers.ollama.is_none()
         && language_model_providers.openrouter.is_none()
     {
@@ -231,24 +230,6 @@ fn list_providers(settings: &Settings) {
         print_provider(
             aacode_settings::LLAMA_CPP_PROVIDER_ID,
             provider.base_url_or(aacode_settings::DEFAULT_LLAMA_CPP_BASE_URL),
-            &provider.auth,
-            &provider.available_models,
-            Some(note),
-        );
-    }
-
-    if let Some(provider) = &language_model_providers.ollama_v1 {
-        let note = if language_model_providers
-            .openai_compatible
-            .contains_key(aacode_settings::OLLAMA_V1_PROVIDER_ID)
-        {
-            "被同名 openai_compatible 条目覆盖"
-        } else {
-            "Ollama /v1（OpenAI 兼容视图）"
-        };
-        print_provider(
-            aacode_settings::OLLAMA_V1_PROVIDER_ID,
-            provider.base_url_or(aacode_settings::DEFAULT_OLLAMA_V1_BASE_URL),
             &provider.auth,
             &provider.available_models,
             Some(note),
