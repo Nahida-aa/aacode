@@ -225,7 +225,7 @@ fn list_providers(settings: &Settings) {
         {
             "被同名 openai_compatible 条目覆盖"
         } else {
-            "本地 llama.cpp /v1（OpenAI 兼容）"
+            "本地 llama.cpp（OpenAI 兼容）"
         };
         print_provider(
             aacode_settings::LLAMA_CPP_PROVIDER_ID,

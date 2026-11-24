@@ -9,7 +9,7 @@
 //! - section 名代表**协议**，或一家/一个本地服务差异大到必须单列的厂商：
 //!   `openai_compatible.<id>` 走 `/chat/completions`（SSE），
 //!   `ollama` 走原生 `/api/chat`（NDJSON，适配器是 `aa_ai_ollama`），
-//!   `llama.cpp` 是独立 section（wire 仍是 OpenAI 兼容 `/v1`，
+//!   `llama.cpp` 是独立 section（wire 是 OpenAI 兼容 `/chat/completions`，
 //!   但默认地址 / 无鉴权归这个 section），
 //!   `openrouter` 走 OpenRouter 的 `/chat/completions`（适配器是 `aa_ai_openrouter`）；
 //! - `available_models` 是数组，`capabilities` 逐模型声明；
@@ -112,7 +112,8 @@ pub struct LanguageModelProviders {
     /// OpenAI 兼容端点：官方 OpenAI、第三方网关、vLLM 等。
     #[serde(default)]
     pub openai_compatible: BTreeMap<String, OpenAiCompatibleProvider>,
-    /// 本地 llama.cpp（`llama-server` 的 `/v1`）。独立 section，默认无鉴权。
+    /// 本地 llama.cpp（`llama-server` 的 `/chat/completions`）。独立 section，
+    /// 默认无鉴权。
     #[serde(default, rename = "llama.cpp")]
     pub llama_cpp: Option<LocalOpenAiProvider>,
     /// 原生 Ollama 端点（语义上是 `/api/chat`，由 `aa_ai_ollama` 处理）。
@@ -614,7 +615,7 @@ mod tests {
         // 本地 llama.cpp 也是独立 section，默认无鉴权。
         assert!(config.ids().any(|id| id == "llama.cpp"));
         let llama = config.resolve("llama.cpp").unwrap();
-        assert_eq!(llama.base_url, "http://localhost:8080/v1");
+        assert_eq!(llama.base_url, "http://localhost:8080");
         assert!(matches!(
             llama.client,
             crate::provider::ProviderClient::OpenAi(_)
@@ -634,7 +635,7 @@ mod tests {
             .resolve_with("llama.cpp", &FakeCredentials(HashMap::new()))
             .unwrap();
         assert_eq!(resolved.id, "llama.cpp");
-        assert_eq!(resolved.base_url, "http://localhost:8080/v1");
+        assert_eq!(resolved.base_url, "http://localhost:8080");
         // wire 仍是 OpenAI 兼容：复用同一个客户端，只是 section 独立。
         assert!(matches!(
             resolved.client,
@@ -660,7 +661,7 @@ mod tests {
                 "openai_compatible":{
                     "llama.cpp":{"base_url":"http://proxy.example/v1","auth":{"kind":"none"}}
                 },
-                "llama.cpp":{"base_url":"http://localhost:8080/v1"}
+                "llama.cpp":{"base_url":"http://localhost:8080"}
             }}"#,
         );
         assert_eq!(config.ids().collect::<Vec<_>>(), vec!["llama.cpp"]);

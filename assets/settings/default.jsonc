@@ -24,10 +24,12 @@
       "base_url": "https://openrouter.ai/api/v1",
     },
     "openai_compatible": {},
-    // 本地 llama.cpp：独立 provider section（`llama-server` 的 /v1 是 OpenAI
-    // 兼容形状）。默认无鉴权；端口按 `llama-server --port` 的实际值填。
+    // 本地 llama.cpp：独立 provider section（`llama-server` 的
+    // `/chat/completions` 是 OpenAI 兼容形状）。默认无鉴权；端口按
+    // `llama-server --port` 的实际值填。写根地址：`llama-server` 同时接受
+    // `/chat/completions` 和 `/v1/chat/completions`。
     "llama.cpp": {
-      "base_url": "http://localhost:8080/v1",
+      "base_url": "http://localhost:8080",
     },
     // 本地 Ollama：原生 section（`/api/chat`，NDJSON）。provider id 就是 `ollama`。
     "ollama": {

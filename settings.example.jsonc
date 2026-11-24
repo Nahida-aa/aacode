@@ -7,7 +7,7 @@
 // - `language_model_providers.<section>`：一个 key = 一个端点，想连几个就写几个；
 //   `openai_compatible.<id>` 走 `/chat/completions`（OpenAI 官方、第三方网关、vLLM）；
 //   `ollama` 是原生 section（`/api/chat`，NDJSON）；
-//   `llama.cpp` 是独立的本地 provider section（wire 仍是 OpenAI 兼容 `/v1`）；
+//   `llama.cpp` 是独立的本地 provider section（wire 是 OpenAI 兼容形状）；
 //   `openrouter` 是 OpenRouter 专用 section（同形协议 + 思考回放 / 归因 header）；
 // - 密钥不写在这里：`auth.env` 是变量名列表，按顺序取第一个有值的；
 //   省略 `env` 时按 id 推导，例如 `minekuai` → `MINEKUAI_API_KEY`；
@@ -81,10 +81,12 @@
         ],
       },
     },
-    // 本地 llama.cpp：独立 provider section（wire 仍是 OpenAI 兼容 `/v1`）。
-    // 端口按 `llama-server --port` 的实际值填（Zed 默认 8080）；base_url 必须带 /v1。
+    // 本地 llama.cpp：独立 provider section，wire 是 OpenAI 兼容形状。
+    // 写根地址（`llama-server --port` 的实际端口，默认 8080）：`llama-server`
+    // 同时接受 `/chat/completions` 和 `/v1/chat/completions`。
+    // 如果换成只暴露 `/v1` 的服务（vLLM、LM Studio、反向代理），补上 `/v1`。
     "llama.cpp": {
-      "base_url": "http://localhost:8080/v1",
+      "base_url": "http://localhost:8080",
       "auth": { "kind": "none" },
     },
     // 本地 Ollama：独立 provider section，原生 `/api/chat`（NDJSON）。

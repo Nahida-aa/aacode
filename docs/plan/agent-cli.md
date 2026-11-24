@@ -148,10 +148,12 @@ aa-agent/
   section（`/api/chat`，NDJSON）→ `aacode chat ollama qwen2.5:0.5b "..."`；
   能拿到官方 `thinking` 字段，`models ollama` 走 `/api/tags`。
   想走 OpenAI 兼容的 `/v1` 就写 `openai_compatible.ollama`（同名时兼容条目优先）。
-- **llama.cpp 是独立 section**：wire 仍是 OpenAI 兼容形状
-  （`/v1/chat/completions`、`/v1/models`、`/v1/responses`、甚至 Anthropic Messages），
+- **llama.cpp 是独立 section**：wire 是 OpenAI 兼容形状
+  （`/chat/completions`、`/models`、`/responses`、甚至 Anthropic Messages），
   但设置放在 `language_model_providers.llama.cpp`，默认无鉴权；
-  `base_url` 指向 `http://localhost:8080/v1`（或 `llama-server --port` 的实际值）。
+  `base_url` 写根地址 `http://localhost:8080`（或 `llama-server --port` 的实际值）——
+  `llama-server` 同时接受 `/chat/completions` 和 `/v1/chat/completions`，
+  不需要自己补 `/v1`。换成只暴露 `/v1` 的服务（vLLM / LM Studio / 反向代理）时再补。
   `llama.cpp` 不再是 `openai_compatible` 下的一个 key。
 
 ### 代理

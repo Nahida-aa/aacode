@@ -134,13 +134,14 @@ impl OpenAiCompatibleProvider {
 
 /// 本地 llama.cpp 端点（`language_model_providers.llama.cpp`）。
 ///
-/// wire 和 `openai_compatible` 相同（`/v1`），但它是**独立 provider section**：
-/// 默认地址、默认无鉴权，以及以后可能出现的 auto-discovery / context window
-/// 归这个 section，不和第三方网关混在一个映射里。
+/// wire 和 `openai_compatible` 相同（`/chat/completions`），但它是**独立
+/// provider section**：默认地址、默认无鉴权，以及以后可能出现的
+/// auto-discovery / context window 归这个 section，不和第三方网关混在一个映射里。
 #[derive(Debug, Clone, Deserialize)]
 pub struct LocalOpenAiProvider {
-    /// 已包含版本段；省略时用该 section 的默认本地地址。
-    /// `api_url` 是 Zed 的字段名，保留为别名（直接粘贴 Zed 配置也能用）。
+    /// 客户端拼 `/chat/completions`、`/models` 之前的前缀；省略时用该 section
+    /// 的默认本地地址。`api_url` 是 Zed 的字段名，保留为别名（直接粘贴 Zed
+    /// 配置也能用）。
     #[serde(default, alias = "api_url")]
     pub base_url: Option<String>,
     /// 鉴权方式；默认不发（本地服务）。反向代理后面可以写 bearer/header。
@@ -244,8 +245,12 @@ impl OllamaProvider {
 /// [`derived_env_name`] 推导为 `LLAMA_CPP_API_KEY`（默认无鉴权，不读）。
 pub const LLAMA_CPP_PROVIDER_ID: &str = "llama.cpp";
 
-/// `llama-server` 的默认端口（Zed 也用 8080）；`base_url` 必须带 `/v1`。
-pub const DEFAULT_LLAMA_CPP_BASE_URL: &str = "http://localhost:8080/v1";
+/// `llama-server` 的默认地址（端口 8080）。
+///
+/// 写根地址就够：`llama-server` 同时注册了 `/chat/completions` 与
+/// `/v1/chat/completions`（`/models` 同理），客户端会自己拼路径。
+/// 如果服务只暴露 `/v1`（vLLM、LM Studio、反向代理），在配置里补上 `/v1`。
+pub const DEFAULT_LLAMA_CPP_BASE_URL: &str = "http://localhost:8080";
 
 /// `language_model_providers.ollama` 的固定 provider id（section 名就是 id）。
 pub const OLLAMA_PROVIDER_ID: &str = "ollama";
