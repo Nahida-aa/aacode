@@ -388,6 +388,26 @@ async fn list_models(settings: &Settings, provider: &str, free: bool) -> Result<
     Ok(())
 }
 
+/// 把设置里的压缩字段转成库层配置；省略的字段用库默认值（对齐 Zed）。
+fn compaction_config(
+    settings: &aacode_settings::CompactionSettings,
+) -> Result<aa_agent::CompactionConfig, String> {
+    let mut config = aa_agent::CompactionConfig::default();
+    if let Some(enabled) = settings.enabled {
+        config.enabled = enabled;
+    }
+    if let Some(raw) = &settings.threshold {
+        config.threshold = aa_agent::compaction::Threshold::parse(raw)?;
+    }
+    if let Some(minimum) = settings.min_context_window {
+        config.min_context_window = minimum;
+    }
+    if let Some(maximum) = settings.summary_max_output_tokens {
+        config.summary_max_output_tokens = Some(maximum);
+    }
+    Ok(config)
+}
+
 async fn chat(
     settings: &Settings,
     provider: &str,
@@ -400,6 +420,7 @@ async fn chat(
         .resolve(provider)
         .map_err(|error| error.to_string())?;
     let model = resolved.model(model_id);
+    let compaction = compaction_config(&settings.compaction)?;
 
     if !resolved.declares_model(model_id) {
         eprintln!("# 设置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
@@ -409,11 +430,11 @@ async fn chat(
     let (mut session, mut file) = open_session(session_name, resume, provider, model_id, cwd, "")?;
 
     let Some(prompt) = prompt else {
-        return chat_repl(&resolved, &model, &mut session, &mut file).await;
+        return chat_repl(&resolved, &model, &mut session, &mut file, &compaction).await;
     };
 
     session.push_user_text(prompt);
-    chat_turn(&resolved, &model, &mut session, true).await?;
+    chat_turn(&resolved, &model, &mut session, true, &compaction).await?;
     persist(&mut file, &session)
 }
 
@@ -423,6 +444,7 @@ async fn chat_repl(
     model: &Model,
     session: &mut Session,
     file: &mut Option<session_file::SessionFile>,
+    compaction: &aa_agent::CompactionConfig,
 ) -> Result<(), String> {
     eprintln!("# 交互模式：输入内容回车发送；/help 看命令，/exit 退出");
 
@@ -457,7 +479,7 @@ async fn chat_repl(
         }
 
         session.push_user_text(line);
-        chat_turn(resolved, model, session, false).await?;
+        chat_turn(resolved, model, session, false, compaction).await?;
         persist(file, session)?;
     }
 }
@@ -468,7 +490,20 @@ async fn chat_turn(
     model: &Model,
     session: &mut Session,
     verbose: bool,
+    compaction: &aa_agent::CompactionConfig,
 ) -> Result<(), String> {
+    // 超预算时先压缩旧对话；chat 没有工具，传空工具表。
+    aa_agent::compaction::maybe_compact(
+        &resolved.client,
+        model,
+        session,
+        &[],
+        compaction,
+        &CliEvents,
+    )
+    .await
+    .map_err(|error| error.to_string())?;
+
     let request = Request {
         messages: session.messages().to_vec(),
         stream: true,
@@ -700,8 +735,9 @@ async fn agent(
 
     let provider = provider.ok_or("run 需要 <provider> <model> <prompt>")?;
     let model_id = model_id.ok_or("run 需要 <provider> <model> <prompt>")?;
+    let settings = settings.expect("非 fake 路径一定加载了设置");
+    let compaction = compaction_config(&settings.compaction)?;
     let resolved = settings
-        .expect("非 fake 路径一定加载了设置")
         .resolve(provider)
         .map_err(|error| error.to_string())?;
     let model = resolved.model(model_id);
@@ -715,6 +751,7 @@ async fn agent(
     session.push_user_text(&prompt);
 
     AgentLoop::new(Arc::new(resolved.client), registry)
+        .with_compaction(compaction)
         .run(&model, &mut session, &CliEvents)
         .await
         .map_err(|error| error.to_string())?;
@@ -978,5 +1015,41 @@ mod tests {
     fn system_is_run_only() {
         assert!(parse(&["chat", "a", "m", "--system", "x"]).is_err());
         assert!(parse(&["run", "a", "m", "go", "--system", "x"]).is_ok());
+    }
+
+    #[test]
+    fn compaction_settings_fall_back_to_zed_defaults() {
+        let config = compaction_config(&aacode_settings::CompactionSettings::default()).unwrap();
+        assert!(config.enabled);
+        assert_eq!(
+            config.threshold,
+            aa_agent::compaction::Threshold::Fraction(0.9)
+        );
+        assert_eq!(config.min_context_window, 80_000);
+        assert_eq!(config.summary_max_output_tokens, None);
+    }
+
+    #[test]
+    fn compaction_settings_accept_zed_threshold_forms() {
+        let settings = aacode_settings::CompactionSettings {
+            enabled: Some(false),
+            threshold: Some("-20000".to_owned()),
+            min_context_window: Some(40_000),
+            summary_max_output_tokens: Some(4_096),
+        };
+        let config = compaction_config(&settings).unwrap();
+        assert!(!config.enabled);
+        assert_eq!(
+            config.threshold,
+            aa_agent::compaction::Threshold::TokensRemaining(20_000)
+        );
+        assert_eq!(config.min_context_window, 40_000);
+        assert_eq!(config.summary_max_output_tokens, Some(4_096));
+
+        let settings = aacode_settings::CompactionSettings {
+            threshold: Some("nonsense".to_owned()),
+            ..Default::default()
+        };
+        assert!(compaction_config(&settings).is_err());
     }
 }

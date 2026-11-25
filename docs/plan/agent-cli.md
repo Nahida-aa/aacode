@@ -38,7 +38,7 @@ ACP 解决的是「agent 怎么和编辑器（Zed 等）对话」。但 agent �
 - **权限门**：工具执行前审批（→ ACP 里就是 `session/request_permission`，提前做对 ACP 直接有用）
 
 ### v2 好用
-- 长对话压缩 / 上下文管理
+- ✅ 长对话压缩 / 上下文管理（见第 6 节「上下文压缩」）
 - 配置（model、工具白名单、env）
 - 流式结构化输出、reasoning 显示
 - **ACP 输出层**（此时协议风险已被 v0/v1 核心验证兜住）
@@ -154,6 +154,32 @@ aacode-cli chat agnes agnes-3.0-flash --continue           # 不带名字 = 最�
 - `--session` 撞到已有文件会报错（防止覆盖）；要接着写就加 `--continue`；
 - 恢复时沿用会话里的系统提示；`--system` 只对新建会话生效；
 - `run --fake` 也走同一套会话，可以完全离线验证「落盘 → 恢复 → 继续」。 
+
+### 上下文压缩
+
+超过模型输入预算时，`chat` / `run` 会先把旧对话摘要成一条 checkpoint，再发本轮
+请求（库实现与取舍见 aa-ai ADR 0015）。默认对齐 Zed：
+
+- 触发：`context_window - max_output_tokens` 用掉 90%；
+- 输入容量 < 80k 不自动压缩（Zed 写死的下限，可用设置调低）；
+- 摘要之外保留最近 80KB 的**用户原话**；工具输出、助手文本进摘要；
+- 摘要用当前会话模型；失败或空摘要直接报错，历史保持不变。
+
+设置里可调（省略 = 上面的默认值）：
+
+```jsonc
+{
+  "compaction": {
+    "enabled": true,
+    "threshold": "90%",          // 或 "100000" / "-20000"
+    "min_context_window": 80000,
+    "summary_max_output_tokens": 8192
+  }
+}
+```
+
+压缩会往会话 JSONL 追加一条 `compaction` 事件；原始事件保留（审计），
+`--continue` 直接重放摘要，不会重复付摘要请求。
 
 ### 测试用哪个端点
 

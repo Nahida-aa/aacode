@@ -94,6 +94,9 @@ pub struct Settings {
     pub proxy: Option<String>,
     #[serde(default)]
     pub language_model_providers: LanguageModelProviders,
+    /// agent 循环的上下文压缩（对齐 Zed 的 `agent.auto_compact`）。
+    #[serde(default)]
+    pub compaction: CompactionSettings,
     /// 用户文件里出现、但还没有适配器的 section。只用于提示，
     /// 不影响解析（内置默认文件里也有这类占位）。
     #[serde(skip)]
@@ -113,6 +116,7 @@ impl std::fmt::Debug for Settings {
         f.debug_struct("Settings")
             .field("proxy", &self.proxy)
             .field("language_model_providers", &self.language_model_providers)
+            .field("compaction", &self.compaction)
             .field("unsupported", &self.unsupported)
             .field("transport", &self.transport.get().map(|_| "<shared>"))
             .finish()
@@ -136,6 +140,26 @@ pub struct LanguageModelProviders {
     /// 由 `aa_ai_openrouter` 处理）。
     #[serde(default)]
     pub openrouter: Option<OpenRouterProvider>,
+}
+
+/// 上下文压缩设置。省略或写 `null` = 用库默认值。
+///
+/// 默认值对齐 Zed：窗口的 90% 触发、输入容量 < 80k 不自动压缩、
+/// 摘要用当前会话模型。
+#[derive(Debug, Clone, Default, serde::Deserialize)]
+pub struct CompactionSettings {
+    /// `false` 关闭自动压缩（手动压缩仍可后续加）。
+    #[serde(default)]
+    pub enabled: Option<bool>,
+    /// `"90%"` / `"100000"` / `"-20000"`（对齐 Zed 的三种写法）。
+    #[serde(default)]
+    pub threshold: Option<String>,
+    /// 输入容量小于此值不自动压缩（默认 80000，对齐 Zed 写死的下限）。
+    #[serde(default)]
+    pub min_context_window: Option<u64>,
+    /// 摘要请求的输出上限；省略 = 用模型的输出上限。
+    #[serde(default)]
+    pub summary_max_output_tokens: Option<u64>,
 }
 
 impl Settings {
@@ -466,6 +490,20 @@ mod tests {
             r#"{"proxy": ""}"#,
         );
         assert_eq!(settings.proxy.as_deref(), Some("http://127.0.0.1:8080"));
+    }
+
+    #[test]
+    fn compaction_section_is_optional() {
+        let settings = parse(
+            r#"{"compaction":{"enabled":false,"threshold":"-20000","min_context_window":40000}}"#,
+        );
+        assert_eq!(settings.compaction.enabled, Some(false));
+        assert_eq!(settings.compaction.threshold.as_deref(), Some("-20000"));
+        assert_eq!(settings.compaction.min_context_window, Some(40_000));
+
+        let settings = parse("{}");
+        assert_eq!(settings.compaction.enabled, None);
+        assert_eq!(settings.compaction.threshold, None);
     }
 
     #[test]
