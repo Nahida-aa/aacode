@@ -10,7 +10,9 @@ aa_ai_openai = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_op
 aa_ai_openrouter = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_openrouter" }
 aa_ai_ollama = { path = "../../lib_ls/aa-ai/packages/aa_language_models/aa_ai_ollama" }
 aa_agent = { path = "../../lib_ls/aa-ai/packages/aa_agent" }
-aa_language_models = { path = "../../lib_ls/aa-ai/packages/aa_language_models" }
+aa_language_models = { path = "../../lib_ls/aa-ai/packages/aa_language_models", features = [
+    "stub",
+] }
 # 共享传输在 aa-stack：应用只构造一次，所有 provider 复用同一个连接池。
 aa_http_client = { path = "../../lib_ls/aa-stack/packages/util/aa_http_client" }
 
