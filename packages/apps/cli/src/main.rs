@@ -7,6 +7,8 @@
 //! aacode-cli providers                 # 列设置里的端点（不读密钥）
 //! aacode-cli models minekuai           # GET /models（需要密钥）
 //! aacode-cli chat minekuai deepseek "你好"        # 纯对话，不带工具
+//! aacode-cli chat minekuai deepseek              # 交互模式（多轮，历史在内存）
+//! aacode-cli chat minekuai deepseek --session demo  # 会话落盘，可恢复
 //! aacode-cli run minekuai deepseek "把 src 里的 TODO 汇总"  # agent + 工具（只读）
 //! aacode-cli run --allow-write ...     # 允许 write/edit
 //! ```
@@ -18,13 +20,17 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 
-use aa_agent::AgentLoop;
+use aa_agent::Session;
+use aa_agent::agent_loop::AgentLoop;
+use aa_agent::session::{Header, Turn};
 use aa_agent::tool::ToolEvents;
-use aa_language_model::provider::{CompletionEvent, LanguageModelClient, StopReason, TokenUsage};
+use aa_language_model::provider::{
+    CompletionEvent, LanguageModelClient, Model, StopReason, TokenUsage,
+};
 use aa_language_model::request::Request;
-use aa_language_model::request::message::{ContentPart, Message, Role};
 use aacode_settings::{Settings, default_path, derived_env_name};
 
+mod session_file;
 mod tools;
 
 const USAGE: &str = "\
@@ -37,11 +43,18 @@ aacode — 多提供商 LLM 客户端 / coding agent
   aacode-cli [--settings <PATH>] run [选项] <provider> <model> <prompt...>
   aacode-cli run --stub [选项] <prompt...>     # 离线冒烟：不连 LLM，用剧本驱动
 
+chat 不给 prompt 就进入交互模式（多轮，/exit 退出，/help 看命令）。
+
 run 的选项:
   --dir <PATH>       工作目录（工具只能访问它，默认当前目录）
   --allow-write      注册 write / edit（默认只读：只有 read / glob）
-  --system <TEXT>    覆盖内置系统提示
+  --system <TEXT>    覆盖内置系统提示（只对新建会话生效）
   --stub             用离线 stub 客户端（不读密钥、不连网络），验证 loop + 工具接线
+
+chat / run 的会话选项:
+  --session <NAME>   会话名；保存为 <sessions>/<NAME>.jsonl（只允许字母数字 ._-）
+  --continue         恢复会话：配合 --session 指定，不带则取最近一次
+  <sessions> 默认 {config_dir}/aacode/sessions，可用 AACODE_SESSIONS 覆盖
 
 models 的选项:
   --free             只列免费模型（按目录里的 pricing 判断；OpenRouter 支持）
@@ -69,6 +82,10 @@ struct Args {
     allow_write: bool,
     system: Option<String>,
     stub: bool,
+    /// `--session`：会话名（落盘时用）。
+    session: Option<String>,
+    /// `--continue`：恢复已有会话。
+    resume: bool,
     command: Command,
 }
 
@@ -77,11 +94,11 @@ enum Command {
     Providers,
     /// 调端点的 `GET /models`（需要密钥）。
     Models { provider: String, free: bool },
-    /// 跑一次流式对话（不带工具）。
+    /// 跑流式对话（不带工具）。`prompt` 为空时进入交互模式。
     Chat {
         provider: String,
         model: String,
-        prompt: String,
+        prompt: Option<String>,
     },
     /// 跑一次带工具的 agent 任务。
     Run {
@@ -153,7 +170,17 @@ async fn run(args: Args) -> Result<(), String> {
             provider,
             model,
             prompt,
-        } => chat(settings_ref(), &provider, &model, prompt).await,
+        } => {
+            chat(
+                settings_ref(),
+                &provider,
+                &model,
+                prompt,
+                args.session,
+                args.resume,
+            )
+            .await
+        }
         Command::Run {
             provider,
             model,
@@ -164,6 +191,8 @@ async fn run(args: Args) -> Result<(), String> {
                 allow_write: args.allow_write,
                 system: args.system.unwrap_or_else(|| DEFAULT_SYSTEM.to_owned()),
                 stub: args.stub,
+                session: args.session,
+                resume: args.resume,
             };
             agent(
                 settings.as_ref(),
@@ -363,7 +392,9 @@ async fn chat(
     settings: &Settings,
     provider: &str,
     model_id: &str,
-    prompt: String,
+    prompt: Option<String>,
+    session_name: Option<String>,
+    resume: bool,
 ) -> Result<(), String> {
     let resolved = settings
         .resolve(provider)
@@ -374,39 +405,112 @@ async fn chat(
         eprintln!("# 设置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
     }
 
+    let cwd = current_dir_display();
+    let (mut session, mut file) = open_session(session_name, resume, provider, model_id, cwd, "")?;
+
+    let Some(prompt) = prompt else {
+        return chat_repl(&resolved, &model, &mut session, &mut file).await;
+    };
+
+    session.push_user_text(prompt);
+    chat_turn(&resolved, &model, &mut session, true).await?;
+    persist(&mut file, &session)
+}
+
+/// 交互模式：一行一轮，历史留在同一个会话里。
+async fn chat_repl(
+    resolved: &aacode_settings::ResolvedProvider,
+    model: &Model,
+    session: &mut Session,
+    file: &mut Option<session_file::SessionFile>,
+) -> Result<(), String> {
+    eprintln!("# 交互模式：输入内容回车发送；/help 看命令，/exit 退出");
+
+    let mut input = String::new();
+    loop {
+        print!("> ");
+        let _ = std::io::stdout().flush();
+
+        input.clear();
+        let read = std::io::stdin()
+            .read_line(&mut input)
+            .map_err(|error| format!("读输入失败：{error}"))?;
+        if read == 0 {
+            // Ctrl-D。
+            println!();
+            return Ok(());
+        }
+
+        let line = input.trim();
+        if line.is_empty() {
+            continue;
+        }
+        match line {
+            "/exit" | "/quit" => return Ok(()),
+            "/help" => {
+                println!("  /exit, /quit  退出");
+                println!("  /help         这条帮助");
+                println!("  其他输入      发给模型（历史会累积）");
+                continue;
+            }
+            _ => {}
+        }
+
+        session.push_user_text(line);
+        chat_turn(resolved, model, session, false).await?;
+        persist(file, session)?;
+    }
+}
+
+/// 跑一轮对话：把 `session` 的历史发给模型，流式打印，再把这一轮写回会话。
+async fn chat_turn(
+    resolved: &aacode_settings::ResolvedProvider,
+    model: &Model,
+    session: &mut Session,
+    verbose: bool,
+) -> Result<(), String> {
     let request = Request {
-        messages: vec![Arc::new(Message::new(
-            Role::User,
-            vec![ContentPart::text(prompt)],
-        ))],
+        messages: session.messages().to_vec(),
         stream: true,
         // 设置里的 reasoning_effort 是每请求选择的默认值，不进 Model。
-        reasoning_effort: resolved.reasoning_effort(model_id),
+        reasoning_effort: resolved.reasoning_effort(&model.id),
         ..Request::default()
     };
 
     let mut stream = resolved
         .client
-        .stream_completion(&model, &request)
+        .stream_completion(model, &request)
         .await
         .map_err(|error| error.to_string())?;
 
+    let mut text = String::new();
+    let mut reasoning = String::new();
+    let mut signature: Option<String> = None;
     let mut usage: Option<TokenUsage> = None;
     let mut stop: Option<StopReason> = None;
 
     while let Some(event) = stream.next().await {
         match event.map_err(|error| error.to_string())? {
-            CompletionEvent::Text(text) => {
-                print!("{text}");
+            CompletionEvent::Text(delta) => {
+                print!("{delta}");
                 let _ = std::io::stdout().flush();
+                text.push_str(&delta);
             }
-            CompletionEvent::Reasoning { text, .. } => {
+            CompletionEvent::Reasoning {
+                text: delta,
+                signature: delta_signature,
+            } => {
                 // 暗色显示思考；不支持思考的端点和模型不会发这个事件。
-                print!("\x1b[2m{text}\x1b[0m");
+                print!("\x1b[2m{delta}\x1b[0m");
                 let _ = std::io::stdout().flush();
+                reasoning.push_str(&delta);
+                if delta_signature.is_some() {
+                    signature = delta_signature;
+                }
             }
             CompletionEvent::ToolUse { name, .. } => {
-                eprintln!("\n[tool] {name}");
+                // chat 不注册工具；模型主动要求工具时说明清楚，而不是静默丢弃。
+                eprintln!("\n[tool] {name}（chat 不带工具，已忽略）");
             }
             CompletionEvent::Usage(value) => usage = Some(value),
             CompletionEvent::Stop(reason) => {
@@ -417,18 +521,101 @@ async fn chat(
     }
 
     println!();
-    match stop {
-        Some(reason) => println!("[stop] {reason:?}"),
-        None => eprintln!("[warn] 流结束了但没有 Stop 事件"),
-    }
-    if let Some(usage) = usage {
-        println!(
-            "[usage] input={} output={}",
-            usage.input_tokens, usage.output_tokens
-        );
+    if verbose {
+        match stop {
+            Some(reason) => println!("[stop] {reason:?}"),
+            None => eprintln!("[warn] 流结束了但没有 Stop 事件"),
+        }
+        if let Some(usage) = usage {
+            println!(
+                "[usage] input={} output={}",
+                usage.input_tokens, usage.output_tokens
+            );
+        }
+    } else if stop.is_none() {
+        eprintln!("[warn] 流结束了但没有 Stop 事件");
     }
 
+    session.push_assistant(Turn {
+        text,
+        reasoning: (!reasoning.is_empty()).then_some(reasoning),
+        signature,
+        tool_calls: Vec::new(),
+        stop,
+        usage,
+    });
     Ok(())
+}
+
+/// 打开会话：新建、按名字恢复，或恢复最近一次。
+///
+/// - 不给 `--session` / `--continue`：纯内存会话，不落盘；
+/// - `--session NAME`：新会话，文件已存在时报错（要接着写请加 `--continue`）；
+/// - `--continue [--session NAME]`：从文件恢复，沿用文件里的系统提示。
+fn open_session(
+    name: Option<String>,
+    resume: bool,
+    provider: &str,
+    model: &str,
+    cwd: String,
+    system: &str,
+) -> Result<(Session, Option<session_file::SessionFile>), String> {
+    let path = match (resume, &name) {
+        (_, Some(name)) => Some(session_file::path_for(name)?),
+        (true, None) => Some(session_file::latest()?),
+        (false, None) => None,
+    };
+    let Some(path) = path else {
+        let session = Session::new(Header::new(provider, model, cwd, system))
+            .map_err(|error| error.to_string())?;
+        return Ok((session, None));
+    };
+
+    if resume {
+        let session = session_file::load(&path)?;
+        eprintln!(
+            "# 恢复会话：{}（{} 条消息）",
+            path.display(),
+            session.message_count()
+        );
+        let header = session.header();
+        if header.provider != provider || header.model != model {
+            eprintln!(
+                "# 注意：会话建立时用的是 {} / {}，本次是 {provider} / {model}",
+                header.provider, header.model
+            );
+        }
+        if !system.is_empty() && session.system() != system {
+            eprintln!("# 注意：沿用会话里的系统提示，忽略本次的 --system");
+        }
+        let file = session_file::SessionFile::resumed(path, &session);
+        return Ok((session, Some(file)));
+    }
+
+    if path.exists() {
+        return Err(format!(
+            "会话 {} 已存在；用 --continue 接着写，或换一个 --session 名字",
+            path.display()
+        ));
+    }
+    let session = Session::new(Header::new(provider, model, cwd, system))
+        .map_err(|error| error.to_string())?;
+    eprintln!("# 新会话：{}", path.display());
+    Ok((session, Some(session_file::SessionFile::new(path))))
+}
+
+/// 把新增事件写进会话文件（没有会话文件时什么也不做）。
+fn persist(file: &mut Option<session_file::SessionFile>, session: &Session) -> Result<(), String> {
+    if let Some(file) = file {
+        file.sync(session)?;
+    }
+    Ok(())
+}
+
+fn current_dir_display() -> String {
+    std::env::current_dir()
+        .map(|path| path.display().to_string())
+        .unwrap_or_default()
 }
 
 /// 带工具的 agent 任务。
@@ -438,6 +625,8 @@ struct RunOptions {
     allow_write: bool,
     system: String,
     stub: bool,
+    session: Option<String>,
+    resume: bool,
 }
 
 async fn agent(
@@ -452,9 +641,12 @@ async fn agent(
         allow_write,
         system,
         stub,
+        session: session_name,
+        resume,
     } = options;
     let workspace = Arc::new(tools::Workspace::new(dir, allow_write));
     let registry = tools::registry(workspace.clone());
+    let cwd = workspace.root().display().to_string();
 
     eprintln!("# 工作目录: {}", workspace.root().display());
     eprintln!(
@@ -493,10 +685,15 @@ async fn agent(
             ],
         ]);
         let model = aa_language_model::provider::Model::new("stub", "stub");
+        // stub 也走会话：离线验证「落盘 → 恢复 → 继续」的完整链路。
+        let (mut session, mut file) =
+            open_session(session_name, resume, "stub", "stub", cwd, &system)?;
+        session.push_user_text(&prompt);
         AgentLoop::new(Arc::new(client), registry)
-            .run(&model, &system, &prompt, &CliEvents)
+            .run(&model, &mut session, &CliEvents)
             .await
             .map_err(|error| error.to_string())?;
+        persist(&mut file, &session)?;
         println!();
         return Ok(());
     }
@@ -513,11 +710,15 @@ async fn agent(
         eprintln!("# 设置里没有模型 `{model_id}`，使用默认事实（不一定准确）");
     }
 
-    let agent = AgentLoop::new(Arc::new(resolved.client), registry);
-    agent
-        .run(&model, &system, &prompt, &CliEvents)
+    let (mut session, mut file) =
+        open_session(session_name, resume, provider, model_id, cwd, &system)?;
+    session.push_user_text(&prompt);
+
+    AgentLoop::new(Arc::new(resolved.client), registry)
+        .run(&model, &mut session, &CliEvents)
         .await
         .map_err(|error| error.to_string())?;
+    persist(&mut file, &session)?;
 
     // 文本已经在事件回调里流式打印过，这里只收尾。
     println!();
@@ -559,6 +760,8 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
     let mut system = None;
     let mut stub = false;
     let mut free = false;
+    let mut session = None;
+    let mut resume = false;
     let mut command_name: Option<String> = None;
     let mut positional: Vec<String> = Vec::new();
 
@@ -587,6 +790,11 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
             "--allow-write" => allow_write = true,
             "--stub" => stub = true,
             "--free" => free = true,
+            "--session" => {
+                let value = iter.next().ok_or("--session 需要一个名字")?;
+                session = Some(value);
+            }
+            "--continue" => resume = true,
             _ if argument.starts_with("--settings=") || argument.starts_with("--config=") => {
                 let (flag, value) = argument.split_once('=').expect("匹配了以 = 开头的分支");
                 if value.is_empty() {
@@ -606,6 +814,13 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
             }
             _ if argument.starts_with("--system=") => {
                 system = Some(argument["--system=".len()..].to_owned());
+            }
+            _ if argument.starts_with("--session=") => {
+                let value = &argument["--session=".len()..];
+                if value.is_empty() {
+                    return Err("--session= 后面需要一个名字".to_owned());
+                }
+                session = Some(value.to_owned());
             }
             _ if argument.starts_with('-') => {
                 return Err(format!("未知选项 `{argument}`"));
@@ -644,18 +859,24 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
                     prompt: positional.join(" "),
                 }
             } else {
-                if positional.len() < 3 {
-                    return Err(format!("{name} 需要 <provider> <model> <prompt>"));
+                let minimum = if name == "chat" { 2 } else { 3 };
+                if positional.len() < minimum {
+                    return Err(if name == "chat" {
+                        "chat 需要 <provider> <model> [prompt...]（不给 prompt 进入交互模式）"
+                            .to_owned()
+                    } else {
+                        format!("{name} 需要 <provider> <model> <prompt>")
+                    });
                 }
                 let mut rest = positional.into_iter();
-                let provider = rest.next().expect("len >= 3");
-                let model = rest.next().expect("len >= 3");
+                let provider = rest.next().expect("len >= minimum");
+                let model = rest.next().expect("len >= minimum");
                 let prompt = rest.collect::<Vec<_>>().join(" ");
                 if name == "chat" {
                     Command::Chat {
                         provider,
                         model,
-                        prompt,
+                        prompt: (!prompt.is_empty()).then_some(prompt),
                     }
                 } else {
                     Command::Run {
@@ -672,6 +893,14 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
     if free && !matches!(command, Command::Models { .. }) {
         return Err("--free 只能和 models 一起用".to_owned());
     }
+    if (session.is_some() || resume)
+        && !matches!(command, Command::Chat { .. } | Command::Run { .. })
+    {
+        return Err("--session / --continue 只能和 chat / run 一起用".to_owned());
+    }
+    if system.is_some() && !matches!(command, Command::Run { .. }) {
+        return Err("--system 只能和 run 一起用".to_owned());
+    }
 
     Ok(Some(Args {
         settings: settings.unwrap_or_else(default_path),
@@ -679,6 +908,8 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
         allow_write,
         system,
         stub,
+        session,
+        resume,
         command,
     }))
 }
@@ -689,5 +920,63 @@ fn expect_no_positional(command: &str, extra: &[String]) -> Result<(), String> {
         Ok(())
     } else {
         Err(format!("{command} 不接受多余参数：{extra:?}"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse(raw: &[&str]) -> Result<Option<Args>, String> {
+        parse_args(raw.iter().map(|argument| argument.to_string()).collect())
+    }
+
+    /// 只关心命令形状的测试：省略路径，避免依赖真实的 config dir。
+    fn parse_command(raw: &[&str]) -> Command {
+        parse(raw).unwrap().unwrap().command
+    }
+
+    #[test]
+    fn chat_without_prompt_enters_repl() {
+        let Command::Chat { prompt, .. } = parse_command(&["chat", "agnes", "agnes-3.0-flash"])
+        else {
+            panic!("应该是 Chat");
+        };
+        assert!(prompt.is_none());
+
+        let Command::Chat { prompt, .. } =
+            parse_command(&["chat", "agnes", "agnes-3.0-flash", "你好", "呀"])
+        else {
+            panic!("应该是 Chat");
+        };
+        assert_eq!(prompt.as_deref(), Some("你好 呀"));
+    }
+
+    #[test]
+    fn session_flags_are_parsed_for_chat_and_run() {
+        let args = parse(&["chat", "agnes", "m", "--session", "demo", "--continue"])
+            .unwrap()
+            .unwrap();
+        assert_eq!(args.session.as_deref(), Some("demo"));
+        assert!(args.resume);
+
+        let args = parse(&["run", "--session=demo", "agnes", "m", "go"])
+            .unwrap()
+            .unwrap();
+        assert_eq!(args.session.as_deref(), Some("demo"));
+        assert!(!args.resume);
+    }
+
+    #[test]
+    fn session_and_continue_are_rejected_elsewhere() {
+        assert!(parse(&["providers", "--session", "demo"]).is_err());
+        assert!(parse(&["models", "agnes", "--continue"]).is_err());
+        assert!(parse(&["--session=", "chat", "a", "m"]).is_err());
+    }
+
+    #[test]
+    fn system_is_run_only() {
+        assert!(parse(&["chat", "a", "m", "--system", "x"]).is_err());
+        assert!(parse(&["run", "a", "m", "go", "--system", "x"]).is_ok());
     }
 }

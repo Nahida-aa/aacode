@@ -91,6 +91,7 @@ dependencies = [
  "aa_language_model",
  "aa_language_models",
  "aacode_settings",
+ "dirs",
  "dotenvy",
  "futures",
  "glob",

@@ -33,7 +33,7 @@ ACP 解决的是「agent 怎么和编辑器（Zed 等）对话」。但 agent �
 
 ### v1 能用
 - 工具扩：目录列表、grep 搜索、跑命令
-- 会话：多 turn 上下文 + 基础持久化（消息落盘）
+- ✅ 会话：多 turn 上下文 + 基础持久化（`--session` / `--continue`，见第 6 节）
 - 错误处理：LLM 超时/限流/工具失败的**重试 + 降级**
 - **权限门**：工具执行前审批（→ ACP 里就是 `session/request_permission`，提前做对 ACP 直接有用）
 
@@ -122,7 +122,7 @@ aa-agent/
 └── rust/                       # 生产：Rust（后期，核心逻辑重实现 + ACP v2 feature）
 ```
 
-## 6. 现状（2026-11-20）
+## 6. 现状（2026-11-25）
 
 计划里的 v0 已经落地成 Rust（不走 TS 实验）：`aa_agent::AgentLoop`（库）+ `aacode-cli run`（应用）。
 第 5 节的 TS 目录只当作早期想法，实际代码在 `packages/apps/cli` + `../../lib_ls/aa-ai/packages/aa_agent`。
@@ -133,9 +133,27 @@ aa-agent/
 |---|---|---|
 | 验证 loop / 工具接线 | `aacode-cli run --stub --dir <DIR> "..."` | 无（剧本驱动，不读设置、不连网） |
 | 真实模型 + 工具 | `aacode-cli run --dir <DIR> <provider> <model> "..."` | 设置里有端点 + 密钥 |
-| 纯对话（不带工具） | `aacode-cli chat <provider> <model> "..."` | 同上 |
+| 纯对话（不带工具） | `aacode-cli chat <provider> <model> ["..."]` | 同上（不给 prompt 进交互模式） |
 
 密钥可以放 `.env`（当前目录或设置文件旁），不用每次 export。
+
+### 会话
+
+`chat` / `run` 默认是**一次性**的：进程退出，历史就没了。要留下历史：
+
+```bash
+aacode-cli chat agnes agnes-3.0-flash --session demo      # 新会话（不给 prompt 进交互模式）
+aacode-cli chat agnes agnes-3.0-flash --session demo --continue "接着上面说"
+aacode-cli run  --session demo --continue "把刚才找到的 TODO 改掉"
+aacode-cli chat agnes agnes-3.0-flash --continue           # 不带名字 = 最近一次
+```
+
+- 落盘位置：`$AACODE_SESSIONS`，否则 `{config_dir}/aacode/sessions/<NAME>.jsonl`；
+- 格式是 `aa_agent::session` 的事件日志（JSONL，一条事件一行，见 aa-ai ADR 0013）：
+  每轮结束追加，崩溃最多丢当前这一轮，之前的对话还能 `--continue`；
+- `--session` 撞到已有文件会报错（防止覆盖）；要接着写就加 `--continue`；
+- 恢复时沿用会话里的系统提示；`--system` 只对新建会话生效；
+- `run --stub` 也走同一套会话，可以完全离线验证「落盘 → 恢复 → 继续」。 
 
 ### 测试用哪个端点
 
