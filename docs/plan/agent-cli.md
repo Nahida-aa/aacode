@@ -192,6 +192,11 @@ aacode-cli chat agnes agnes-3.0-flash --continue           # 不带名字 = 最�
   section（`/api/chat`，NDJSON）→ `aacode chat ollama qwen2.5:0.5b "..."`；
   能拿到官方 `thinking` 字段，`models ollama` 走 `/api/tags`。
   想走 OpenAI 兼容的 `/v1` 就写 `openai_compatible.ollama`（同名时兼容条目优先）。
+- **完全离线**：库里有真 socket 的 mock 端点（aa-ai ADR 0016），不用 Python：
+  `cargo run -p aa_language_models --features mock-server --example mock_endpoint -- 18099`
+  起来后把打印的 `base_url`（`http://127.0.0.1:18099/v1`）填进
+  `openai_compatible.mock`；第二个参数写 `ollama` 就切到 NDJSON 协议。
+  普通请求回 `echo: …`，压缩摘要请求回固定 checkpoint，能跑通 chat / run 的完整链路。
 - **llama.cpp 是独立 section**：wire 是 OpenAI 兼容形状
   （`/chat/completions`、`/models`、`/responses`、甚至 Anthropic Messages），
   但设置放在 `language_model_providers.llama.cpp`，默认无鉴权；
