@@ -28,7 +28,7 @@ use std::sync::Arc;
 use aa_ai_ollama::OllamaLanguageModelProvider;
 use aa_ai_openai::OpenAiLanguageModelProvider;
 use aa_ai_openrouter::OpenRouterLanguageModelProvider;
-use aa_language_model::provider::{Model, ReasoningEffort};
+use aa_language_model::provider::{LanguageModel, ReasoningEffort};
 use serde::Deserialize;
 
 use crate::credentials::Credentials;
@@ -572,7 +572,7 @@ pub enum ProviderClient {
 /// OpenAI 是 `{"data":[{"id","owned_by"}]}`，Ollama 是
 /// `{"models":[{"name","details":{"family"}}]}`，OpenRouter 是
 /// `{"data":[{"id","pricing","context_length",...}]}`；这里只留「能填进
-/// `Model::id` 的名字」和可选的归属/家族/免费标记。
+/// `LanguageModel::id` 的名字」和可选的归属/家族/免费标记。
 #[derive(Debug, Clone)]
 pub struct ModelSummary {
     pub id: String,
@@ -628,7 +628,7 @@ impl ProviderClient {
 impl aa_language_model::provider::LanguageModelClient for ProviderClient {
     fn stream_completion(
         &self,
-        model: &Model,
+        model: &LanguageModel,
         request: &aa_language_model::request::Request,
     ) -> Pin<
         Box<
@@ -650,30 +650,30 @@ impl aa_language_model::provider::LanguageModelClient for ProviderClient {
 }
 
 struct ResolvedModel {
-    model: Model,
+    model: LanguageModel,
     reasoning_effort: Option<ReasoningEffort>,
 }
 
 impl ResolvedProvider {
     /// 配置里声明的模型（按 id 排序）。
-    pub fn models(&self) -> impl Iterator<Item = &Model> {
+    pub fn models(&self) -> impl Iterator<Item = &LanguageModel> {
         self.models.values().map(|entry| &entry.model)
     }
 
     /// 取模型事实；配置里没声明时返回默认事实，不报错。
     ///
     /// 这样兼容端点临时上线的模型不用改配置就能试。
-    pub fn model(&self, id: &str) -> Model {
+    pub fn model(&self, id: &str) -> LanguageModel {
         self.models
             .get(id)
             .map(|entry| entry.model.clone())
-            .unwrap_or_else(|| Model::new(self.id.as_str(), id))
+            .unwrap_or_else(|| LanguageModel::new(self.id.as_str(), id))
     }
 
     /// 配置里给这个模型写的默认推理强度。
     ///
     /// 这是**每请求选择**（`Request::reasoning_effort`）的默认值，不是模型事实，
-    /// 所以不进 `Model`（见 aa-ai ADR 0006 D4）。
+    /// 所以不进 `LanguageModel`（见 aa-ai ADR 0006 D4）。
     pub fn reasoning_effort(&self, id: &str) -> Option<ReasoningEffort> {
         self.models.get(id).and_then(|entry| entry.reasoning_effort)
     }
@@ -713,8 +713,8 @@ pub struct AvailableModel {
 }
 
 impl AvailableModel {
-    fn to_model(&self, provider: &str) -> Model {
-        let mut model = Model::new(provider, self.name.as_str());
+    fn to_model(&self, provider: &str) -> LanguageModel {
+        let mut model = LanguageModel::new(provider, self.name.as_str());
 
         model.context_window = self.context_window;
         model.max_output_tokens = self.max_output_tokens;

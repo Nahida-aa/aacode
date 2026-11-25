@@ -25,7 +25,7 @@ use aa_agent::agent_loop::AgentLoop;
 use aa_agent::session::{Header, Turn};
 use aa_agent::tool::ToolEvents;
 use aa_language_model::provider::{
-    CompletionEvent, LanguageModelClient, Model, StopReason, TokenUsage,
+    CompletionEvent, LanguageModel, LanguageModelClient, StopReason, TokenUsage,
 };
 use aa_language_model::request::Request;
 use aacode_settings::{Settings, default_path, derived_env_name};
@@ -441,7 +441,7 @@ async fn chat(
 /// 交互模式：一行一轮，历史留在同一个会话里。
 async fn chat_repl(
     resolved: &aacode_settings::ResolvedProvider,
-    model: &Model,
+    model: &LanguageModel,
     session: &mut Session,
     file: &mut Option<session_file::SessionFile>,
     compaction: &aa_agent::CompactionConfig,
@@ -487,7 +487,7 @@ async fn chat_repl(
 /// 跑一轮对话：把 `session` 的历史发给模型，流式打印，再把这一轮写回会话。
 async fn chat_turn(
     resolved: &aacode_settings::ResolvedProvider,
-    model: &Model,
+    model: &LanguageModel,
     session: &mut Session,
     verbose: bool,
     compaction: &aa_agent::CompactionConfig,
@@ -507,7 +507,7 @@ async fn chat_turn(
     let request = Request {
         messages: session.messages().to_vec(),
         stream: true,
-        // 设置里的 reasoning_effort 是每请求选择的默认值，不进 Model。
+        // 设置里的 reasoning_effort 是每请求选择的默认值，不进 LanguageModel。
         reasoning_effort: resolved.reasoning_effort(&model.id),
         ..Request::default()
     };
@@ -719,7 +719,7 @@ async fn agent(
                 ),
             ],
         ]);
-        let model = aa_language_model::provider::Model::new("fake", "fake");
+        let model = aa_language_model::provider::LanguageModel::new("fake", "fake");
         // fake 也走会话：离线验证「落盘 → 恢复 → 继续」的完整链路。
         let (mut session, mut file) =
             open_session(session_name, resume, "fake", "fake", cwd, &system)?;
