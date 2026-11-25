@@ -82,7 +82,7 @@ const DEFAULT_SETTINGS: &str = include_str!("../../../assets/settings/default.js
 /// 整份 `settings.jsonc`。
 ///
 /// 现在只有 LLM 配置；以后的主题、工具白名单等可以并列加在这里。
-#[derive(Debug, Clone, Default, serde::Deserialize)]
+#[derive(Clone, Default, serde::Deserialize)]
 pub struct Settings {
     /// 出站 HTTP/HTTPS 代理。形状与语义对齐 Zed 的顶层 `proxy` 设置：
     ///
@@ -101,9 +101,22 @@ pub struct Settings {
     /// 全进程共享的 HTTP 传输（一个连接池）。按 `proxy` 首次使用时构造。
     ///
     /// 放在设置层是因为「代理怎么走」是应用配置；库层只接收构造好的
-    /// `Arc<aa_http_client::HttpClient>`（见 aa-ai `docs/decisions/0010-transport-object.md`）。
+    /// `Arc<dyn aa_http_client::HttpClient>`（见 aa-ai `docs/decisions/0010-transport-object.md`）。
     #[serde(skip)]
-    transport: OnceLock<Arc<aa_http_client::HttpClient>>,
+    transport: OnceLock<Arc<dyn aa_http_client::HttpClient>>,
+}
+
+// `dyn HttpClient` 没有 `Debug`（trait 是跨 crate 的，不能补 impl），手写一个：
+// 传输只报「是否已构造」，不打印连接池内部状态。
+impl std::fmt::Debug for Settings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Settings")
+            .field("proxy", &self.proxy)
+            .field("language_model_providers", &self.language_model_providers)
+            .field("unsupported", &self.unsupported)
+            .field("transport", &self.transport.get().map(|_| "<shared>"))
+            .finish()
+    }
 }
 
 /// 按协议分组的 provider 表（对齐 Zed `LanguageModelSettings`）。
@@ -195,7 +208,7 @@ impl Settings {
     /// 代理语义在这里落定：显式设置 → `Proxy::explicit`；没写 → 跟随环境变量。
     /// 库层只接收这个已构造好的 `Arc`，不再自己读配置
     /// （见 aa-ai `docs/decisions/0010-transport-object.md`）。
-    pub fn transport(&self) -> Result<Arc<aa_http_client::HttpClient>, SettingsError> {
+    pub fn transport(&self) -> Result<Arc<dyn aa_http_client::HttpClient>, SettingsError> {
         if let Some(transport) = self.transport.get() {
             return Ok(transport.clone());
         }
@@ -342,15 +355,14 @@ fn normalize_proxy(proxy: Option<String>, path: &Path) -> Result<Option<String>,
 ///
 /// `None` = 跟随环境变量；`Some(url)` = 显式代理（URL 已由 [`normalize_proxy`]
 /// 校过前缀，这里再由 `reqwest::Proxy::all` 做语法解析）。
-fn build_transport(proxy: Option<&str>) -> Result<Arc<aa_http_client::HttpClient>, String> {
+fn build_transport(proxy: Option<&str>) -> Result<Arc<dyn aa_http_client::HttpClient>, String> {
     let proxy = match proxy {
         Some(url) => aa_http_client::Proxy::explicit(url),
         None => aa_http_client::Proxy::Environment,
     };
-    aa_http_client::HttpClient::builder()
+    aa_http_client::builder()
         .proxy(proxy)
         .build()
-        .map(Arc::new)
         .map_err(|error| error.to_string())
 }
 

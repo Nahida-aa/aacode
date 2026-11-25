@@ -115,7 +115,7 @@ impl OpenAiCompatibleProvider {
     pub fn resolve(
         &self,
         id: &str,
-        transport: &Arc<aa_http_client::HttpClient>,
+        transport: &Arc<dyn aa_http_client::HttpClient>,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, SettingsError> {
         build_provider(
@@ -161,7 +161,7 @@ impl LocalOpenAiProvider {
         &self,
         id: &str,
         default_base_url: &str,
-        transport: &Arc<aa_http_client::HttpClient>,
+        transport: &Arc<dyn aa_http_client::HttpClient>,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, SettingsError> {
         build_provider(
@@ -232,7 +232,7 @@ impl OllamaProvider {
     /// `base_url` 是根地址；库层自己拼 `/api/chat` 与 `/api/tags`。
     pub fn resolve(
         &self,
-        transport: &Arc<aa_http_client::HttpClient>,
+        transport: &Arc<dyn aa_http_client::HttpClient>,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, SettingsError> {
         build_ollama_provider(self, transport, credentials)
@@ -308,7 +308,7 @@ impl OpenRouterProvider {
     /// `base_url` 已含版本段；库层只拼 `/chat/completions` 与 `/models`。
     pub fn resolve(
         &self,
-        transport: &Arc<aa_http_client::HttpClient>,
+        transport: &Arc<dyn aa_http_client::HttpClient>,
         credentials: &dyn Credentials,
     ) -> Result<ResolvedProvider, SettingsError> {
         build_openrouter_provider(self, transport, credentials)
@@ -329,7 +329,7 @@ struct ProviderSpec<'a> {
 
 fn build_provider(
     spec: ProviderSpec<'_>,
-    transport: &Arc<aa_http_client::HttpClient>,
+    transport: &Arc<dyn aa_http_client::HttpClient>,
     credentials: &dyn Credentials,
 ) -> Result<ResolvedProvider, SettingsError> {
     let ProviderSpec {
@@ -387,7 +387,7 @@ fn build_provider(
 /// 原生 Ollama：根地址 + 可选的鉴权（反向代理后面才需要）+ 模型表。
 fn build_ollama_provider(
     provider: &OllamaProvider,
-    transport: &Arc<aa_http_client::HttpClient>,
+    transport: &Arc<dyn aa_http_client::HttpClient>,
     credentials: &dyn Credentials,
 ) -> Result<ResolvedProvider, SettingsError> {
     let id = OLLAMA_PROVIDER_ID;
@@ -441,7 +441,7 @@ fn build_ollama_provider(
 /// OpenRouter：Bearer 鉴权 + 可选归因 header + 模型表。
 fn build_openrouter_provider(
     provider: &OpenRouterProvider,
-    transport: &Arc<aa_http_client::HttpClient>,
+    transport: &Arc<dyn aa_http_client::HttpClient>,
     credentials: &dyn Credentials,
 ) -> Result<ResolvedProvider, SettingsError> {
     let id = OPENROUTER_PROVIDER_ID;
