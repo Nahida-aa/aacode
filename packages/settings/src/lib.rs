@@ -360,9 +360,10 @@ fn build_transport(proxy: Option<&str>) -> Result<Arc<dyn aa_http_client::HttpCl
         Some(url) => aa_http_client::Proxy::explicit(url),
         None => aa_http_client::Proxy::Environment,
     };
-    aa_http_client::builder()
+    aa_reqwest_client::builder()
         .proxy(proxy)
         .build()
+        .map(|client| Arc::new(client) as Arc<dyn aa_http_client::HttpClient>)
         .map_err(|error| error.to_string())
 }
 

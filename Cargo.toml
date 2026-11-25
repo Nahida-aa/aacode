@@ -14,7 +14,9 @@ aa_language_models = { path = "../../lib_ls/aa-ai/packages/aa_language_models", 
     "fake",
 ] }
 # 共享传输在 aa-stack：应用只构造一次，所有 provider 复用同一个连接池。
+# `aa_http_client` = 接口（trait/AsyncBody），`aa_reqwest_client` = reqwest 实现与 builder。
 aa_http_client = { path = "../../lib_ls/aa-stack/packages/util/aa_http_client" }
+aa_reqwest_client = { path = "../../lib_ls/aa-stack/packages/util/aa_reqwest_client" }
 
 aacode_settings = { path = "packages/settings" }
 
