@@ -41,7 +41,7 @@ aacode — 多提供商 LLM 客户端 / coding agent
   aacode-cli [--settings <PATH>] models <provider> [--free]
   aacode-cli [--settings <PATH>] chat <provider> <model> [prompt...]
   aacode-cli [--settings <PATH>] run [选项] <provider> <model> <prompt...>
-  aacode-cli run --stub [选项] <prompt...>     # 离线冒烟：不连 LLM，用剧本驱动
+  aacode-cli run --fake [选项] <prompt...>     # 离线冒烟：不连 LLM，用剧本驱动
 
 chat 不给 prompt 就进入交互模式（多轮，/exit 退出，/help 看命令）。
 
@@ -49,7 +49,7 @@ run 的选项:
   --dir <PATH>       工作目录（工具只能访问它，默认当前目录）
   --allow-write      注册 write / edit（默认只读：只有 read / glob）
   --system <TEXT>    覆盖内置系统提示（只对新建会话生效）
-  --stub             用离线 stub 客户端（不读密钥、不连网络），验证 loop + 工具接线
+  --fake             用离线 fake 客户端（不读密钥、不连网络），验证 loop + 工具接线
 
 chat / run 的会话选项:
   --session <NAME>   会话名；保存为 <sessions>/<NAME>.jsonl（只允许字母数字 ._-）
@@ -81,7 +81,7 @@ struct Args {
     dir: PathBuf,
     allow_write: bool,
     system: Option<String>,
-    stub: bool,
+    fake: bool,
     /// `--session`：会话名（落盘时用）。
     session: Option<String>,
     /// `--continue`：恢复已有会话。
@@ -102,7 +102,7 @@ enum Command {
     },
     /// 跑一次带工具的 agent 任务。
     Run {
-        /// `--stub` 时不需要 provider / model。
+        /// `--fake` 时不需要 provider / model。
         provider: Option<String>,
         model: Option<String>,
         prompt: String,
@@ -133,12 +133,12 @@ async fn main() -> ExitCode {
 }
 
 async fn run(args: Args) -> Result<(), String> {
-    // `--stub` 完全不碰磁盘设置：没有 settings.jsonc 也能跑冒烟。
-    if args.stub && !matches!(args.command, Command::Run { .. }) {
-        return Err("--stub 只能和 run 一起用".to_owned());
+    // `--fake` 完全不碰磁盘设置：没有 settings.jsonc 也能跑冒烟。
+    if args.fake && !matches!(args.command, Command::Run { .. }) {
+        return Err("--fake 只能和 run 一起用".to_owned());
     }
 
-    let settings = if args.stub {
+    let settings = if args.fake {
         None
     } else {
         // 密钥可以不 export：`cargo run` 时的当前目录或设置文件旁的 `.env` 都会读。
@@ -158,7 +158,7 @@ async fn run(args: Args) -> Result<(), String> {
         Some(settings)
     };
 
-    let settings_ref = || settings.as_ref().expect("非 stub 路径一定加载了设置");
+    let settings_ref = || settings.as_ref().expect("非 fake 路径一定加载了设置");
 
     match args.command {
         Command::Providers => {
@@ -190,7 +190,7 @@ async fn run(args: Args) -> Result<(), String> {
                 dir: args.dir,
                 allow_write: args.allow_write,
                 system: args.system.unwrap_or_else(|| DEFAULT_SYSTEM.to_owned()),
-                stub: args.stub,
+                fake: args.fake,
                 session: args.session,
                 resume: args.resume,
             };
@@ -624,7 +624,7 @@ struct RunOptions {
     dir: PathBuf,
     allow_write: bool,
     system: String,
-    stub: bool,
+    fake: bool,
     session: Option<String>,
     resume: bool,
 }
@@ -640,7 +640,7 @@ async fn agent(
         dir,
         allow_write,
         system,
-        stub,
+        fake,
         session: session_name,
         resume,
     } = options;
@@ -659,11 +659,11 @@ async fn agent(
         }
     );
 
-    if stub {
+    if fake {
         // 离线冒烟：剧本固定为「先 glob，再回一段话」，用来验证 loop + 工具接线，
         // 不读设置、不碰网络。真模型的行为不在这里验证。
-        eprintln!("# stub 模式：不连 LLM");
-        let client = aa_language_models::stub::StubClient::with_rounds([
+        eprintln!("# fake 模式：不连 LLM");
+        let client = aa_language_models::fake::FakeClient::with_rounds([
             vec![
                 aa_language_model::provider::CompletionEvent::ToolUse {
                     id: "call_1".to_owned(),
@@ -677,17 +677,17 @@ async fn agent(
             ],
             vec![
                 aa_language_model::provider::CompletionEvent::Text(
-                    "（stub）已通过 glob 看过文件列表。".to_owned(),
+                    "（fake）已通过 glob 看过文件列表。".to_owned(),
                 ),
                 aa_language_model::provider::CompletionEvent::Stop(
                     aa_language_model::provider::StopReason::EndTurn,
                 ),
             ],
         ]);
-        let model = aa_language_model::provider::Model::new("stub", "stub");
-        // stub 也走会话：离线验证「落盘 → 恢复 → 继续」的完整链路。
+        let model = aa_language_model::provider::Model::new("fake", "fake");
+        // fake 也走会话：离线验证「落盘 → 恢复 → 继续」的完整链路。
         let (mut session, mut file) =
-            open_session(session_name, resume, "stub", "stub", cwd, &system)?;
+            open_session(session_name, resume, "fake", "fake", cwd, &system)?;
         session.push_user_text(&prompt);
         AgentLoop::new(Arc::new(client), registry)
             .run(&model, &mut session, &CliEvents)
@@ -701,7 +701,7 @@ async fn agent(
     let provider = provider.ok_or("run 需要 <provider> <model> <prompt>")?;
     let model_id = model_id.ok_or("run 需要 <provider> <model> <prompt>")?;
     let resolved = settings
-        .expect("非 stub 路径一定加载了设置")
+        .expect("非 fake 路径一定加载了设置")
         .resolve(provider)
         .map_err(|error| error.to_string())?;
     let model = resolved.model(model_id);
@@ -751,14 +751,14 @@ impl ToolEvents for CliEvents {
 
 /// `Ok(None)` = 打印用法并正常退出。
 ///
-/// 选项可以写在命令前也可以写在命令后（`--stub run ...` 与 `run --stub ...` 等价）：
+/// 选项可以写在命令前也可以写在命令后（`--fake run ...` 与 `run --fake ...` 等价）：
 /// 扫到一个非选项 token 且还没有命令时，它就是命令名；之后的非选项都是位置参数。
 fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
     let mut settings = None;
     let mut dir = None;
     let mut allow_write = false;
     let mut system = None;
-    let mut stub = false;
+    let mut fake = false;
     let mut free = false;
     let mut session = None;
     let mut resume = false;
@@ -788,7 +788,7 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
                 system = Some(value);
             }
             "--allow-write" => allow_write = true,
-            "--stub" => stub = true,
+            "--fake" => fake = true,
             "--free" => free = true,
             "--session" => {
                 let value = iter.next().ok_or("--session 需要一个名字")?;
@@ -848,10 +848,10 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
             Command::Models { provider, free }
         }
         "chat" | "run" => {
-            // `run --stub <prompt>`：不需要 provider / model。
-            if name == "run" && stub {
+            // `run --fake <prompt>`：不需要 provider / model。
+            if name == "run" && fake {
                 if positional.is_empty() {
-                    return Err("run --stub 需要 <prompt>".to_owned());
+                    return Err("run --fake 需要 <prompt>".to_owned());
                 }
                 Command::Run {
                     provider: None,
@@ -907,7 +907,7 @@ fn parse_args(raw: Vec<String>) -> Result<Option<Args>, String> {
         dir: dir.unwrap_or_else(|| PathBuf::from(".")),
         allow_write,
         system,
-        stub,
+        fake,
         session,
         resume,
         command,

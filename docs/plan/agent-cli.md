@@ -17,7 +17,7 @@ ACP 解决的是「agent 怎么和编辑器（Zed 等）对话」。但 agent �
         │
 [核心循环]   agent loop：收 → LLM → 工具 → 回填 → … → stop
         │
-[LLM 层]    provider 接口 + stub(假流式) / 真模型        ← Zed 的 stream_completion ≈ 这个
+[LLM 层]    provider 接口 + fake(假流式) / 真模型        ← Zed 的 stream_completion ≈ 这个
 [工具层]    读/写文件、跑命令、搜索（带 schema 校验）       ← agent 自己执行，报给 client
 [会话/状态]  多 turn 上下文、持久化、（后期）压缩
 ```
@@ -26,7 +26,7 @@ ACP 解决的是「agent 怎么和编辑器（Zed 等）对话」。但 agent �
 
 ### v0 最小闭环（5 件，先做这些）
 1. **agent loop**：user 消息 → LLM →（可选）工具调用 → 结果回填 → 继续 LLM → 直到 stop
-2. **LLM 接口**：provider 抽象 + 一个 **stub provider**（固定文本 / 假流式），不依赖真模型就能跑协议
+2. **LLM 接口**：provider 抽象 + 一个 **fake provider**（固定文本 / 假流式），不依赖真模型就能跑协议
 3. **≥2 个工具**：读文件 + 写文件（或读文件 + 跑 shell 命令），带输入 schema 校验
 4. **流式输出**：LLM 增量回显 stdout（不憋完再吐）
 5. **取消**：SIGINT / Ctrl-C 中断当前 turn
@@ -69,8 +69,8 @@ v2 的「压缩」在 ACP 里是**可选能力**（Zed 要开 flag 才广播）�
 v0 内的细粒度顺序（**工具先设计后实现，loop 先行**）：
 
 1. **设计 2 个工具的 schema（不实现）**：读文件 + 写文件（或跑命令）。定死 input/output 契约，loop 才有真实目标。
-2. **实现 loop + 工具 1（读文件）+ stub LLM**：跑通 happy path。
-   - **关键**：stub LLM 必须能「决定调哪个工具」，否则 loop 的工具路径没被触发，2 个工具白写。
+2. **实现 loop + 工具 1（读文件）+ fake LLM**：跑通 happy path。
+   - **关键**：fake LLM 必须能「决定调哪个工具」，否则 loop 的工具路径没被触发，2 个工具白写。
 3. **实现工具 2（写文件/命令）**：逼出异常路径（取消中途、工具失败、结果回填）。
 
 **阶段 1 → 阶段 2 的出口判据（5 条，别凭感觉）**：
@@ -78,7 +78,7 @@ v0 内的细粒度顺序（**工具先设计后实现，loop 先行**）：
 - [ ] `--print "..."` 能从 CLI 进、流式出、结束于 stopReason
 - [ ] 至少 1 个工具被 agent 真正调用并回填结果（不是硬编码）
 - [ ] 取消（SIGINT）能干净停住当前 turn
-- [ ] stub LLM 不依赖任何真模型
+- [ ] fake LLM 不依赖任何真模型
 - [ ] 核心循环能在不 import 任何 UI/协议模块的情况下单测
 
 这 5 条过了就接 ACP——核心再长，多接个壳成本很低；核心没稳就接 ACP，协议 bug 会混进核心 bug，很难分。
@@ -113,7 +113,7 @@ aa-agent/
 │   ├── tsconfig.json
 │   └── src/
 │       ├── loop.ts              # agent loop（核心）
-│       ├── llm.ts               # provider 接口 + stub
+│       ├── llm.ts               # provider 接口 + fake
 │       ├── tools.ts             # 工具（读/写/命令）+ schema
 │       ├── session.ts           # 上下文 + 持久化（后补）
 │       ├── cli.ts               # bin：--print / line / --acp
@@ -131,7 +131,7 @@ aa-agent/
 
 | 目的 | 命令 | 依赖 |
 |---|---|---|
-| 验证 loop / 工具接线 | `aacode-cli run --stub --dir <DIR> "..."` | 无（剧本驱动，不读设置、不连网） |
+| 验证 loop / 工具接线 | `aacode-cli run --fake --dir <DIR> "..."` | 无（剧本驱动，不读设置、不连网） |
 | 真实模型 + 工具 | `aacode-cli run --dir <DIR> <provider> <model> "..."` | 设置里有端点 + 密钥 |
 | 纯对话（不带工具） | `aacode-cli chat <provider> <model> ["..."]` | 同上（不给 prompt 进交互模式） |
 
@@ -153,7 +153,7 @@ aacode-cli chat agnes agnes-3.0-flash --continue           # 不带名字 = 最�
   每轮结束追加，崩溃最多丢当前这一轮，之前的对话还能 `--continue`；
 - `--session` 撞到已有文件会报错（防止覆盖）；要接着写就加 `--continue`；
 - 恢复时沿用会话里的系统提示；`--system` 只对新建会话生效；
-- `run --stub` 也走同一套会话，可以完全离线验证「落盘 → 恢复 → 继续」。 
+- `run --fake` 也走同一套会话，可以完全离线验证「落盘 → 恢复 → 继续」。 
 
 ### 测试用哪个端点
 
